@@ -1,0 +1,222 @@
+TAP version 13
+# Subtest: same-turn logical reads use one bounded physical admission without caching latest
+ok 1 - same-turn logical reads use one bounded physical admission without caching latest
+  ---
+  duration_ms: 2.522333
+  type: 'test'
+  ...
+# Subtest: single-read defaults remain unchanged and batch support must be explicit
+ok 2 - single-read defaults remain unchanged and batch support must be explicit
+  ---
+  duration_ms: 0.521959
+  type: 'test'
+  ...
+# Subtest: 40 members split 16/16/8 while preserving exact per-item order and outcomes
+ok 3 - 40 members split 16/16/8 while preserving exact per-item order and outcomes
+  ---
+  duration_ms: 0.604083
+  type: 'test'
+  ...
+# Subtest: aggregate budget counts UTF-8 and full envelope; large existing reads remain singleton
+ok 4 - aggregate budget counts UTF-8 and full envelope; large existing reads remain singleton
+  ---
+  duration_ms: 0.591917
+  type: 'test'
+  ...
+# Subtest: request inputs are snapshotted before microtask batching
+ok 5 - request inputs are snapshotted before microtask batching
+  ---
+  duration_ms: 0.195292
+  type: 'test'
+  ...
+# Subtest: genuine contract revert remains its original member error and never retries
+ok 6 - genuine contract revert remains its original member error and never retries
+  ---
+  duration_ms: 0.297958
+  type: 'test'
+  ...
+# Subtest: HTTP200 JSON-RPC401 outranks another revert and closes all queued provider reads
+ok 7 - HTTP200 JSON-RPC401 outranks another revert and closes all queued provider reads
+  ---
+  duration_ms: 0.407667
+  type: 'test'
+  ...
+# Subtest: HTTP200 JSON-RPC403 outranks another revert and closes all queued provider reads
+ok 8 - HTTP200 JSON-RPC403 outranks another revert and closes all queued provider reads
+  ---
+  duration_ms: 0.271042
+  type: 'test'
+  ...
+# Subtest: unsupported member restricts only its actual method
+ok 9 - unsupported member restricts only its actual method
+  ---
+  duration_ms: 0.401334
+  type: 'test'
+  ...
+# Subtest: 429 member keeps original error and records unchanged shared cooldown without retry
+ok 10 - 429 member keeps original error and records unchanged shared cooldown without retry
+  ---
+  duration_ms: 1.253125
+  type: 'test'
+  ...
+# Subtest: incomplete batch result cannot expose any success
+ok 11 - incomplete batch result cannot expose any success
+  ---
+  duration_ms: 0.170375
+  type: 'test'
+  ...
+# Subtest: pre-aborted owner batch never dispatches; another owner remains independent
+ok 12 - pre-aborted owner batch never dispatches; another owner remains independent
+  ---
+  duration_ms: 0.309291
+  type: 'test'
+  ...
+# Subtest: noncooperative cancelled batch retains its one physical slot until settlement
+ok 13 - noncooperative cancelled batch retains its one physical slot until settlement
+  ---
+  duration_ms: 3.181959
+  type: 'test'
+  ...
+# Subtest: bounded logical queue rejects excess before allocating unbounded batches
+ok 14 - bounded logical queue rejects excess before allocating unbounded batches
+  ---
+  duration_ms: 0.893459
+  type: 'test'
+  ...
+# Subtest: observed denial survives concurrent owner cancellation in shared admission state
+ok 15 - observed denial survives concurrent owner cancellation in shared admission state
+  ---
+  duration_ms: 0.44925
+  type: 'test'
+  ...
+# Subtest: shared admission is keyed by exact provider, chain and transport configuration
+ok 16 - shared admission is keyed by exact provider, chain and transport configuration
+  ---
+  duration_ms: 0.844
+  type: 'test'
+  ...
+# Subtest: a 429 storm respects one physical slot, bounded attempts, shared cooldown and original errors
+ok 17 - a 429 storm respects one physical slot, bounded attempts, shared cooldown and original errors
+  ---
+  duration_ms: 992.708042
+  type: 'test'
+  ...
+# Subtest: Retry-After is a lower bound and exponential jitter stays within explicit bounds
+ok 18 - Retry-After is a lower bound and exponential jitter stays within explicit bounds
+  ---
+  duration_ms: 70.774125
+  type: 'test'
+  ...
+# Subtest: long Retry-After opens cooldown but never sleeps beyond the bounded request budget
+ok 19 - long Retry-After opens cooldown but never sleeps beyond the bounded request budget
+  ---
+  duration_ms: 0.582583
+  type: 'test'
+  ...
+# Subtest: queued cancellation removes only its waiter and preserves the caller reason
+ok 20 - queued cancellation removes only its waiter and preserves the caller reason
+  ---
+  duration_ms: 1.561417
+  type: 'test'
+  ...
+# Subtest: ignoring transport abort cannot release a physical slot early or return late success
+ok 21 - ignoring transport abort cannot release a physical slot early or return late success
+  ---
+  duration_ms: 0.879042
+  type: 'test'
+  ...
+# Subtest: 403 caches provider-wide denial; unsupported methods cache only their exact method
+ok 22 - 403 caches provider-wide denial; unsupported methods cache only their exact method
+  ---
+  duration_ms: 0.944625
+  type: 'test'
+  ...
+# Subtest: shared negative facts never forward another owner raw error, cause or response
+ok 23 - shared negative facts never forward another owner raw error, cause or response
+  ---
+  duration_ms: 0.630583
+  type: 'test'
+  ...
+# Subtest: private observer mutation cannot change the original error or retry classification
+ok 24 - private observer mutation cannot change the original error or retry classification
+  ---
+  duration_ms: 0.211625
+  type: 'test'
+  ...
+# Subtest: negative capability facts expire and deterministic execution errors never retry
+ok 25 - negative capability facts expire and deterministic execution errors never retry
+  ---
+  duration_ms: 14.656583
+  type: 'test'
+  ...
+# Subtest: stateful operation retry ownership records cooldown but does not multiply physical attempts
+ok 26 - stateful operation retry ownership records cooldown but does not multiply physical attempts
+  ---
+  duration_ms: 0.340708
+  type: 'test'
+  ...
+# Subtest: circuit cooldown is shared with queued calls and queue capacity is explicit
+ok 27 - circuit cooldown is shared with queued calls and queue capacity is explicit
+  ---
+  duration_ms: 31.148625
+  type: 'test'
+  ...
+# Subtest: observer failures cannot change results and events expose truthful active waits without endpoint strings
+ok 28 - observer failures cannot change results and events expose truthful active waits without endpoint strings
+  ---
+  duration_ms: 0.803292
+  type: 'test'
+  ...
+# (node:39670) ExperimentalWarning: The MockTimers API is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: deadlines include queue waits and refuse already-expired work
+ok 29 - deadlines include queue waits and refuse already-expired work
+  ---
+  duration_ms: 11.044375
+  type: 'test'
+  ...
+# Subtest: an explicit HTTP503 request-byte capacity refusal never retries or creates shared outage cooldown
+ok 30 - an explicit HTTP503 request-byte capacity refusal never retries or creates shared outage cooldown
+  ---
+  duration_ms: 0.318208
+  type: 'test'
+  ...
+# Subtest: a long physical read consumes the start interval without adding a second pause after completion
+ok 31 - a long physical read consumes the start interval without adding a second pause after completion
+  ---
+  duration_ms: 1.096333
+  type: 'test'
+  ...
+# Subtest: short physical reads still wait for the exact shared minimum start interval
+ok 32 - short physical reads still wait for the exact shared minimum start interval
+  ---
+  duration_ms: 0.937375
+  type: 'test'
+  ...
+# Subtest: an aborted physical read holds its slot through settlement without an additional completion pause or listener leak
+ok 33 - an aborted physical read holds its slot through settlement without an additional completion pause or listener leak
+  ---
+  duration_ms: 0.540041
+  type: 'test'
+  ...
+# Subtest: queued work never dispatches after either access-denial status at nonzero pacing
+ok 34 - queued work never dispatches after either access-denial status at nonzero pacing
+  ---
+  duration_ms: 0.850458
+  type: 'test'
+  ...
+# Subtest: a queued request deadline removes admission and cannot dispatch after the physical owner settles
+ok 35 - a queued request deadline removes admission and cannot dispatch after the physical owner settles
+  ---
+  duration_ms: 0.520959
+  type: 'test'
+  ...
+1..35
+# tests 35
+# suites 0
+# pass 35
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1165.777459

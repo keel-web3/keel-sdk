@@ -130,6 +130,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/sdk-saved-release-differential.test.mjs",
   "tests/native-geth-capacity-fixture.test.mjs",
   "tests/sdk-provider-request-scheduler.test.mjs",
+  "tests/sdk-configured-read-batch.test.mjs",
   "tests/viewer-chunk-store-cancellation.test.mjs",
   "tests/sdk-tezos-catalog.test.mjs",
   "tests/sdk-simulation-capacity-policy.test.mjs",

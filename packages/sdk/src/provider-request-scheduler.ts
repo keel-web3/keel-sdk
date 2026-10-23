@@ -39,6 +39,8 @@ export interface KeelProviderRequestSchedulerOptions {
 }
 export interface KeelProviderScheduledRequest {
   readonly method: string;
+  /** Actual members of one bounded physical HTTP batch. No synthetic method. */
+  readonly methods?: readonly string[];
   readonly signal?: AbortSignal;
   /** Monotonic deadline including queue, cooldown, attempts and backoff. */
   readonly deadlineAt?: number;
@@ -71,6 +73,25 @@ function classify(error: unknown): Failure {
     value = item?.cause;
   }
   return { retryable: false, retryAfterMs: 0 };
+}
+/** Keep each member error intact while letting the physical admission record
+ * the strongest observed restriction on its actual method. */
+export class KeelProviderBatchFailure extends Error {
+  readonly method: string;
+  readonly original: unknown;
+  readonly accessDenied: boolean;
+  readonly failures: readonly { readonly method: string; readonly error: unknown }[];
+  constructor(failures: readonly { readonly method: string; readonly error: unknown }[]) {
+    if (!failures.length || failures.length > 16) throw new TypeError("A physical read batch needs bounded failed members.");
+    if (failures.some(item => !/^[a-z][a-z0-9_]{0,127}$/iu.test(item.method))) throw new TypeError("A physical read batch needs actual method names.");
+    const priority = (error: unknown) => { const failure = classify(error); return failure.permanent === "access-denied" ? 0 : failure.retryable ? 1 : failure.permanent === "unsupported" ? 2 : 3; };
+    const selected = failures.reduce((best, item) => priority(item.error) < priority(best.error)
+      || priority(item.error) === priority(best.error) && classify(item.error).retryAfterMs > classify(best.error).retryAfterMs ? item : best);
+    super("A configured reader batch contains a failed member.", { cause: selected.error });
+    this.name = "KeelProviderBatchFailure"; this.method = selected.method; this.original = selected.error;
+    this.accessDenied = classify(selected.error).permanent === "access-denied";
+    this.failures = Object.freeze(failures.map(item => Object.freeze({ ...item })));
+  }
 }
 function bound(value: number | undefined, fallback: number, minimum: number, maximum: number): number {
   const result = value ?? fallback;
@@ -192,6 +213,17 @@ export function createKeelProviderRequestScheduler(options: KeelProviderRequestS
     invalidateCapabilities() { capabilities.clear(); },
     async run<T>(input: KeelProviderScheduledRequest, execute: (signal: AbortSignal, context: { readonly requestId: number; readonly attempt: number }) => Promise<T>): Promise<T> {
       if (typeof input.method !== "string" || !/^[a-z][a-z0-9_]{0,127}$/iu.test(input.method)) throw new TypeError("Provider scheduling needs a bounded RPC method name.");
+      const methods = [...new Set(input.methods ?? [input.method])];
+      if (!methods.length || methods.length > 16 || !methods.includes(input.method) || methods.some(method => typeof method !== "string" || !/^[a-z][a-z0-9_]{0,127}$/iu.test(method))) throw new TypeError("Provider admission needs the actual bounded batch methods.");
+      const restricted = () => methods.map(cached).find(capability => capability && capability.status !== "available");
+      const retainRestrictions = (error: unknown) => {
+        const failures = error instanceof KeelProviderBatchFailure ? error.failures : [{ method: input.method, error }];
+        for (const item of failures) {
+          const failure = classify(item.error);
+          if (failure.permanent && methods.includes(item.method)) cacheCapability(failure.permanent === "access-denied" ? "*" : item.method,
+            { status: failure.permanent, expiresAt: Date.now() + capabilityAge, failure });
+        }
+      };
       const started = performance.now(), deadlineAt = input.deadlineAt ?? started + 120_000;
       if (!Number.isFinite(deadlineAt) || deadlineAt - started > 120_001) throw new TypeError("Provider requests need a deadline within 120 seconds.");
       if (deadlineAt <= started) throw new DOMException("The bounded provider request expired.", "TimeoutError");
@@ -206,7 +238,7 @@ export function createKeelProviderRequestScheduler(options: KeelProviderRequestS
         attempt, maximumAttempts: attempts, queuedRequests: queue.length, activeRequests: active, ...fields });
       try {
         signal.throwIfAborted();
-        const capability = cached(input.method);
+        const capability = restricted();
         if (capability && capability.status !== "available") { const error = new KeelProviderAvailabilityError(capability.failure!); emit("capability-cache", { status: capability.status, error }); throw error; }
         for (attempt = 1; attempt <= attempts; attempt++) {
           emit("queued");
@@ -223,7 +255,7 @@ export function createKeelProviderRequestScheduler(options: KeelProviderRequestS
               if (wait > maximumRetryDelayMs || performance.now() + wait >= deadlineAt) throw lastFailure ? new KeelProviderAvailabilityError(lastFailure, wait) : new DOMException("The provider cooldown exceeds this check's time budget.", "TimeoutError");
               await pause(wait, signal);
             }
-            const freshCapability = cached(input.method);
+            const freshCapability = restricted();
             if (freshCapability && freshCapability.status !== "available") { const error = new KeelProviderAvailabilityError(freshCapability.failure!); emit("capability-cache", { status: freshCapability.status, error }); throw error; }
             nextAt = Date.now() + minIntervalMs;
             emit("request-start");
@@ -231,14 +263,16 @@ export function createKeelProviderRequestScheduler(options: KeelProviderRequestS
               physicalOperation = execute(signal, { requestId, attempt });
               const result = await withAbort(physicalOperation, signal);
               signal.throwIfAborted(); failures = 0;
-              cacheCapability(input.method, { status: "available", expiresAt: Date.now() + capabilityAge });
+              for (const method of methods) cacheCapability(method, { status: "available", expiresAt: Date.now() + capabilityAge });
               emit("request-complete", { status: "available" }); return result;
             } catch (error) {
-              signal.throwIfAborted();
               const failure = classify(error);
+              // An already observed denial survives a concurrent owner abort.
+              retainRestrictions(error);
+              signal.throwIfAborted();
               emit("request-failed", { error });
               if (failure.permanent) {
-                cacheCapability(failure.permanent === "access-denied" ? "*" : input.method,
+                cacheCapability(failure.permanent === "access-denied" ? "*" : error instanceof KeelProviderBatchFailure && methods.includes(error.method) ? error.method : input.method,
                   { status: failure.permanent, expiresAt: Date.now() + capabilityAge, failure });
                 throw error;
               }
@@ -261,7 +295,13 @@ export function createKeelProviderRequestScheduler(options: KeelProviderRequestS
             // caller's wait, but keep its physical slot until it really settles.
             // nextAt already bounds request starts. A slow physical read can
             // consume that interval; completion must not impose a second one.
-            if (physicalOperation) void physicalOperation.then(release, release); else release();
+            if (physicalOperation) void physicalOperation.then(release, error => {
+              // Cancellation may settle the subscriber before a noncooperative
+              // transport reports its denial. Record it before opening the next
+              // physical slot; cancellation cannot erase known restrictions.
+              retainRestrictions(error);
+              release();
+            }); else release();
           }
         }
         throw new KeelProviderAvailabilityError(lastFailure ?? { retryable: false, retryAfterMs: 0 });

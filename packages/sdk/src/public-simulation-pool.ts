@@ -1,5 +1,5 @@
 import { createKeelRpcPool, KeelRpcResponseError, normalizeKeelRpcUrl, type KeelRpcPoolOptions } from "./rpc.js";
-import { sharedKeelProviderRequestScheduler, isKeelProviderScheduledFailure, isKeelProviderDeadlineFailure, inheritKeelProviderScheduledFailure, KeelProviderQueueFullError, type KeelProviderRequestEvent, type KeelProviderRequestObserver } from "./provider-request-scheduler.js";
+import { sharedKeelProviderRequestScheduler, KeelProviderBatchFailure, isKeelProviderScheduledFailure, isKeelProviderDeadlineFailure, inheritKeelProviderScheduledFailure, KeelProviderQueueFullError, type KeelProviderRequestEvent, type KeelProviderRequestObserver } from "./provider-request-scheduler.js";
 export { createKeelProviderRequestScheduler, sharedKeelProviderRequestScheduler, KeelProviderQueueFullError,
   type KeelProviderRequestEvent, type KeelProviderRequestObserver, type KeelProviderRequestSchedulerOptions } from "./provider-request-scheduler.js";
 import { createPinnedKeelSimulationTransport } from "./simulation-connection.js";
@@ -38,7 +38,10 @@ const quantity = (value: unknown): bigint | undefined => typeof value === "strin
 /** Admit the caller's existing configured reader without discovering an endpoint,
  * changing recipients or adding a retry layer. The server must supply the exact
  * configured identity and disable any lower-layer retries it owns separately. */
-export function createKeelScheduledReadTransport(readTransport: KeelPreflightTransport, options: {
+export function createKeelScheduledReadTransport(readTransport: KeelPreflightTransport & {
+  /** Existing same-recipient HTTP batching, returning outcomes in request order. */
+  requestBatch?(requests: readonly { readonly method: string; readonly params: readonly unknown[] }[]): Promise<readonly PromiseSettledResult<unknown>[]>;
+}, options: {
   readonly chainId: number; readonly rpcUrl: string; readonly minIntervalMs?: number;
   readonly fetchImpl?: typeof fetch; readonly signal?: AbortSignal; readonly observe?: KeelProviderRequestObserver;
   readonly requestTimeoutMs?: number;
@@ -50,6 +53,8 @@ export function createKeelScheduledReadTransport(readTransport: KeelPreflightTra
    * Its URL identifies admission only; this helper never opens or changes it. */
   readonly configuredRecipient?: boolean;
   readonly maximumRequestBytes?: number;
+  /** Explicit existing HTTP batch support only; does not parallelize recipients. */
+  readonly batch?: boolean;
 }): KeelPreflightTransport {
   let url: string;
   if (options.configuredRecipient === true) {
@@ -67,12 +72,60 @@ export function createKeelScheduledReadTransport(readTransport: KeelPreflightTra
   const methods = new Set(["eth_chainId", "eth_blockNumber", "eth_getBlockByNumber", "eth_getBlockByHash", "eth_getCode", "eth_getBalance", "eth_getTransactionCount",
     "eth_getTransactionReceipt", "eth_getTransactionByHash", "eth_call", "eth_gasPrice", "eth_maxPriorityFeePerGas", "eth_feeHistory", "eth_getLogs", "eth_getStorageAt", "eth_getProof", "net_version", "web3_clientVersion"]);
   if (options.allowEstimateGas === true) methods.add("eth_estimateGas");
+  const run = (exact: { readonly method: string; readonly params: readonly unknown[] }) => scheduler.run({ method: exact.method, retryMode: "caller", deadlineAt: performance.now() + timeoutMs,
+    ...(options.signal === undefined ? {} : { signal: options.signal }), ...(options.observe === undefined ? {} : { observe: options.observe }) }, () => readTransport.request(exact));
+  if (options.batch === true && !readTransport.requestBatch) throw new TypeError("Physical read batching requires its existing same-recipient HTTP batch transport.");
+  type Pending = { exact: { readonly method: string; readonly params: readonly unknown[] }; bytes: number; resolve(value: unknown): void; reject(error: unknown): void };
+  const waiting: Pending[] = []; let queued = false, retained = 0;
+  const maximumBatchRequests = 16, maximumBatchBytes = 64 * 1024;
+  const dispatch = async (group: readonly Pending[]) => {
+    let outcomes: readonly PromiseSettledResult<unknown>[] | undefined;
+    try {
+      if (group.length === 1) { group[0]!.resolve(await run(group[0]!.exact)); return; }
+      await scheduler.run({ method: group[0]!.exact.method, methods: group.map(item => item.exact.method), retryMode: "caller", deadlineAt: performance.now() + timeoutMs,
+        ...(options.signal === undefined ? {} : { signal: options.signal }), ...(options.observe === undefined ? {} : { observe: options.observe }) }, async () => {
+        outcomes = await readTransport.requestBatch!(group.map(item => item.exact));
+        if (!Array.isArray(outcomes) || outcomes.length !== group.length || outcomes.some(item => !item || (item.status !== "fulfilled" && item.status !== "rejected"))) {
+          outcomes = undefined; throw new TypeError("The configured read batch returned an incomplete member result.");
+        }
+        const failures = outcomes.flatMap((item, index) => item.status === "rejected" ? [{ method: group[index]!.exact.method, error: item.reason as unknown }] : []);
+        if (failures.length) throw new KeelProviderBatchFailure(failures);
+      });
+    } catch (error) {
+      // Never expose another member's success after a known denial. A queued
+      // restriction or cancellation also rejects the whole undispatched group.
+      if (!(error instanceof KeelProviderBatchFailure) || error.accessDenied || !outcomes || options.signal?.aborted) {
+        const reason = error instanceof KeelProviderBatchFailure && error.accessDenied ? error.original : error;
+        for (const item of group) item.reject(reason); return;
+      }
+    } finally { retained -= group.length; }
+    outcomes!.forEach((outcome, index) => { if (outcome.status === "fulfilled") group[index]!.resolve(outcome.value); else group[index]!.reject(outcome.reason); });
+  };
+  const flush = () => {
+    queued = false;
+    while (waiting.length) {
+      const group: Pending[] = []; let bytes = 2;
+      while (waiting.length && group.length < maximumBatchRequests) {
+        const next = waiting[0]!;
+        if (group.length && bytes + next.bytes + 1 > maximumBatchBytes) break;
+        group.push(waiting.shift()!); bytes += next.bytes + 1;
+        if (bytes > maximumBatchBytes) break; // Existing large read stays alone.
+      }
+      void dispatch(group);
+    }
+  };
   return { request(input) {
     if (!methods.has(input.method)) return Promise.reject(new TypeError("Configured reader admission accepts read-only methods; publication simulation uses its qualified transport."));
-    const exact = structuredClone(input);
-    if (new TextEncoder().encode(JSON.stringify(exact)).length > maximumRequestBytes) return Promise.reject(new TypeError("Configured reader admission needs a bounded read request."));
-    return scheduler.run({ method: exact.method, retryMode: "caller", deadlineAt: performance.now() + timeoutMs,
-      ...(options.signal === undefined ? {} : { signal: options.signal }), ...(options.observe === undefined ? {} : { observe: options.observe }) }, () => readTransport.request(exact));
+    const exact = structuredClone({ method: input.method, params: input.params ?? [] });
+    const inputBytes = new TextEncoder().encode(JSON.stringify(exact)).length;
+    if (inputBytes > maximumRequestBytes) return Promise.reject(new TypeError("Configured reader admission needs a bounded read request."));
+    if (options.batch !== true) return run(exact);
+    if (retained >= 64) return Promise.reject(new KeelProviderQueueFullError());
+    // Reserve full JSON-RPC envelope overhead, including a 32-character ID.
+    // The actual dispatching HTTP transport verifies the exact UTF-8 envelope.
+    const bytes = new TextEncoder().encode(JSON.stringify({ jsonrpc: "2.0", id: "0".repeat(32), ...exact })).length;
+    retained++;
+    return new Promise((resolve, reject) => { waiting.push({ exact, bytes, resolve, reject }); if (!queued) { queued = true; queueMicrotask(flush); } });
   } };
 }
 
