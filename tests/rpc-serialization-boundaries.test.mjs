@@ -22,6 +22,7 @@ test('owner-private evidence measures exact UTF-8 wire bytes including changing 
   assert.equal(sent.length, observed.length);
   for (let i = 0; i < sent.length; i++) {
     assert.equal(observed[i].requestWireBytes, Buffer.byteLength(sent[i], 'utf8'));
+    assert.equal(observed[i].httpRequestBytes, observed[i].requestWireBytes);
     assert.deepEqual(observed[i].request.params, JSON.parse(sent[i]).params);
   }
   assert.ok(sent.some(body => JSON.parse(body).id === 10));

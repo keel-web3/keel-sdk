@@ -251,6 +251,8 @@ export interface KeelRpcPrivateObservation {
    * Absent unless a body was prepared for dispatch; never a provider limit. */
   readonly requestWireBytes?: number;
   readonly elapsedMs: number;
+  /** Exact UTF-8 POST body bytes, including JSON-RPC version and transport ID. */
+  readonly httpRequestBytes?: number;
   readonly httpStatus?: number;
   readonly retryAfterMs?: number;
   readonly response?: unknown;
@@ -297,7 +299,7 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
         // A separate snapshot prevents an observer from modifying proof inputs
         // or a response that has not yet completed validation.
         const event = structuredClone({ providerIndex: states.indexOf(state), request: { method, params }, elapsedMs: performance.now() - started,
-          ...(requestWireBytes === undefined ? {} : { requestWireBytes }), ...fields,
+          ...(requestWireBytes === undefined ? {} : { requestWireBytes, httpRequestBytes: requestWireBytes }), ...fields,
           ...(fields.error === undefined ? {} : { error: snapshotKeelProviderPrivateError(fields.error) }) });
         const pending = options.onPrivateResponse(Object.freeze(event));
         if (pending) void Promise.resolve(pending).catch(() => undefined);
