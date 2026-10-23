@@ -34,6 +34,15 @@ test('exact history receipt preserves nonce, quantity, buyer and digest',()=>{
 });
 test('checked contract ABI and SDK selectors/topics agree',()=>{
  const compiled=JSON.parse(fs.readFileSync(new URL('../../keel-contracts/modules/keel-mint-access/abi/KeelMintGate.json',import.meta.url)));
- for(const name of ['mint','mintExact','authorizationDigest','exactAuthorizationDigest','EXACT_MINT_AUTHORIZATION_TYPEHASH'])assert.equal(toFunctionSelector(abi.find(x=>x.type==='function'&&x.name===name)),toFunctionSelector(compiled.find(x=>x.type==='function'&&x.name===name)));
+ for(const name of ['mint','mintExact','authorizationDigest','exactAuthorizationDigest','EXACT_MINT_AUTHORIZATION_TYPEHASH','fundNativeCredit','withdrawPartial'])assert.equal(toFunctionSelector(abi.find(x=>x.type==='function'&&x.name===name)),toFunctionSelector(compiled.find(x=>x.type==='function'&&x.name===name)));
  assert.deepEqual(abi.find(x=>x.type==='event'&&x.name==='ExactAuthorizationConsumed').inputs.map(({name,type,indexed})=>({name,type,indexed:!!indexed})),compiled.find(x=>x.type==='event'&&x.name==='ExactAuthorizationConsumed').inputs.map(({name,type,indexed})=>({name,type,indexed:!!indexed})));
+});
+
+test('funded credit and partial withdrawal ABI preserve account, asset and amount',()=>{
+ for(const [functionName,args] of [['fundNativeCredit',[auth.account]],['withdrawPartial',['0x'+'00'.repeat(20),auth.account,1n]]]){
+  const data=encodeFunctionData({abi,functionName,args});const decoded=decodeFunctionData({abi,data});assert.equal(decoded.functionName,functionName);assert.deepEqual(normalize(decoded.args),normalize(args));
+ }
+ const topics=encodeEventTopics({abi,eventName:'NativeCreditFunded',args:{account:auth.account,funder:auth.signer}});
+ const decoded=decodeEventLog({abi,topics,data:encodeAbiParameters([{type:'uint256'}],[1n])});
+ assert.deepEqual(normalize(decoded.args),normalize({amount:1n,account:auth.account,funder:auth.signer}));
 });
