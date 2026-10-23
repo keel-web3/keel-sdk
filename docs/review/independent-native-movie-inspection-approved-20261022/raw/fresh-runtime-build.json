@@ -1,0 +1,133 @@
+[
+  {
+    "command": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "node_modules/typescript/bin/tsc",
+      "-p",
+      "packages/protocol/tsconfig.json"
+    ],
+    "cwd": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk",
+    "exit": 0,
+    "elapsed": 0.8707499504089355
+  },
+  {
+    "command": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "node_modules/typescript/bin/tsc",
+      "-p",
+      "packages/viewer/tsconfig.json"
+    ],
+    "cwd": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk",
+    "exit": 0,
+    "elapsed": 0.7954339981079102
+  },
+  {
+    "command": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "node_modules/typescript/bin/tsc",
+      "-p",
+      "packages/sdk/tsconfig.json"
+    ],
+    "cwd": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk",
+    "exit": 0,
+    "elapsed": 8.37466812133789
+  },
+  {
+    "command": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "node_modules/typescript/bin/tsc",
+      "-p",
+      "packages/builder/tsconfig.json"
+    ],
+    "cwd": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk",
+    "exit": 0,
+    "elapsed": 1.4411382675170898
+  },
+  {
+    "command": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "node_modules/typescript/bin/tsc",
+      "-p",
+      "packages/studio-core/tsconfig.json"
+    ],
+    "cwd": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk",
+    "exit": 0,
+    "elapsed": 0.9538388252258301
+  },
+  {
+    "command": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "node_modules/typescript/bin/tsc",
+      "-p",
+      "packages/ethereum-adapter/tsconfig.json"
+    ],
+    "cwd": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk",
+    "exit": 0,
+    "elapsed": 0.9883730411529541
+  },
+  {
+    "command": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "scripts/build-wrapper-viewer.mjs"
+    ],
+    "cwd": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/viewer",
+    "exit": 0,
+    "elapsed": 0.09475374221801758
+  },
+  {
+    "command": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "scripts/package-proof-runtime.mjs"
+    ],
+    "cwd": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sdk",
+    "exit": 0,
+    "elapsed": 0.02444005012512207
+  },
+  {
+    "command": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "scripts/package-canonical-shell.mjs"
+    ],
+    "cwd": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sdk",
+    "exit": 0,
+    "elapsed": 0.14083003997802734
+  },
+  {
+    "command": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "scripts/package-layered-runtime.mjs"
+    ],
+    "cwd": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sdk",
+    "exit": 0,
+    "elapsed": 0.07690620422363281
+  },
+  {
+    "command": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "scripts/package-storage-policy.mjs"
+    ],
+    "cwd": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sdk",
+    "exit": 0,
+    "elapsed": 0.024150848388671875
+  },
+  {
+    "command": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "../mint-queue/build.mjs"
+    ],
+    "cwd": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sdk",
+    "exit": 0,
+    "elapsed": 0.022069931030273438
+  },
+  {
+    "command": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "node_modules/typescript/bin/tsc",
+      "-p",
+      "packages/mcp/tsconfig.json"
+    ],
+    "cwd": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk",
+    "exit": 0,
+    "elapsed": 1.3070447444915771
+  }
+]

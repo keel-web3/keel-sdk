@@ -1,0 +1,13 @@
+{
+  "source": "9f5bf42309efae5ee933850c9afab618cf29121b",
+  "site": "5453cfd7cd2380baac494a05971bffa441406ab8",
+  "command": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "--test",
+    "--test-concurrency=1",
+    "tests/native-movie-preview.browser.test.mjs"
+  ],
+  "cwd": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk",
+  "exit": 0,
+  "elapsed": 1.5488078594207764
+}

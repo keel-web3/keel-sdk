@@ -1,0 +1,39 @@
+{
+  "status": "ADMITTED_EXACT_TEST_SETUP_ONLY",
+  "reviewer": "lead, independent of media production author and independent test author",
+  "patches": [
+    {
+      "path": "/private/tmp/keel-independent-native-movie-20261022-01/evidence/budget-setsar-max-setup-only.patch",
+      "sha256": "8ae139fbac87b60b554f053a6d2deb33b686f2e8a51810666e3b197b7274e380"
+    },
+    {
+      "path": "/private/tmp/keel-native-movie-display-budget-20261022-01/evidence/display-budget-setup.proposed.patch",
+      "sha256": "905944cf3edb8f9e118c68fc338fe54305d8aa51a233bd1ff1fe9fdd5c2f839f"
+    }
+  ],
+  "changes": "Explicit setsar=256/1:max=1000 instead of the generator default; QA patch additionally uses disjoint output filenames. Every rejection/budget/no-heavy-render assertion unchanged.",
+  "reason": "Original new generated ad64 fixture actually SAR100 and983040000displayedpixels, below2B. Its0P1F was a wrong test expectation and is retracted, preserved unchanged. Exact corrected generated6b250 fixture has independently parsed tkhd8192x1024,pasp256/1,stsz300, plus actualpinnedFFmpegprobe matching.2516582400>2000000000 existinglimit.",
+  "correctedFixture": {
+    "bytes": 8838,
+    "sha256": "6b2509573d9cd6ba31ae2cfba98e32632132f0b0d80f34917eb2912d59d94aa6"
+  },
+  "independentByteParserResult": {
+    "tkhdWidth": 8192,
+    "tkhdHeight": 1024,
+    "pasp": [
+      256,
+      1
+    ],
+    "stszSampleCount": 300,
+    "displayedPixels": 2516582400,
+    "existingLimit": 2000000000
+  },
+  "requirements": [
+    "Preserve original ad64 source/0P1F/probe/claim retraction",
+    "No cap/tolerance change",
+    "No actual over-budget rendering; safe hook retains real probes and rejects only forbidden full scaled decode",
+    "Fresh exact before/after source test and independent source review remain required"
+  ],
+  "productionApproval": false,
+  "liveOrDeploymentApproval": false
+}

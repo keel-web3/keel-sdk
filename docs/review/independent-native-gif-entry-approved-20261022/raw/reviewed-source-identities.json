@@ -1,0 +1,14 @@
+[
+  {
+    "path": "packages/builder/src/media-preparation.ts",
+    "bytes": 48252,
+    "sha256": "4f10e063de80db4e2549dc348698074db0eb601e2f1fa8f0fa2bc79e23f7751b",
+    "gitBlob": "8acff23af36ecf8668d1ffe35af5e34c8f45ac58"
+  },
+  {
+    "path": "tests/media-frame-request-snapshot.test.mjs",
+    "bytes": 3238,
+    "sha256": "edb5374781bdbba391495e6b2c07821638a7b2b1f39cd020e83201b95bb1d762",
+    "gitBlob": "dd12d10299b58e3eb9d69508e027467bb40e390b"
+  }
+]

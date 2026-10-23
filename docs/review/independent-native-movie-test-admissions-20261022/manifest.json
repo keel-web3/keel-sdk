@@ -1,0 +1,142 @@
+[
+  {
+    "path": "README.md",
+    "bytes": 2357,
+    "sha256": "d5340df66ec3c9c53108315650f5e7086297f1a9becd8e098a657d958b0b4efa"
+  },
+  {
+    "path": "native-movie-boundaries.original.mjs",
+    "bytes": 6750,
+    "sha256": "141b97b42fe23453bcade9b4ae3e08d494a32f0b52b5ba24f4fdbaf4abab2523"
+  },
+  {
+    "path": "native-movie-boundaries.proposed.mjs",
+    "bytes": 6575,
+    "sha256": "84ddbc1af86fee76bdc3638f152a3415c20637ae5b654f5a6acfbf8634e23ebb"
+  },
+  {
+    "path": "quicktime-test-expectation.proposed.patch",
+    "bytes": 1949,
+    "sha256": "dc153a3e43917753e0e420930d81d8c3cdc4692eb58aed9c473f34dc0043e05a"
+  },
+  {
+    "path": "raw/own-runtime-output-identities.json",
+    "bytes": 286246,
+    "sha256": "57db13ec5ebbc683735bf388fb5d26fd0f533256c37fd3a8be67c7f35766c99e"
+  },
+  {
+    "path": "raw/portability-b3-uncomposed-classification.json",
+    "bytes": 388,
+    "sha256": "23de0d5e5cdb655a1955b0ff20f9e9f2e7e8ce274232b6d8a7a01ab027b96ac5"
+  },
+  {
+    "path": "raw/portability-b3-uncomposed-classification.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "raw/portability-b3-uncomposed-classification.stdout",
+    "bytes": 4646,
+    "sha256": "c60e817269cb946ac5e9f80b7cac7d1da5923477f84ef64102a664a2ab3a26d3"
+  },
+  {
+    "path": "raw/portability-composed-affected.json",
+    "bytes": 570,
+    "sha256": "6e939f0ec5e3f1d8c4735965d53ce919560647ac9ded7adc2523f0b44c7e4850"
+  },
+  {
+    "path": "raw/portability-composed-affected.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "raw/portability-composed-affected.stdout",
+    "bytes": 5581,
+    "sha256": "c7801fa2e985681e40b1536b9b04e4829d59614adf93c5e2a849b8b8fdb71936"
+  },
+  {
+    "path": "raw/portability-composed-browser.json",
+    "bytes": 418,
+    "sha256": "5a6239a85ee2a64ed4a8d1b7af7e332875c483e0d5302f70d661dc4ee1a573ee"
+  },
+  {
+    "path": "raw/portability-composed-browser.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "raw/portability-composed-browser.stdout",
+    "bytes": 618,
+    "sha256": "d20f428c7f1d5823124844b374d88648a137d0f6957063f7f6074808b8e1c2c6"
+  },
+  {
+    "path": "raw/portability-composed-classification.json",
+    "bytes": 387,
+    "sha256": "ac45e6e9a2f650161a1df82b58cf6e91cfce6b6853ca38f83f2780566e82f3b3"
+  },
+  {
+    "path": "raw/portability-composed-classification.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "raw/portability-composed-classification.stdout",
+    "bytes": 882,
+    "sha256": "a6bc39b89c2919a6ab597912ddbdedc3a21b34dfe996965628e1f8d5af2f5d42"
+  },
+  {
+    "path": "raw/quicktime-admission.json",
+    "bytes": 526,
+    "sha256": "6f6aefac5a98a427000dd70ab9461c8466a96d3b5a0c9382977b8112e51c4394"
+  },
+  {
+    "path": "raw/quicktime-original.json",
+    "bytes": 529,
+    "sha256": "8ebb625674f97e381db1d279c56ceaf36c09999db3de6069c0886b8ddb8aefef"
+  },
+  {
+    "path": "raw/quicktime-original.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "raw/quicktime-original.stdout",
+    "bytes": 2985,
+    "sha256": "2e4832badcb8ac2a391111a43448def412517e3122f4d62b50cca0d97d169f59"
+  },
+  {
+    "path": "raw/quicktime-proposed.json",
+    "bytes": 529,
+    "sha256": "15d2007d24f59d7937d6cf385f96c0e41e87cd5aae27773822c466937b11c989"
+  },
+  {
+    "path": "raw/quicktime-proposed.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "raw/quicktime-proposed.stdout",
+    "bytes": 1156,
+    "sha256": "60a469d0891dc788c278b7be5a72d21164d3071ecff6a3860c8578dad2d28700"
+  },
+  {
+    "path": "raw/test-portability-admission.json",
+    "bytes": 832,
+    "sha256": "a9ddd9a302ca3ee13b8783cca4f212e12b02ac29e545eceda5ecab790308e6fc"
+  },
+  {
+    "path": "raw/test-portability-audit.json",
+    "bytes": 45320,
+    "sha256": "d411ea71eb8c8102fa2e13836ecdab2fcddebfb9b6c2a104f46c328d4eb471ad"
+  },
+  {
+    "path": "raw/test-portability.diff",
+    "bytes": 10067,
+    "sha256": "58e63f1b32368007eaf586b7484b55a80289c14394c8b998885da320d69d52fa"
+  },
+  {
+    "path": "setup-test-portability.py",
+    "bytes": 3354,
+    "sha256": "63f823006e349e1e606d0e46709d50ce2e054cb14407bb8a288823e791a25b76"
+  }
+]

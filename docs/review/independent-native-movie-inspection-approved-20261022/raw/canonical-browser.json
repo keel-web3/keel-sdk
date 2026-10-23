@@ -1,0 +1,15 @@
+{
+  "source": "fefd8fc91c7e286143a8857edfbb5cdddafbcb56",
+  "site": "5453cfd7cd2380baac494a05971bffa441406ab8",
+  "command": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "--test",
+    "--test-concurrency=1",
+    "tests/temporal-carrier-sequence.browser.test.mjs",
+    "tests/native-presentation-guard.browser.test.mjs",
+    "tests/native-movie-preview.browser.test.mjs"
+  ],
+  "cwd": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk",
+  "exit": 0,
+  "elapsed": 8.489166021347046
+}

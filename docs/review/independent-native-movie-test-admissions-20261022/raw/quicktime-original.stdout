@@ -1,0 +1,50 @@
+TAP version 13
+# Subtest: native movie geometry is exact, bounded and distinct from strict equivalence
+ok 1 - native movie geometry is exact, bounded and distinct from strict equivalence
+  ---
+  duration_ms: 3.972625
+  type: 'test'
+  ...
+# Subtest: native title is exactly one bounded UTF-8 type1 locale0 atom matching the actual decoder report
+ok 2 - native title is exactly one bounded UTF-8 type1 locale0 atom matching the actual decoder report
+  ---
+  duration_ms: 1.719292
+  type: 'test'
+  ...
+# Subtest: native Original keeps complete actual audio/video checks and timed frames without granting lossless authority
+ok 3 - native Original keeps complete actual audio/video checks and timed frames without granting lossless authority
+  ---
+  duration_ms: 170.956042
+  type: 'test'
+  ...
+# Subtest: qualified QuickTime SAR is native preview only and unsupported creator metadata remains an inspection capability refusal
+not ok 4 - qualified QuickTime SAR is native preview only and unsupported creator metadata remains an inspection capability refusal
+  ---
+  duration_ms: 49.768583
+  type: 'test'
+  location: '/private/tmp/keel-independent-native-movie-20261022-01/keel-sdk/tests/reviewer-native-movie-boundaries.original.mjs:58:1'
+  failureType: 'testCodeFailure'
+  error: 'Movie unsupported trak/tapt metadata, aperture or presentation semantics require an exact preserving adapter; native media is retained.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    retain (file:///private/tmp/keel-independent-native-movie-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:13:40)
+    walk (file:///private/tmp/keel-independent-native-movie-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:171:17)
+    walk (file:///private/tmp/keel-independent-native-movie-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:185:17)
+    walk (file:///private/tmp/keel-independent-native-movie-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:447:17)
+    assertMoviePresentationSemantics (file:///private/tmp/keel-independent-native-movie-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:450:5)
+    decodeMovie (file:///private/tmp/keel-independent-native-movie-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:145:26)
+    async readFrame (file:///private/tmp/keel-independent-native-movie-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:390:25)
+    async compareMediaFrames (file:///private/tmp/keel-independent-native-movie-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:410:22)
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-native-movie-20261022-01/keel-sdk/tests/reviewer-native-movie-boundaries.original.mjs:65:22)
+    async Test.run (node:internal/test_runner/test:1054:7)
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 3
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 342.617791

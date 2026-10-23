@@ -1,0 +1,29 @@
+{
+  "platform": "macOS-15.6.1-arm64-arm-64bit-Mach-O",
+  "architecture": "arm64",
+  "node": "22.22.1",
+  "SDK": "189ec0b0f0fd2d35e5b0c97cee23b85bcbd092ef",
+  "Site": "5453cfd7cd2380baac494a05971bffa441406ab8",
+  "freshOwnRuntimeFiles": 1716,
+  "binaries": [
+    {
+      "path": "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "resolved": "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "bytes": 112972416,
+      "sha256": "245e0321af97d3c21dd4e7104457334dfe3c3ba7982d0db75363e354565f8cbb"
+    },
+    {
+      "path": "/private/tmp/keel-independent-native-gif-20261022-02/keel-sdk/packages/builder/node_modules/ffmpeg-static/ffmpeg",
+      "resolved": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/ffmpeg-static@5.3.0/node_modules/ffmpeg-static/ffmpeg",
+      "bytes": 45568216,
+      "sha256": "a90e3db6a3fd35f6074b013f948b1aa45b31c6375489d39e572bea3f18336584"
+    },
+    {
+      "path": "/Users/ravonus/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell",
+      "resolved": "/Users/ravonus/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell",
+      "bytes": 163329264,
+      "sha256": "7687bff7cb2db075f250e6d5848bbc8838cac3802ac3952a899c574f8eccab45"
+    }
+  ],
+  "scope": "local public/synthetic source; actual loopback Chromium/MCP workspace; no SSH/provider/authenticatedhost/wallet/deployment"
+}

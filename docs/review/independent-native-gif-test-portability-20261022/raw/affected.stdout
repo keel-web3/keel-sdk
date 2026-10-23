@@ -1,0 +1,89 @@
+TAP version 13
+# Subtest: comparison captures time, MIME, recipe and source before any async continuation
+ok 1 - comparison captures time, MIME, recipe and source before any async continuation
+  ---
+  duration_ms: 11.658958
+  type: 'test'
+  ...
+# Subtest: replacing the request signal cannot cancel another captured source or hide its real abort
+ok 2 - replacing the request signal cannot cancel another captured source or hide its real abort
+  ---
+  duration_ms: 5.847417
+  type: 'test'
+  ...
+# Subtest: strict edited comparison uses the same entry source snapshot rather than processed candidate bytes
+ok 3 - strict edited comparison uses the same entry source snapshot rather than processed candidate bytes
+  ---
+  duration_ms: 41.349042
+  type: 'test'
+  ...
+# Subtest: comparison rejects an oversized entry before copying its supplied byte view
+ok 4 - comparison rejects an oversized entry before copying its supplied byte view
+  ---
+  duration_ms: 1.058
+  type: 'test'
+  ...
+# Subtest: native compare binds frame and declared timeline to the same initial actual source bytes
+ok 5 - native compare binds frame and declared timeline to the same initial actual source bytes
+  ---
+  duration_ms: 9.970417
+  type: 'test'
+  ...
+# {"committed":"0x19a488cb5a0d34f20c3d0d266797b65c62ab197554f7e484377954ee5acb83a5","initial":"0x19a488cb5a0d34f20c3d0d266797b65c62ab197554f7e484377954ee5acb83a5","mutated":"0x35fd32e1ac822834d6e945ce225c13a0c48731397a5578b86bd9aafae3546435","sourceFrameTimeMs":0,"declared":[120,240,200]}
+# Subtest: finite native GIF exposes all declared frames without approving altered playback
+ok 6 - finite native GIF exposes all declared frames without approving altered playback
+  ---
+  duration_ms: 21.909958
+  type: 'test'
+  ...
+# Subtest: finite GIF remains unavailable to strict preparation, edited comparison and actual-pair proof
+ok 7 - finite GIF remains unavailable to strict preparation, edited comparison and actual-pair proof
+  ---
+  duration_ms: 33.264291
+  type: 'test'
+  ...
+# Subtest: clamped native GIF exposes all declared frames without approving altered playback
+ok 8 - clamped native GIF exposes all declared frames without approving altered playback
+  ---
+  duration_ms: 6.680333
+  type: 'test'
+  ...
+# Subtest: clamped GIF remains unavailable to strict preparation, edited comparison and actual-pair proof
+ok 9 - clamped GIF remains unavailable to strict preparation, edited comparison and actual-pair proof
+  ---
+  duration_ms: 13.585167
+  type: 'test'
+  ...
+# Subtest: native finite WebP retains complete intrinsic timing and existing loop admission
+ok 10 - native finite WebP retains complete intrinsic timing and existing loop admission
+  ---
+  duration_ms: 10.46075
+  type: 'test'
+  ...
+# Subtest: native GIF inspection still refuses incomplete or interactive complete controls, exact export remains available
+ok 11 - native GIF inspection still refuses incomplete or interactive complete controls, exact export remains available
+  ---
+  duration_ms: 5.998083
+  type: 'test'
+  ...
+# Subtest: actual MCP native finite comparison/export stays byte bound and strict conversion still rejects
+ok 12 - actual MCP native finite comparison/export stays byte bound and strict conversion still rejects
+  ---
+  duration_ms: 42.346
+  type: 'test'
+  ...
+# Subtest: actual MCP native clamped comparison/export stays byte bound and strict conversion still rejects
+ok 13 - actual MCP native clamped comparison/export stays byte bound and strict conversion still rejects
+  ---
+  duration_ms: 18.838625
+  type: 'test'
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 394.963667

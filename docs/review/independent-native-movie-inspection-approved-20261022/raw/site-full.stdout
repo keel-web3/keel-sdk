@@ -1,0 +1,236 @@
+TAP version 13
+# Subtest: normal Studio media service inspects/frames/exports retained native sar without conversion authority
+ok 1 - normal Studio media service inspects/frames/exports retained native sar without conversion authority
+  ---
+  duration_ms: 308.594167
+  type: 'test'
+  ...
+# Subtest: normal Studio media service inspects/frames/exports retained native title without conversion authority
+ok 2 - normal Studio media service inspects/frames/exports retained native title without conversion authority
+  ---
+  duration_ms: 199.921709
+  type: 'test'
+  ...
+# (node:3092) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: untouched uploaded movie automatically reaches ACTUAL complete two-context compiler measurement without Apply
+ok 3 - untouched uploaded movie automatically reaches ACTUAL complete two-context compiler measurement without Apply
+  ---
+  duration_ms: 898.943625
+  type: 'test'
+  ...
+# {"scope":"local-actual-codecs-normal-assets-source-body-physical-plans-final-render-selector-with-explicit-owner-catalog-adapters","input":{"digest":"0xa421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561","bytes":1786},"before":{"id":"canonical:gzip","codec":"gzip","recipeDigest":"0x9077af32ffa61cfc3290a19245cff080de90f1f943bd8d2c53b25fdc2ddf46e3","measurementScope":{"contextDigest":"0x8b4321a231f9c2330eb80e94451231fd5f4cf5a1b788939c64391a448e765c82","kind":"final-project-release","projectId":"20000000-0000-4000-8000-000000000001","releaseId":"20000000-0000-4000-8000-000000000002","releaseRevision":1,"sourceRevision":1},"tokenURICommitment":{"digest":"0x6e8a2ab174b25a6afc4b8e5f87e7aa20b61a30fd4023ed4a70cb444dcb549fc3","byteLength":136065},"derivedMetadataDigest":"0xdccda0557fbea49dd37792badcf16be554f9a7b9dd36a4808ae67d25b103dd77","metadataBytes":115815,"htmlBytes":95106,"imageBytes":91,"imageURIBytes":146,"imageDelivery":"inline","externalPreviewReadAuthenticated":false,"animationURIBytes":115257,"sourceBytes":1786,"compressedPayloadBytes":7965,"encodedPayloadBytes":8349,"completeTokenURIBytes":136065,"newStoredBytes":2245,"reusedStoredBytes":132079,"uniqueStoredBytes":134324,"uniqueObjects":5,"decoderObjectBytes":0,"bootObjectBytes":0,"combinedBootDecoderObjectBytes":119848,"generatedHtmlSuffixBytes":969,"nativeBrowserGzip":true,"javascriptCodecDecoderBytes":0,"decoderCostScope":"exact-distinct-stored-object-roles","javascriptGzipDecoderBytes":0,"sourceByteIdentity":"verified-exact","physicalManifestStoredBytes":2820,"accountedNewStoredBytes":5065,"costScope":"distinct-document-and-preview-objects-plus-physical-manifest","gas":"requires-complete-final-simulation","finalContext":{"digest":"0x02f551d391eca8688ebc4ce584afc408045e4aaf910371002dc2fbe45d9edc3b","tokenUriDigest":"0x6e8a2ab174b25a6afc4b8e5f87e7aa20b61a30fd4023ed4a70cb444dcb549fc3","completeTokenUriBytes":136065,"prefixBytes":337,"suffixBytes":1459,"graphDigest":"0x5f1e4ce44a7bfa625fe6ac0513934d34615ab6140843c9ed9f30eaa90a64fcf6","manifestDigest":"0x84cc014920d8d6a7d422cd8317676c6c4eafc13712cfa786a79aff4f6f25d556","manifestObjectId":"0x2846ca994d7f234d7b1d58936a4c49ab9a4d30d94b0e2bb5bcd978f3bfd69af0","manifestPlanDigest":"0x9888c6e15894d50b77b74dee30eb9233206ce841473b08d7495fd50844f9202e"}},"after":{"id":"canonical:gzip","codec":"gzip","recipeDigest":"0x9077af32ffa61cfc3290a19245cff080de90f1f943bd8d2c53b25fdc2ddf46e3","measurementScope":{"contextDigest":"0x8b4321a231f9c2330eb80e94451231fd5f4cf5a1b788939c64391a448e765c82","kind":"final-project-release","projectId":"20000000-0000-4000-8000-000000000001","releaseId":"20000000-0000-4000-8000-000000000002","releaseRevision":1,"sourceRevision":1},"tokenURICommitment":{"digest":"0xd5c6f7633a9c4570f439ffeadceb4424044e19282a4f83a47b7b71375271908c","byteLength":134700},"derivedMetadataDigest":"0xdaa38232645483e1b50392201a4deab70966830ed550a12292406c308813c0d1","metadataBytes":114450,"htmlBytes":93741,"imageBytes":91,"imageURIBytes":146,"imageDelivery":"inline","externalPreviewReadAuthenticated":false,"animationURIBytes":113892,"sourceBytes":188,"compressedPayloadBytes":6943,"encodedPayloadBytes":6985,"completeTokenURIBytes":134700,"newStoredBytes":880,"reusedStoredBytes":132079,"uniqueStoredBytes":132959,"uniqueObjects":5,"decoderObjectBytes":0,"bootObjectBytes":0,"combinedBootDecoderObjectBytes":119848,"generatedHtmlSuffixBytes":969,"nativeBrowserGzip":true,"javascriptCodecDecoderBytes":0,"decoderCostScope":"exact-distinct-stored-object-roles","javascriptGzipDecoderBytes":0,"sourceByteIdentity":"verified-exact","physicalManifestStoredBytes":2860,"accountedNewStoredBytes":3740,"costScope":"distinct-document-and-preview-objects-plus-physical-manifest","gas":"requires-complete-final-simulation","finalContext":{"digest":"0xd34f9490114dabb4428013990cdc55faf62f49d9f16c09b0e78529d5e02f4c8b","tokenUriDigest":"0xd5c6f7633a9c4570f439ffeadceb4424044e19282a4f83a47b7b71375271908c","completeTokenUriBytes":134700,"prefixBytes":337,"suffixBytes":1459,"graphDigest":"0x97831c0bb98e5001da83a85d5a467b59cd7a5edc4a56724ea9ef1769e6ebc2b8","manifestDigest":"0x4de30afd87d68bf4b39c8048b9f76cd18c27e06ae518bb99eb6b2569d10cfb85","manifestObjectId":"0x7655677f70b9ef473fa35247bb33bf71b05b21aaf3c6c8325707bbe140743928","manifestPlanDigest":"0xf577b25866c190c21523f845240130149d98dd354d66c21b54f02af5dec65988"}}}
+# Subtest: a smaller actual current normal URI preserves native with an explicit reason despite a hypothetical variant saving
+ok 4 - a smaller actual current normal URI preserves native with an explicit reason despite a hypothetical variant saving
+  ---
+  duration_ms: 860.627
+  type: 'test'
+  ...
+# Subtest: a missing current normal output never manufactures a baseline or generates a candidate
+ok 5 - a missing current normal output never manufactures a baseline or generates a candidate
+  ---
+  duration_ms: 193.609209
+  type: 'test'
+  ...
+# Subtest: Raw and explicit Apply retain creator intent without generating or measuring an alternative
+ok 6 - Raw and explicit Apply retain creator intent without generating or measuring an alternative
+  ---
+  duration_ms: 182.893708
+  type: 'test'
+  ...
+# Subtest: access denial terminates this consumer before another candidate or backend attempt
+ok 7 - access denial terminates this consumer before another candidate or backend attempt
+  ---
+  duration_ms: 326.05575
+  type: 'test'
+  ...
+# Subtest: hydrated pair proof cannot grant actual-pair authority to the logical media preparation sibling
+ok 8 - hydrated pair proof cannot grant actual-pair authority to the logical media preparation sibling
+  ---
+  duration_ms: 170.875125
+  type: 'test'
+  ...
+# Subtest: the retained invalid PNG stays rejected by the real decoder; correction never bypasses image verification
+ok 9 - the retained invalid PNG stays rejected by the real decoder; correction never bypasses image verification
+  ---
+  duration_ms: 1.388083
+  type: 'test'
+  ...
+# Subtest: the wrong owner/revision result cannot enter automatic preparation even through a faulty adapter
+ok 10 - the wrong owner/revision result cannot enter automatic preparation even through a faulty adapter
+  ---
+  duration_ms: 166.108208
+  type: 'test'
+  ...
+# Subtest: an older or unqualified renderer keeps the native temporal file instead of freezing it
+ok 11 - an older or unqualified renderer keeps the native temporal file instead of freezing it
+  ---
+  duration_ms: 571.028
+  type: 'test'
+  ...
+# Subtest: a changed final collector preview commitment terminates before preparing either graph
+ok 12 - a changed final collector preview commitment terminates before preparing either graph
+  ---
+  duration_ms: 320.421458
+  type: 'test'
+  ...
+# Subtest: source change after the first actual final render cannot produce a second graph or adopt its partial result
+ok 13 - source change after the first actual final render cannot produce a second graph or adopt its partial result
+  ---
+  duration_ms: 419.70675
+  type: 'test'
+  ...
+# Subtest: saved defaults change after the first actual final render is a terminal preparation error
+ok 14 - saved defaults change after the first actual final render is a terminal preparation error
+  ---
+  duration_ms: 426.825458
+  type: 'test'
+  ...
+# Subtest: pre-aborted default preparation performs no owned-source work
+ok 15 - pre-aborted default preparation performs no owned-source work
+  ---
+  duration_ms: 179.052084
+  type: 'test'
+  ...
+# Subtest: an untouched movie with real audio remains native with all original bytes; no image optimization drops sound
+ok 16 - an untouched movie with real audio remains native with all original bytes; no image optimization drops sound
+  ---
+  duration_ms: 371.380834
+  type: 'test'
+  ...
+# (node:3865) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: unchanged final normal bytes produce compact bound review without artwork or wallet authority
+ok 17 - unchanged final normal bytes produce compact bound review without artwork or wallet authority
+  ---
+  duration_ms: 159.585416
+  type: 'test'
+  ...
+# Subtest: a different actual candidate manifest requires a new review rather than adoption
+ok 18 - a different actual candidate manifest requires a new review rather than adoption
+  ---
+  duration_ms: 131.238667
+  type: 'test'
+  ...
+# Subtest: final review rejects provisional without borrowing another candidate's success
+ok 19 - final review rejects provisional without borrowing another candidate's success
+  ---
+  duration_ms: 119.177584
+  type: 'test'
+  ...
+# Subtest: final review rejects mutated-return without borrowing another candidate's success
+ok 20 - final review rejects mutated-return without borrowing another candidate's success
+  ---
+  duration_ms: 114.603375
+  type: 'test'
+  ...
+# Subtest: final review rejects source-race without borrowing another candidate's success
+ok 21 - final review rejects source-race without borrowing another candidate's success
+  ---
+  duration_ms: 109.254583
+  type: 'test'
+  ...
+# Subtest: actor/source/default/chain/revision substitution is rejected before final proof
+ok 22 - actor/source/default/chain/revision substitution is rejected before final proof
+  ---
+  duration_ms: 379.506541
+  type: 'test'
+  ...
+# (node:4145) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: real final normal metadata and actual per-codec plans drive SDK ranking; provisional body estimates cannot adopt
+ok 23 - real final normal metadata and actual per-codec plans drive SDK ranking; provisional body estimates cannot adopt
+  ---
+  duration_ms: 462.90975
+  type: 'test'
+  ...
+# {"scope":"local-final-normal-render-and-real-sdk-selector-no-live-registration-or-simulation","candidates":[{"id":"gzip","codec":"gzip","recipeDigest":"0xb57b5bb332b7c916f7cc6b1d4f65052e728cd5fc3c65eb165ce11832e2584bce","measurementScope":{"contextDigest":"0x008115e0a7863f5ce719b1fbc54e2fcf3fda55e7997f4dda659b280979bb2659","creatorId":"creator","kind":"final-project-release","projectId":"20000000-0000-4000-8000-000000000001","releaseId":"release","releaseRevision":7,"sourceRevision":4},"tokenURICommitment":{"digest":"0x08400f666e8e156d60d51dee4a944eb0a6d84980484580507fc433f3f95ad161","byteLength":124225},"derivedMetadataDigest":"0x127efebb5776473069388d4bc00ba47701b67cb97aa27d99ba449fce59800e6d","metadataBytes":106055,"htmlBytes":86986,"imageBytes":68,"imageURIBytes":114,"imageDelivery":"inline","externalPreviewReadAuthenticated":false,"animationURIBytes":105001,"sourceBytes":150123,"compressedPayloadBytes":552,"encodedPayloadBytes":740,"completeTokenURIBytes":124225,"newStoredBytes":2061,"reusedStoredBytes":119848,"uniqueStoredBytes":121909,"uniqueObjects":5,"decoderObjectBytes":0,"bootObjectBytes":0,"combinedBootDecoderObjectBytes":119848,"generatedHtmlSuffixBytes":969,"nativeBrowserGzip":true,"javascriptCodecDecoderBytes":0,"decoderCostScope":"exact-distinct-stored-object-roles","javascriptGzipDecoderBytes":0,"sourceByteIdentity":"verified-exact"},{"id":"none","codec":"none","recipeDigest":"0xd079a7bd1c11399ae268bd15f2c9e1c3135bb8833829ade8d588ee16e87e9492","measurementScope":{"contextDigest":"0x008115e0a7863f5ce719b1fbc54e2fcf3fda55e7997f4dda659b280979bb2659","creatorId":"creator","kind":"final-project-release","projectId":"20000000-0000-4000-8000-000000000001","releaseId":"release","releaseRevision":7,"sourceRevision":4},"tokenURICommitment":{"digest":"0x176dd7841244d782b34ae758c624f8ba74e52312a8ff3879104e0356fa1bbd7f","byteLength":373763},"derivedMetadataDigest":"0xd89d4fab62a85ac48da246de460f02548c753cd93ba146a5ec0ae730315ba932","metadataBytes":305553,"htmlBytes":236444,"imageBytes":68,"imageURIBytes":114,"imageDelivery":"inline","externalPreviewReadAuthenticated":false,"animationURIBytes":304499,"sourceBytes":150123,"compressedPayloadBytes":150123,"encodedPayloadBytes":150147,"completeTokenURIBytes":373763,"newStoredBytes":251599,"reusedStoredBytes":119848,"uniqueStoredBytes":371447,"uniqueObjects":5,"decoderObjectBytes":0,"bootObjectBytes":0,"combinedBootDecoderObjectBytes":119848,"generatedHtmlSuffixBytes":969,"nativeBrowserGzip":false,"javascriptCodecDecoderBytes":null,"decoderCostScope":"exact-distinct-stored-object-roles","sourceByteIdentity":"verified-exact"}]}
+# (node:4353) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: current readonly candidate derives exact scratch plans without persistent blob/database/history ports
+ok 24 - current readonly candidate derives exact scratch plans without persistent blob/database/history ports
+  ---
+  duration_ms: 197.892792
+  type: 'test'
+  ...
+# Subtest: paid or unresolved source cannot be relabeled new or enter comparison/adoption
+ok 25 - paid or unresolved source cannot be relabeled new or enter comparison/adoption
+  ---
+  duration_ms: 141.412042
+  type: 'test'
+  ...
+# Subtest: an exact unissued source reaches authoritative defaults rather than being blanket-blocked
+ok 26 - an exact unissued source reaches authoritative defaults rather than being blanket-blocked
+  ---
+  duration_ms: 36.203333
+  type: 'test'
+  ...
+# Subtest: finite native GIF inspect-temporal remains usable without conversion approval
+ok 27 - finite native GIF inspect-temporal remains usable without conversion approval
+  ---
+  duration_ms: 90.173709
+  type: 'test'
+  ...
+# {"name":"finite","action":"inspect-temporal","digest":"0x19a488cb5a0d34f20c3d0d266797b65c62ab197554f7e484377954ee5acb83a5","byteLength":126,"delays":[120,240,200],"loop":2}
+# Subtest: finite native GIF frame remains usable without conversion approval
+ok 28 - finite native GIF frame remains usable without conversion approval
+  ---
+  duration_ms: 2.479834
+  type: 'test'
+  ...
+# {"name":"finite","action":"frame","digest":"0x19a488cb5a0d34f20c3d0d266797b65c62ab197554f7e484377954ee5acb83a5","byteLength":126,"delays":[120,240,200],"loop":2}
+# Subtest: finite native GIF export remains usable without conversion approval
+ok 29 - finite native GIF export remains usable without conversion approval
+  ---
+  duration_ms: 0.512458
+  type: 'test'
+  ...
+# {"name":"finite","action":"export","digest":"0x19a488cb5a0d34f20c3d0d266797b65c62ab197554f7e484377954ee5acb83a5","byteLength":126,"delays":[120,240,200],"loop":2}
+# Subtest: clamped native GIF inspect-temporal remains usable without conversion approval
+ok 30 - clamped native GIF inspect-temporal remains usable without conversion approval
+  ---
+  duration_ms: 2.274334
+  type: 'test'
+  ...
+# {"name":"clamped","action":"inspect-temporal","digest":"0x35fd32e1ac822834d6e945ce225c13a0c48731397a5578b86bd9aafae3546435","byteLength":126,"delays":[10,20,30],"loop":0}
+# Subtest: clamped native GIF frame remains usable without conversion approval
+ok 31 - clamped native GIF frame remains usable without conversion approval
+  ---
+  duration_ms: 2.191333
+  type: 'test'
+  ...
+# {"name":"clamped","action":"frame","digest":"0x35fd32e1ac822834d6e945ce225c13a0c48731397a5578b86bd9aafae3546435","byteLength":126,"delays":[10,20,30],"loop":0}
+# Subtest: clamped native GIF export remains usable without conversion approval
+ok 32 - clamped native GIF export remains usable without conversion approval
+  ---
+  duration_ms: 0.420833
+  type: 'test'
+  ...
+# {"name":"clamped","action":"export","digest":"0x35fd32e1ac822834d6e945ce225c13a0c48731397a5578b86bd9aafae3546435","byteLength":126,"delays":[10,20,30],"loop":0}
+# Subtest: actual complete animated source inspection preserves the variable timeline, no-audio fact and exact original
+ok 33 - actual complete animated source inspection preserves the variable timeline, no-audio fact and exact original
+  ---
+  duration_ms: 7.044584
+  type: 'test'
+  ...
+# Subtest: inspection rejects edited recipes, arbitrary files and cancelled work without a persisted candidate
+ok 34 - inspection rejects edited recipes, arbitrary files and cancelled work without a persisted candidate
+  ---
+  duration_ms: 2.766292
+  type: 'test'
+  ...
+# Subtest: actual silent variable-rate MP4 inspection and both native image carriers preserve every source frame and exact timestamps
+ok 35 - actual silent variable-rate MP4 inspection and both native image carriers preserve every source frame and exact timestamps
+  ---
+  duration_ms: 413.667875
+  type: 'test'
+  ...
+1..35
+# tests 35
+# suites 0
+# pass 35
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 16549.81925

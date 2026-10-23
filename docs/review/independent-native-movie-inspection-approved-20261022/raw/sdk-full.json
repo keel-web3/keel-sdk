@@ -1,0 +1,32 @@
+{
+  "source": "fefd8fc91c7e286143a8857edfbb5cdddafbcb56",
+  "site": "5453cfd7cd2380baac494a05971bffa441406ab8",
+  "command": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "--test",
+    "--test-concurrency=1",
+    "reviewer-native-gif-mutable-input.test.mjs",
+    "tests/media-frame-request-snapshot.test.mjs",
+    "tests/native-media-frame-read.test.mjs",
+    "tests/audio-clock-binding.test.mjs",
+    "tests/audio-clock-binding-mcp.test.mjs",
+    "tests/movie-track-binding.test.mjs",
+    "tests/movie-edit-list.test.mjs",
+    "tests/movie-presentation-semantics.test.mjs",
+    "tests/actual-media-container.test.mjs",
+    "tests/actual-media-pair.test.mjs",
+    "tests/media-preparation.test.mjs",
+    "tests/temporal-webp.test.mjs",
+    "reviewer-temporal-pair-retained-bytes.mjs",
+    "reviewer-shared-848.test.mjs",
+    "reviewer-shared-848-mcp.test.mjs",
+    "reviewer-editlist-byte-equality.test.mjs",
+    "reviewer-noedit-timeline.test.mjs",
+    "reviewer-audio-track-binding.test.mjs",
+    "tests/native-movie-inspection.test.mjs",
+    "tests/native-movie-mcp.test.mjs"
+  ],
+  "cwd": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk",
+  "exit": 0,
+  "elapsed": 13.840603113174438
+}

@@ -1,0 +1,11 @@
+# Independent test-only admissions — PASS
+
+Two precise author changes are independently admitted. Neither admission approves production9f5 or closes live publication.
+
+**b3f60c2980a613559da577063a741b3639245adc:** four exact retained MP4/WebP references are tracked under tests; whole-text inverse substitution proves all three test changes are fixture URLs only. Exact SAR2918B/66f1276b and title2972B/7c41053e are retained. Both candidate464B files have exact SHA15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db. No assertions, recipes, production or existing classifications change. Two local inspection/MCP suites correctly join deterministic; installed-Chromium suite correctly joins browser only. No removals.
+
+A clean thin checkout composed this with already-admitted d740a2a into **25c8b4b37b125377f14d95754184e5a21b58c03b**, without conflict or production changes. Fresh composed classification3P, affectedGIF+movie21P, actual relocated-browser2P, all zero failures/skips. Raw exact commands and TAP are adjacent. Uncomposed b3 classification0P3F is preserved: the two inherited GIF tests remain unclassified until d740 is included. Runtime explicitly reuses/copies this reviewer's freshly built9f5 output,1718 files/24911034B, manifestSHA57db13ec5ebbc683735bf388fb5d26fd0f533256c37fd3a8be67c7f35766c99e; no extra build claim is made for the path-only tests. No author runtime was used.
+
+**QuickTime expectation patch dc153a3e43917753e0e420930d81d8c3cdc4692eb58aed9c473f34dc0043e05a:** ADMIT TEST EXPECTATION ONLY. Fresh original3P1F fails at emitted trak/tapt aperture; proposed4P. This new positive assumed a profile the existing closed parser does not support and the task explicitly does not broaden. The exact original, RED and proposed patch remain retained. The single new QuickTime-positive branch becomes a precise tapt capability-refusal assertion; exact original export, source generator, all other geometry/title/audio/creator/strict tests remain unchanged. This grants no tapt capability or generalized QuickTime support. The corrected test is separate from the113 production-cohort result.
+
+Node22.22.1 on local macOS arm64; all ordinary local tools and loopback Chromium. No host, provider, credentials, wallet, chain or deployment operations. Production source review and whole service/live gates remain separate.

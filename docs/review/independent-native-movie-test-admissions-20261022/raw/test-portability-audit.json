@@ -1,0 +1,1004 @@
+{
+  "candidate": "b3f60c2980a613559da577063a741b3639245adc",
+  "runtimeSource": "9f5bf42309efae5ee933850c9afab618cf29121b",
+  "exactURLOnlyThreeTests": true,
+  "fixtures": [
+    {
+      "path": "tests/fixtures/native-movie-inspection/sar.mp4",
+      "bytes": 2918,
+      "sha256": "66f1276bd4fdeafa2b3eb370598250b40248bb7ed356829c7bf257635512cab3"
+    },
+    {
+      "path": "tests/fixtures/native-movie-inspection/title.mp4",
+      "bytes": 2972,
+      "sha256": "7c41053e177dd103e6a2a40e4b634a9cdaa48288b3ac3a028d64facffff636a7"
+    },
+    {
+      "path": "tests/fixtures/native-movie-inspection/sar.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+    },
+    {
+      "path": "tests/fixtures/native-movie-inspection/title.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+    }
+  ],
+  "reverifiedOwnCopiedOutputs": 1718,
+  "outputBytes": 24911034,
+  "runtimeManifestSHA256": "57db13ec5ebbc683735bf388fb5d26fd0f533256c37fd3a8be67c7f35766c99e",
+  "aliases": [
+    {
+      "path": "node_modules/.pnpm",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm"
+    },
+    {
+      "path": "node_modules/solc",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/solc@0.8.36/node_modules/solc"
+    },
+    {
+      "path": "node_modules/typescript",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
+    },
+    {
+      "path": "node_modules/viem",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/viem@2.55.19_typescript@5.9.3_zod@4.5.4/node_modules/viem"
+    },
+    {
+      "path": "node_modules/yaml",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/yaml@2.8.2/node_modules/yaml"
+    },
+    {
+      "path": "node_modules/esbuild",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild"
+    },
+    {
+      "path": "node_modules/@types/node",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@types+node@22.20.1/node_modules/@types/node"
+    },
+    {
+      "path": "node_modules/@wagmi/connectors",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@wagmi+connectors@8.1.0_@wagmi+core@3.6.4_@tanstack+query-core@5.102.8_@types+react@19._517417a4ed73aa4efe451520c5d47bd5/node_modules/@wagmi/connectors"
+    },
+    {
+      "path": "node_modules/@wagmi/core",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@wagmi+core@3.6.4_@tanstack+query-core@5.102.8_@types+react@19.2.18_react@19.2.0_typesc_a017c76c60ab76be6d16c134d9b3c0db/node_modules/@wagmi/core"
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@openzeppelin+contracts@5.6.1/node_modules/@openzeppelin/contracts"
+    },
+    {
+      "path": "node_modules/@keel/pixel-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/pixel-engine"
+    },
+    {
+      "path": "node_modules/@keel/sprite-codex",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sprite-codex"
+    },
+    {
+      "path": "node_modules/@keel/game-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/game-engine"
+    },
+    {
+      "path": "node_modules/@keel/mcp",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/mcp"
+    },
+    {
+      "path": "node_modules/@keel/protocol",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/protocol"
+    },
+    {
+      "path": "node_modules/@keel/mint-queue",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/mint-queue"
+    },
+    {
+      "path": "node_modules/@keel/viewer",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/viewer"
+    },
+    {
+      "path": "node_modules/@keel/sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sdk"
+    },
+    {
+      "path": "node_modules/@keel/sandbox-sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sandbox-sdk"
+    },
+    {
+      "path": "node_modules/@keel/ethereum-adapter",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/ethereum-adapter"
+    },
+    {
+      "path": "node_modules/@keel/studio-core",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/studio-core"
+    },
+    {
+      "path": "node_modules/@keel/builder",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/builder"
+    },
+    {
+      "path": "node_modules/@keel/web3-boundary-tests",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/web3-boundary-tests"
+    },
+    {
+      "path": "packages/sprite-codex/node_modules/typescript",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
+    },
+    {
+      "path": "packages/sprite-codex/node_modules/sharp",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/sharp@0.35.3_@types+node@22.20.1/node_modules/sharp"
+    },
+    {
+      "path": "packages/sprite-codex/node_modules/@types/node",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@types+node@22.20.1/node_modules/@types/node"
+    },
+    {
+      "path": "packages/sprite-codex/node_modules/@keel/pixel-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/pixel-engine"
+    },
+    {
+      "path": "packages/sprite-codex/node_modules/@keel/sprite-codex",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sprite-codex"
+    },
+    {
+      "path": "packages/sprite-codex/node_modules/@keel/game-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/game-engine"
+    },
+    {
+      "path": "packages/sprite-codex/node_modules/@keel/mcp",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/mcp"
+    },
+    {
+      "path": "packages/sprite-codex/node_modules/@keel/protocol",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/protocol"
+    },
+    {
+      "path": "packages/sprite-codex/node_modules/@keel/mint-queue",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/mint-queue"
+    },
+    {
+      "path": "packages/sprite-codex/node_modules/@keel/viewer",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/viewer"
+    },
+    {
+      "path": "packages/sprite-codex/node_modules/@keel/sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sdk"
+    },
+    {
+      "path": "packages/sprite-codex/node_modules/@keel/sandbox-sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sandbox-sdk"
+    },
+    {
+      "path": "packages/sprite-codex/node_modules/@keel/ethereum-adapter",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/ethereum-adapter"
+    },
+    {
+      "path": "packages/sprite-codex/node_modules/@keel/studio-core",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/studio-core"
+    },
+    {
+      "path": "packages/sprite-codex/node_modules/@keel/builder",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/builder"
+    },
+    {
+      "path": "packages/sprite-codex/node_modules/@keel/web3-boundary-tests",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/web3-boundary-tests"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/keel",
+      "target": "/Users/ravonus/dev/keel-engine/packages/keel"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/ads",
+      "target": "/Users/ravonus/dev/keel-engine/packages/ads"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/decal",
+      "target": "/Users/ravonus/dev/keel-engine/packages/decal"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/ui",
+      "target": "/Users/ravonus/dev/keel-engine/packages/ui"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/worldgen",
+      "target": "/Users/ravonus/dev/keel-engine/packages/worldgen"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/proof",
+      "target": "/Users/ravonus/dev/keel-engine/packages/proof"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/buildings",
+      "target": "/Users/ravonus/dev/keel-engine/packs/buildings"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/capture",
+      "target": "/Users/ravonus/dev/keel-engine/packages/capture"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/city",
+      "target": "/Users/ravonus/dev/keel-engine/packages/city"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/core",
+      "target": "/Users/ravonus/dev/keel-engine/packages/core"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/vehicle",
+      "target": "/Users/ravonus/dev/keel-engine/packages/vehicle"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/lod",
+      "target": "/Users/ravonus/dev/keel-engine/packages/lod"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/input",
+      "target": "/Users/ravonus/dev/keel-engine/packages/input"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/driver",
+      "target": "/Users/ravonus/dev/keel-engine/packages/driver"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/entity",
+      "target": "/Users/ravonus/dev/keel-engine/packages/entity"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/camera",
+      "target": "/Users/ravonus/dev/keel-engine/packages/camera"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/herd",
+      "target": "/Users/ravonus/dev/keel-engine/ai/herd"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/codec",
+      "target": "/Users/ravonus/dev/keel-engine/packages/codec"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/road",
+      "target": "/Users/ravonus/dev/keel-engine/packages/road"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/runtime",
+      "target": "/Users/ravonus/dev/keel-engine/packages/runtime"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/dungeon",
+      "target": "/Users/ravonus/dev/keel-engine/packs/dungeon"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/render",
+      "target": "/Users/ravonus/dev/keel-engine/packages/render"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/world",
+      "target": "/Users/ravonus/dev/keel-engine/packages/world"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/particles",
+      "target": "/Users/ravonus/dev/keel-engine/packages/particles"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/humans",
+      "target": "/Users/ravonus/dev/keel-engine/packs/humans"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/controls",
+      "target": "/Users/ravonus/dev/keel-engine/packages/controls"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/architecture",
+      "target": "/Users/ravonus/dev/keel-engine/packages/architecture"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/audio",
+      "target": "/Users/ravonus/dev/keel-engine/packages/audio"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/object",
+      "target": "/Users/ravonus/dev/keel-engine/packages/object"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/animals",
+      "target": "/Users/ravonus/dev/keel-engine/packs/animals"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/terrain",
+      "target": "/Users/ravonus/dev/keel-engine/packages/terrain"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/foliage",
+      "target": "/Users/ravonus/dev/keel-engine/packs/foliage"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/view",
+      "target": "/Users/ravonus/dev/keel-engine/packages/view"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/elevation",
+      "target": "/Users/ravonus/dev/keel-engine/packages/elevation"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/vehicles",
+      "target": "/Users/ravonus/dev/keel-engine/packs/vehicles"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/cloth",
+      "target": "/Users/ravonus/dev/keel-engine/packs/cloth"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/bake",
+      "target": "/Users/ravonus/dev/keel-engine/packages/bake"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/arena",
+      "target": "/Users/ravonus/dev/keel-engine/packages/arena"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/replay",
+      "target": "/Users/ravonus/dev/keel-engine/packages/replay"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/physics",
+      "target": "/Users/ravonus/dev/keel-engine/packages/physics"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/level",
+      "target": "/Users/ravonus/dev/keel-engine/packages/level"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/scene",
+      "target": "/Users/ravonus/dev/keel-engine/packages/scene"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/creatures",
+      "target": "/Users/ravonus/dev/keel-engine/packs/creatures"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/import",
+      "target": "/Users/ravonus/dev/keel-engine/packages/import"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/builder",
+      "target": "/Users/ravonus/dev/keel-engine/packages/builder"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/wander",
+      "target": "/Users/ravonus/dev/keel-engine/ai/wander"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel-engine/alchemy",
+      "target": "/Users/ravonus/dev/keel-engine/packages/alchemy"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel/pixel-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/pixel-engine"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel/sprite-codex",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sprite-codex"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel/game-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/game-engine"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel/mcp",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/mcp"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel/protocol",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/protocol"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel/mint-queue",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/mint-queue"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel/viewer",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/viewer"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel/sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sdk"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel/sandbox-sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sandbox-sdk"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel/ethereum-adapter",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/ethereum-adapter"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel/studio-core",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/studio-core"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel/builder",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/builder"
+    },
+    {
+      "path": "packages/game-engine/node_modules/@keel/web3-boundary-tests",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/web3-boundary-tests"
+    },
+    {
+      "path": "packages/mcp/node_modules/typescript",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
+    },
+    {
+      "path": "packages/mcp/node_modules/@keel/pixel-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/pixel-engine"
+    },
+    {
+      "path": "packages/mcp/node_modules/@keel/sprite-codex",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sprite-codex"
+    },
+    {
+      "path": "packages/mcp/node_modules/@keel/game-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/game-engine"
+    },
+    {
+      "path": "packages/mcp/node_modules/@keel/mcp",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/mcp"
+    },
+    {
+      "path": "packages/mcp/node_modules/@keel/protocol",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/protocol"
+    },
+    {
+      "path": "packages/mcp/node_modules/@keel/mint-queue",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/mint-queue"
+    },
+    {
+      "path": "packages/mcp/node_modules/@keel/viewer",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/viewer"
+    },
+    {
+      "path": "packages/mcp/node_modules/@keel/sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sdk"
+    },
+    {
+      "path": "packages/mcp/node_modules/@keel/sandbox-sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sandbox-sdk"
+    },
+    {
+      "path": "packages/mcp/node_modules/@keel/ethereum-adapter",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/ethereum-adapter"
+    },
+    {
+      "path": "packages/mcp/node_modules/@keel/studio-core",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/studio-core"
+    },
+    {
+      "path": "packages/mcp/node_modules/@keel/builder",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/builder"
+    },
+    {
+      "path": "packages/mcp/node_modules/@keel/web3-boundary-tests",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/web3-boundary-tests"
+    },
+    {
+      "path": "packages/protocol/node_modules/typescript",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
+    },
+    {
+      "path": "packages/protocol/node_modules/@keel/pixel-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/pixel-engine"
+    },
+    {
+      "path": "packages/protocol/node_modules/@keel/sprite-codex",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sprite-codex"
+    },
+    {
+      "path": "packages/protocol/node_modules/@keel/game-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/game-engine"
+    },
+    {
+      "path": "packages/protocol/node_modules/@keel/mcp",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/mcp"
+    },
+    {
+      "path": "packages/protocol/node_modules/@keel/protocol",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/protocol"
+    },
+    {
+      "path": "packages/protocol/node_modules/@keel/mint-queue",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/mint-queue"
+    },
+    {
+      "path": "packages/protocol/node_modules/@keel/viewer",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/viewer"
+    },
+    {
+      "path": "packages/protocol/node_modules/@keel/sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sdk"
+    },
+    {
+      "path": "packages/protocol/node_modules/@keel/sandbox-sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sandbox-sdk"
+    },
+    {
+      "path": "packages/protocol/node_modules/@keel/ethereum-adapter",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/ethereum-adapter"
+    },
+    {
+      "path": "packages/protocol/node_modules/@keel/studio-core",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/studio-core"
+    },
+    {
+      "path": "packages/protocol/node_modules/@keel/builder",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/builder"
+    },
+    {
+      "path": "packages/protocol/node_modules/@keel/web3-boundary-tests",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/web3-boundary-tests"
+    },
+    {
+      "path": "packages/viewer/node_modules/typescript",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
+    },
+    {
+      "path": "packages/viewer/node_modules/esbuild",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild"
+    },
+    {
+      "path": "packages/viewer/node_modules/@keel/pixel-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/pixel-engine"
+    },
+    {
+      "path": "packages/viewer/node_modules/@keel/sprite-codex",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sprite-codex"
+    },
+    {
+      "path": "packages/viewer/node_modules/@keel/game-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/game-engine"
+    },
+    {
+      "path": "packages/viewer/node_modules/@keel/mcp",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/mcp"
+    },
+    {
+      "path": "packages/viewer/node_modules/@keel/protocol",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/protocol"
+    },
+    {
+      "path": "packages/viewer/node_modules/@keel/mint-queue",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/mint-queue"
+    },
+    {
+      "path": "packages/viewer/node_modules/@keel/viewer",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/viewer"
+    },
+    {
+      "path": "packages/viewer/node_modules/@keel/sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sdk"
+    },
+    {
+      "path": "packages/viewer/node_modules/@keel/sandbox-sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sandbox-sdk"
+    },
+    {
+      "path": "packages/viewer/node_modules/@keel/ethereum-adapter",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/ethereum-adapter"
+    },
+    {
+      "path": "packages/viewer/node_modules/@keel/studio-core",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/studio-core"
+    },
+    {
+      "path": "packages/viewer/node_modules/@keel/builder",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/builder"
+    },
+    {
+      "path": "packages/viewer/node_modules/@keel/web3-boundary-tests",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/web3-boundary-tests"
+    },
+    {
+      "path": "packages/sdk/node_modules/typescript",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
+    },
+    {
+      "path": "packages/sdk/node_modules/saxes",
+      "target": "/Users/ravonus/dev/wt/studio-public-discovery-20261020/keel-site/node_modules/.pnpm/saxes@6.0.0/node_modules/saxes"
+    },
+    {
+      "path": "packages/sdk/node_modules/viem",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/viem@2.55.19_typescript@5.9.3_zod@4.5.4/node_modules/viem"
+    },
+    {
+      "path": "packages/sdk/node_modules/esbuild",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild"
+    },
+    {
+      "path": "packages/sdk/node_modules/terser",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/terser@5.44.0/node_modules/terser"
+    },
+    {
+      "path": "packages/sdk/node_modules/@types/node",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@types+node@22.20.1/node_modules/@types/node"
+    },
+    {
+      "path": "packages/sdk/node_modules/@noble/hashes",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@noble+hashes@1.8.0/node_modules/@noble/hashes"
+    },
+    {
+      "path": "packages/sdk/node_modules/@jsquash/webp",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@jsquash+webp@1.5.0/node_modules/@jsquash/webp"
+    },
+    {
+      "path": "packages/sdk/node_modules/@jsquash/png",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@jsquash+png@3.1.1/node_modules/@jsquash/png"
+    },
+    {
+      "path": "packages/sdk/node_modules/@keel/pixel-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/pixel-engine"
+    },
+    {
+      "path": "packages/sdk/node_modules/@keel/sprite-codex",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sprite-codex"
+    },
+    {
+      "path": "packages/sdk/node_modules/@keel/game-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/game-engine"
+    },
+    {
+      "path": "packages/sdk/node_modules/@keel/mcp",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/mcp"
+    },
+    {
+      "path": "packages/sdk/node_modules/@keel/protocol",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/protocol"
+    },
+    {
+      "path": "packages/sdk/node_modules/@keel/mint-queue",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/mint-queue"
+    },
+    {
+      "path": "packages/sdk/node_modules/@keel/viewer",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/viewer"
+    },
+    {
+      "path": "packages/sdk/node_modules/@keel/sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sdk"
+    },
+    {
+      "path": "packages/sdk/node_modules/@keel/sandbox-sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sandbox-sdk"
+    },
+    {
+      "path": "packages/sdk/node_modules/@keel/ethereum-adapter",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/ethereum-adapter"
+    },
+    {
+      "path": "packages/sdk/node_modules/@keel/studio-core",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/studio-core"
+    },
+    {
+      "path": "packages/sdk/node_modules/@keel/builder",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/builder"
+    },
+    {
+      "path": "packages/sdk/node_modules/@keel/web3-boundary-tests",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/web3-boundary-tests"
+    },
+    {
+      "path": "packages/sandbox-sdk/node_modules/typescript",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
+    },
+    {
+      "path": "packages/sandbox-sdk/node_modules/@keel/pixel-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/pixel-engine"
+    },
+    {
+      "path": "packages/sandbox-sdk/node_modules/@keel/sprite-codex",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sprite-codex"
+    },
+    {
+      "path": "packages/sandbox-sdk/node_modules/@keel/game-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/game-engine"
+    },
+    {
+      "path": "packages/sandbox-sdk/node_modules/@keel/mcp",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/mcp"
+    },
+    {
+      "path": "packages/sandbox-sdk/node_modules/@keel/protocol",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/protocol"
+    },
+    {
+      "path": "packages/sandbox-sdk/node_modules/@keel/mint-queue",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/mint-queue"
+    },
+    {
+      "path": "packages/sandbox-sdk/node_modules/@keel/viewer",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/viewer"
+    },
+    {
+      "path": "packages/sandbox-sdk/node_modules/@keel/sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sdk"
+    },
+    {
+      "path": "packages/sandbox-sdk/node_modules/@keel/sandbox-sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sandbox-sdk"
+    },
+    {
+      "path": "packages/sandbox-sdk/node_modules/@keel/ethereum-adapter",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/ethereum-adapter"
+    },
+    {
+      "path": "packages/sandbox-sdk/node_modules/@keel/studio-core",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/studio-core"
+    },
+    {
+      "path": "packages/sandbox-sdk/node_modules/@keel/builder",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/builder"
+    },
+    {
+      "path": "packages/sandbox-sdk/node_modules/@keel/web3-boundary-tests",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/web3-boundary-tests"
+    },
+    {
+      "path": "packages/ethereum-adapter/node_modules/typescript",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
+    },
+    {
+      "path": "packages/ethereum-adapter/node_modules/viem",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/viem@2.55.19_typescript@5.9.3_zod@4.5.4/node_modules/viem"
+    },
+    {
+      "path": "packages/ethereum-adapter/node_modules/@keel/pixel-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/pixel-engine"
+    },
+    {
+      "path": "packages/ethereum-adapter/node_modules/@keel/sprite-codex",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sprite-codex"
+    },
+    {
+      "path": "packages/ethereum-adapter/node_modules/@keel/game-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/game-engine"
+    },
+    {
+      "path": "packages/ethereum-adapter/node_modules/@keel/mcp",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/mcp"
+    },
+    {
+      "path": "packages/ethereum-adapter/node_modules/@keel/protocol",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/protocol"
+    },
+    {
+      "path": "packages/ethereum-adapter/node_modules/@keel/mint-queue",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/mint-queue"
+    },
+    {
+      "path": "packages/ethereum-adapter/node_modules/@keel/viewer",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/viewer"
+    },
+    {
+      "path": "packages/ethereum-adapter/node_modules/@keel/sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sdk"
+    },
+    {
+      "path": "packages/ethereum-adapter/node_modules/@keel/sandbox-sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sandbox-sdk"
+    },
+    {
+      "path": "packages/ethereum-adapter/node_modules/@keel/ethereum-adapter",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/ethereum-adapter"
+    },
+    {
+      "path": "packages/ethereum-adapter/node_modules/@keel/studio-core",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/studio-core"
+    },
+    {
+      "path": "packages/ethereum-adapter/node_modules/@keel/builder",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/builder"
+    },
+    {
+      "path": "packages/ethereum-adapter/node_modules/@keel/web3-boundary-tests",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/web3-boundary-tests"
+    },
+    {
+      "path": "packages/studio-core/node_modules/onchfs",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/onchfs@0.1.0_typescript@5.9.3_zod@4.5.4/node_modules/onchfs"
+    },
+    {
+      "path": "packages/studio-core/node_modules/typescript",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
+    },
+    {
+      "path": "packages/studio-core/node_modules/sharp",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/sharp@0.35.3_@types+node@22.20.1/node_modules/sharp"
+    },
+    {
+      "path": "packages/studio-core/node_modules/@keel/pixel-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/pixel-engine"
+    },
+    {
+      "path": "packages/studio-core/node_modules/@keel/sprite-codex",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sprite-codex"
+    },
+    {
+      "path": "packages/studio-core/node_modules/@keel/game-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/game-engine"
+    },
+    {
+      "path": "packages/studio-core/node_modules/@keel/mcp",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/mcp"
+    },
+    {
+      "path": "packages/studio-core/node_modules/@keel/protocol",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/protocol"
+    },
+    {
+      "path": "packages/studio-core/node_modules/@keel/mint-queue",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/mint-queue"
+    },
+    {
+      "path": "packages/studio-core/node_modules/@keel/viewer",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/viewer"
+    },
+    {
+      "path": "packages/studio-core/node_modules/@keel/sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sdk"
+    },
+    {
+      "path": "packages/studio-core/node_modules/@keel/sandbox-sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sandbox-sdk"
+    },
+    {
+      "path": "packages/studio-core/node_modules/@keel/ethereum-adapter",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/ethereum-adapter"
+    },
+    {
+      "path": "packages/studio-core/node_modules/@keel/studio-core",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/studio-core"
+    },
+    {
+      "path": "packages/studio-core/node_modules/@keel/builder",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/builder"
+    },
+    {
+      "path": "packages/studio-core/node_modules/@keel/web3-boundary-tests",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/web3-boundary-tests"
+    },
+    {
+      "path": "packages/builder/node_modules/ffmpeg-static",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/ffmpeg-static@5.3.0/node_modules/ffmpeg-static"
+    },
+    {
+      "path": "packages/builder/node_modules/typescript",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
+    },
+    {
+      "path": "packages/builder/node_modules/esbuild",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild"
+    },
+    {
+      "path": "packages/builder/node_modules/terser",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/terser@5.44.0/node_modules/terser"
+    },
+    {
+      "path": "packages/builder/node_modules/sharp",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/sharp@0.35.3_@types+node@22.20.1/node_modules/sharp"
+    },
+    {
+      "path": "packages/builder/node_modules/@gltf-transform/core",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@gltf-transform+core@4.4.2/node_modules/@gltf-transform/core"
+    },
+    {
+      "path": "packages/builder/node_modules/@gltf-transform/extensions",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@gltf-transform+extensions@4.4.2/node_modules/@gltf-transform/extensions"
+    },
+    {
+      "path": "packages/builder/node_modules/@gltf-transform/functions",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@gltf-transform+functions@4.4.2_@types+node@22.20.1/node_modules/@gltf-transform/functions"
+    },
+    {
+      "path": "packages/builder/node_modules/@keel/pixel-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/pixel-engine"
+    },
+    {
+      "path": "packages/builder/node_modules/@keel/sprite-codex",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sprite-codex"
+    },
+    {
+      "path": "packages/builder/node_modules/@keel/game-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/game-engine"
+    },
+    {
+      "path": "packages/builder/node_modules/@keel/mcp",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/mcp"
+    },
+    {
+      "path": "packages/builder/node_modules/@keel/protocol",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/protocol"
+    },
+    {
+      "path": "packages/builder/node_modules/@keel/mint-queue",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/mint-queue"
+    },
+    {
+      "path": "packages/builder/node_modules/@keel/viewer",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/viewer"
+    },
+    {
+      "path": "packages/builder/node_modules/@keel/sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sdk"
+    },
+    {
+      "path": "packages/builder/node_modules/@keel/sandbox-sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sandbox-sdk"
+    },
+    {
+      "path": "packages/builder/node_modules/@keel/ethereum-adapter",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/ethereum-adapter"
+    },
+    {
+      "path": "packages/builder/node_modules/@keel/studio-core",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/studio-core"
+    },
+    {
+      "path": "packages/builder/node_modules/@keel/builder",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/builder"
+    },
+    {
+      "path": "packages/builder/node_modules/@keel/web3-boundary-tests",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/web3-boundary-tests"
+    },
+    {
+      "path": "packages/web3-boundary-tests/node_modules/@keel/pixel-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/pixel-engine"
+    },
+    {
+      "path": "packages/web3-boundary-tests/node_modules/@keel/sprite-codex",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sprite-codex"
+    },
+    {
+      "path": "packages/web3-boundary-tests/node_modules/@keel/game-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/game-engine"
+    },
+    {
+      "path": "packages/web3-boundary-tests/node_modules/@keel/mcp",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/mcp"
+    },
+    {
+      "path": "packages/web3-boundary-tests/node_modules/@keel/protocol",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/protocol"
+    },
+    {
+      "path": "packages/web3-boundary-tests/node_modules/@keel/mint-queue",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/mint-queue"
+    },
+    {
+      "path": "packages/web3-boundary-tests/node_modules/@keel/viewer",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/viewer"
+    },
+    {
+      "path": "packages/web3-boundary-tests/node_modules/@keel/sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sdk"
+    },
+    {
+      "path": "packages/web3-boundary-tests/node_modules/@keel/sandbox-sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/sandbox-sdk"
+    },
+    {
+      "path": "packages/web3-boundary-tests/node_modules/@keel/ethereum-adapter",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/ethereum-adapter"
+    },
+    {
+      "path": "packages/web3-boundary-tests/node_modules/@keel/studio-core",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/studio-core"
+    },
+    {
+      "path": "packages/web3-boundary-tests/node_modules/@keel/builder",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/builder"
+    },
+    {
+      "path": "packages/web3-boundary-tests/node_modules/@keel/web3-boundary-tests",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-01/test-portability-sdk/packages/web3-boundary-tests"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "command": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "--test",
+    "--test-concurrency=1",
+    "tests/reviewer-native-movie-boundaries.original.mjs"
+  ],
+  "cwd": "/private/tmp/keel-independent-native-movie-20261022-01/keel-sdk",
+  "source": "9f5bf42309efae5ee933850c9afab618cf29121b",
+  "testSHA256": "141b97b42fe23453bcade9b4ae3e08d494a32f0b52b5ba24f4fdbaf4abab2523",
+  "patchSHA256": "dc153a3e43917753e0e420930d81d8c3cdc4692eb58aed9c473f34dc0043e05a",
+  "exit": 1,
+  "elapsed": 0.3712308406829834
+}

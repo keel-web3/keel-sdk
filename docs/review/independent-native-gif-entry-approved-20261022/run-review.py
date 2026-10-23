@@ -1,0 +1,4 @@
+import subprocess,json,time,os,sys
+from pathlib import Path
+r=Path(__file__).parent;n='/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node';name=sys.argv[1];cwd=r/sys.argv[2];args=sys.argv[3:];env=os.environ.copy();env['KEEL_CHROME_HEADLESS_SHELL']='/Users/ravonus/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell'
+dest=r/'evidence'/('site-results' if sys.argv[2].startswith('keel-site') else 'browser-results');dest.mkdir(exist_ok=True);env['KEEL_TEMPORAL_EVIDENCE_DIR']=str(dest);t=time.time();p=subprocess.run([n,*args],cwd=cwd,env=env,capture_output=True);(r/'evidence'/f'{name}.stdout').write_bytes(p.stdout);(r/'evidence'/f'{name}.stderr').write_bytes(p.stderr);result={'command':[n,*args],'cwd':str(cwd),'exit':p.returncode,'elapsed':time.time()-t};(r/'evidence'/f'{name}.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result));sys.exit(p.returncode)

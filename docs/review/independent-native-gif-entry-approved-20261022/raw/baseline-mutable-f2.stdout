@@ -1,0 +1,47 @@
+TAP version 13
+# Subtest: native compare binds frame and declared timeline to the same initial actual source bytes
+not ok 1 - native compare binds frame and declared timeline to the same initial actual source bytes
+  ---
+  duration_ms: 23.642333
+  type: 'test'
+  location: '/private/tmp/keel-independent-native-gif-20261022-01/keel-sdk/reviewer-native-gif-mutable-input.test.mjs:8:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    inspection must not relabel another actual source timeline with the initial digest
+    + actual - expected
+    
+      [
+    +   10,
+    +   20,
+    +   30
+    -   120,
+    -   240,
+    -   200
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 120
+    1: 240
+    2: 200
+  actual:
+    0: 10
+    1: 20
+    2: 30
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///private/tmp/keel-independent-native-gif-20261022-01/keel-sdk/reviewer-native-gif-mutable-input.test.mjs:13:9)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# {"committed":"0x19a488cb5a0d34f20c3d0d266797b65c62ab197554f7e484377954ee5acb83a5","initial":"0x19a488cb5a0d34f20c3d0d266797b65c62ab197554f7e484377954ee5acb83a5","mutated":"0x35fd32e1ac822834d6e945ce225c13a0c48731397a5578b86bd9aafae3546435","sourceFrameTimeMs":10,"declared":[10,20,30]}
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 325.456958

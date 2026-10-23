@@ -1,0 +1,1944 @@
+{
+  "sdk": "fefd8fc91c7e286143a8857edfbb5cdddafbcb56",
+  "site": "5453cfd7cd2380baac494a05971bffa441406ab8",
+  "runtime": "no outputs copied; fresh build required",
+  "aliases": [
+    {
+      "path": "keel-sdk/node_modules/.pnpm",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/node_modules/solc",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/solc@0.8.36/node_modules/solc",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/node_modules/typescript",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/node_modules/viem",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/viem@2.55.19_typescript@5.9.3_zod@4.5.4/node_modules/viem",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/node_modules/yaml",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/yaml@2.8.2/node_modules/yaml",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/node_modules/esbuild",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/node_modules/@types/node",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@types+node@22.20.1/node_modules/@types/node",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/node_modules/@wagmi/connectors",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@wagmi+connectors@8.1.0_@wagmi+core@3.6.4_@tanstack+query-core@5.102.8_@types+react@19._517417a4ed73aa4efe451520c5d47bd5/node_modules/@wagmi/connectors",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/node_modules/@wagmi/core",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@wagmi+core@3.6.4_@tanstack+query-core@5.102.8_@types+react@19.2.18_react@19.2.0_typesc_a017c76c60ab76be6d16c134d9b3c0db/node_modules/@wagmi/core",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/node_modules/@openzeppelin/contracts",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@openzeppelin+contracts@5.6.1/node_modules/@openzeppelin/contracts",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/node_modules/@keel/pixel-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/pixel-engine",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/node_modules/@keel/sprite-codex",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sprite-codex",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/node_modules/@keel/game-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/game-engine",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/node_modules/@keel/mcp",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/mcp",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/node_modules/@keel/protocol",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/protocol",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/node_modules/@keel/mint-queue",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/mint-queue",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/node_modules/@keel/viewer",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/viewer",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/node_modules/@keel/sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sdk",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/node_modules/@keel/sandbox-sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sandbox-sdk",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/node_modules/@keel/ethereum-adapter",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/ethereum-adapter",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/node_modules/@keel/studio-core",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/studio-core",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/node_modules/@keel/builder",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/builder",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/node_modules/@keel/web3-boundary-tests",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/web3-boundary-tests",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sprite-codex/node_modules/typescript",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sprite-codex/node_modules/sharp",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/sharp@0.35.3_@types+node@22.20.1/node_modules/sharp",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sprite-codex/node_modules/@types/node",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@types+node@22.20.1/node_modules/@types/node",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sprite-codex/node_modules/@keel/pixel-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/pixel-engine",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sprite-codex/node_modules/@keel/sprite-codex",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sprite-codex",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sprite-codex/node_modules/@keel/game-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/game-engine",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sprite-codex/node_modules/@keel/mcp",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/mcp",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sprite-codex/node_modules/@keel/protocol",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/protocol",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sprite-codex/node_modules/@keel/mint-queue",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/mint-queue",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sprite-codex/node_modules/@keel/viewer",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/viewer",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sprite-codex/node_modules/@keel/sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sdk",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sprite-codex/node_modules/@keel/sandbox-sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sandbox-sdk",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sprite-codex/node_modules/@keel/ethereum-adapter",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/ethereum-adapter",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sprite-codex/node_modules/@keel/studio-core",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/studio-core",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sprite-codex/node_modules/@keel/builder",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/builder",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sprite-codex/node_modules/@keel/web3-boundary-tests",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/web3-boundary-tests",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/keel",
+      "target": "/Users/ravonus/dev/keel-engine/packages/keel",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/ads",
+      "target": "/Users/ravonus/dev/keel-engine/packages/ads",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/decal",
+      "target": "/Users/ravonus/dev/keel-engine/packages/decal",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/ui",
+      "target": "/Users/ravonus/dev/keel-engine/packages/ui",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/worldgen",
+      "target": "/Users/ravonus/dev/keel-engine/packages/worldgen",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/proof",
+      "target": "/Users/ravonus/dev/keel-engine/packages/proof",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/buildings",
+      "target": "/Users/ravonus/dev/keel-engine/packs/buildings",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/capture",
+      "target": "/Users/ravonus/dev/keel-engine/packages/capture",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/city",
+      "target": "/Users/ravonus/dev/keel-engine/packages/city",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/core",
+      "target": "/Users/ravonus/dev/keel-engine/packages/core",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/vehicle",
+      "target": "/Users/ravonus/dev/keel-engine/packages/vehicle",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/lod",
+      "target": "/Users/ravonus/dev/keel-engine/packages/lod",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/input",
+      "target": "/Users/ravonus/dev/keel-engine/packages/input",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/driver",
+      "target": "/Users/ravonus/dev/keel-engine/packages/driver",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/entity",
+      "target": "/Users/ravonus/dev/keel-engine/packages/entity",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/camera",
+      "target": "/Users/ravonus/dev/keel-engine/packages/camera",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/herd",
+      "target": "/Users/ravonus/dev/keel-engine/ai/herd",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/codec",
+      "target": "/Users/ravonus/dev/keel-engine/packages/codec",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/road",
+      "target": "/Users/ravonus/dev/keel-engine/packages/road",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/runtime",
+      "target": "/Users/ravonus/dev/keel-engine/packages/runtime",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/dungeon",
+      "target": "/Users/ravonus/dev/keel-engine/packs/dungeon",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/render",
+      "target": "/Users/ravonus/dev/keel-engine/packages/render",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/world",
+      "target": "/Users/ravonus/dev/keel-engine/packages/world",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/particles",
+      "target": "/Users/ravonus/dev/keel-engine/packages/particles",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/humans",
+      "target": "/Users/ravonus/dev/keel-engine/packs/humans",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/controls",
+      "target": "/Users/ravonus/dev/keel-engine/packages/controls",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/architecture",
+      "target": "/Users/ravonus/dev/keel-engine/packages/architecture",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/audio",
+      "target": "/Users/ravonus/dev/keel-engine/packages/audio",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/object",
+      "target": "/Users/ravonus/dev/keel-engine/packages/object",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/animals",
+      "target": "/Users/ravonus/dev/keel-engine/packs/animals",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/terrain",
+      "target": "/Users/ravonus/dev/keel-engine/packages/terrain",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/foliage",
+      "target": "/Users/ravonus/dev/keel-engine/packs/foliage",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/view",
+      "target": "/Users/ravonus/dev/keel-engine/packages/view",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/elevation",
+      "target": "/Users/ravonus/dev/keel-engine/packages/elevation",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/vehicles",
+      "target": "/Users/ravonus/dev/keel-engine/packs/vehicles",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/cloth",
+      "target": "/Users/ravonus/dev/keel-engine/packs/cloth",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/bake",
+      "target": "/Users/ravonus/dev/keel-engine/packages/bake",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/arena",
+      "target": "/Users/ravonus/dev/keel-engine/packages/arena",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/replay",
+      "target": "/Users/ravonus/dev/keel-engine/packages/replay",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/physics",
+      "target": "/Users/ravonus/dev/keel-engine/packages/physics",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/level",
+      "target": "/Users/ravonus/dev/keel-engine/packages/level",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/scene",
+      "target": "/Users/ravonus/dev/keel-engine/packages/scene",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/creatures",
+      "target": "/Users/ravonus/dev/keel-engine/packs/creatures",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/import",
+      "target": "/Users/ravonus/dev/keel-engine/packages/import",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/builder",
+      "target": "/Users/ravonus/dev/keel-engine/packages/builder",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/wander",
+      "target": "/Users/ravonus/dev/keel-engine/ai/wander",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel-engine/alchemy",
+      "target": "/Users/ravonus/dev/keel-engine/packages/alchemy",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel/pixel-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/pixel-engine",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel/sprite-codex",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sprite-codex",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel/game-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/game-engine",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel/mcp",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/mcp",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel/protocol",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/protocol",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel/mint-queue",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/mint-queue",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel/viewer",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/viewer",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel/sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sdk",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel/sandbox-sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sandbox-sdk",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel/ethereum-adapter",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/ethereum-adapter",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel/studio-core",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/studio-core",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel/builder",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/builder",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/game-engine/node_modules/@keel/web3-boundary-tests",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/web3-boundary-tests",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/mcp/node_modules/typescript",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/mcp/node_modules/@keel/pixel-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/pixel-engine",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/mcp/node_modules/@keel/sprite-codex",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sprite-codex",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/mcp/node_modules/@keel/game-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/game-engine",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/mcp/node_modules/@keel/mcp",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/mcp",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/mcp/node_modules/@keel/protocol",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/protocol",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/mcp/node_modules/@keel/mint-queue",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/mint-queue",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/mcp/node_modules/@keel/viewer",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/viewer",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/mcp/node_modules/@keel/sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sdk",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/mcp/node_modules/@keel/sandbox-sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sandbox-sdk",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/mcp/node_modules/@keel/ethereum-adapter",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/ethereum-adapter",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/mcp/node_modules/@keel/studio-core",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/studio-core",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/mcp/node_modules/@keel/builder",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/builder",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/mcp/node_modules/@keel/web3-boundary-tests",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/web3-boundary-tests",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/protocol/node_modules/typescript",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/protocol/node_modules/@keel/pixel-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/pixel-engine",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/protocol/node_modules/@keel/sprite-codex",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sprite-codex",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/protocol/node_modules/@keel/game-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/game-engine",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/protocol/node_modules/@keel/mcp",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/mcp",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/protocol/node_modules/@keel/protocol",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/protocol",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/protocol/node_modules/@keel/mint-queue",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/mint-queue",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/protocol/node_modules/@keel/viewer",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/viewer",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/protocol/node_modules/@keel/sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sdk",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/protocol/node_modules/@keel/sandbox-sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sandbox-sdk",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/protocol/node_modules/@keel/ethereum-adapter",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/ethereum-adapter",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/protocol/node_modules/@keel/studio-core",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/studio-core",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/protocol/node_modules/@keel/builder",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/builder",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/protocol/node_modules/@keel/web3-boundary-tests",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/web3-boundary-tests",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/viewer/node_modules/typescript",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/viewer/node_modules/esbuild",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/viewer/node_modules/@keel/pixel-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/pixel-engine",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/viewer/node_modules/@keel/sprite-codex",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sprite-codex",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/viewer/node_modules/@keel/game-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/game-engine",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/viewer/node_modules/@keel/mcp",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/mcp",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/viewer/node_modules/@keel/protocol",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/protocol",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/viewer/node_modules/@keel/mint-queue",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/mint-queue",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/viewer/node_modules/@keel/viewer",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/viewer",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/viewer/node_modules/@keel/sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sdk",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/viewer/node_modules/@keel/sandbox-sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sandbox-sdk",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/viewer/node_modules/@keel/ethereum-adapter",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/ethereum-adapter",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/viewer/node_modules/@keel/studio-core",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/studio-core",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/viewer/node_modules/@keel/builder",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/builder",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/viewer/node_modules/@keel/web3-boundary-tests",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/web3-boundary-tests",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sdk/node_modules/typescript",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sdk/node_modules/saxes",
+      "target": "/Users/ravonus/dev/wt/studio-public-discovery-20261020/keel-site/node_modules/.pnpm/saxes@6.0.0/node_modules/saxes",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sdk/node_modules/viem",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/viem@2.55.19_typescript@5.9.3_zod@4.5.4/node_modules/viem",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sdk/node_modules/esbuild",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sdk/node_modules/terser",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/terser@5.44.0/node_modules/terser",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sdk/node_modules/@types/node",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@types+node@22.20.1/node_modules/@types/node",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sdk/node_modules/@noble/hashes",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@noble+hashes@1.8.0/node_modules/@noble/hashes",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sdk/node_modules/@jsquash/webp",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@jsquash+webp@1.5.0/node_modules/@jsquash/webp",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sdk/node_modules/@jsquash/png",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@jsquash+png@3.1.1/node_modules/@jsquash/png",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sdk/node_modules/@keel/pixel-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/pixel-engine",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sdk/node_modules/@keel/sprite-codex",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sprite-codex",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sdk/node_modules/@keel/game-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/game-engine",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sdk/node_modules/@keel/mcp",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/mcp",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sdk/node_modules/@keel/protocol",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/protocol",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sdk/node_modules/@keel/mint-queue",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/mint-queue",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sdk/node_modules/@keel/viewer",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/viewer",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sdk/node_modules/@keel/sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sdk",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sdk/node_modules/@keel/sandbox-sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sandbox-sdk",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sdk/node_modules/@keel/ethereum-adapter",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/ethereum-adapter",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sdk/node_modules/@keel/studio-core",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/studio-core",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sdk/node_modules/@keel/builder",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/builder",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sdk/node_modules/@keel/web3-boundary-tests",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/web3-boundary-tests",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sandbox-sdk/node_modules/typescript",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sandbox-sdk/node_modules/@keel/pixel-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/pixel-engine",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sandbox-sdk/node_modules/@keel/sprite-codex",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sprite-codex",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sandbox-sdk/node_modules/@keel/game-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/game-engine",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sandbox-sdk/node_modules/@keel/mcp",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/mcp",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sandbox-sdk/node_modules/@keel/protocol",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/protocol",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sandbox-sdk/node_modules/@keel/mint-queue",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/mint-queue",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sandbox-sdk/node_modules/@keel/viewer",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/viewer",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sandbox-sdk/node_modules/@keel/sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sdk",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sandbox-sdk/node_modules/@keel/sandbox-sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sandbox-sdk",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sandbox-sdk/node_modules/@keel/ethereum-adapter",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/ethereum-adapter",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sandbox-sdk/node_modules/@keel/studio-core",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/studio-core",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sandbox-sdk/node_modules/@keel/builder",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/builder",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/sandbox-sdk/node_modules/@keel/web3-boundary-tests",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/web3-boundary-tests",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/ethereum-adapter/node_modules/typescript",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/ethereum-adapter/node_modules/viem",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/viem@2.55.19_typescript@5.9.3_zod@4.5.4/node_modules/viem",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/ethereum-adapter/node_modules/@keel/pixel-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/pixel-engine",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/ethereum-adapter/node_modules/@keel/sprite-codex",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sprite-codex",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/ethereum-adapter/node_modules/@keel/game-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/game-engine",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/ethereum-adapter/node_modules/@keel/mcp",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/mcp",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/ethereum-adapter/node_modules/@keel/protocol",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/protocol",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/ethereum-adapter/node_modules/@keel/mint-queue",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/mint-queue",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/ethereum-adapter/node_modules/@keel/viewer",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/viewer",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/ethereum-adapter/node_modules/@keel/sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sdk",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/ethereum-adapter/node_modules/@keel/sandbox-sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sandbox-sdk",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/ethereum-adapter/node_modules/@keel/ethereum-adapter",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/ethereum-adapter",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/ethereum-adapter/node_modules/@keel/studio-core",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/studio-core",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/ethereum-adapter/node_modules/@keel/builder",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/builder",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/ethereum-adapter/node_modules/@keel/web3-boundary-tests",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/web3-boundary-tests",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/studio-core/node_modules/onchfs",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/onchfs@0.1.0_typescript@5.9.3_zod@4.5.4/node_modules/onchfs",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/studio-core/node_modules/typescript",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/studio-core/node_modules/sharp",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/sharp@0.35.3_@types+node@22.20.1/node_modules/sharp",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/studio-core/node_modules/@keel/pixel-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/pixel-engine",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/studio-core/node_modules/@keel/sprite-codex",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sprite-codex",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/studio-core/node_modules/@keel/game-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/game-engine",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/studio-core/node_modules/@keel/mcp",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/mcp",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/studio-core/node_modules/@keel/protocol",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/protocol",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/studio-core/node_modules/@keel/mint-queue",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/mint-queue",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/studio-core/node_modules/@keel/viewer",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/viewer",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/studio-core/node_modules/@keel/sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sdk",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/studio-core/node_modules/@keel/sandbox-sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sandbox-sdk",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/studio-core/node_modules/@keel/ethereum-adapter",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/ethereum-adapter",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/studio-core/node_modules/@keel/studio-core",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/studio-core",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/studio-core/node_modules/@keel/builder",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/builder",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/studio-core/node_modules/@keel/web3-boundary-tests",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/web3-boundary-tests",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/builder/node_modules/ffmpeg-static",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/ffmpeg-static@5.3.0/node_modules/ffmpeg-static",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/builder/node_modules/typescript",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/builder/node_modules/esbuild",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/builder/node_modules/terser",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/terser@5.44.0/node_modules/terser",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/builder/node_modules/sharp",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/sharp@0.35.3_@types+node@22.20.1/node_modules/sharp",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/builder/node_modules/@gltf-transform/core",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@gltf-transform+core@4.4.2/node_modules/@gltf-transform/core",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/builder/node_modules/@gltf-transform/extensions",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@gltf-transform+extensions@4.4.2/node_modules/@gltf-transform/extensions",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/builder/node_modules/@gltf-transform/functions",
+      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@gltf-transform+functions@4.4.2_@types+node@22.20.1/node_modules/@gltf-transform/functions",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/builder/node_modules/@keel/pixel-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/pixel-engine",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/builder/node_modules/@keel/sprite-codex",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sprite-codex",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/builder/node_modules/@keel/game-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/game-engine",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/builder/node_modules/@keel/mcp",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/mcp",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/builder/node_modules/@keel/protocol",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/protocol",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/builder/node_modules/@keel/mint-queue",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/mint-queue",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/builder/node_modules/@keel/viewer",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/viewer",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/builder/node_modules/@keel/sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sdk",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/builder/node_modules/@keel/sandbox-sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sandbox-sdk",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/builder/node_modules/@keel/ethereum-adapter",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/ethereum-adapter",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/builder/node_modules/@keel/studio-core",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/studio-core",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/builder/node_modules/@keel/builder",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/builder",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/builder/node_modules/@keel/web3-boundary-tests",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/web3-boundary-tests",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/web3-boundary-tests/node_modules/@keel/pixel-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/pixel-engine",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/web3-boundary-tests/node_modules/@keel/sprite-codex",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sprite-codex",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/web3-boundary-tests/node_modules/@keel/game-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/game-engine",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/web3-boundary-tests/node_modules/@keel/mcp",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/mcp",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/web3-boundary-tests/node_modules/@keel/protocol",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/protocol",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/web3-boundary-tests/node_modules/@keel/mint-queue",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/mint-queue",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/web3-boundary-tests/node_modules/@keel/viewer",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/viewer",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/web3-boundary-tests/node_modules/@keel/sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sdk",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/web3-boundary-tests/node_modules/@keel/sandbox-sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sandbox-sdk",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/web3-boundary-tests/node_modules/@keel/ethereum-adapter",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/ethereum-adapter",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/web3-boundary-tests/node_modules/@keel/studio-core",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/studio-core",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/web3-boundary-tests/node_modules/@keel/builder",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/builder",
+      "exists": true
+    },
+    {
+      "path": "keel-sdk/packages/web3-boundary-tests/node_modules/@keel/web3-boundary-tests",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/web3-boundary-tests",
+      "exists": true
+    },
+    {
+      "path": "keel-site/packages/site-domain/node_modules/zod",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/zod@4.4.3/node_modules/zod",
+      "exists": true
+    },
+    {
+      "path": "keel-site/packages/site-domain/node_modules/vitest",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/vitest@4.1.11_@types+node@22.20.1_vite@8.2.2_@types+node@22.20.1_esbuild@0.28.2_jiti@2.7.0_tsx@4.23.12_/node_modules/vitest",
+      "exists": true
+    },
+    {
+      "path": "keel-site/packages/site-domain/node_modules/tsx",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/tsx@4.23.12/node_modules/tsx",
+      "exists": true
+    },
+    {
+      "path": "keel-site/packages/site-domain/node_modules/typescript",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript",
+      "exists": true
+    },
+    {
+      "path": "keel-site/packages/site-domain/node_modules/.vite",
+      "target": "/Users/ravonus/dev/keel-site/packages/site-domain/node_modules/.vite",
+      "exists": true
+    },
+    {
+      "path": "keel-site/packages/site-domain/node_modules/@types/node",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@types+node@22.20.1/node_modules/@types/node",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/zod",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/zod@4.4.3/node_modules/zod",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/mediabunny",
+      "target": "/Users/ravonus/dev/wt/studio-public-discovery-20261020/keel-site/node_modules/.pnpm/mediabunny@1.61.3/node_modules/mediabunny",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/drizzle-kit",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/drizzle-kit@0.31.10/node_modules/drizzle-kit",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/next",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/next@16.2.12_@babel+core@7.29.7_@playwright+test@1.62.1_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/prettier-plugin-tailwindcss",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/prettier-plugin-tailwindcss@0.6.14_prettier@3.9.6/node_modules/prettier-plugin-tailwindcss",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/eslint-config-next",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/eslint-config-next@16.2.12_@typescript-eslint+parser@8.67.0_eslint@9.39.5_jiti@2.7.0__t_9a82ef5d7661c391d8fd9e74dcbe282f/node_modules/eslint-config-next",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/wagmi",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/wagmi@2.19.5_@tanstack+query-core@5.101.4_@tanstack+react-query@5.101.4_react@19.2.0__@_3a3b49e6fcd459e3dcf06a5e05977bdc/node_modules/wagmi",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/prettier",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/prettier@3.9.6/node_modules/prettier",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/typescript-eslint",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/typescript-eslint@8.67.0_eslint@9.39.5_jiti@2.7.0__typescript@5.9.3/node_modules/typescript-eslint",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/file-type",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/file-type@18.5.0/node_modules/file-type",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/tsx",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/tsx@4.23.12/node_modules/tsx",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/typescript",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/postcss",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/postcss@8.5.26/node_modules/postcss",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/ioredis",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/ioredis@5.11.1/node_modules/ioredis",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/server-only",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/server-only@0.0.1/node_modules/server-only",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/brotli-dec-wasm",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/brotli-dec-wasm@2.3.2/node_modules/brotli-dec-wasm",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/qrcode",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/qrcode@1.5.4/node_modules/qrcode",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/jsdom",
+      "target": "/Users/ravonus/dev/wt/studio-public-discovery-20261020/keel-site/node_modules/.pnpm/jsdom@26.1.0_bufferutil@4.1.0_utf-8-validate@5.0.10/node_modules/jsdom",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/react-dom",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/react-dom@19.2.0_react@19.2.0/node_modules/react-dom",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/brotli-wasm",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/brotli-wasm@3.0.1/node_modules/brotli-wasm",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/postgres",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/postgres@3.4.9/node_modules/postgres",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/superjson",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/superjson@2.2.6/node_modules/superjson",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/accounts",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/accounts@0.14.12_@types+react@19.2.18_@wagmi+core@3.6.4_react@19.2.0_typescript@5.9.3_u_e0e5911f41a49d275e2842a6107914f1/node_modules/accounts",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/drizzle-orm",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/drizzle-orm@0.45.2_postgres@3.4.9/node_modules/drizzle-orm",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/siwe",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/siwe@2.3.2_ethers@6.17.0_bufferutil@4.1.0_utf-8-validate@5.0.10_/node_modules/siwe",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/viem",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/viem@2.55.19_bufferutil@4.1.0_typescript@5.9.3_utf-8-validate@5.0.10_zod@4.4.3/node_modules/viem",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/sats-connect",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/sats-connect@4.2.1_typescript@5.9.3/node_modules/sats-connect",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/eslint",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/eslint@9.39.5_jiti@2.7.0/node_modules/eslint",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/zustand",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/zustand@5.0.15_@types+react@19.2.18_react@19.2.0_use-sync-external-store@1.4.0_react@19.2.0_/node_modules/zustand",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/esbuild",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/tailwindcss",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/tailwindcss@4.3.3/node_modules/tailwindcss",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/react",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/react@19.2.0/node_modules/react",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/sharp",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/sharp@0.35.3_@types+node@22.20.1/node_modules/sharp",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/drand-client",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/drand-client@1.4.2/node_modules/drand-client",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@types/qrcode",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@types+qrcode@1.5.6/node_modules/@types/qrcode",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@types/react-dom",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@types+react-dom@19.2.4_@types+react@19.2.18/node_modules/@types/react-dom",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@types/node",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@types+node@22.20.1/node_modules/@types/node",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@types/react",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@types+react@19.2.18/node_modules/@types/react",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@playwright/test",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@playwright+test@1.62.1/node_modules/@playwright/test",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@wagmi/connectors",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@wagmi+connectors@8.1.0_@coinbase+wallet-sdk@4.3.6_@types+react@19.2.18_bufferutil@4.1._087e7d597b6733a3c8044f879d668786/node_modules/@wagmi/connectors",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@wagmi/core",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@wagmi+core@3.6.4_@tanstack+query-core@5.101.4_@types+react@19.2.18_accounts@0.14.12_re_79eb013d04fb0b8b5d64bceafcf07731/node_modules/@wagmi/core",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@tanstack/react-query",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@tanstack+react-query@5.101.4_react@19.2.0/node_modules/@tanstack/react-query",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@tanstack/react-query-persist-client",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@tanstack+react-query-persist-client@5.101.4_@tanstack+react-query@5.101.4_react@19.2.0__react@19.2.0/node_modules/@tanstack/react-query-persist-client",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@jsquash/webp",
+      "target": "/Users/ravonus/dev/wt/studio-public-discovery-20261020/keel-site/node_modules/.pnpm/@jsquash+webp@1.5.0/node_modules/@jsquash/webp",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@jsquash/png",
+      "target": "/Users/ravonus/dev/wt/studio-public-discovery-20261020/keel-site/node_modules/.pnpm/@jsquash+png@3.1.1/node_modules/@jsquash/png",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@tailwindcss/postcss",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@tailwindcss+postcss@4.3.3/node_modules/@tailwindcss/postcss",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@ecadlabs/beacon-types",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@ecadlabs+beacon-types@4.8.4-ecad/node_modules/@ecadlabs/beacon-types",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@ecadlabs/beacon-transport-postmessage",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@ecadlabs+beacon-transport-postmessage@4.8.4-ecad/node_modules/@ecadlabs/beacon-transport-postmessage",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@ecadlabs/beacon-core",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@ecadlabs+beacon-core@4.8.4-ecad/node_modules/@ecadlabs/beacon-core",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@trpc/react-query",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@trpc+react-query@11.18.0_@tanstack+react-query@5.101.4_react@19.2.0__@trpc+client@11.1_f36bc51fd6bb43406af8010fa05f3f9d/node_modules/@trpc/react-query",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@trpc/server",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@trpc+server@11.18.0_typescript@5.9.3/node_modules/@trpc/server",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@trpc/client",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@trpc+client@11.18.0_@trpc+server@11.18.0_typescript@5.9.3__typescript@5.9.3/node_modules/@trpc/client",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@taquito/utils",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@taquito+utils@25.0.0/node_modules/@taquito/utils",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@taquito/beacon-wallet",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@taquito+beacon-wallet@25.0.0_bufferutil@4.1.0_ioredis@5.11.1_utf-8-validate@5.0.10/node_modules/@taquito/beacon-wallet",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@taquito/taquito",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@taquito+taquito@25.0.0/node_modules/@taquito/taquito",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@t3-oss/env-nextjs",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@t3-oss+env-nextjs@0.13.11_typescript@5.9.3_valibot@1.1.0_typescript@5.9.3__zod@4.4.3/node_modules/@t3-oss/env-nextjs",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@keel/pixel-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/pixel-engine",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@keel/sprite-codex",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sprite-codex",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@keel/site-domain",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-site/packages/site-domain",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@keel/game-engine",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/game-engine",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@keel/mcp",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/mcp",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@keel/protocol",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/protocol",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@keel/mint-queue",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/mint-queue",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@keel/viewer",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/viewer",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@keel/sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sdk",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@keel/sandbox-sdk",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/sandbox-sdk",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@keel/ethereum-adapter",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/ethereum-adapter",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@keel/studio-core",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/studio-core",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@keel/builder",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/builder",
+      "exists": true
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@keel/web3-boundary-tests",
+      "target": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk/packages/web3-boundary-tests",
+      "exists": true
+    }
+  ],
+  "references": [
+    {
+      "path": "keel-sdk/docs/review/independent-native-movie-inspection-blocked-20261022/raw/audio-coherent-inputs/coherent-audio-count.mov",
+      "bytes": 233806,
+      "sha256": "9aea6febb834cede4531d6d5bcf428f6b82f7a6d12d0a3e1a7a9232fe5b2e8f8"
+    },
+    {
+      "path": "keel-sdk/docs/review/independent-native-movie-inspection-blocked-20261022/raw/audio-coherent-inputs/original.mov",
+      "bytes": 233806,
+      "sha256": "a757e325367ea0d7994f1a41b953abc780867444edcc0cb6d519e2806c4b5b5f"
+    },
+    {
+      "path": "keel-sdk/docs/review/independent-native-movie-inspection-blocked-20261022/raw/browser-results/reviewer-native-clamped.gif",
+      "bytes": 126,
+      "sha256": "35fd32e1ac822834d6e945ce225c13a0c48731397a5578b86bd9aafae3546435"
+    },
+    {
+      "path": "keel-sdk/docs/review/independent-native-movie-inspection-blocked-20261022/raw/browser-results/reviewer-native-finite.gif",
+      "bytes": 126,
+      "sha256": "19a488cb5a0d34f20c3d0d266797b65c62ab197554f7e484377954ee5acb83a5"
+    },
+    {
+      "path": "keel-sdk/docs/review/independent-native-movie-inspection-blocked-20261022/raw/budget-original/native-overbudget-display.mp4",
+      "bytes": 8838,
+      "sha256": "ad64e44832758bb5abef4db4a4025cb3a5cc44b814072b57d5d32d9b0c963b9b"
+    },
+    {
+      "path": "keel-sdk/docs/review/independent-native-movie-inspection-blocked-20261022/raw/edit-list-inputs/duplicate-edts.mp4",
+      "bytes": 2973,
+      "sha256": "ec083cb7e5c9a53fc65e626b408fd4553d784889874914c30c2eacc970440c21"
+    },
+    {
+      "path": "keel-sdk/docs/review/independent-native-movie-inspection-blocked-20261022/raw/edit-list-inputs/duplicate.mp4",
+      "bytes": 2965,
+      "sha256": "f41bb7f4977ab4a34def60d30c170e9afdb385156dd9f6da686089b324f227ed"
+    },
+    {
+      "path": "keel-sdk/docs/review/independent-native-movie-inspection-blocked-20261022/raw/edit-list-inputs/half-rate.mp4",
+      "bytes": 2937,
+      "sha256": "b2ad0f3b82fe2808a468d1f0e6ac283c869e9fc852483e48f2caf602583109e3"
+    },
+    {
+      "path": "keel-sdk/docs/review/independent-native-movie-inspection-blocked-20261022/raw/edit-list-inputs/unknown-flags.mp4",
+      "bytes": 2937,
+      "sha256": "33f37b310127315151ab0593177e2963aab85b245987d8ebea33a830925b9f1b"
+    },
+    {
+      "path": "keel-sdk/docs/review/independent-native-movie-inspection-blocked-20261022/raw/edit-list-inputs/unknown-version.mp4",
+      "bytes": 2937,
+      "sha256": "41bf356340d157a5b731e3ef498e9e9048c37f585913813fb0de1bbd9d958902"
+    },
+    {
+      "path": "keel-sdk/docs/review/independent-native-movie-inspection-blocked-20261022/raw/edit-list-inputs/wrong-count.mp4",
+      "bytes": 2937,
+      "sha256": "4182c1002ed7999774e8abaa86b259dfe8e068c307c35b2a0eb13323762fead5"
+    },
+    {
+      "path": "keel-sdk/docs/review/independent-native-movie-inspection-blocked-20261022/raw/inputs/apng-first-frame.webp",
+      "bytes": 174,
+      "sha256": "737a04d4c463eff7395bcf4043315533956295ce1c11184291e4ab2085a1ba05"
+    },
+    {
+      "path": "keel-sdk/docs/review/independent-native-movie-inspection-blocked-20261022/raw/inputs/sar.mp4",
+      "bytes": 2918,
+      "sha256": "66f1276bd4fdeafa2b3eb370598250b40248bb7ed356829c7bf257635512cab3"
+    },
+    {
+      "path": "keel-sdk/docs/review/independent-native-movie-inspection-blocked-20261022/raw/inputs/sar.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+    },
+    {
+      "path": "keel-sdk/docs/review/independent-native-movie-inspection-blocked-20261022/raw/inputs/title.mp4",
+      "bytes": 2972,
+      "sha256": "7c41053e177dd103e6a2a40e4b634a9cdaa48288b3ac3a028d64facffff636a7"
+    },
+    {
+      "path": "keel-sdk/docs/review/independent-native-movie-inspection-blocked-20261022/raw/inputs/title.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+    },
+    {
+      "path": "keel-sdk/docs/review/independent-native-movie-inspection-blocked-20261022/raw/native-overbudget-display-max.mp4",
+      "bytes": 8838,
+      "sha256": "6b2509573d9cd6ba31ae2cfba98e32632132f0b0d80f34917eb2912d59d94aa6"
+    },
+    {
+      "path": "keel-sdk/docs/review/independent-native-movie-inspection-blocked-20261022/raw/native-overbudget-display.mp4",
+      "bytes": 8838,
+      "sha256": "ad64e44832758bb5abef4db4a4025cb3a5cc44b814072b57d5d32d9b0c963b9b"
+    },
+    {
+      "path": "keel-sdk/docs/review/independent-native-movie-inspection-blocked-20261022/raw/noedit-timeline-inputs/invented-sample.mp4",
+      "bytes": 2937,
+      "sha256": "3911e5d7363e348bd9f4dfc8b34801b3cf0c8559d35a06f96192ace15e014806"
+    },
+    {
+      "path": "keel-sdk/docs/review/independent-native-movie-inspection-blocked-20261022/raw/noedit-timeline-inputs/noedit-all-clock-tail.mp4",
+      "bytes": 2901,
+      "sha256": "6218f0b975d6def54a0c0a5b8878b342918f523e33d2444ea2237e4a8fb3fcee"
+    },
+    {
+      "path": "keel-sdk/docs/review/independent-native-movie-inspection-blocked-20261022/raw/noedit-timeline-inputs/noedit-media-tail.mp4",
+      "bytes": 2901,
+      "sha256": "b87d389151c2db4eac79ccb8adabe4cd635183414c676808343f26ecefa7b8ac"
+    },
+    {
+      "path": "keel-sdk/docs/review/independent-native-movie-inspection-blocked-20261022/raw/noedit-timeline-inputs/noedit-movie-track-tail.mp4",
+      "bytes": 2901,
+      "sha256": "42f7dee0db6a9e65c66c515b376d00703308d54ca96fbaf5033fc69dc1d5ffcf"
+    },
+    {
+      "path": "keel-sdk/docs/review/independent-native-movie-inspection-blocked-20261022/raw/site-results/reviewer-native-clamped.gif",
+      "bytes": 126,
+      "sha256": "35fd32e1ac822834d6e945ce225c13a0c48731397a5578b86bd9aafae3546435"
+    },
+    {
+      "path": "keel-sdk/docs/review/independent-native-movie-inspection-blocked-20261022/raw/site-results/reviewer-native-finite.gif",
+      "bytes": 126,
+      "sha256": "19a488cb5a0d34f20c3d0d266797b65c62ab197554f7e484377954ee5acb83a5"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-audio-binding-20261022/aac-one-tick-tail.mp4",
+      "bytes": 9175,
+      "sha256": "2b99a953e7732bea560e987ed919162d29318e646d5a6af5127bfe7dbd8c65fc"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-audio-binding-20261022/aac-original.mp4",
+      "bytes": 9175,
+      "sha256": "d02a5f6c0380b192e8b868f011ff1deedfcc010cd022fbe02bec8ccbc818f5e6"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-audio-binding-20261022/pcm-coherent-count.mov",
+      "bytes": 233806,
+      "sha256": "9aea6febb834cede4531d6d5bcf428f6b82f7a6d12d0a3e1a7a9232fe5b2e8f8"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-audio-binding-20261022/pcm-original.mov",
+      "bytes": 233806,
+      "sha256": "a757e325367ea0d7994f1a41b953abc780867444edcc0cb6d519e2806c4b5b5f"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-display-metadata-20261022/reviewer-inputs/apng-first-frame.webp",
+      "bytes": 174,
+      "sha256": "737a04d4c463eff7395bcf4043315533956295ce1c11184291e4ab2085a1ba05"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-display-metadata-20261022/reviewer-inputs/sar.mp4",
+      "bytes": 2918,
+      "sha256": "66f1276bd4fdeafa2b3eb370598250b40248bb7ed356829c7bf257635512cab3"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-display-metadata-20261022/reviewer-inputs/sar.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-display-metadata-20261022/reviewer-inputs/title.mp4",
+      "bytes": 2972,
+      "sha256": "7c41053e177dd103e6a2a40e4b634a9cdaa48288b3ac3a028d64facffff636a7"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-display-metadata-20261022/reviewer-inputs/title.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-edit-list-20261022/author-baseline-artifacts/duplicate-edts.mp4",
+      "bytes": 2973,
+      "sha256": "ec083cb7e5c9a53fc65e626b408fd4553d784889874914c30c2eacc970440c21"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-edit-list-20261022/author-baseline-artifacts/duplicate-edts.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-edit-list-20261022/author-baseline-artifacts/duplicate.mp4",
+      "bytes": 2965,
+      "sha256": "f41bb7f4977ab4a34def60d30c170e9afdb385156dd9f6da686089b324f227ed"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-edit-list-20261022/author-baseline-artifacts/duplicate.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-edit-list-20261022/author-baseline-artifacts/half-rate.mp4",
+      "bytes": 2937,
+      "sha256": "b2ad0f3b82fe2808a468d1f0e6ac283c869e9fc852483e48f2caf602583109e3"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-edit-list-20261022/author-baseline-artifacts/half-rate.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-edit-list-20261022/author-baseline-artifacts/unknown-flags.mp4",
+      "bytes": 2937,
+      "sha256": "33f37b310127315151ab0593177e2963aab85b245987d8ebea33a830925b9f1b"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-edit-list-20261022/author-baseline-artifacts/unknown-flags.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-edit-list-20261022/author-baseline-artifacts/unknown-version.mp4",
+      "bytes": 2937,
+      "sha256": "41bf356340d157a5b731e3ef498e9e9048c37f585913813fb0de1bbd9d958902"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-edit-list-20261022/author-baseline-artifacts/unknown-version.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-edit-list-20261022/author-baseline-artifacts/wrong-count.mp4",
+      "bytes": 2937,
+      "sha256": "4182c1002ed7999774e8abaa86b259dfe8e068c307c35b2a0eb13323762fead5"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-edit-list-20261022/author-baseline-artifacts/wrong-count.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-edit-list-20261022/movie-tail-before-fix.mp4",
+      "bytes": 2937,
+      "sha256": "24f30f1fc7fce04647dede03e4bb640ab180dbf721e60d613fc8ebfb358e9c06"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-edit-list-20261022/reviewer-inputs/duplicate-edts.mp4",
+      "bytes": 2973,
+      "sha256": "ec083cb7e5c9a53fc65e626b408fd4553d784889874914c30c2eacc970440c21"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-edit-list-20261022/reviewer-inputs/duplicate.mp4",
+      "bytes": 2965,
+      "sha256": "f41bb7f4977ab4a34def60d30c170e9afdb385156dd9f6da686089b324f227ed"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-edit-list-20261022/reviewer-inputs/duplicate.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-edit-list-20261022/reviewer-inputs/half-rate.mp4",
+      "bytes": 2937,
+      "sha256": "b2ad0f3b82fe2808a468d1f0e6ac283c869e9fc852483e48f2caf602583109e3"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-edit-list-20261022/reviewer-inputs/half-rate.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-edit-list-20261022/reviewer-inputs/unknown-flags.mp4",
+      "bytes": 2937,
+      "sha256": "33f37b310127315151ab0593177e2963aab85b245987d8ebea33a830925b9f1b"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-edit-list-20261022/reviewer-inputs/unknown-version.mp4",
+      "bytes": 2937,
+      "sha256": "41bf356340d157a5b731e3ef498e9e9048c37f585913813fb0de1bbd9d958902"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-edit-list-20261022/reviewer-inputs/unknown-version.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-edit-list-20261022/reviewer-inputs/wrong-count.mp4",
+      "bytes": 2937,
+      "sha256": "4182c1002ed7999774e8abaa86b259dfe8e068c307c35b2a0eb13323762fead5"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-edit-list-20261022/reviewer-inputs/wrong-count.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-track-binding-20261022/coherent-stsz-four-unsafe.webp",
+      "bytes": 464,
+      "sha256": "af3d9003c447a0503c289d78c63ec6f11d6e9b719243387ace40842b71a19bd9"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-track-binding-20261022/coherent-stsz-four.mp4",
+      "bytes": 2941,
+      "sha256": "6d1129149eccd627df7112e60dea6e791466710a260360b49d7cc165297d7576"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-track-binding-20261022/reviewer-retained-inputs/invented-sample.mp4",
+      "bytes": 2937,
+      "sha256": "3911e5d7363e348bd9f4dfc8b34801b3cf0c8559d35a06f96192ace15e014806"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-track-binding-20261022/reviewer-retained-inputs/invented-sample.webp",
+      "bytes": 464,
+      "sha256": "af3d9003c447a0503c289d78c63ec6f11d6e9b719243387ace40842b71a19bd9"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-track-binding-20261022/reviewer-retained-inputs/noedit-all-clock-tail.mp4",
+      "bytes": 2901,
+      "sha256": "6218f0b975d6def54a0c0a5b8878b342918f523e33d2444ea2237e4a8fb3fcee"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-track-binding-20261022/reviewer-retained-inputs/noedit-all-clock-tail.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-track-binding-20261022/reviewer-retained-inputs/noedit-media-tail.mp4",
+      "bytes": 2901,
+      "sha256": "b87d389151c2db4eac79ccb8adabe4cd635183414c676808343f26ecefa7b8ac"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-track-binding-20261022/reviewer-retained-inputs/noedit-media-tail.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-track-binding-20261022/reviewer-retained-inputs/noedit-movie-track-tail.mp4",
+      "bytes": 2901,
+      "sha256": "42f7dee0db6a9e65c66c515b376d00703308d54ca96fbaf5033fc69dc1d5ffcf"
+    },
+    {
+      "path": "keel-sdk/docs/review/temporal-track-binding-20261022/reviewer-retained-inputs/noedit-movie-track-tail.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+    },
+    {
+      "path": "keel-site/apps/studio/tests/unit/native-movie-inspection.test.ts",
+      "bytes": 2376,
+      "sha256": "7ab901cc271192e482231e408e3ca0165e7a109d0eed6f5f9c8948180a494daa"
+    },
+    {
+      "path": "keel-site/apps/studio/tests/unit/reviewer-native-gif-semantics.test.ts",
+      "bytes": 1677,
+      "sha256": "a9dba9b0d82c2b48321bc37da171bfaea9bcaa62f3adb85d869bab35282834e8"
+    }
+  ]
+}

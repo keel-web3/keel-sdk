@@ -1,0 +1,79 @@
+diff --git a/scripts/test-suites.mjs b/scripts/test-suites.mjs
+index b391ac8..a791e54 100644
+--- a/scripts/test-suites.mjs
++++ b/scripts/test-suites.mjs
+@@ -6,6 +6,7 @@ const TEST_ROOT = resolve(import.meta.dirname, "../tests");
+ /** Requires a real installed headless browser and therefore stays out of the default unit gate. */
+ export const BROWSER_TEST_FILES = Object.freeze([
+   "tests/native-presentation-guard.browser.test.mjs",
++  "tests/native-movie-preview.browser.test.mjs",
+   "tests/sdk-authored-project-browser.test.mjs",
+   "tests/sdk-authored-reader-parity.test.mjs",
+   "tests/qa-authored-current-reader-browser.test.mjs",
+@@ -92,6 +93,8 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
+   "tests/movie-edit-list.test.mjs",
+   "tests/movie-presentation-semantics.test.mjs",
+   "tests/movie-track-binding.test.mjs",
++  "tests/native-movie-inspection.test.mjs",
++  "tests/native-movie-mcp.test.mjs",
+   "tests/proof-state-reader-fallback-safety.test.mjs",
+   "tests/reviewer-denial-cancellation.test.mjs",
+   "tests/reviewer-rpc-denial-cancellation.test.mjs",
+diff --git a/tests/fixtures/native-movie-inspection/sar.mp4 b/tests/fixtures/native-movie-inspection/sar.mp4
+new file mode 100644
+index 0000000..e2acda0
+Binary files /dev/null and b/tests/fixtures/native-movie-inspection/sar.mp4 differ
+diff --git a/tests/fixtures/native-movie-inspection/sar.webp b/tests/fixtures/native-movie-inspection/sar.webp
+new file mode 100644
+index 0000000..a4406f3
+Binary files /dev/null and b/tests/fixtures/native-movie-inspection/sar.webp differ
+diff --git a/tests/fixtures/native-movie-inspection/title.mp4 b/tests/fixtures/native-movie-inspection/title.mp4
+new file mode 100644
+index 0000000..2e3df98
+Binary files /dev/null and b/tests/fixtures/native-movie-inspection/title.mp4 differ
+diff --git a/tests/fixtures/native-movie-inspection/title.webp b/tests/fixtures/native-movie-inspection/title.webp
+new file mode 100644
+index 0000000..a4406f3
+Binary files /dev/null and b/tests/fixtures/native-movie-inspection/title.webp differ
+diff --git a/tests/native-movie-inspection.test.mjs b/tests/native-movie-inspection.test.mjs
+index c18970f..796211c 100644
+--- a/tests/native-movie-inspection.test.mjs
++++ b/tests/native-movie-inspection.test.mjs
+@@ -8,8 +8,8 @@ const require=createRequire(new URL('../packages/builder/package.json',import.me
+ const hash=bytes=>'0x'+createHash('sha256').update(bytes).digest('hex');
+ const expected={sar:{size:2918,sha:'0x66f1276bd4fdeafa2b3eb370598250b40248bb7ed356829c7bf257635512cab3',width:64,height:24},title:{size:2972,sha:'0x7c41053e177dd103e6a2a40e4b634a9cdaa48288b3ac3a028d64facffff636a7',width:32,height:24}};
+ for(const name of ['sar','title']){
+- const source=new Uint8Array(await readFile(new URL('../../evidence/inputs/'+name+'.mp4',import.meta.url))),identity=expected[name];assert.equal(source.length,identity.size);assert.equal(hash(source),identity.sha);
++ const source=new Uint8Array(await readFile(new URL('./fixtures/native-movie-inspection/'+name+'.mp4',import.meta.url))),identity=expected[name];assert.equal(source.length,identity.size);assert.equal(hash(source),identity.sha);
+  test(`retained ${name} Original export stays byte exact without conversion`,async()=>{const result=await prepareMediaCandidate({bytes:source,mediaType:'video/mp4',recipe:ORIGINAL_MEDIA_EDIT_RECIPE});assert.deepEqual(result.bytes,source);assert.equal(result.sourceIntegrity.digest,identity.sha);assert.equal(result.verification.losslessPixelsVerified,false)});
+- test(`retained ${name} native inspection returns complete displayed frame geometry and original identity`,async()=>{const result=await compareMediaFrames({bytes:source,mediaType:'video/mp4',recipe:ORIGINAL_MEDIA_EDIT_RECIPE,timeMs:0});assert.equal(result.sourceIntegrity.digest,identity.sha);assert.equal(result.sourceInfo.frameCount,3);assert.equal(result.sourceInfo.hasAudio,false);assert.equal(result.sourceInfo.width,identity.width);assert.equal(result.sourceInfo.height,identity.height);const frame=await sharp(result.originalFrame).metadata();assert.equal(frame.width,identity.width);assert.equal(frame.height,identity.height);assert.deepEqual(result.originalFrame,result.processedFrame);assert.equal(result.verification.losslessPixelsVerified,false);assert.equal(result.verification.completeDecode,false);assert.deepEqual(source,new Uint8Array(await readFile(new URL('../../evidence/inputs/'+name+'.mp4',import.meta.url))))});
+- test(`retained ${name} still cannot grant strict conversion or actual pair equivalence`,async()=>{const recipe={...ORIGINAL_MEDIA_EDIT_RECIPE,mode:'lossless',format:'webp'},candidate=new Uint8Array(await readFile(new URL('../../evidence/inputs/'+name+'.webp',import.meta.url)));for(const operation of [()=>prepareMediaCandidate({bytes:source,mediaType:'video/mp4',recipe}),()=>compareMediaFrames({bytes:source,mediaType:'video/mp4',recipe,timeMs:0}),()=>verifyActualMediaPair({sourceBytes:source,candidateBytes:candidate,recipe})])await assert.rejects(operation(),/aspect|metadata|semantics|preserv/)});
++ test(`retained ${name} native inspection returns complete displayed frame geometry and original identity`,async()=>{const result=await compareMediaFrames({bytes:source,mediaType:'video/mp4',recipe:ORIGINAL_MEDIA_EDIT_RECIPE,timeMs:0});assert.equal(result.sourceIntegrity.digest,identity.sha);assert.equal(result.sourceInfo.frameCount,3);assert.equal(result.sourceInfo.hasAudio,false);assert.equal(result.sourceInfo.width,identity.width);assert.equal(result.sourceInfo.height,identity.height);const frame=await sharp(result.originalFrame).metadata();assert.equal(frame.width,identity.width);assert.equal(frame.height,identity.height);assert.deepEqual(result.originalFrame,result.processedFrame);assert.equal(result.verification.losslessPixelsVerified,false);assert.equal(result.verification.completeDecode,false);assert.deepEqual(source,new Uint8Array(await readFile(new URL('./fixtures/native-movie-inspection/'+name+'.mp4',import.meta.url))))});
++ test(`retained ${name} still cannot grant strict conversion or actual pair equivalence`,async()=>{const recipe={...ORIGINAL_MEDIA_EDIT_RECIPE,mode:'lossless',format:'webp'},candidate=new Uint8Array(await readFile(new URL('./fixtures/native-movie-inspection/'+name+'.webp',import.meta.url)));for(const operation of [()=>prepareMediaCandidate({bytes:source,mediaType:'video/mp4',recipe}),()=>compareMediaFrames({bytes:source,mediaType:'video/mp4',recipe,timeMs:0}),()=>verifyActualMediaPair({sourceBytes:source,candidateBytes:candidate,recipe})])await assert.rejects(operation(),/aspect|metadata|semantics|preserv/)});
+ }
+diff --git a/tests/native-movie-mcp.test.mjs b/tests/native-movie-mcp.test.mjs
+index 6fc6f80..cc12d77 100644
+--- a/tests/native-movie-mcp.test.mjs
++++ b/tests/native-movie-mcp.test.mjs
+@@ -2,7 +2,7 @@ import test from 'node:test';import assert from 'node:assert/strict';import {cre
+ const require=createRequire(import.meta.url),ts=require('typescript');
+ for(const name of ['media-edit-tools','paths']){const source=new URL('../packages/mcp/src/'+name+'.ts',import.meta.url),code=ts.transpileModule(await readFile(source,'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;await writeFile(new URL('../packages/mcp/dist/native-movie-test-'+name+'.mjs',import.meta.url),code)}
+ const {MEDIA_EDIT_TOOL_DEFINITIONS}=await import('../packages/mcp/dist/native-movie-test-media-edit-tools.mjs'),{createWorkspace}=await import('../packages/mcp/dist/native-movie-test-paths.mjs');
+-const workspace=await createWorkspace(new URL('../docs/review/temporal-display-metadata-20261022/reviewer-inputs/',import.meta.url).pathname),recipe={schema:'keel-media-edit@1',mode:'original',format:'original',quality:82,noSound:false};
++const workspace=await createWorkspace(new URL('./fixtures/native-movie-inspection/',import.meta.url).pathname),recipe={schema:'keel-media-edit@1',mode:'original',format:'original',quality:82,noSound:false};
+ for(const [name,width]of [['sar',64],['title',32]])test(`actual portable MCP native ${name} inspection uses displayed geometry and retains exact original bytes`,async()=>{
+  const inputPath=name+'.mp4',source=await readFile(await workspace.resolveExistingFile(inputPath,32*1024*1024));
+  const compare=await MEDIA_EDIT_TOOL_DEFINITIONS.find(t=>t.descriptor.name==='keel-media-compare').run({workspace},{inputPath,recipe});
+diff --git a/tests/native-movie-preview.browser.test.mjs b/tests/native-movie-preview.browser.test.mjs
+index 955b656..93aa855 100644
+--- a/tests/native-movie-preview.browser.test.mjs
++++ b/tests/native-movie-preview.browser.test.mjs
+@@ -6,7 +6,7 @@ import {compareMediaFrames,ORIGINAL_MEDIA_EDIT_RECIPE} from '../packages/builder
+ import {buildKeelInlineShellFragments,buildKeelInlineNormalMediaDocument} from '../packages/sdk/dist/inline-viewer-graph.js';
+ import {withNativeMediaBrowser,wait} from './helpers/native-media-browser.mjs';
+ for(const [name,width]of [['sar',64],['title',32]])test(`native ${name} PNG inspection and canonical original movie agree on actual browser geometry`,{timeout:30000},async()=>{
+- const source=new Uint8Array(await readFile(new URL('../docs/review/temporal-display-metadata-20261022/reviewer-inputs/'+name+'.mp4',import.meta.url))),frame=await compareMediaFrames({bytes:source,mediaType:'video/mp4',recipe:ORIGINAL_MEDIA_EDIT_RECIPE,timeMs:0});
++ const source=new Uint8Array(await readFile(new URL('./fixtures/native-movie-inspection/'+name+'.mp4',import.meta.url))),frame=await compareMediaFrames({bytes:source,mediaType:'video/mp4',recipe:ORIGINAL_MEDIA_EDIT_RECIPE,timeMs:0});
+  assert.equal(frame.sourceInfo.width,width);assert.equal(frame.sourceInfo.height,24);assert.equal(frame.verification.losslessPixelsVerified,false);
+  const shell=await buildKeelInlineShellFragments({repositoryRoot:process.cwd()}),document=await buildKeelInlineNormalMediaDocument({shell,asset:{id:'native-preview-geometry',mediaType:'video/mp4',source}});
+  const result=await withNativeMediaBrowser(document,async({childEvaluate})=>{

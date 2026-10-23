@@ -1,0 +1,19 @@
+--- ../evidence/native-movie-boundaries.original.mjs	2026-10-22 17:40:26
++++ tests/native-movie-boundaries.test.mjs	2026-10-22 17:40:26
+@@ -55,14 +55,14 @@
+   const frame=await compareMediaFrames({bytes:source,recipe:original,timeMs:200});assert.equal(frame.sourceInfo.hasAudio,true);assert.ok(frame.sourceInfo.frameCount>1);assert.equal(frame.verification.completeDecode,false);assert.equal(frame.verification.losslessPixelsVerified,false);assert.deepEqual((await prepareMediaCandidate({bytes:source,recipe:original})).bytes,source);
+  }
+ });
+-test('qualified QuickTime SAR is native preview only and unsupported creator metadata remains an inspection capability refusal',async()=>{
++test('unqualified QuickTime aperture and creator metadata remain native inspection capability refusals',async()=>{
+  const dir=await mkdtemp(path.join(tmpdir(),'keel-native-movie-'));
+  try{
+   for(const [name,extra]of [['quicktime',[]],['creator',['-metadata','artist=EXPLICIT_CREATOR']]]){
+    const file=path.join(dir,name+'.mov');execFileSync(ffmpeg,['-hide_banner','-loglevel','error','-f','lavfi','-i','testsrc=size=32x24:rate=5','-t','0.6','-vf','setsar=2/1','-c:v','libx264rgb','-crf','0','-threads','2','-an',...extra,'-y',file]);
+    const bytes=new Uint8Array(await readFile(file));assert.deepEqual((await prepareMediaCandidate({bytes,recipe:original})).bytes,bytes);
+    if(name==='creator')await assert.rejects(compareMediaFrames({bytes,recipe:original,timeMs:0}),/metadata|semantics/i);
+-   else{const result=await compareMediaFrames({bytes,recipe:original,timeMs:200});assert.equal(result.sourceInfo.width,64);assert.equal(result.sourceInfo.height,24);assert.equal(result.originalFrameTimeMs,200);assert.equal(result.verification.losslessPixelsVerified,false)}
++   else await assert.rejects(compareMediaFrames({bytes,recipe:original,timeMs:200}),/tapt.*aperture|aperture.*semantics/i)
+   }
+  }finally{await rm(dir,{recursive:true,force:true})}
+ });

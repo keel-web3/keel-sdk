@@ -1,0 +1,12 @@
+{
+  "command": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "--test",
+    "--test-concurrency=1",
+    "tests/temporal-carrier-sequence.browser.test.mjs",
+    "tests/native-presentation-guard.browser.test.mjs"
+  ],
+  "cwd": "/private/tmp/keel-independent-native-gif-20261022-02/keel-sdk",
+  "exit": 0,
+  "elapsed": 9.943567037582397
+}

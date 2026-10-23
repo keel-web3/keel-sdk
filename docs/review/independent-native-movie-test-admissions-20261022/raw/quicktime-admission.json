@@ -1,0 +1,8 @@
+{
+  "patchSHA256": "dc153a3e43917753e0e420930d81d8c3cdc4692eb58aed9c473f34dc0043e05a",
+  "verdict": "ADMIT TEST EXPECTATION ONLY",
+  "oldResult": "3P1F",
+  "newResult": "4P0F",
+  "reason": "New QuickTime generator emits unsupported trak/tapt aperture; no support was authorized or added; exact native export still succeeds. Test name and only that new positive branch corrected; original reference and RED retained. Existing geometry/title/strict/audio assertions unchanged.",
+  "wholeTextExactExpectedTransformation": true
+}

@@ -1,0 +1,23 @@
+{
+  "candidate": "b3f60c2980a613559da577063a741b3639245adc",
+  "verdict": "ADMIT TEST SETUP AND CLASSIFICATION ONLY",
+  "exactMapInsertions": {
+    "deterministic": [
+      "tests/native-movie-inspection.test.mjs",
+      "tests/native-movie-mcp.test.mjs"
+    ],
+    "browser": [
+      "tests/native-movie-preview.browser.test.mjs"
+    ]
+  },
+  "removals": [],
+  "QAComposition": "25c8b4b37b125377f14d95754184e5a21b58c03b",
+  "compositionInputs": [
+    "b3f60c2980a613559da577063a741b3639245adc",
+    "d740a2acccff9ca61eba0c8d352f55c38c140282"
+  ],
+  "uncomposedClassification": "0P3F, two inherited GIF files remain unclassified; preserved",
+  "composedClassification": "3P0F",
+  "composedAffected": "21P0F",
+  "compiledRuntime": "own freshly built9f5 outputs copied/rehashed; no additional build claim for test-only composition"
+}

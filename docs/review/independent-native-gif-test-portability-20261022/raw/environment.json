@@ -1,0 +1,12 @@
+{
+  "candidate": "d740a2acccff9ca61eba0c8d352f55c38c140282",
+  "production": "189ec0b0f0fd2d35e5b0c97cee23b85bcbd092ef",
+  "branch": "codex/independent-native-gif-portability-20261022",
+  "system": "macOS-15.6.1-arm64-arm-64bit-Mach-O",
+  "arch": "arm64",
+  "initialLoad": "7.27 15.64 14.41",
+  "preTestLoad": "7.48 12.93 13.49",
+  "freeDiskAtStart": "50GiB",
+  "gitStatusBeforeEvidence": "?? docs/review/independent-native-gif-test-portability-20261022/",
+  "noBuildClaim": true
+}

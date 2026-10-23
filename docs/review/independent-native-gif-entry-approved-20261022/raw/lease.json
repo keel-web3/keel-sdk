@@ -1,0 +1,8 @@
+{
+  "owner": "/root/independent_temporal_pairs",
+  "SDK": "189ec0b0f0fd2d35e5b0c97cee23b85bcbd092ef",
+  "Site": "5453cfd7cd2380baac494a05971bffa441406ab8",
+  "scope": "entry-snapshot scoped independent review only",
+  "outputs": "own fresh seven-package/runtime output; public cache read-only",
+  "git": "shared immutable objects/ownedsource+index, no historycopy"
+}

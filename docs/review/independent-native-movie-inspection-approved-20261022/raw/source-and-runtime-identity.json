@@ -1,0 +1,68 @@
+{
+  "production": "fefd8fc91c7e286143a8857edfbb5cdddafbcb56",
+  "site": "5453cfd7cd2380baac494a05971bffa441406ab8",
+  "os": "macOS-15.6.1-arm64-arm-64bit-Mach-O",
+  "arch": "arm64",
+  "allSourceChangesSince189": [
+    "packages/builder/src/media-preparation.ts",
+    "packages/builder/src/movie-presentation-semantics.ts"
+  ],
+  "sixLineSuccessorDiff": "diff --git a/packages/builder/src/media-preparation.ts b/packages/builder/src/media-preparation.ts\nindex f7ced7d..6cb88f1 100644\n--- a/packages/builder/src/media-preparation.ts\n+++ b/packages/builder/src/media-preparation.ts\n@@ -151,6 +151,12 @@ async function decodeMovie(binary: string, cwd: string, input: string, signal?:A\n   if (!dims || Number(dims[1])*Number(dims[2]) > MAX_PIXELS || Math.max(Number(dims[1]),Number(dims[2])) > 8192) throw new Error(\"Movie dimensions are unavailable or exceed the decode budget.\");\n   const presentation = assertMoviePresentationSemantics(containerBytes,probe.stderr.split(\"Output #\")[0]!,selectedStream,Number(dims[1]),Number(dims[2]),purpose);\n   const nativeDisplay=presentation.nativeDisplay;\n+  // Native SAR previews may expand beyond the coded raster. Bind the same\n+  // existing frame/pixel budgets to the complete parsed sample count before\n+  // launching a scaled decode, rather than rejecting after processing it.\n+  if(nativeDisplay&&(presentation.videoTimeline.samples>BigInt(MAX_FRAMES)\n+    ||presentation.videoTimeline.samples*BigInt(nativeDisplay.width)*BigInt(nativeDisplay.height)>BigInt(MAX_MOVIE_PIXELS)))\n+    throw new RangeError(\"Movie exceeds the bounded native display frame decode budget.\");\n   const nativePreviewFilter=nativeDisplay&&(nativeDisplay.width!==nativeDisplay.codedWidth||nativeDisplay.height!==nativeDisplay.codedHeight)\n     ?`scale=${nativeDisplay.width}:${nativeDisplay.height}:flags=bilinear,setsar=1`:undefined;\n   const nativeVideoFilter=nativePreviewFilter?[\"-vf\",nativePreviewFilter]:[];",
+  "sources": [
+    {
+      "path": "packages/builder/src/media-preparation.ts",
+      "bytes": 50343,
+      "sha256": "f026df721c094730b25ed1310ddf30ce1fffed74ccb19100998763d4a1be553f"
+    },
+    {
+      "path": "packages/builder/src/movie-presentation-semantics.ts",
+      "bytes": 31929,
+      "sha256": "6ef84624b9a6296a7401e6d13a266f3c2ad06e214e154c923f51bec79e82981c"
+    },
+    {
+      "path": "tests/native-movie-inspection.test.mjs",
+      "bytes": 2965,
+      "sha256": "23809ebf31e50b5364bcc797c7a3eafa701819fd092fb537434c70d3b5a0e9fa"
+    },
+    {
+      "path": "tests/native-movie-mcp.test.mjs",
+      "bytes": 2340,
+      "sha256": "8a6a20f76434f25538b81745ba0ff36c58c83d5521a58b3905a167e4ba1d3762"
+    },
+    {
+      "path": "tests/native-movie-preview.browser.test.mjs",
+      "bytes": 2805,
+      "sha256": "ba23131079115930021d5bbd1127176d081d6f5efdf976142344d3c1e1595eea"
+    },
+    {
+      "path": "reviewer-native-display-budget-max.test.mjs",
+      "bytes": 2406,
+      "sha256": "a57653dd541b050b2135b38a015608b6a6c7db2720962338c916244ad7674fc2"
+    },
+    {
+      "path": "tests/reviewer-native-movie-boundaries.proposed.mjs",
+      "bytes": 6575,
+      "sha256": "84ddbc1af86fee76bdc3638f152a3415c20637ae5b654f5a6acfbf8634e23ebb"
+    }
+  ],
+  "tools": [
+    {
+      "path": "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "bytes": 112972416,
+      "sha256": "245e0321af97d3c21dd4e7104457334dfe3c3ba7982d0db75363e354565f8cbb"
+    },
+    {
+      "path": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/ffmpeg-static@5.3.0/node_modules/ffmpeg-static/ffmpeg",
+      "bytes": 45568216,
+      "sha256": "a90e3db6a3fd35f6074b013f948b1aa45b31c6375489d39e572bea3f18336584"
+    },
+    {
+      "path": "/Users/ravonus/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell",
+      "bytes": 163329264,
+      "sha256": "7687bff7cb2db075f250e6d5848bbc8838cac3802ac3952a899c574f8eccab45"
+    }
+  ],
+  "outputFiles": 1718,
+  "outputBytes": 24911871,
+  "ownRuntimeManifestSHA256": "1c2e9afcb5d561507c3dcd9775b2210781f8b58e3799af5473774bfb83c0a801"
+}

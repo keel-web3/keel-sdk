@@ -1,0 +1,9 @@
+{
+  "command": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "reviewer-native-movie-open-repro.mjs"
+  ],
+  "cwd": "/private/tmp/keel-independent-native-gif-20261022-02/keel-sdk",
+  "exit": 0,
+  "elapsed": 0.31034183502197266
+}

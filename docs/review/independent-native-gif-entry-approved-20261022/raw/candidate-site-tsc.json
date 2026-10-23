@@ -1,0 +1,12 @@
+{
+  "command": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "node_modules/typescript/bin/tsc",
+    "--noEmit",
+    "--incremental",
+    "false"
+  ],
+  "cwd": "/private/tmp/keel-independent-native-gif-20261022-02/keel-site/apps/studio",
+  "exit": 0,
+  "elapsed": 51.07576298713684
+}

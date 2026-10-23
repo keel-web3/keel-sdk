@@ -1,0 +1,15 @@
+{
+  "oldIssues": [
+    "unclassified tests: tests/media-frame-request-snapshot.test.mjs, tests/native-media-frame-read.test.mjs"
+  ],
+  "newIssues": [],
+  "deterministicAdded": [
+    "tests/media-frame-request-snapshot.test.mjs",
+    "tests/native-media-frame-read.test.mjs",
+    "tests/native-gif-source-identity.test.mjs"
+  ],
+  "removed": [],
+  "otherGroupsUnchanged": true,
+  "exactThreeLineInsertion": true,
+  "containsSiblingEvidenceDir": false
+}

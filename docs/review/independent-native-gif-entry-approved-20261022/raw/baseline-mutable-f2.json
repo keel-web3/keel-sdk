@@ -1,0 +1,10 @@
+{
+  "command": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "--test",
+    "reviewer-native-gif-mutable-input.test.mjs"
+  ],
+  "cwd": "/private/tmp/keel-independent-native-gif-20261022-01/keel-sdk",
+  "exit": 1,
+  "elapsed": 0.379072904586792
+}

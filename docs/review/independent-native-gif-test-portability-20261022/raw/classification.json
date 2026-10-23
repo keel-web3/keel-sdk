@@ -1,0 +1,14 @@
+{
+  "candidate": "d740a2acccff9ca61eba0c8d352f55c38c140282",
+  "runtimeSource": "189ec0b0f0fd2d35e5b0c97cee23b85bcbd092ef",
+  "runtime": "own frozen hash-verified compiled outputs, reused, not new build",
+  "command": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "--test",
+    "tests/test-suite-classification.test.mjs"
+  ],
+  "cwd": "/private/tmp/keel-independent-native-gif-portability-20261022-01/keel-sdk",
+  "exit": 0,
+  "elapsedSeconds": 0.19025325775146484,
+  "nodeSHA256": "245e0321af97d3c21dd4e7104457334dfe3c3ba7982d0db75363e354565f8cbb"
+}

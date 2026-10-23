@@ -1,0 +1,12 @@
+{
+  "source": "fefd8fc91c7e286143a8857edfbb5cdddafbcb56",
+  "site": "5453cfd7cd2380baac494a05971bffa441406ab8",
+  "command": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "--test",
+    "reviewer-native-display-budget-max.test.mjs"
+  ],
+  "cwd": "/private/tmp/keel-independent-native-movie-20261022-02/keel-sdk",
+  "exit": 0,
+  "elapsed": 0.2746899127960205
+}

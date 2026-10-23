@@ -1,0 +1,37 @@
+[
+  {
+    "path": "scripts/test-suites.mjs",
+    "bytes": 19727,
+    "sha256": "4090e7b0daca735779ece242c9c13126261bcd68ba2f99aac29c410406b8084a"
+  },
+  {
+    "path": "tests/media-frame-request-snapshot.test.mjs",
+    "bytes": 3232,
+    "sha256": "58b7e1154d5c8ef62378313df813dde50cb7af76c20380cf6c35fddff35ec07c"
+  },
+  {
+    "path": "tests/native-media-frame-read.test.mjs",
+    "bytes": 5588,
+    "sha256": "96d0a4c1209e21b66082cdbc170a4c8d6889159e460e9f72e94b9bbadd0289ec"
+  },
+  {
+    "path": "tests/native-gif-source-identity.test.mjs",
+    "bytes": 1332,
+    "sha256": "4154f8ce488193d7bb7ce7bd8e6e171dec4b1a724b91b4692bb62feb1ae9e623"
+  },
+  {
+    "path": "tests/fixtures/native-gif-entry/reviewer-native-finite.gif",
+    "bytes": 126,
+    "sha256": "19a488cb5a0d34f20c3d0d266797b65c62ab197554f7e484377954ee5acb83a5"
+  },
+  {
+    "path": "tests/fixtures/native-gif-entry/reviewer-native-clamped.gif",
+    "bytes": 126,
+    "sha256": "35fd32e1ac822834d6e945ce225c13a0c48731397a5578b86bd9aafae3546435"
+  },
+  {
+    "path": "reviewer-native-gif-mutable-input.test.mjs",
+    "bytes": 1331,
+    "sha256": "c71d19b0b8564712daecad4fff752ef6aacbc3956f6cffc4c0846b5e15afd5ff"
+  }
+]

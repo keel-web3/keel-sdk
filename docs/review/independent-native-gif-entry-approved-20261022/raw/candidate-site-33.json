@@ -1,0 +1,22 @@
+{
+  "command": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "--conditions=react-server",
+    "--import",
+    "tsx",
+    "--import",
+    "./tests/unit/support/css-modules.mjs",
+    "--test",
+    "--test-concurrency=1",
+    "tests/unit/temporal-media-service.test.ts",
+    "tests/unit/reviewer-native-gif-semantics.test.ts",
+    "tests/unit/owned-temporal-complete-context.test.ts",
+    "tests/unit/registered-inline-release-cost-scope.test.ts",
+    "tests/unit/registered-inline-final-review.test.ts",
+    "tests/unit/registered-inline-final-sdk.test.ts",
+    "tests/unit/registered-inline-readonly.test.ts"
+  ],
+  "cwd": "/private/tmp/keel-independent-native-gif-20261022-02/keel-site/apps/studio",
+  "exit": 0,
+  "elapsed": 30.648723125457764
+}

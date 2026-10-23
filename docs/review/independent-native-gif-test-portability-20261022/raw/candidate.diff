@@ -1,0 +1,1352 @@
+diff --git a/docs/review/native-gif-test-portability-20261022/README.md b/docs/review/native-gif-test-portability-20261022/README.md
+new file mode 100644
+index 0000000..4bfa6e7
+--- /dev/null
++++ b/docs/review/native-gif-test-portability-20261022/README.md
+@@ -0,0 +1,3 @@
++Test-only candidate, independent admission pending. Source189 has independent scoped approval540defa; its two new tests were not registered in the normal suite, and the snapshot test plus original independent race regression depended on sibling temporary evidence paths. This correction registers all three regressions, copies the exact two retained public synthetic GIF references into tracked fixtures with unchanged SHA256, changes only fixture URLs, and mirrors the independent regression into the normal tests directory with import-path relocation. All original assertion lines are byte-identical; no reference bytes, expected results, tolerances, production code or exclusions change. The original independent root-level test remains unchanged for historical provenance. Full default classification and affected test runs remain required against this correction before integration. No production or live qualification is claimed.
++
++Lead fresh validation: exact source189 before classification reports the two new unclassified tests; corrected classification reports zero issues, all three syntax checks pass, and all13 affected original assertions pass in0.437s. Node22.22.1/Mac load6.87; all1716 compiled runtime outputs/24,883,645 bytes were hash-verified and copied from immutable independently built189 outputs under an explicit read-only lease, not represented as a new build. Independent admission/fresh rerun remains pending.
+diff --git a/docs/review/native-gif-test-portability-20261022/affected.result.json b/docs/review/native-gif-test-portability-20261022/affected.result.json
+new file mode 100644
+index 0000000..0a9fac1
+--- /dev/null
++++ b/docs/review/native-gif-test-portability-20261022/affected.result.json
+@@ -0,0 +1,17 @@
++{
++  "command": [
++    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
++    "--test",
++    "--test-concurrency=1",
++    "tests/native-media-frame-read.test.mjs",
++    "tests/media-frame-request-snapshot.test.mjs",
++    "tests/native-gif-source-identity.test.mjs"
++  ],
++  "cwd": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01",
++  "uptime": "17:41  1 user, load averages: 6.87 13.87 13.83",
++  "seconds": 0.43694758298806846,
++  "exitCode": 0,
++  "stdoutSHA256": "c87ba7ad1168cafad8a10f2ff4cb61ff818ccdcb43df50aa2358266880afe223",
++  "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++  "runtime": "Explicitly hash-verified independent189 compiledoutputs copiedowned; no new build claim; referencesportabletrackedunchanged"
++}
+diff --git a/docs/review/native-gif-test-portability-20261022/affected.stderr b/docs/review/native-gif-test-portability-20261022/affected.stderr
+new file mode 100644
+index 0000000..e69de29
+diff --git a/docs/review/native-gif-test-portability-20261022/affected.stdout b/docs/review/native-gif-test-portability-20261022/affected.stdout
+new file mode 100644
+index 0000000..34cac4d
+--- /dev/null
++++ b/docs/review/native-gif-test-portability-20261022/affected.stdout
+@@ -0,0 +1,89 @@
++TAP version 13
++# Subtest: comparison captures time, MIME, recipe and source before any async continuation
++ok 1 - comparison captures time, MIME, recipe and source before any async continuation
++  ---
++  duration_ms: 5.157208
++  type: 'test'
++  ...
++# Subtest: replacing the request signal cannot cancel another captured source or hide its real abort
++ok 2 - replacing the request signal cannot cancel another captured source or hide its real abort
++  ---
++  duration_ms: 2.184709
++  type: 'test'
++  ...
++# Subtest: strict edited comparison uses the same entry source snapshot rather than processed candidate bytes
++ok 3 - strict edited comparison uses the same entry source snapshot rather than processed candidate bytes
++  ---
++  duration_ms: 6.712917
++  type: 'test'
++  ...
++# Subtest: comparison rejects an oversized entry before copying its supplied byte view
++ok 4 - comparison rejects an oversized entry before copying its supplied byte view
++  ---
++  duration_ms: 0.374583
++  type: 'test'
++  ...
++# Subtest: native compare binds frame and declared timeline to the same initial actual source bytes
++ok 5 - native compare binds frame and declared timeline to the same initial actual source bytes
++  ---
++  duration_ms: 5.099334
++  type: 'test'
++  ...
++# {"committed":"0x19a488cb5a0d34f20c3d0d266797b65c62ab197554f7e484377954ee5acb83a5","initial":"0x19a488cb5a0d34f20c3d0d266797b65c62ab197554f7e484377954ee5acb83a5","mutated":"0x35fd32e1ac822834d6e945ce225c13a0c48731397a5578b86bd9aafae3546435","sourceFrameTimeMs":0,"declared":[120,240,200]}
++# Subtest: finite native GIF exposes all declared frames without approving altered playback
++ok 6 - finite native GIF exposes all declared frames without approving altered playback
++  ---
++  duration_ms: 7.957584
++  type: 'test'
++  ...
++# Subtest: finite GIF remains unavailable to strict preparation, edited comparison and actual-pair proof
++ok 7 - finite GIF remains unavailable to strict preparation, edited comparison and actual-pair proof
++  ---
++  duration_ms: 5.602
++  type: 'test'
++  ...
++# Subtest: clamped native GIF exposes all declared frames without approving altered playback
++ok 8 - clamped native GIF exposes all declared frames without approving altered playback
++  ---
++  duration_ms: 2.288584
++  type: 'test'
++  ...
++# Subtest: clamped GIF remains unavailable to strict preparation, edited comparison and actual-pair proof
++ok 9 - clamped GIF remains unavailable to strict preparation, edited comparison and actual-pair proof
++  ---
++  duration_ms: 3.8175
++  type: 'test'
++  ...
++# Subtest: native finite WebP retains complete intrinsic timing and existing loop admission
++ok 10 - native finite WebP retains complete intrinsic timing and existing loop admission
++  ---
++  duration_ms: 2.319708
++  type: 'test'
++  ...
++# Subtest: native GIF inspection still refuses incomplete or interactive complete controls, exact export remains available
++ok 11 - native GIF inspection still refuses incomplete or interactive complete controls, exact export remains available
++  ---
++  duration_ms: 1.604291
++  type: 'test'
++  ...
++# Subtest: actual MCP native finite comparison/export stays byte bound and strict conversion still rejects
++ok 12 - actual MCP native finite comparison/export stays byte bound and strict conversion still rejects
++  ---
++  duration_ms: 11.2355
++  type: 'test'
++  ...
++# Subtest: actual MCP native clamped comparison/export stays byte bound and strict conversion still rejects
++ok 13 - actual MCP native clamped comparison/export stays byte bound and strict conversion still rejects
++  ---
++  duration_ms: 4.562
++  type: 'test'
++  ...
++1..13
++# tests 13
++# suites 0
++# pass 13
++# fail 0
++# cancelled 0
++# skipped 0
++# todo 0
++# duration_ms 409.655667
+diff --git a/docs/review/native-gif-test-portability-20261022/after-classification.stderr b/docs/review/native-gif-test-portability-20261022/after-classification.stderr
+new file mode 100644
+index 0000000..e69de29
+diff --git a/docs/review/native-gif-test-portability-20261022/after-classification.stdout b/docs/review/native-gif-test-portability-20261022/after-classification.stdout
+new file mode 100644
+index 0000000..4382165
+--- /dev/null
++++ b/docs/review/native-gif-test-portability-20261022/after-classification.stdout
+@@ -0,0 +1 @@
++{"issues":[]}
+diff --git a/docs/review/native-gif-test-portability-20261022/before-classification.stderr b/docs/review/native-gif-test-portability-20261022/before-classification.stderr
+new file mode 100644
+index 0000000..e69de29
+diff --git a/docs/review/native-gif-test-portability-20261022/before-classification.stdout b/docs/review/native-gif-test-portability-20261022/before-classification.stdout
+new file mode 100644
+index 0000000..d0c60d2
+--- /dev/null
++++ b/docs/review/native-gif-test-portability-20261022/before-classification.stdout
+@@ -0,0 +1 @@
++{"issues":["unclassified tests: tests/media-frame-request-snapshot.test.mjs, tests/native-media-frame-read.test.mjs"]}
+diff --git a/docs/review/native-gif-test-portability-20261022/classification-and-syntax.json b/docs/review/native-gif-test-portability-20261022/classification-and-syntax.json
+new file mode 100644
+index 0000000..f98e040
+--- /dev/null
++++ b/docs/review/native-gif-test-portability-20261022/classification-and-syntax.json
+@@ -0,0 +1,44 @@
++{
++  "results": [
++    {
++      "label": "before",
++      "cwd": "/private/tmp/keel-native-media-inspection-20261022-02/keel-sdk",
++      "exitCode": 1,
++      "actual": {
++        "issues": [
++          "unclassified tests: tests/media-frame-request-snapshot.test.mjs, tests/native-media-frame-read.test.mjs"
++        ]
++      },
++      "sourceMutation": false
++    },
++    {
++      "label": "after",
++      "cwd": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01",
++      "exitCode": 0,
++      "actual": {
++        "issues": []
++      },
++      "sourceMutation": false
++    },
++    {
++      "name": "tests/media-frame-request-snapshot.test.mjs",
++      "syntaxExitCode": 0,
++      "stdoutBytes": 0,
++      "stderrBytes": 0
++    },
++    {
++      "name": "tests/native-media-frame-read.test.mjs",
++      "syntaxExitCode": 0,
++      "stdoutBytes": 0,
++      "stderrBytes": 0
++    },
++    {
++      "name": "tests/native-gif-source-identity.test.mjs",
++      "syntaxExitCode": 0,
++      "stdoutBytes": 0,
++      "stderrBytes": 0
++    }
++  ],
++  "functionalTests": "PENDING; no build/large test job started while Mac over load40",
++  "productionSourceChanged": false
++}
+diff --git a/docs/review/native-gif-test-portability-20261022/manifest.json b/docs/review/native-gif-test-portability-20261022/manifest.json
+new file mode 100644
+index 0000000..ad31010
+--- /dev/null
++++ b/docs/review/native-gif-test-portability-20261022/manifest.json
+@@ -0,0 +1,57 @@
++[
++  {
++    "path": "README.md",
++    "bytes": 1438,
++    "sha256": "6e4d38677973918291ffe3577aaea7076feb213c547839dec6ee8250d05b8116"
++  },
++  {
++    "path": "affected.result.json",
++    "bytes": 760,
++    "sha256": "85b6c9d686560ca34d268aab818a364cae6395e0ebb615286b50ed77cb6a8415"
++  },
++  {
++    "path": "affected.stderr",
++    "bytes": 0,
++    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
++  },
++  {
++    "path": "affected.stdout",
++    "bytes": 3648,
++    "sha256": "c87ba7ad1168cafad8a10f2ff4cb61ff818ccdcb43df50aa2358266880afe223"
++  },
++  {
++    "path": "after-classification.stderr",
++    "bytes": 0,
++    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
++  },
++  {
++    "path": "after-classification.stdout",
++    "bytes": 14,
++    "sha256": "32a45b2a0dfc651ccd5a8355d6f4cb56b8a6b1bc10cbd8281506e37622317d19"
++  },
++  {
++    "path": "before-classification.stderr",
++    "bytes": 0,
++    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
++  },
++  {
++    "path": "before-classification.stdout",
++    "bytes": 119,
++    "sha256": "70f52a83bbb757d605ce269bc4fb7c9f9be6dea1ca139642251db087897bb607"
++  },
++  {
++    "path": "classification-and-syntax.json",
++    "bytes": 1129,
++    "sha256": "b43eb5a537b8335ab4ad819c0228ad8be585eaef41af6f84037b79417e3a13ad"
++  },
++  {
++    "path": "read-only-runtime-lease.json",
++    "bytes": 41350,
++    "sha256": "e47cf13ca42e12b2ae2fe36f3ba37aa95aa07c0cc636a7e7af4c76e98c608137"
++  },
++  {
++    "path": "reference-identity.json",
++    "bytes": 1184,
++    "sha256": "ec4d6b9b4efedc14468dd29f97e9fa8ac04161f4986509048a786fb716a24b9e"
++  }
++]
+diff --git a/docs/review/native-gif-test-portability-20261022/read-only-runtime-lease.json b/docs/review/native-gif-test-portability-20261022/read-only-runtime-lease.json
+new file mode 100644
+index 0000000..e765661
+--- /dev/null
++++ b/docs/review/native-gif-test-portability-20261022/read-only-runtime-lease.json
+@@ -0,0 +1,984 @@
++{
++  "source": "189ec0b0f0fd2d35e5b0c97cee23b85bcbd092ef",
++  "compiledArtifactOwner": "independent QA540defa; frozen build reused explicitly, not rebuilt",
++  "manifestPath": "/private/tmp/keel-independent-native-gif-20261022-02/keel-sdk/docs/review/independent-native-gif-entry-approved-20261022/raw/own-runtime-output-identities.json",
++  "manifestSHA256": "32a300c47067d7aea9fc91bfa5e547fdaa71106efdf5c4877911c0043bd63c2a",
++  "matchedOutputs": 1716,
++  "bytes": 24883645,
++  "ownedOutputCopies": true,
++  "aliases": [
++    {
++      "path": "node_modules/.pnpm",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm"
++    },
++    {
++      "path": "node_modules/solc",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/solc@0.8.36/node_modules/solc"
++    },
++    {
++      "path": "node_modules/@types/node",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@types+node@22.20.1/node_modules/@types/node"
++    },
++    {
++      "path": "node_modules/@wagmi/connectors",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@wagmi+connectors@8.1.0_@wagmi+core@3.6.4_@tanstack+query-core@5.102.8_@types+react@19._517417a4ed73aa4efe451520c5d47bd5/node_modules/@wagmi/connectors"
++    },
++    {
++      "path": "node_modules/@wagmi/core",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@wagmi+core@3.6.4_@tanstack+query-core@5.102.8_@types+react@19.2.18_react@19.2.0_typesc_a017c76c60ab76be6d16c134d9b3c0db/node_modules/@wagmi/core"
++    },
++    {
++      "path": "node_modules/typescript",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
++    },
++    {
++      "path": "node_modules/@openzeppelin/contracts",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@openzeppelin+contracts@5.6.1/node_modules/@openzeppelin/contracts"
++    },
++    {
++      "path": "node_modules/viem",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/viem@2.55.19_typescript@5.9.3_zod@4.5.4/node_modules/viem"
++    },
++    {
++      "path": "node_modules/yaml",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/yaml@2.8.2/node_modules/yaml"
++    },
++    {
++      "path": "node_modules/esbuild",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild"
++    },
++    {
++      "path": "node_modules/@keel/pixel-engine",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/pixel-engine"
++    },
++    {
++      "path": "node_modules/@keel/sprite-codex",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sprite-codex"
++    },
++    {
++      "path": "node_modules/@keel/game-engine",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/game-engine"
++    },
++    {
++      "path": "node_modules/@keel/mcp",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/mcp"
++    },
++    {
++      "path": "node_modules/@keel/protocol",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/protocol"
++    },
++    {
++      "path": "node_modules/@keel/mint-queue",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/mint-queue"
++    },
++    {
++      "path": "node_modules/@keel/viewer",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/viewer"
++    },
++    {
++      "path": "node_modules/@keel/sdk",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sdk"
++    },
++    {
++      "path": "node_modules/@keel/sandbox-sdk",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sandbox-sdk"
++    },
++    {
++      "path": "node_modules/@keel/ethereum-adapter",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/ethereum-adapter"
++    },
++    {
++      "path": "node_modules/@keel/studio-core",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/studio-core"
++    },
++    {
++      "path": "node_modules/@keel/builder",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/builder"
++    },
++    {
++      "path": "node_modules/@keel/web3-boundary-tests",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/web3-boundary-tests"
++    },
++    {
++      "path": "packages/sprite-codex/node_modules/@types/node",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@types+node@22.20.1/node_modules/@types/node"
++    },
++    {
++      "path": "packages/sprite-codex/node_modules/typescript",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
++    },
++    {
++      "path": "packages/sprite-codex/node_modules/@keel/pixel-engine",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/pixel-engine"
++    },
++    {
++      "path": "packages/sprite-codex/node_modules/@keel/sprite-codex",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sprite-codex"
++    },
++    {
++      "path": "packages/sprite-codex/node_modules/@keel/game-engine",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/game-engine"
++    },
++    {
++      "path": "packages/sprite-codex/node_modules/@keel/mcp",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/mcp"
++    },
++    {
++      "path": "packages/sprite-codex/node_modules/@keel/protocol",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/protocol"
++    },
++    {
++      "path": "packages/sprite-codex/node_modules/@keel/mint-queue",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/mint-queue"
++    },
++    {
++      "path": "packages/sprite-codex/node_modules/@keel/viewer",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/viewer"
++    },
++    {
++      "path": "packages/sprite-codex/node_modules/@keel/sdk",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sdk"
++    },
++    {
++      "path": "packages/sprite-codex/node_modules/@keel/sandbox-sdk",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sandbox-sdk"
++    },
++    {
++      "path": "packages/sprite-codex/node_modules/@keel/ethereum-adapter",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/ethereum-adapter"
++    },
++    {
++      "path": "packages/sprite-codex/node_modules/@keel/studio-core",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/studio-core"
++    },
++    {
++      "path": "packages/sprite-codex/node_modules/@keel/builder",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/builder"
++    },
++    {
++      "path": "packages/sprite-codex/node_modules/@keel/web3-boundary-tests",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/web3-boundary-tests"
++    },
++    {
++      "path": "packages/sprite-codex/node_modules/sharp",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/sharp@0.35.3_@types+node@22.20.1/node_modules/sharp"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/keel",
++      "target": "/Users/ravonus/dev/keel-engine/packages/keel"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/ads",
++      "target": "/Users/ravonus/dev/keel-engine/packages/ads"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/decal",
++      "target": "/Users/ravonus/dev/keel-engine/packages/decal"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/ui",
++      "target": "/Users/ravonus/dev/keel-engine/packages/ui"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/worldgen",
++      "target": "/Users/ravonus/dev/keel-engine/packages/worldgen"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/proof",
++      "target": "/Users/ravonus/dev/keel-engine/packages/proof"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/buildings",
++      "target": "/Users/ravonus/dev/keel-engine/packs/buildings"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/capture",
++      "target": "/Users/ravonus/dev/keel-engine/packages/capture"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/city",
++      "target": "/Users/ravonus/dev/keel-engine/packages/city"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/core",
++      "target": "/Users/ravonus/dev/keel-engine/packages/core"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/vehicle",
++      "target": "/Users/ravonus/dev/keel-engine/packages/vehicle"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/lod",
++      "target": "/Users/ravonus/dev/keel-engine/packages/lod"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/input",
++      "target": "/Users/ravonus/dev/keel-engine/packages/input"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/driver",
++      "target": "/Users/ravonus/dev/keel-engine/packages/driver"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/entity",
++      "target": "/Users/ravonus/dev/keel-engine/packages/entity"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/camera",
++      "target": "/Users/ravonus/dev/keel-engine/packages/camera"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/herd",
++      "target": "/Users/ravonus/dev/keel-engine/ai/herd"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/codec",
++      "target": "/Users/ravonus/dev/keel-engine/packages/codec"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/road",
++      "target": "/Users/ravonus/dev/keel-engine/packages/road"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/runtime",
++      "target": "/Users/ravonus/dev/keel-engine/packages/runtime"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/dungeon",
++      "target": "/Users/ravonus/dev/keel-engine/packs/dungeon"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/render",
++      "target": "/Users/ravonus/dev/keel-engine/packages/render"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/world",
++      "target": "/Users/ravonus/dev/keel-engine/packages/world"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/particles",
++      "target": "/Users/ravonus/dev/keel-engine/packages/particles"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/humans",
++      "target": "/Users/ravonus/dev/keel-engine/packs/humans"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/controls",
++      "target": "/Users/ravonus/dev/keel-engine/packages/controls"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/architecture",
++      "target": "/Users/ravonus/dev/keel-engine/packages/architecture"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/audio",
++      "target": "/Users/ravonus/dev/keel-engine/packages/audio"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/object",
++      "target": "/Users/ravonus/dev/keel-engine/packages/object"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/animals",
++      "target": "/Users/ravonus/dev/keel-engine/packs/animals"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/terrain",
++      "target": "/Users/ravonus/dev/keel-engine/packages/terrain"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/foliage",
++      "target": "/Users/ravonus/dev/keel-engine/packs/foliage"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/view",
++      "target": "/Users/ravonus/dev/keel-engine/packages/view"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/elevation",
++      "target": "/Users/ravonus/dev/keel-engine/packages/elevation"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/vehicles",
++      "target": "/Users/ravonus/dev/keel-engine/packs/vehicles"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/cloth",
++      "target": "/Users/ravonus/dev/keel-engine/packs/cloth"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/bake",
++      "target": "/Users/ravonus/dev/keel-engine/packages/bake"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/arena",
++      "target": "/Users/ravonus/dev/keel-engine/packages/arena"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/replay",
++      "target": "/Users/ravonus/dev/keel-engine/packages/replay"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/physics",
++      "target": "/Users/ravonus/dev/keel-engine/packages/physics"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/level",
++      "target": "/Users/ravonus/dev/keel-engine/packages/level"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/scene",
++      "target": "/Users/ravonus/dev/keel-engine/packages/scene"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/creatures",
++      "target": "/Users/ravonus/dev/keel-engine/packs/creatures"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/import",
++      "target": "/Users/ravonus/dev/keel-engine/packages/import"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/builder",
++      "target": "/Users/ravonus/dev/keel-engine/packages/builder"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/wander",
++      "target": "/Users/ravonus/dev/keel-engine/ai/wander"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel-engine/alchemy",
++      "target": "/Users/ravonus/dev/keel-engine/packages/alchemy"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel/pixel-engine",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/pixel-engine"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel/sprite-codex",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sprite-codex"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel/game-engine",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/game-engine"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel/mcp",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/mcp"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel/protocol",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/protocol"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel/mint-queue",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/mint-queue"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel/viewer",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/viewer"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel/sdk",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sdk"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel/sandbox-sdk",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sandbox-sdk"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel/ethereum-adapter",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/ethereum-adapter"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel/studio-core",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/studio-core"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel/builder",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/builder"
++    },
++    {
++      "path": "packages/game-engine/node_modules/@keel/web3-boundary-tests",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/web3-boundary-tests"
++    },
++    {
++      "path": "packages/mcp/node_modules/typescript",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
++    },
++    {
++      "path": "packages/mcp/node_modules/@keel/pixel-engine",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/pixel-engine"
++    },
++    {
++      "path": "packages/mcp/node_modules/@keel/sprite-codex",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sprite-codex"
++    },
++    {
++      "path": "packages/mcp/node_modules/@keel/game-engine",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/game-engine"
++    },
++    {
++      "path": "packages/mcp/node_modules/@keel/mcp",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/mcp"
++    },
++    {
++      "path": "packages/mcp/node_modules/@keel/protocol",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/protocol"
++    },
++    {
++      "path": "packages/mcp/node_modules/@keel/mint-queue",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/mint-queue"
++    },
++    {
++      "path": "packages/mcp/node_modules/@keel/viewer",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/viewer"
++    },
++    {
++      "path": "packages/mcp/node_modules/@keel/sdk",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sdk"
++    },
++    {
++      "path": "packages/mcp/node_modules/@keel/sandbox-sdk",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sandbox-sdk"
++    },
++    {
++      "path": "packages/mcp/node_modules/@keel/ethereum-adapter",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/ethereum-adapter"
++    },
++    {
++      "path": "packages/mcp/node_modules/@keel/studio-core",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/studio-core"
++    },
++    {
++      "path": "packages/mcp/node_modules/@keel/builder",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/builder"
++    },
++    {
++      "path": "packages/mcp/node_modules/@keel/web3-boundary-tests",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/web3-boundary-tests"
++    },
++    {
++      "path": "packages/protocol/node_modules/typescript",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
++    },
++    {
++      "path": "packages/protocol/node_modules/@keel/pixel-engine",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/pixel-engine"
++    },
++    {
++      "path": "packages/protocol/node_modules/@keel/sprite-codex",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sprite-codex"
++    },
++    {
++      "path": "packages/protocol/node_modules/@keel/game-engine",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/game-engine"
++    },
++    {
++      "path": "packages/protocol/node_modules/@keel/mcp",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/mcp"
++    },
++    {
++      "path": "packages/protocol/node_modules/@keel/protocol",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/protocol"
++    },
++    {
++      "path": "packages/protocol/node_modules/@keel/mint-queue",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/mint-queue"
++    },
++    {
++      "path": "packages/protocol/node_modules/@keel/viewer",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/viewer"
++    },
++    {
++      "path": "packages/protocol/node_modules/@keel/sdk",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sdk"
++    },
++    {
++      "path": "packages/protocol/node_modules/@keel/sandbox-sdk",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sandbox-sdk"
++    },
++    {
++      "path": "packages/protocol/node_modules/@keel/ethereum-adapter",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/ethereum-adapter"
++    },
++    {
++      "path": "packages/protocol/node_modules/@keel/studio-core",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/studio-core"
++    },
++    {
++      "path": "packages/protocol/node_modules/@keel/builder",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/builder"
++    },
++    {
++      "path": "packages/protocol/node_modules/@keel/web3-boundary-tests",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/web3-boundary-tests"
++    },
++    {
++      "path": "packages/viewer/node_modules/typescript",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
++    },
++    {
++      "path": "packages/viewer/node_modules/esbuild",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild"
++    },
++    {
++      "path": "packages/viewer/node_modules/@keel/pixel-engine",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/pixel-engine"
++    },
++    {
++      "path": "packages/viewer/node_modules/@keel/sprite-codex",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sprite-codex"
++    },
++    {
++      "path": "packages/viewer/node_modules/@keel/game-engine",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/game-engine"
++    },
++    {
++      "path": "packages/viewer/node_modules/@keel/mcp",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/mcp"
++    },
++    {
++      "path": "packages/viewer/node_modules/@keel/protocol",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/protocol"
++    },
++    {
++      "path": "packages/viewer/node_modules/@keel/mint-queue",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/mint-queue"
++    },
++    {
++      "path": "packages/viewer/node_modules/@keel/viewer",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/viewer"
++    },
++    {
++      "path": "packages/viewer/node_modules/@keel/sdk",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sdk"
++    },
++    {
++      "path": "packages/viewer/node_modules/@keel/sandbox-sdk",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sandbox-sdk"
++    },
++    {
++      "path": "packages/viewer/node_modules/@keel/ethereum-adapter",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/ethereum-adapter"
++    },
++    {
++      "path": "packages/viewer/node_modules/@keel/studio-core",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/studio-core"
++    },
++    {
++      "path": "packages/viewer/node_modules/@keel/builder",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/builder"
++    },
++    {
++      "path": "packages/viewer/node_modules/@keel/web3-boundary-tests",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/web3-boundary-tests"
++    },
++    {
++      "path": "packages/sdk/node_modules/@types/node",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@types+node@22.20.1/node_modules/@types/node"
++    },
++    {
++      "path": "packages/sdk/node_modules/@noble/hashes",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@noble+hashes@1.8.0/node_modules/@noble/hashes"
++    },
++    {
++      "path": "packages/sdk/node_modules/@jsquash/webp",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@jsquash+webp@1.5.0/node_modules/@jsquash/webp"
++    },
++    {
++      "path": "packages/sdk/node_modules/@jsquash/png",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@jsquash+png@3.1.1/node_modules/@jsquash/png"
++    },
++    {
++      "path": "packages/sdk/node_modules/typescript",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
++    },
++    {
++      "path": "packages/sdk/node_modules/saxes",
++      "target": "/Users/ravonus/dev/wt/studio-public-discovery-20261020/keel-site/node_modules/.pnpm/saxes@6.0.0/node_modules/saxes"
++    },
++    {
++      "path": "packages/sdk/node_modules/viem",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/viem@2.55.19_typescript@5.9.3_zod@4.5.4/node_modules/viem"
++    },
++    {
++      "path": "packages/sdk/node_modules/esbuild",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild"
++    },
++    {
++      "path": "packages/sdk/node_modules/terser",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/terser@5.44.0/node_modules/terser"
++    },
++    {
++      "path": "packages/sdk/node_modules/@keel/pixel-engine",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/pixel-engine"
++    },
++    {
++      "path": "packages/sdk/node_modules/@keel/sprite-codex",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sprite-codex"
++    },
++    {
++      "path": "packages/sdk/node_modules/@keel/game-engine",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/game-engine"
++    },
++    {
++      "path": "packages/sdk/node_modules/@keel/mcp",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/mcp"
++    },
++    {
++      "path": "packages/sdk/node_modules/@keel/protocol",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/protocol"
++    },
++    {
++      "path": "packages/sdk/node_modules/@keel/mint-queue",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/mint-queue"
++    },
++    {
++      "path": "packages/sdk/node_modules/@keel/viewer",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/viewer"
++    },
++    {
++      "path": "packages/sdk/node_modules/@keel/sdk",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sdk"
++    },
++    {
++      "path": "packages/sdk/node_modules/@keel/sandbox-sdk",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sandbox-sdk"
++    },
++    {
++      "path": "packages/sdk/node_modules/@keel/ethereum-adapter",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/ethereum-adapter"
++    },
++    {
++      "path": "packages/sdk/node_modules/@keel/studio-core",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/studio-core"
++    },
++    {
++      "path": "packages/sdk/node_modules/@keel/builder",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/builder"
++    },
++    {
++      "path": "packages/sdk/node_modules/@keel/web3-boundary-tests",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/web3-boundary-tests"
++    },
++    {
++      "path": "packages/sandbox-sdk/node_modules/typescript",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
++    },
++    {
++      "path": "packages/sandbox-sdk/node_modules/@keel/pixel-engine",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/pixel-engine"
++    },
++    {
++      "path": "packages/sandbox-sdk/node_modules/@keel/sprite-codex",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sprite-codex"
++    },
++    {
++      "path": "packages/sandbox-sdk/node_modules/@keel/game-engine",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/game-engine"
++    },
++    {
++      "path": "packages/sandbox-sdk/node_modules/@keel/mcp",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/mcp"
++    },
++    {
++      "path": "packages/sandbox-sdk/node_modules/@keel/protocol",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/protocol"
++    },
++    {
++      "path": "packages/sandbox-sdk/node_modules/@keel/mint-queue",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/mint-queue"
++    },
++    {
++      "path": "packages/sandbox-sdk/node_modules/@keel/viewer",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/viewer"
++    },
++    {
++      "path": "packages/sandbox-sdk/node_modules/@keel/sdk",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sdk"
++    },
++    {
++      "path": "packages/sandbox-sdk/node_modules/@keel/sandbox-sdk",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sandbox-sdk"
++    },
++    {
++      "path": "packages/sandbox-sdk/node_modules/@keel/ethereum-adapter",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/ethereum-adapter"
++    },
++    {
++      "path": "packages/sandbox-sdk/node_modules/@keel/studio-core",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/studio-core"
++    },
++    {
++      "path": "packages/sandbox-sdk/node_modules/@keel/builder",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/builder"
++    },
++    {
++      "path": "packages/sandbox-sdk/node_modules/@keel/web3-boundary-tests",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/web3-boundary-tests"
++    },
++    {
++      "path": "packages/ethereum-adapter/node_modules/typescript",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
++    },
++    {
++      "path": "packages/ethereum-adapter/node_modules/viem",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/viem@2.55.19_typescript@5.9.3_zod@4.5.4/node_modules/viem"
++    },
++    {
++      "path": "packages/ethereum-adapter/node_modules/@keel/pixel-engine",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/pixel-engine"
++    },
++    {
++      "path": "packages/ethereum-adapter/node_modules/@keel/sprite-codex",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sprite-codex"
++    },
++    {
++      "path": "packages/ethereum-adapter/node_modules/@keel/game-engine",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/game-engine"
++    },
++    {
++      "path": "packages/ethereum-adapter/node_modules/@keel/mcp",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/mcp"
++    },
++    {
++      "path": "packages/ethereum-adapter/node_modules/@keel/protocol",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/protocol"
++    },
++    {
++      "path": "packages/ethereum-adapter/node_modules/@keel/mint-queue",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/mint-queue"
++    },
++    {
++      "path": "packages/ethereum-adapter/node_modules/@keel/viewer",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/viewer"
++    },
++    {
++      "path": "packages/ethereum-adapter/node_modules/@keel/sdk",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sdk"
++    },
++    {
++      "path": "packages/ethereum-adapter/node_modules/@keel/sandbox-sdk",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sandbox-sdk"
++    },
++    {
++      "path": "packages/ethereum-adapter/node_modules/@keel/ethereum-adapter",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/ethereum-adapter"
++    },
++    {
++      "path": "packages/ethereum-adapter/node_modules/@keel/studio-core",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/studio-core"
++    },
++    {
++      "path": "packages/ethereum-adapter/node_modules/@keel/builder",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/builder"
++    },
++    {
++      "path": "packages/ethereum-adapter/node_modules/@keel/web3-boundary-tests",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/web3-boundary-tests"
++    },
++    {
++      "path": "packages/studio-core/node_modules/onchfs",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/onchfs@0.1.0_typescript@5.9.3_zod@4.5.4/node_modules/onchfs"
++    },
++    {
++      "path": "packages/studio-core/node_modules/typescript",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
++    },
++    {
++      "path": "packages/studio-core/node_modules/@keel/pixel-engine",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/pixel-engine"
++    },
++    {
++      "path": "packages/studio-core/node_modules/@keel/sprite-codex",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sprite-codex"
++    },
++    {
++      "path": "packages/studio-core/node_modules/@keel/game-engine",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/game-engine"
++    },
++    {
++      "path": "packages/studio-core/node_modules/@keel/mcp",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/mcp"
++    },
++    {
++      "path": "packages/studio-core/node_modules/@keel/protocol",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/protocol"
++    },
++    {
++      "path": "packages/studio-core/node_modules/@keel/mint-queue",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/mint-queue"
++    },
++    {
++      "path": "packages/studio-core/node_modules/@keel/viewer",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/viewer"
++    },
++    {
++      "path": "packages/studio-core/node_modules/@keel/sdk",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sdk"
++    },
++    {
++      "path": "packages/studio-core/node_modules/@keel/sandbox-sdk",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sandbox-sdk"
++    },
++    {
++      "path": "packages/studio-core/node_modules/@keel/ethereum-adapter",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/ethereum-adapter"
++    },
++    {
++      "path": "packages/studio-core/node_modules/@keel/studio-core",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/studio-core"
++    },
++    {
++      "path": "packages/studio-core/node_modules/@keel/builder",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/builder"
++    },
++    {
++      "path": "packages/studio-core/node_modules/@keel/web3-boundary-tests",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/web3-boundary-tests"
++    },
++    {
++      "path": "packages/studio-core/node_modules/sharp",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/sharp@0.35.3_@types+node@22.20.1/node_modules/sharp"
++    },
++    {
++      "path": "packages/builder/node_modules/ffmpeg-static",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/ffmpeg-static@5.3.0/node_modules/ffmpeg-static"
++    },
++    {
++      "path": "packages/builder/node_modules/typescript",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
++    },
++    {
++      "path": "packages/builder/node_modules/@gltf-transform/core",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@gltf-transform+core@4.4.2/node_modules/@gltf-transform/core"
++    },
++    {
++      "path": "packages/builder/node_modules/@gltf-transform/extensions",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@gltf-transform+extensions@4.4.2/node_modules/@gltf-transform/extensions"
++    },
++    {
++      "path": "packages/builder/node_modules/@gltf-transform/functions",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/@gltf-transform+functions@4.4.2_@types+node@22.20.1/node_modules/@gltf-transform/functions"
++    },
++    {
++      "path": "packages/builder/node_modules/esbuild",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild"
++    },
++    {
++      "path": "packages/builder/node_modules/terser",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/terser@5.44.0/node_modules/terser"
++    },
++    {
++      "path": "packages/builder/node_modules/@keel/pixel-engine",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/pixel-engine"
++    },
++    {
++      "path": "packages/builder/node_modules/@keel/sprite-codex",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sprite-codex"
++    },
++    {
++      "path": "packages/builder/node_modules/@keel/game-engine",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/game-engine"
++    },
++    {
++      "path": "packages/builder/node_modules/@keel/mcp",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/mcp"
++    },
++    {
++      "path": "packages/builder/node_modules/@keel/protocol",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/protocol"
++    },
++    {
++      "path": "packages/builder/node_modules/@keel/mint-queue",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/mint-queue"
++    },
++    {
++      "path": "packages/builder/node_modules/@keel/viewer",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/viewer"
++    },
++    {
++      "path": "packages/builder/node_modules/@keel/sdk",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sdk"
++    },
++    {
++      "path": "packages/builder/node_modules/@keel/sandbox-sdk",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sandbox-sdk"
++    },
++    {
++      "path": "packages/builder/node_modules/@keel/ethereum-adapter",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/ethereum-adapter"
++    },
++    {
++      "path": "packages/builder/node_modules/@keel/studio-core",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/studio-core"
++    },
++    {
++      "path": "packages/builder/node_modules/@keel/builder",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/builder"
++    },
++    {
++      "path": "packages/builder/node_modules/@keel/web3-boundary-tests",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/web3-boundary-tests"
++    },
++    {
++      "path": "packages/builder/node_modules/sharp",
++      "target": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/sharp@0.35.3_@types+node@22.20.1/node_modules/sharp"
++    },
++    {
++      "path": "packages/web3-boundary-tests/node_modules/@keel/pixel-engine",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/pixel-engine"
++    },
++    {
++      "path": "packages/web3-boundary-tests/node_modules/@keel/sprite-codex",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sprite-codex"
++    },
++    {
++      "path": "packages/web3-boundary-tests/node_modules/@keel/game-engine",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/game-engine"
++    },
++    {
++      "path": "packages/web3-boundary-tests/node_modules/@keel/mcp",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/mcp"
++    },
++    {
++      "path": "packages/web3-boundary-tests/node_modules/@keel/protocol",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/protocol"
++    },
++    {
++      "path": "packages/web3-boundary-tests/node_modules/@keel/mint-queue",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/mint-queue"
++    },
++    {
++      "path": "packages/web3-boundary-tests/node_modules/@keel/viewer",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/viewer"
++    },
++    {
++      "path": "packages/web3-boundary-tests/node_modules/@keel/sdk",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sdk"
++    },
++    {
++      "path": "packages/web3-boundary-tests/node_modules/@keel/sandbox-sdk",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/sandbox-sdk"
++    },
++    {
++      "path": "packages/web3-boundary-tests/node_modules/@keel/ethereum-adapter",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/ethereum-adapter"
++    },
++    {
++      "path": "packages/web3-boundary-tests/node_modules/@keel/studio-core",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/studio-core"
++    },
++    {
++      "path": "packages/web3-boundary-tests/node_modules/@keel/builder",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/builder"
++    },
++    {
++      "path": "packages/web3-boundary-tests/node_modules/@keel/web3-boundary-tests",
++      "target": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01/packages/web3-boundary-tests"
++    }
++  ],
++  "noSharedMutation": true
++}
+diff --git a/docs/review/native-gif-test-portability-20261022/reference-identity.json b/docs/review/native-gif-test-portability-20261022/reference-identity.json
+new file mode 100644
+index 0000000..291139d
+--- /dev/null
++++ b/docs/review/native-gif-test-portability-20261022/reference-identity.json
+@@ -0,0 +1,23 @@
++{
++  "references": [
++    {
++      "path": "tests/fixtures/native-gif-entry/reviewer-native-finite.gif",
++      "bytes": 126,
++      "sha256": "19a488cb5a0d34f20c3d0d266797b65c62ab197554f7e484377954ee5acb83a5",
++      "source": "/private/tmp/keel-native-media-inspection-20261022-02/evidence/browser-results/reviewer-native-finite.gif"
++    },
++    {
++      "path": "tests/fixtures/native-gif-entry/reviewer-native-clamped.gif",
++      "bytes": 126,
++      "sha256": "35fd32e1ac822834d6e945ce225c13a0c48731397a5578b86bd9aafae3546435",
++      "source": "/private/tmp/keel-native-media-inspection-20261022-02/evidence/browser-results/reviewer-native-clamped.gif"
++    }
++  ],
++  "snapshotTestBeforeSHA256": "edb5374781bdbba391495e6b2c07821638a7b2b1f39cd020e83201b95bb1d762",
++  "snapshotTestAfterSHA256": "58b7e1154d5c8ef62378313df813dde50cb7af76c20380cf6c35fddff35ec07c",
++  "independentRegressionOriginalSHA256": "c71d19b0b8564712daecad4fff752ef6aacbc3956f6cffc4c0846b5e15afd5ff",
++  "independentRegressionMirrorSHA256": "4154f8ce488193d7bb7ce7bd8e6e171dec4b1a724b91b4692bb62feb1ae9e623",
++  "assertionLinesByteIdentical": true,
++  "productionSourceChanged": false,
++  "independentAdmission": "PENDING"
++}
+diff --git a/scripts/test-suites.mjs b/scripts/test-suites.mjs
+index b391ac8..c66bdc7 100644
+--- a/scripts/test-suites.mjs
++++ b/scripts/test-suites.mjs
+@@ -194,6 +194,9 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
+   "tests/rpc-read-manifest.test.mjs",
+   "tests/mcp-media-edit.test.mjs",
+   "tests/media-preparation.test.mjs",
++  "tests/media-frame-request-snapshot.test.mjs",
++  "tests/native-media-frame-read.test.mjs",
++  "tests/native-gif-source-identity.test.mjs",
+   "tests/media-slot-plan.test.mjs",
+   "tests/studio-core-build-defaults.test.mjs",
+   "tests/studio-contract-readable-fallback.test.mjs",
+diff --git a/tests/fixtures/native-gif-entry/reviewer-native-clamped.gif b/tests/fixtures/native-gif-entry/reviewer-native-clamped.gif
+new file mode 100644
+index 0000000000000000000000000000000000000000..2f481c3a0f6101925fd9ce854b6ea586a7059544
+GIT binary patch
+literal 126
+zcmZ?wbhEHbWMN=oXkcLQ$t?WOz@Ye_+s`#5*x50_)kx2PnUMh~^pk}ZMC$-CP$>%o
+f0~1S6za%SIf(coo0cZxpe`IN93~7e{P~Fx5oZJ<)
+
+literal 0
+HcmV?d00001
+
+diff --git a/tests/fixtures/native-gif-entry/reviewer-native-finite.gif b/tests/fixtures/native-gif-entry/reviewer-native-finite.gif
+new file mode 100644
+index 0000000000000000000000000000000000000000..31cf63ca1f13f3654e9cff723576f3c78d3e9326
+GIT binary patch
+literal 126
+zcmZ?wbhEHbWMN=oXkcLQ$t?WOz@Ye_+s`#5*x50_)kx2PnUN7F^pk~^hk=1X2Z(`6
+iSr{0YSbF*;S-}z#$Px`eGZ_9OON(GgGyI3@wgv#F!4>EL
+
+literal 0
+HcmV?d00001
+
+diff --git a/tests/media-frame-request-snapshot.test.mjs b/tests/media-frame-request-snapshot.test.mjs
+index dd12d10..4c46ad6 100644
+--- a/tests/media-frame-request-snapshot.test.mjs
++++ b/tests/media-frame-request-snapshot.test.mjs
+@@ -3,7 +3,7 @@ import test from 'node:test';
+ import {readFile} from 'node:fs/promises';
+ import {createHash} from 'node:crypto';
+ import {compareMediaFrames,ORIGINAL_MEDIA_EDIT_RECIPE} from '../packages/builder/dist/media-preparation.js';
+-const finite=new Uint8Array(await readFile(new URL('../../evidence/browser-results/reviewer-native-finite.gif',import.meta.url))),short=new Uint8Array(await readFile(new URL('../../evidence/browser-results/reviewer-native-clamped.gif',import.meta.url)));
++const finite=new Uint8Array(await readFile(new URL('./fixtures/native-gif-entry/reviewer-native-finite.gif',import.meta.url))),short=new Uint8Array(await readFile(new URL('./fixtures/native-gif-entry/reviewer-native-clamped.gif',import.meta.url)));
+ const digest=bytes=>'0x'+createHash('sha256').update(bytes).digest('hex');
+ 
+ test('comparison captures time, MIME, recipe and source before any async continuation',async()=>{
+diff --git a/tests/native-gif-source-identity.test.mjs b/tests/native-gif-source-identity.test.mjs
+new file mode 100644
+index 0000000..e7ba2f7
+--- /dev/null
++++ b/tests/native-gif-source-identity.test.mjs
+@@ -0,0 +1,15 @@
++import assert from 'node:assert/strict';
++import test from 'node:test';
++import {readFile} from 'node:fs/promises';
++import {createHash} from 'node:crypto';
++import {compareMediaFrames,ORIGINAL_MEDIA_EDIT_RECIPE} from '../packages/builder/dist/media-preparation.js';
++const root=new URL('./fixtures/native-gif-entry/',import.meta.url),finite=new Uint8Array(await readFile(new URL('reviewer-native-finite.gif',root))),short=new Uint8Array(await readFile(new URL('reviewer-native-clamped.gif',root)));
++const digest=b=>'0x'+createHash('sha256').update(b).digest('hex');
++test('native compare binds frame and declared timeline to the same initial actual source bytes',async t=>{
++ const bytes=finite.slice(),input={bytes,mediaType:'image/gif',recipe:ORIGINAL_MEDIA_EDIT_RECIPE,timeMs:15};
++ const pending=compareMediaFrames(input);bytes.set(short);const result=await pending;
++ t.diagnostic(JSON.stringify({committed:result.sourceIntegrity.digest,initial:digest(finite),mutated:digest(short),sourceFrameTimeMs:result.sourceFrameTimeMs,declared:result.sourceInfo.frameDurationsMs}));
++ assert.equal(result.sourceIntegrity.digest,digest(finite));
++ assert.deepEqual(result.sourceInfo.frameDurationsMs,[120,240,200],'inspection must not relabel another actual source timeline with the initial digest');
++ assert.equal(result.sourceFrameTimeMs,0);
++});

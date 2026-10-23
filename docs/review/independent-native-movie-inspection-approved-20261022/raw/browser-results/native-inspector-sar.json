@@ -1,0 +1,18 @@
+{
+  "video": {
+    "width": 64,
+    "height": 24,
+    "cssWidth": 320,
+    "cssHeight": 120
+  },
+  "png": {
+    "width": 64,
+    "height": 24,
+    "cssWidth": 320,
+    "cssHeight": 120
+  },
+  "scope": "local native inspector plus current canonical original player, no conversion or chain proof",
+  "consoleErrors": [],
+  "externalRequests": [],
+  "failedRequests": []
+}
