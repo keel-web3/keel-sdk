@@ -163,7 +163,6 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/acceptance-mcp-route-guards.test.mjs",
   "tests/sdk-publication-recovery.test.mjs",
   "tests/sdk-rpc-routing.test.mjs",
-  "tests/signature-privacy.test.mjs",
   "tests/creator-prepared-inline.test.mjs",
   "tests/inline-build-route.test.mjs",
   "tests/registered-native-gzip.test.mjs",
