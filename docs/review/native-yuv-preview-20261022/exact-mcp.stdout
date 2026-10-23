@@ -1,0 +1,48 @@
+{
+  "sourceBytes": 1828,
+  "sourceSHA256": "41bc415d0a2a142ee23db0de0089fb7d1675cc6718516a15da3f306bffb13193",
+  "sourceInfo": {
+    "width": 16,
+    "height": 16,
+    "durationMs": 400,
+    "frameCount": 10,
+    "animated": true,
+    "hasAudio": false,
+    "frameTimesMs": [
+      0,
+      40,
+      80,
+      120,
+      160,
+      200,
+      240,
+      280,
+      320,
+      360
+    ],
+    "frameDurationsMs": [
+      40,
+      40,
+      40,
+      40,
+      40,
+      40,
+      40,
+      40,
+      40,
+      40
+    ]
+  },
+  "sourceFrameTimeMs": 120,
+  "verification": {
+    "sourcePreserved": true,
+    "completeDecode": false,
+    "framesAndTimingPreserved": true,
+    "losslessPixelsVerified": false,
+    "browserDecode": "requires-runtime-check"
+  },
+  "persisted": false,
+  "publication": "not-performed",
+  "strictRefusals": 2,
+  "pass": true
+}

@@ -1,0 +1,52 @@
+TAP version 13
+# Subtest: exact ordinary YUV Original export remains byte exact without fidelity claims
+ok 1 - exact ordinary YUV Original export remains byte exact without fidelity claims
+  ---
+  duration_ms: 2.618792
+  type: 'test'
+  ...
+# Subtest: exact ordinary YUV B-frame Original fully inspects and previews the selected source time
+ok 2 - exact ordinary YUV B-frame Original fully inspects and previews the selected source time
+  ---
+  duration_ms: 139.748542
+  type: 'test'
+  ...
+# Subtest: YUV native inspection cannot grant strict conversion or pair equivalence
+ok 3 - YUV native inspection cannot grant strict conversion or pair equivalence
+  ---
+  duration_ms: 130.9905
+  type: 'test'
+  ...
+# Subtest: native exact container presentation independently maps every bounded B-frame to its full cycle
+ok 4 - native exact container presentation independently maps every bounded B-frame to its full cycle
+  ---
+  duration_ms: 0.956083
+  type: 'test'
+  ...
+# Subtest: native B-frame clocks reject count mismatches, unknown offsets, overlaps, holes and changed edit origin
+ok 5 - native B-frame clocks reject count mismatches, unknown offsets, overlaps, holes and changed edit origin
+  ---
+  duration_ms: 1.32575
+  type: 'test'
+  ...
+# Subtest: native YUV sample admission refuses depth, chroma, HDR, interlace and unqualified color near-matches
+ok 6 - native YUV sample admission refuses depth, chroma, HDR, interlace and unqualified color near-matches
+  ---
+  duration_ms: 0.203042
+  type: 'test'
+  ...
+# Subtest: actual progressive 8-bit BT709 YUV planar profiles retain exact Original bytes and inspected timing
+ok 7 - actual progressive 8-bit BT709 YUV planar profiles retain exact Original bytes and inspected timing
+  ---
+  duration_ms: 328.960459
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 763.358167

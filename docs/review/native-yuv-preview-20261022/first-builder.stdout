@@ -1,0 +1,2 @@
+packages/builder/src/movie-presentation-semantics.ts(325,69): error TS18048: 'track.timing' is possibly 'undefined'.
+packages/builder/src/movie-presentation-semantics.ts(326,23): error TS18048: 'track.timing' is possibly 'undefined'.

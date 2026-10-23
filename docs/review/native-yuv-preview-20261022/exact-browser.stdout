@@ -1,0 +1,22 @@
+TAP version 13
+# Subtest: browser codec rejection falls back to the real checked SDK decoder without modifying the MP4
+ok 1 - browser codec rejection falls back to the real checked SDK decoder without modifying the MP4
+  ---
+  duration_ms: 1279.4685
+  type: 'test'
+  ...
+# Subtest: expired private media session has one sign-in error and resumes the exact original after sign-in
+ok 2 - expired private media session has one sign-in error and resumes the exact original after sign-in
+  ---
+  duration_ms: 553.621042
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3346.033125

@@ -1,0 +1,9 @@
+{
+  "build": "PATH=/Users/ravonus/.nvm/versions/node/v22.22.1/bin:$PATH node scripts/build.mjs",
+  "affected": "node --test --test-concurrency=1 tests/media-preparation.test.mjs tests/actual-media-container.test.mjs tests/actual-media-pair.test.mjs tests/movie-presentation-semantics.test.mjs tests/movie-edit-list.test.mjs tests/movie-track-binding.test.mjs tests/audio-clock-binding.test.mjs tests/audio-clock-binding-mcp.test.mjs tests/native-media-frame-read.test.mjs tests/native-gif-source-identity.test.mjs tests/native-movie-inspection.test.mjs tests/native-movie-mcp.test.mjs tests/native-movie-boundaries.test.mjs tests/native-yuv-preview.test.mjs",
+  "builderTSC": "node node_modules/typescript/bin/tsc -p packages/builder/tsconfig.json --noEmit --incremental false",
+  "classification": "validateTestSuiteClassification() from scripts/test-suites.mjs",
+  "siteTSC": "node node_modules/typescript/bin/tsc --noEmit --incremental false",
+  "siteService": "node --conditions=react-server --import tsx --test --test-concurrency=1 tests/unit/temporal-media-service.test.ts tests/unit/media-preparation-service.test.ts",
+  "siteBrowser": "CHROMIUM_PATH=<installed Chromium1234> node --import tsx --test --test-concurrency=1 --test-name-pattern='browser codec rejection|expired private media session' tests/integration/media-local-preview.browser.test.ts"
+}

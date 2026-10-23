@@ -1,0 +1,84 @@
+TAP version 13
+# Subtest: browser codec rejection falls back to the real checked SDK decoder without modifying the MP4
+not ok 1 - browser codec rejection falls back to the real checked SDK decoder without modifying the MP4
+  ---
+  duration_ms: 533.451625
+  type: 'test'
+  location: '/private/tmp/keel-native-yuv-preview-20261022-01/keel-site/apps/studio/tests/integration/media-local-preview.browser.test.ts:1:5818'
+  failureType: 'hookFailed'
+  error: |-
+    browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+    
+    <launching> /Users/ravonus/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,BoundaryEventDispatchTracksNodeRemoval,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --no-sandbox --user-data-dir=/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/playwright_chromiumdev_profile-APBMnH --remote-debugging-pipe --no-startup-window
+    <launched> pid=74628
+    [pid=74628][err] [1022/202401.287112:ERROR:base/power_monitor/thermal_state_observer_mac.mm:140] ThermalStateObserverMac unable to register to power notifications. Result: 9
+    [pid=74628][err] [1022/202401.302690:ERROR:net/dns/dns_config_service_posix.cc:138] DNS config watch failed to start.
+    [pid=74628][err] [1022/202401.304175:WARNING:net/dns/dns_config_service_posix.cc:197] Failed to read DnsConfig.
+    [pid=74628][err] [1022/202401.311307:FATAL:base/apple/mach_port_rendezvous_mac.cc:159] Check failed: kr == KERN_SUCCESS. bootstrap_check_in org.chromium.Chromium.MachPortRendezvousServer.74628: Permission denied (1100)
+    Call log:
+    [2m  - <launching> /Users/ravonus/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,BoundaryEventDispatchTracksNodeRemoval,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --no-sandbox --user-data-dir=/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/playwright_chromiumdev_profile-APBMnH --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=74628[22m
+    [2m  - [pid=74628][err] [1022/202401.287112:ERROR:base/power_monitor/thermal_state_observer_mac.mm:140] ThermalStateObserverMac unable to register to power notifications. Result: 9[22m
+    [2m  - [pid=74628][err] [1022/202401.302690:ERROR:net/dns/dns_config_service_posix.cc:138] DNS config watch failed to start.[22m
+    [2m  - [pid=74628][err] [1022/202401.304175:WARNING:net/dns/dns_config_service_posix.cc:197] Failed to read DnsConfig.[22m
+    [2m  - [pid=74628][err] [1022/202401.311307:FATAL:base/apple/mach_port_rendezvous_mac.cc:159] Check failed: kr == KERN_SUCCESS. bootstrap_check_in org.chromium.Chromium.MachPortRendezvousServer.74628: Permission denied (1100)[22m
+    [2m  - [pid=74628] <gracefully close start>[22m
+    [2m  - [pid=74628] <kill>[22m
+    [2m  - [pid=74628] <will force kill>[22m
+    [2m  - [pid=74628] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=74628] <process did exit: exitCode=null, signal=SIGTRAP>[22m
+    [2m  - [pid=74628] starting temporary directories cleanup[22m
+    [2m  - [pid=74628] finished temporary directories cleanup[22m
+    [2m  - [pid=74628] <gracefully close end>[22m
+    
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    TestContext.<anonymous> (/private/tmp/keel-native-yuv-preview-20261022-01/keel-site/apps/studio/tests/integration/media-local-preview.browser.test.ts:18:26)
+  ...
+# Subtest: expired private media session has one sign-in error and resumes the exact original after sign-in
+not ok 2 - expired private media session has one sign-in error and resumes the exact original after sign-in
+  ---
+  duration_ms: 0.335875
+  type: 'test'
+  location: '/private/tmp/keel-native-yuv-preview-20261022-01/keel-site/apps/studio/tests/integration/media-local-preview.browser.test.ts:1:10787'
+  failureType: 'hookFailed'
+  error: |-
+    browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+    
+    <launching> /Users/ravonus/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,BoundaryEventDispatchTracksNodeRemoval,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --no-sandbox --user-data-dir=/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/playwright_chromiumdev_profile-APBMnH --remote-debugging-pipe --no-startup-window
+    <launched> pid=74628
+    [pid=74628][err] [1022/202401.287112:ERROR:base/power_monitor/thermal_state_observer_mac.mm:140] ThermalStateObserverMac unable to register to power notifications. Result: 9
+    [pid=74628][err] [1022/202401.302690:ERROR:net/dns/dns_config_service_posix.cc:138] DNS config watch failed to start.
+    [pid=74628][err] [1022/202401.304175:WARNING:net/dns/dns_config_service_posix.cc:197] Failed to read DnsConfig.
+    [pid=74628][err] [1022/202401.311307:FATAL:base/apple/mach_port_rendezvous_mac.cc:159] Check failed: kr == KERN_SUCCESS. bootstrap_check_in org.chromium.Chromium.MachPortRendezvousServer.74628: Permission denied (1100)
+    Call log:
+    [2m  - <launching> /Users/ravonus/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,BoundaryEventDispatchTracksNodeRemoval,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --no-sandbox --user-data-dir=/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/playwright_chromiumdev_profile-APBMnH --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=74628[22m
+    [2m  - [pid=74628][err] [1022/202401.287112:ERROR:base/power_monitor/thermal_state_observer_mac.mm:140] ThermalStateObserverMac unable to register to power notifications. Result: 9[22m
+    [2m  - [pid=74628][err] [1022/202401.302690:ERROR:net/dns/dns_config_service_posix.cc:138] DNS config watch failed to start.[22m
+    [2m  - [pid=74628][err] [1022/202401.304175:WARNING:net/dns/dns_config_service_posix.cc:197] Failed to read DnsConfig.[22m
+    [2m  - [pid=74628][err] [1022/202401.311307:FATAL:base/apple/mach_port_rendezvous_mac.cc:159] Check failed: kr == KERN_SUCCESS. bootstrap_check_in org.chromium.Chromium.MachPortRendezvousServer.74628: Permission denied (1100)[22m
+    [2m  - [pid=74628] <gracefully close start>[22m
+    [2m  - [pid=74628] <kill>[22m
+    [2m  - [pid=74628] <will force kill>[22m
+    [2m  - [pid=74628] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=74628] <process did exit: exitCode=null, signal=SIGTRAP>[22m
+    [2m  - [pid=74628] starting temporary directories cleanup[22m
+    [2m  - [pid=74628] finished temporary directories cleanup[22m
+    [2m  - [pid=74628] <gracefully close end>[22m
+    
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    TestContext.<anonymous> (/private/tmp/keel-native-yuv-preview-20261022-01/keel-site/apps/studio/tests/integration/media-local-preview.browser.test.ts:18:26)
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 0
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1797.224459

@@ -1,0 +1,52 @@
+{
+  "source": "4fa47717d9e9fac48cc6c9f925540f190e478564",
+  "base": "8d9e23ee4e3f99cf9cf7cf18cd6dc593257021c9",
+  "site": "0345f43d337e4863ebee3ce3b2bd3e0d30d4a9c0",
+  "node": {
+    "path": "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "version": "v22.22.1",
+    "sha256": "245e0321af97d3c21dd4e7104457334dfe3c3ba7982d0db75363e354565f8cbb"
+  },
+  "chromium": {
+    "path": "/Users/ravonus/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell",
+    "sha256": "7687bff7cb2db075f250e6d5848bbc8838cac3802ac3952a899c574f8eccab45"
+  },
+  "platform": "Darwin Chads-MacBook-Pro-3.local 24.6.0 Darwin Kernel Version 24.6.0: Mon Jul 14 11:30:40 PDT 2025; root:xnu-11417.140.69~1/RELEASE_ARM64_T6041 arm64",
+  "uptime": "20:28  1 user, load averages: 9.53 8.59 8.06",
+  "inputs": [
+    {
+      "path": "tests/fixtures/native-yuv-preview/media-preview.mp4",
+      "bytes": 1828,
+      "sha256": "41bc415d0a2a142ee23db0de0089fb7d1675cc6718516a15da3f306bffb13193"
+    },
+    {
+      "path": "../keel-site/apps/studio/tests/integration/media-local-preview.browser.test.ts",
+      "bytes": 13044,
+      "sha256": "c47e0cd2daab8879b0ee2acb4defb9c7d038a2f8d21a9ced6a0a100cac91d51f"
+    }
+  ],
+  "results": {
+    "standardBuild": 0,
+    "builderTSC": 0,
+    "classificationIssues": 0,
+    "newFocused": [
+      7,
+      0
+    ],
+    "affectedSDKMCP": [
+      88,
+      0
+    ],
+    "exactSiteBrowser": [
+      2,
+      0
+    ],
+    "actualSiteTemporalService": [
+      3,
+      0
+    ],
+    "realMCPExactOriginal": "PASS",
+    "fullIsolatedSiteTSC": 2
+  },
+  "limits": "Not live/publication proof. Source independent review pending. Full Site TSC setup diagnostics retained; no claim of typecheck pass."
+}

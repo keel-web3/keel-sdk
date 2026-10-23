@@ -1,0 +1,6 @@
+{
+  "base": "8d9e23ee4e3f99cf9cf7cf18cd6dc593257021c9",
+  "scope": "own sparse source/index/aliases/outputs/tests; public active root cache readonly; baseline copied outputs only, candidate requires fresh official build",
+  "budgetGiB": 1,
+  "maxHeavyStages": 1
+}

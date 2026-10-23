@@ -1,0 +1,356 @@
+{
+  "site": "0345f43d337e4863ebee3ce3b2bd3e0d30d4a9c0",
+  "sdk": "/private/tmp/keel-native-yuv-preview-20261022-01/keel-sdk",
+  "aliases": [
+    {
+      "path": "apps/studio/node_modules/zod",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/zod@4.4.3/node_modules/zod",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@types/qrcode",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@types+qrcode@1.5.6/node_modules/@types/qrcode",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@types/react-dom",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@types+react-dom@19.2.4_@types+react@19.2.18/node_modules/@types/react-dom",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@types/node",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@types+node@22.20.1/node_modules/@types/node",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@types/react",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@types+react@19.2.18/node_modules/@types/react",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/mediabunny",
+      "target": "/Users/ravonus/dev/wt/studio-public-discovery-20261020/keel-site/node_modules/.pnpm/mediabunny@1.61.3/node_modules/mediabunny",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/drizzle-kit",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/drizzle-kit@0.31.10/node_modules/drizzle-kit",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@playwright/test",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@playwright+test@1.62.1/node_modules/@playwright/test",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/next",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/next@16.2.12_@babel+core@7.29.7_@playwright+test@1.62.1_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@wagmi/connectors",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@wagmi+connectors@8.1.0_@coinbase+wallet-sdk@4.3.6_@types+react@19.2.18_bufferutil@4.1._087e7d597b6733a3c8044f879d668786/node_modules/@wagmi/connectors",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@wagmi/core",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@wagmi+core@3.6.4_@tanstack+query-core@5.101.4_@types+react@19.2.18_accounts@0.14.12_re_79eb013d04fb0b8b5d64bceafcf07731/node_modules/@wagmi/core",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@tanstack/react-query",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@tanstack+react-query@5.101.4_react@19.2.0/node_modules/@tanstack/react-query",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@tanstack/react-query-persist-client",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@tanstack+react-query-persist-client@5.101.4_@tanstack+react-query@5.101.4_react@19.2.0__react@19.2.0/node_modules/@tanstack/react-query-persist-client",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/prettier-plugin-tailwindcss",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/prettier-plugin-tailwindcss@0.6.14_prettier@3.9.6/node_modules/prettier-plugin-tailwindcss",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/eslint-config-next",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/eslint-config-next@16.2.12_@typescript-eslint+parser@8.67.0_eslint@9.39.5_jiti@2.7.0__t_9a82ef5d7661c391d8fd9e74dcbe282f/node_modules/eslint-config-next",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@jsquash/webp",
+      "target": "/Users/ravonus/dev/wt/studio-public-discovery-20261020/keel-site/node_modules/.pnpm/@jsquash+webp@1.5.0/node_modules/@jsquash/webp",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@jsquash/png",
+      "target": "/Users/ravonus/dev/wt/studio-public-discovery-20261020/keel-site/node_modules/.pnpm/@jsquash+png@3.1.1/node_modules/@jsquash/png",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/wagmi",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/wagmi@2.19.5_@tanstack+query-core@5.101.4_@tanstack+react-query@5.101.4_react@19.2.0__@_3a3b49e6fcd459e3dcf06a5e05977bdc/node_modules/wagmi",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/prettier",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/prettier@3.9.6/node_modules/prettier",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/typescript-eslint",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/typescript-eslint@8.67.0_eslint@9.39.5_jiti@2.7.0__typescript@5.9.3/node_modules/typescript-eslint",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/file-type",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/file-type@18.5.0/node_modules/file-type",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@tailwindcss/postcss",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@tailwindcss+postcss@4.3.3/node_modules/@tailwindcss/postcss",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/tsx",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/tsx@4.23.12/node_modules/tsx",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/typescript",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/postcss",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/postcss@8.5.26/node_modules/postcss",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@ecadlabs/beacon-types",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@ecadlabs+beacon-types@4.8.4-ecad/node_modules/@ecadlabs/beacon-types",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@ecadlabs/beacon-transport-postmessage",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@ecadlabs+beacon-transport-postmessage@4.8.4-ecad/node_modules/@ecadlabs/beacon-transport-postmessage",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@ecadlabs/beacon-core",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@ecadlabs+beacon-core@4.8.4-ecad/node_modules/@ecadlabs/beacon-core",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/ioredis",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/ioredis@5.11.1/node_modules/ioredis",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/server-only",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/server-only@0.0.1/node_modules/server-only",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/brotli-dec-wasm",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/brotli-dec-wasm@2.3.2/node_modules/brotli-dec-wasm",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/qrcode",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/qrcode@1.5.4/node_modules/qrcode",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/jsdom",
+      "target": "/Users/ravonus/dev/wt/studio-public-discovery-20261020/keel-site/node_modules/.pnpm/jsdom@26.1.0_bufferutil@4.1.0_utf-8-validate@5.0.10/node_modules/jsdom",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/react-dom",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/react-dom@19.2.0_react@19.2.0/node_modules/react-dom",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/brotli-wasm",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/brotli-wasm@3.0.1/node_modules/brotli-wasm",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/postgres",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/postgres@3.4.9/node_modules/postgres",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@trpc/react-query",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@trpc+react-query@11.18.0_@tanstack+react-query@5.101.4_react@19.2.0__@trpc+client@11.1_f36bc51fd6bb43406af8010fa05f3f9d/node_modules/@trpc/react-query",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@trpc/server",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@trpc+server@11.18.0_typescript@5.9.3/node_modules/@trpc/server",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@trpc/client",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@trpc+client@11.18.0_@trpc+server@11.18.0_typescript@5.9.3__typescript@5.9.3/node_modules/@trpc/client",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/superjson",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/superjson@2.2.6/node_modules/superjson",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/accounts",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/accounts@0.14.12_@types+react@19.2.18_@wagmi+core@3.6.4_react@19.2.0_typescript@5.9.3_u_e0e5911f41a49d275e2842a6107914f1/node_modules/accounts",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/drizzle-orm",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/drizzle-orm@0.45.2_postgres@3.4.9/node_modules/drizzle-orm",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/siwe",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/siwe@2.3.2_ethers@6.17.0_bufferutil@4.1.0_utf-8-validate@5.0.10_/node_modules/siwe",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/viem",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/viem@2.55.19_bufferutil@4.1.0_typescript@5.9.3_utf-8-validate@5.0.10_zod@4.4.3/node_modules/viem",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/sats-connect",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/sats-connect@4.2.1_typescript@5.9.3/node_modules/sats-connect",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/eslint",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/eslint@9.39.5_jiti@2.7.0/node_modules/eslint",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/zustand",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/zustand@5.0.15_@types+react@19.2.18_react@19.2.0_use-sync-external-store@1.4.0_react@19.2.0_/node_modules/zustand",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@taquito/utils",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@taquito+utils@25.0.0/node_modules/@taquito/utils",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@taquito/beacon-wallet",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@taquito+beacon-wallet@25.0.0_bufferutil@4.1.0_ioredis@5.11.1_utf-8-validate@5.0.10/node_modules/@taquito/beacon-wallet",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@taquito/taquito",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@taquito+taquito@25.0.0/node_modules/@taquito/taquito",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/esbuild",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@t3-oss/env-nextjs",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/@t3-oss+env-nextjs@0.13.11_typescript@5.9.3_valibot@1.1.0_typescript@5.9.3__zod@4.4.3/node_modules/@t3-oss/env-nextjs",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@keel/pixel-engine",
+      "target": "/private/tmp/keel-independent-composed-site-20261022-01/keel-sdk/packages/pixel-engine",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@keel/sprite-codex",
+      "target": "/private/tmp/keel-native-yuv-preview-20261022-01/keel-sdk/packages/sprite-codex",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@keel/site-domain",
+      "target": "/private/tmp/keel-native-yuv-preview-20261022-01/keel-site/packages/site-domain",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@keel/game-engine",
+      "target": "/private/tmp/keel-native-yuv-preview-20261022-01/keel-sdk/packages/game-engine",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@keel/mcp",
+      "target": "/private/tmp/keel-native-yuv-preview-20261022-01/keel-sdk/packages/mcp",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@keel/protocol",
+      "target": "/private/tmp/keel-native-yuv-preview-20261022-01/keel-sdk/packages/protocol",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@keel/mint-queue",
+      "target": "/private/tmp/keel-native-yuv-preview-20261022-01/keel-sdk/packages/mint-queue",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@keel/viewer",
+      "target": "/private/tmp/keel-native-yuv-preview-20261022-01/keel-sdk/packages/viewer",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@keel/sdk",
+      "target": "/private/tmp/keel-native-yuv-preview-20261022-01/keel-sdk/packages/sdk",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@keel/sandbox-sdk",
+      "target": "/private/tmp/keel-native-yuv-preview-20261022-01/keel-sdk/packages/sandbox-sdk",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@keel/ethereum-adapter",
+      "target": "/private/tmp/keel-native-yuv-preview-20261022-01/keel-sdk/packages/ethereum-adapter",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@keel/studio-core",
+      "target": "/private/tmp/keel-native-yuv-preview-20261022-01/keel-sdk/packages/studio-core",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@keel/builder",
+      "target": "/private/tmp/keel-native-yuv-preview-20261022-01/keel-sdk/packages/builder",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/@keel/web3-boundary-tests",
+      "target": "/private/tmp/keel-native-yuv-preview-20261022-01/keel-sdk/packages/web3-boundary-tests",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/tailwindcss",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/tailwindcss@4.3.3/node_modules/tailwindcss",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/react",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/react@19.2.0/node_modules/react",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/sharp",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/sharp@0.35.3_@types+node@22.20.1/node_modules/sharp",
+      "exists": true
+    },
+    {
+      "path": "apps/studio/node_modules/drand-client",
+      "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/drand-client@1.4.2/node_modules/drand-client",
+      "exists": true
+    }
+  ]
+}
