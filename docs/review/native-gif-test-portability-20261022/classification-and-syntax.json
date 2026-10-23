@@ -1,0 +1,44 @@
+{
+  "results": [
+    {
+      "label": "before",
+      "cwd": "/private/tmp/keel-native-media-inspection-20261022-02/keel-sdk",
+      "exitCode": 1,
+      "actual": {
+        "issues": [
+          "unclassified tests: tests/media-frame-request-snapshot.test.mjs, tests/native-media-frame-read.test.mjs"
+        ]
+      },
+      "sourceMutation": false
+    },
+    {
+      "label": "after",
+      "cwd": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01",
+      "exitCode": 0,
+      "actual": {
+        "issues": []
+      },
+      "sourceMutation": false
+    },
+    {
+      "name": "tests/media-frame-request-snapshot.test.mjs",
+      "syntaxExitCode": 0,
+      "stdoutBytes": 0,
+      "stderrBytes": 0
+    },
+    {
+      "name": "tests/native-media-frame-read.test.mjs",
+      "syntaxExitCode": 0,
+      "stdoutBytes": 0,
+      "stderrBytes": 0
+    },
+    {
+      "name": "tests/native-gif-source-identity.test.mjs",
+      "syntaxExitCode": 0,
+      "stdoutBytes": 0,
+      "stderrBytes": 0
+    }
+  ],
+  "functionalTests": "PENDING; no build/large test job started while Mac over load40",
+  "productionSourceChanged": false
+}

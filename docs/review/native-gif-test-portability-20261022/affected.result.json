@@ -1,0 +1,17 @@
+{
+  "command": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "--test",
+    "--test-concurrency=1",
+    "tests/native-media-frame-read.test.mjs",
+    "tests/media-frame-request-snapshot.test.mjs",
+    "tests/native-gif-source-identity.test.mjs"
+  ],
+  "cwd": "/private/tmp/keel-sdk-native-gif-fixtures-20261022-01",
+  "uptime": "17:41  1 user, load averages: 6.87 13.87 13.83",
+  "seconds": 0.43694758298806846,
+  "exitCode": 0,
+  "stdoutSHA256": "c87ba7ad1168cafad8a10f2ff4cb61ff818ccdcb43df50aa2358266880afe223",
+  "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "runtime": "Explicitly hash-verified independent189 compiledoutputs copiedowned; no new build claim; referencesportabletrackedunchanged"
+}

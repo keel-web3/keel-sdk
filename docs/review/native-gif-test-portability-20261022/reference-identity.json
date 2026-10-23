@@ -1,0 +1,23 @@
+{
+  "references": [
+    {
+      "path": "tests/fixtures/native-gif-entry/reviewer-native-finite.gif",
+      "bytes": 126,
+      "sha256": "19a488cb5a0d34f20c3d0d266797b65c62ab197554f7e484377954ee5acb83a5",
+      "source": "/private/tmp/keel-native-media-inspection-20261022-02/evidence/browser-results/reviewer-native-finite.gif"
+    },
+    {
+      "path": "tests/fixtures/native-gif-entry/reviewer-native-clamped.gif",
+      "bytes": 126,
+      "sha256": "35fd32e1ac822834d6e945ce225c13a0c48731397a5578b86bd9aafae3546435",
+      "source": "/private/tmp/keel-native-media-inspection-20261022-02/evidence/browser-results/reviewer-native-clamped.gif"
+    }
+  ],
+  "snapshotTestBeforeSHA256": "edb5374781bdbba391495e6b2c07821638a7b2b1f39cd020e83201b95bb1d762",
+  "snapshotTestAfterSHA256": "58b7e1154d5c8ef62378313df813dde50cb7af76c20380cf6c35fddff35ec07c",
+  "independentRegressionOriginalSHA256": "c71d19b0b8564712daecad4fff752ef6aacbc3956f6cffc4c0846b5e15afd5ff",
+  "independentRegressionMirrorSHA256": "4154f8ce488193d7bb7ce7bd8e6e171dec4b1a724b91b4692bb62feb1ae9e623",
+  "assertionLinesByteIdentical": true,
+  "productionSourceChanged": false,
+  "independentAdmission": "PENDING"
+}
