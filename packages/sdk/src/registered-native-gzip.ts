@@ -143,6 +143,9 @@ function inspectDocument(bytes: Uint8Array, binding: KeelRegisteredNativeGzipBin
     if (stored.toString("base64") !== embedded.storedBase64 || stored.length !== embedded.storedIntegrity.byteLength || sha(stored) !== embedded.storedIntegrity.digest) throw new TypeError("Native Gzip stored source integrity mismatch.");
     const decoded = gunzipSync(stored, { maxOutputLength: item.integrity.byteLength });
     if (decoded.length !== item.integrity.byteLength || sha(decoded) !== item.integrity.digest) throw new TypeError("Native Gzip decoded source integrity mismatch.");
+    // Newly qualified native ISO MIME aliases require the same exact complete
+    // original container whether storage selected None or Gzip.
+    if (item.mediaType === "video/x-m4v" || item.mediaType === "video/quicktime" && item.role === "entrypoint") assertRegisteredNativeNoneBinary({id: item.id, role: item.role, mediaType: item.mediaType, source: decoded});
     decodedResources.push({id: item.id, role: item.role, mediaType: item.mediaType, aliases: item.aliases, source: decoded});
     members.push({ id: item.id, mediaType: item.mediaType, integrity: { ...item.integrity }, storedIntegrity: { ...embedded.storedIntegrity } });
   }

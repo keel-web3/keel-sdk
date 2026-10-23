@@ -16,6 +16,7 @@ export const KEEL_ASSET_DISPLAY_MEDIA_TYPES = Object.freeze([
   "audio/aac",
   "audio/mp4",
   "video/mp4",
+  "video/x-m4v",
   "video/webm",
 ] as const);
 
@@ -24,6 +25,7 @@ export type KeelAssetDisplayKind = "image" | "video" | "audio";
 
 /** Map a supported direct creator asset to the canonical display behavior. */
 export function keelAssetDisplayKind(mediaType: string): KeelAssetDisplayKind {
+  if (mediaType === "video/quicktime") throw new TypeError("Original QuickTime is not supported for direct playback by this registered browser profile. Keep the original and prepare a separate MP4 playback derivative; verify it before publishing.");
   if ((KEEL_ASSET_DISPLAY_MEDIA_TYPES as readonly string[]).includes(mediaType)) {
     if (mediaType.startsWith("image/")) return "image";
     if (mediaType.startsWith("video/")) return "video";

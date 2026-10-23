@@ -19,6 +19,8 @@ const MEDIA_BY_EXTENSION: Readonly<Record<string, string>> = {
   ".mjs": "text/javascript",
   ".mp3": "audio/mpeg",
   ".mp4": "video/mp4",
+  ".mov": "video/quicktime",
+  ".m4v": "video/x-m4v",
   ".mtl": "text/plain",
   ".obj": "model/obj",
   ".ogg": "audio/ogg",

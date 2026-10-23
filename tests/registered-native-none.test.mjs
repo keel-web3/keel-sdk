@@ -2,11 +2,13 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
-import {gunzipSync} from 'node:zlib';
+import {gunzipSync,gzipSync} from 'node:zlib';
 import {buildKeelInlineLocalDocument,buildKeelInlineModuleFragment,decodeKeelInlineGraphFragment,buildKeelInlineRawPercentTokenURIGraph,buildKeelPreparedOneOfOneTokenURI} from '../packages/sdk/dist/inline-viewer-graph.js';
 import {createKeelRegisteredNativeGzipProof,assertKeelRegisteredNativeGzipProof,KEEL_REGISTERED_NATIVE_GZIP_FRAME_PROFILE as p} from '../packages/sdk/dist/registered-native-gzip.js';
 import {inspectKeelInlinePayloadCarriage,assertKeelFreshPayloadCarriage,assertKeelFreshPayloadAudit,auditKeelInlineTokenURI} from '../packages/sdk/dist/inline-transport-audit.js';
 import {createKeelPublishReviewPlan,verifyKeelPublishReviewPlan} from '../packages/sdk/dist/publish-plan.js';
+import {inferMediaType,normalizeAssets} from '../packages/studio-core/dist/media.js';
+import {keelAssetDisplayKind} from '../packages/sdk/dist/asset-display.js';
 const hash=b=>'0x'+createHash('sha256').update(b).digest('hex');
 const integrity=b=>({algorithm:'sha256',digest:hash(b),byteLength:b.length});
 const fixture=JSON.parse(gunzipSync(readFileSync(new URL('./fixtures/registered-native-gzip-revision5.json.gz',import.meta.url))));
@@ -167,4 +169,39 @@ test('actual native None full metadata audit and COPY review survive JSON recove
  const recovered=JSON.parse(JSON.stringify(envelope));assert.equal((await verifyKeelPublishReviewPlan(recovered)).valid,true);
  const carriage=recovered.plan.preparedCopy.payloadCarriage;assert.equal(carriage.registeredNativeGzip.members.length,1);assert.equal(carriage.registeredNativeGzip.members[0].id,'keel.asset-display');assert.equal(carriage.registeredNativeGzip.nativeNoneMembers.length,1);assert.equal(carriage.payloads.find(payload=>payload.id==='artwork.mp4').nativeNone.role,'entrypoint');
  delete carriage.payloads.find(payload=>payload.id==='artwork.mp4').nativeNone;assert.equal((await verifyKeelPublishReviewPlan(recovered)).valid,false);
+});
+
+
+test('actual M4V native file retains exact source and MIME through default None proof and fresh COPY carriage',async t=>{
+ for(const [name,mime,size,digest,brand]of [
+  ['normal-artwork.m4v','video/x-m4v',1775,'eb417767725dbb6fc81fd5e88313f1c2d2a6e91206d2bc8d88075854d5d2f719','M4V '],
+ ])await t.test(mime,async()=>{
+  const source=readFileSync(new URL('./fixtures/registered-native-none/'+name,import.meta.url));assert.equal(source.length,size);assert.equal(hash(source),'0x'+digest);assert.equal(source.subarray(4,8).toString(),'ftyp');assert.equal(source.subarray(8,12).toString(),brand);assert.notDeepEqual(source,mp4);
+  for(const declared of [undefined,'application/octet-stream',mime]){
+   const normalized=normalizeAssets([{fileName:name,bytes:source,...(declared?{mediaType:declared}:{})}]);assert.equal(normalized[0].mediaType,mime);assert.equal(normalized[0].role,'video');assert.deepEqual(normalized[0].bytes,source);assert.equal(inferMediaType(name,declared),mime);
+  }
+  assert.equal(keelAssetDisplayKind(mime),'video');
+  const root=await buildKeelInlineLocalDocument({shell,modules:[display],entry:{id:name,mediaType:mime,source}}),item=entries(root).find(item=>item.id===name);assert.equal(item.mediaType,mime);assert.equal(item.embedded.compression,'none');assert.deepEqual(Buffer.from(item.embedded.storedBase64,'base64'),source);
+  const current=proof(root);assert.equal(current.members.length,1);assert.equal(current.nativeNoneMembers.length,1);assert.equal(current.nativeNoneMembers[0].mediaType,mime);assert.deepEqual(assertKeelRegisteredNativeGzipProof(current,root.rootBytes),current);
+  const audit=inspectKeelInlinePayloadCarriage(root.rootBytes,{registeredNativeGzip:current});assertKeelFreshPayloadAudit(JSON.parse(JSON.stringify(audit)));
+  const graph=await buildKeelInlineRawPercentTokenURIGraph(root,{registeredNativeGzip:current});assert.equal(graph.htmlIntegrity.digest,hash(root.rootBytes));
+  const wrongBrand=Buffer.from(source);wrongBrand.write('NOPE',8);
+  for(const compression of ['none','gzip']){
+   const valid=await buildKeelInlineLocalDocument({shell,modules:[display],entry:{id:name,mediaType:mime,source,compression}});assert.doesNotThrow(()=>proof(valid));
+   for(const [badName,bytes,badMime]of [['HTML renamed',Buffer.from('<html>not a video</html>'),mime],['truncated source',source.subarray(0,-1),mime],['wrong major brand',wrongBrand,mime],['audio-only MOV',readFileSync(new URL('./fixtures/registered-native-none/audio-only.mov',import.meta.url)),mime],['unknown video type',source,'video/x-invented']]){
+    if(badMime==='video/x-invented'){assert.throws(()=>keelAssetDisplayKind(badMime));continue}
+    const forged=await buildKeelInlineLocalDocument({shell,modules:[display],entry:{id:name,mediaType:badMime,source:bytes,compression}});assert.throws(()=>proof(forged),undefined,badName+' '+compression);
+   }
+  }
+ });
+});
+
+
+test('QuickTime inference preserves the original but direct playback fails with actionable derivative guidance',async()=>{
+ const source=readFileSync(new URL('./fixtures/registered-native-none/normal-artwork.mov',import.meta.url));assert.equal(source.length,1732);assert.equal(hash(source),'0xfe333b7dcd494dc0a7fbc755defb9fceb97aaa3aff960cdac77a570986c0d05f');assert.equal(source.subarray(8,12).toString(),'qt  ');
+ const resource=normalizeAssets([{fileName:'original.mov',bytes:source}])[0];assert.equal(resource.mediaType,'video/quicktime');assert.deepEqual(resource.bytes,source);
+ assert.throws(()=>keelAssetDisplayKind(resource.mediaType),/Keep the original.*separate MP4 playback derivative/);
+ await assert.rejects(buildKeelInlineLocalDocument({shell,modules:[display],entry:{id:resource.id,mediaType:resource.mediaType,source}}),/Keep the original.*separate MP4 playback derivative/);
+ const safe=await document();
+ for(const compression of ['none','gzip']){const items=entries(safe),item=items.find(item=>item.id==='artwork.mp4');item.mediaType='video/quicktime';item.integrity=integrity(source);const stored=compression==='gzip'?gzipSync(source):source;item.embedded={compression,storedBase64:stored.toString('base64'),storedIntegrity:integrity(stored)};assert.throws(()=>proof(fromEntries(items)),/Native None/)}
 });

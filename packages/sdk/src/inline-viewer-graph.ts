@@ -1300,6 +1300,7 @@ export async function buildKeelInlineLocalDocument(input: {
     inspectKeelNativeSVG(input.entry.source);
     if (input.modules.length !== 1 || input.modules[0]?.version !== "1.5.0") throw new TypeError("Native SVG requires the exact new SVG-capable asset-display 1.5 profile.");
   }
+  if (input.entry.mediaType === "video/quicktime") keelAssetDisplayKind(input.entry.mediaType);
   if (input.entry.mediaType !== "text/html" && input.entry.mediaType !== "text/javascript" && !isNormalMediaEntry(input.entry.mediaType) && !isModelMediaEntry(input.entry.mediaType)) throw new TypeError("The entry MIME has no qualified current viewer; it cannot be silently parsed as HTML.");
   const payloadStorage = resolveKeelPayloadStorage(input.payloadStorage);
   const entryCompression = inlineCompression(inheritInlineStorage(payloadStorage, input.entry.payloadStorage), input.entry.compression, "none");

@@ -6,7 +6,8 @@ import { inspectKeelModelMedia } from "./model-media.js";
 const invalid = (): never => { throw new TypeError("Native None requires a complete supported original media container and role."); };
 const text = (bytes: Uint8Array, at: number, length: number) => String.fromCharCode(...bytes.subarray(at, at + length));
 interface Box { readonly kind: string; readonly at: number; readonly body: number; readonly end: number }
-function inspectVideoMP4(bytes: Uint8Array): void {
+const ISO_VIDEO_MEDIA_TYPES = ["video/mp4", "video/x-m4v"] as const;
+function inspectVideoISO(bytes: Uint8Array, mediaType: string): void {
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   let boxCount = 0;
   const boxes = (start = 0, end = bytes.length): Box[] => {
@@ -29,6 +30,10 @@ function inspectVideoMP4(bytes: Uint8Array): void {
   };
   const top = boxes(), ftyp = one(top, "ftyp"), moov = one(top, "moov"), mdat = top.filter(row => row.kind === "mdat" && row.end > row.body);
   if (ftyp.at !== 0 || ftyp.end - ftyp.body < 8 || (ftyp.end - ftyp.body) % 4 || !mdat.length || top.some(row => row.kind === "moof")) invalid();
+  // Preserve the actual native MIME, not an MP4 relabel. New aliases require
+  // their known complete ISO container; brands never replace track validation.
+  const majorBrand = text(bytes, ftyp.body, 4);
+  if (mediaType === "video/x-m4v" && !["M4V ", "M4VH", "M4VP", "isom", "iso2", "mp41", "mp42", "avc1"].includes(majorBrand)) invalid();
   // An AVIF/image container cannot masquerade as a video through its MIME.
   for (let at = ftyp.body; at < ftyp.end; at += 4) if (at !== ftyp.body + 4 && ["avif", "avis", "heic", "heix", "mif1"].includes(text(bytes, at, 4))) invalid();
   const tracks = boxes(moov.body, moov.end).filter(row => row.kind === "trak");
@@ -140,7 +145,7 @@ function inspectVideoWebM(bytes: Uint8Array): void {
 
 export function assertRegisteredNativeNoneIdentity(input: {readonly role: unknown; readonly mediaType: string}): void {
   if (typeof input.role !== "string" || !["entrypoint", "asset", "data"].includes(input.role)) invalid();
-  if (["video/mp4", "video/webm"].includes(input.mediaType)) return;
+  if ((ISO_VIDEO_MEDIA_TYPES as readonly string[]).includes(input.mediaType) || input.mediaType === "video/webm") return;
   if (input.role !== "entrypoint" && ((KEEL_NATIVE_AUDIO_MEDIA_TYPES as readonly string[]).includes(input.mediaType)
     || ["model/gltf-binary", "application/octet-stream"].includes(input.mediaType))) return;
   return invalid();
@@ -149,7 +154,7 @@ export function assertRegisteredNativeNoneIdentity(input: {readonly role: unknow
 export function assertRegisteredNativeNoneBinary(input: {readonly id: string; readonly role: unknown; readonly mediaType: string; readonly source: Uint8Array}): "model" | void {
   assertRegisteredNativeNoneIdentity(input);
   if (!input.source.length || input.source.length > 32 * 1024 * 1024) invalid();
-  if (input.mediaType === "video/mp4") return inspectVideoMP4(input.source);
+  if ((ISO_VIDEO_MEDIA_TYPES as readonly string[]).includes(input.mediaType)) return inspectVideoISO(input.source, input.mediaType);
   if (input.mediaType === "video/webm") return inspectVideoWebM(input.source);
   if ((KEEL_NATIVE_AUDIO_MEDIA_TYPES as readonly string[]).includes(input.mediaType)) {
     // Rev5 audio uses the canonical derived HTML entry and verified audio asset,

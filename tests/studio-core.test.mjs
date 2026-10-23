@@ -64,6 +64,19 @@ test("normal model folders infer exact shared MIME roles without rewriting decla
   assert.equal(inferMediaType("nested/unsupported.fbx"), "application/octet-stream");
 });
 
+test("normal MOV/M4V file names infer native video MIME while explicit MIME remains authoritative", () => {
+  for (const [name, mime] of [["clip.mov", "video/quicktime"], ["clip.m4v", "video/x-m4v"]]) {
+    for (const declared of [undefined, "", "application/octet-stream"]) {
+      assert.equal(inferMediaType(`nested/${name}`, declared), mime);
+      assert.equal(inferMediaType(`nested/${name.toUpperCase()}`, declared), mime);
+      assert.equal(inferRole(inferMediaType(name, declared), name), "video");
+    }
+    assert.equal(inferMediaType(name, "text/javascript"), "text/javascript");
+  }
+  assert.equal(inferMediaType("clip.mov.png"), "image/png");
+  assert.equal(inferMediaType("clip.m4v.bak"), "application/octet-stream");
+});
+
 test("studio-core creates safe names and compression summaries", () => {
   assert.equal(slugify("  Living Study #1  "), "living-study-1");
   assert.equal(normalizeVirtualPath("/content/preview.webp"), "/content/preview.webp");
