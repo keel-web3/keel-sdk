@@ -31,7 +31,7 @@ jobs:
             (cd "packages/$package" && pnpm pack --pack-destination ../../first-packs)
           done
           mkdir -p packages/sdk/dist/proof-runtime
-          printf 'throw new Error("stale runtime");\n' > packages/sdk/dist/proof-runtime/runner-client.js
+          printf 'throw new Error("stale runtime");\n' > packages/sdk/dist/__keel_stale_build_output__.js
           node scripts/build.mjs
           for package in protocol viewer sdk builder; do
             (cd "packages/$package" && pnpm pack --pack-destination ../../second-packs)

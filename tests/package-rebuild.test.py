@@ -41,8 +41,8 @@ class PackageRebuildTests(unittest.TestCase):
             self.pack(b, {"name": "@keel/sdk"}, runtime=b"export const wrong = true;")
             with self.assertRaisesRegex(ValueError, "package/dist/index.js"):
                 module.compare_packages(a, b)
-            self.pack(b, {"name": "@keel/sdk"}, extra={"package/dist/proof-runtime/runner-client.js": b"stale"})
-            with self.assertRaisesRegex(ValueError, "runner-client.js"):
+            self.pack(b, {"name": "@keel/sdk"}, extra={"package/dist/__keel_stale_build_output__.js": b"stale"})
+            with self.assertRaisesRegex(ValueError, "__keel_stale_build_output__.js"):
                 module.compare_packages(a, b)
 
 

@@ -31,7 +31,7 @@ def compare_packages(first, second):
         if a != b:
             changed = sorted(k for k in a.keys() | b.keys() if a.get(k) != b.get(k))
             raise ValueError(f"Rebuild changed {name}: {', '.join(changed)}")
-        if "package/dist/proof-runtime/runner-client.js" in b:
+        if "package/dist/__keel_stale_build_output__.js" in b:
             raise ValueError("Obsolete injected module survived rebuild")
         print(name, len(a), "package files identical (package.json key order normalized)")
 

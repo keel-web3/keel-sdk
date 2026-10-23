@@ -1,0 +1,9 @@
+# Linux CI baseline and scoped test-harness correction
+
+Baseline PR73 head ec024a2adc8b06e0114d8a3531c59a9e90da3e2c, runtime source5696dcba210526e4bcdab768a769deb2a77020bb. Actual GitHub Ubuntu jobs39891739026 (package provenance) and39891738922 (modules verify) failed. Full original logs retained unchanged. Modules suite3215 tests:3099PASS,29FAIL,87SKIP,0cancel. Four video conversion failures remain OPEN; this patch does not claim a green Linux suite.
+
+The provenance workflow injected `proof-runtime/runner-client.js`, which is now maintained TypeScript output, then incorrectly rejected its legitimate regenerated file. The unique stale sentinel `__keel_stale_build_output__.js` exercises exactly the same output cleanup and packed-file comparison; legitimate changed package bytes still fail. No build implementation changed.
+
+Four authored-runtime tests created scratch paths beneath macOS-only `/private/tmp`; Node os.tmpdir() preserves unique mkdtemp and finally cleanup on Linux and macOS. The copied SDK and stored-text harness resolved SDK dependencies through root node_modules, where pnpm does not guarantee transitive `saxes`; they now resolve through the actual SDK package node_modules/require anchor. No assertion, expected asset, limit, production source, dependency lock or runtime manifest changed.
+
+Author command: Node22.22.1 --test tests/mcp-authored-runtime-resolution.test.mjs tests/qa-authored-origin-and-response.test.mjs tests/sdk-authored-project.test.mjs tests/sdk-authored-published-project.test.mjs tests/sdk-published-reader-identity.test.mjs tests/stored-text-runtime.test.mjs tests/build-output.test.mjs:72PASS/0FAIL/0skip/0cancel. python3 tests/package-rebuild.test.py:2PASS. These are macOS scoped author results; fresh independent review and actual Linux CI rerun are required. The four Linux movie metadata refusals have not been hidden or corrected in this patch.

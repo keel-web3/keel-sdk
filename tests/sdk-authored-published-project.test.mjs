@@ -1,3 +1,4 @@
+import {tmpdir} from 'node:os';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {mkdtemp,writeFile,rm} from 'node:fs/promises';
@@ -20,7 +21,7 @@ for(const kind of ['missing-core','wrong-chain','wrong-hash','different-store','
  await assert.rejects(createKeelAuthoredProject(spec));
 });
 test('normal MCP author infers Three, resolves its current catalog and privately caches public sources before staging zero library bytes',async()=>{
- const root=await mkdtemp('/private/tmp/keel-authored-reuse-mcp-'),wire=await authoredRuntimeResolutionFixture();const prior={fetch:globalThis.fetch,url:process.env.KEEL_STUDIO_URL,token:process.env.KEEL_STUDIO_AGENT_TOKEN};
+ const root=await mkdtemp(path.join(tmpdir(),'keel-authored-reuse-mcp-')),wire=await authoredRuntimeResolutionFixture();const prior={fetch:globalThis.fetch,url:process.env.KEEL_STUDIO_URL,token:process.env.KEEL_STUDIO_AGENT_TOKEN};
  try{
  process.env.KEEL_STUDIO_URL='https://studio.invalid';process.env.KEEL_STUDIO_AGENT_TOKEN='keel_agent_'+'x'.repeat(32);let gets=0,posts=0;
  globalThis.fetch=async(url,input)=>{const target=new URL(url);assert.equal(target.origin,'https://studio.invalid');assert.equal(target.pathname,'/api/agent/staging');

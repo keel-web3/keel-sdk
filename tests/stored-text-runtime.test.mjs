@@ -14,6 +14,7 @@ const sdkRoot = fileURLToPath(new URL('..', import.meta.url));
 const stageRoot = sdkRoot;
 const sourceRoot = path.join(sdkRoot, 'packages/sdk/src');
 const requireSdk = createRequire(path.join(sdkRoot, 'package.json'));
+const requireSdkRuntime = createRequire(path.join(sdkRoot, 'packages/sdk/package.json'));
 const { build } = requireSdk('esbuild');
 const scratch = await mkdtemp(path.join(tmpdir(), 'keel-stored-text-proof-'));
 after(() => rm(scratch, { recursive: true, force: true }));
@@ -39,7 +40,7 @@ const result = await build({
       builder.onResolve({ filter: /^[^./]/ }, args => {
         if (args.path.startsWith('node:') || path.isAbsolute(args.path)) return;
         if (args.path === '@keel/protocol') return { path: path.join(sdkRoot, 'packages/protocol/dist/index.js'), external: true };
-        return { path: requireSdk.resolve(args.path), external: true };
+        return { path: requireSdkRuntime.resolve(args.path), external: true };
       });
       builder.onLoad({ filter: /verification-shell\.ts$/ }, async args => ({
         contents: (await readFile(args.path, 'utf8')).replace('function compactInlineRuntime(', 'export function compactInlineRuntime('),

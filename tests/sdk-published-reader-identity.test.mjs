@@ -30,7 +30,7 @@ test('a clean copied package authenticates actual reader bytes and fails closed 
   const {cp,symlink}=await import('node:fs/promises');
   await cp(path.join(root,'packages/sdk/dist'),scratch,{recursive:true});
   await writeFile(path.join(scratch,'package.json'),' {"type":"module"}');
-  await symlink(path.join(root,'node_modules'),path.join(scratch,'node_modules'),'dir');
+  await symlink(path.join(root,'packages/sdk/node_modules'),path.join(scratch,'node_modules'),'dir');
   const module=await import(pathToFileURL(path.join(scratch,'verification-shell.js')).href);
   assert.equal((await module.buildPublishedViewReaderModule()).integrity.digest,KEEL_PUBLISHED_VIEW_READER_V1.digest);
   await writeFile(asset,new Uint8Array(251050));await assert.rejects(module.buildPublishedViewReaderModule(),/digest or byte-length/);

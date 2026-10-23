@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {mkdtemp,readFile,writeFile,rm} from 'node:fs/promises';
 import {join} from 'node:path';
+import {tmpdir} from 'node:os';
 import {build} from 'esbuild';
 import {createIntegrity,canonicalJson} from '../packages/protocol/dist/index.js';
 import {createKeelAuthoredProject,assertKeelAuthoredProjectFiles,planKeelAuthoredProjectChanges,buildKeelAuthoredInlineDocument} from '../packages/sdk/dist/authored-project.js';
@@ -68,7 +69,7 @@ test('studio-upload remains browser safe with authored commitment checking',asyn
  assert.ok(!Object.keys(bundled.metafile.inputs).some(file=>/authored-project\.ts$|esbuild\/lib|node:/u.test(file)));
 });
 test('actual MCP author/recovery/stage validates graph then sends exact stable logical source paths',async()=>{
- const root=await mkdtemp('/private/tmp/keel-mcp-authored-test-'),server=await serverFor(root),priorToken=process.env.KEEL_STUDIO_AGENT_TOKEN,priorStudioUrl=process.env.KEEL_STUDIO_URL,priorFetch=globalThis.fetch;
+ const root=await mkdtemp(join(tmpdir(),'keel-mcp-authored-test-')),server=await serverFor(root),priorToken=process.env.KEEL_STUDIO_AGENT_TOKEN,priorStudioUrl=process.env.KEEL_STUDIO_URL,priorFetch=globalThis.fetch;
  try{
   const made=await call(server,2,'keel-project-author',{...authoredFixture(),out:'work'});assert.equal(made.result.isError,undefined);const prepared=made.result.structuredContent;
   const resumed=await call(server,3,'keel-project-author',{...authoredFixture(),out:'work'});assert.deepEqual(resumed.result.structuredContent,prepared);

@@ -1,3 +1,5 @@
+import path from 'node:path';
+import {tmpdir} from 'node:os';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {mkdtemp,rm} from 'node:fs/promises';
@@ -14,7 +16,7 @@ test('actual parsed imports infer exact supported runtime and preserve explicit 
  assert.throws(()=>inferKeelAuthoredRuntime(modules('export function color(){}'),{runtime:'unknown'}),/qualified/);
 });
 for(const mode of ['http-401','http-403','http-429','http-503','malformed','oversized-header','oversized-stream','wrong-chain','wrong-version','source-digest','wrong-alias','wrong-license','missing-closure','wrong-fragment-codec','missing-reader-receipt'])test(`automatic runtime resolver ${mode} rejects without retry or alternate origin`,async()=>{
- const root=await mkdtemp('/private/tmp/keel-runtime-negative-'),wire=await authoredRuntimeResolutionFixture(),prior={fetch:globalThis.fetch,url:process.env.KEEL_STUDIO_URL,token:process.env.KEEL_STUDIO_AGENT_TOKEN};let requests=0;
+ const root=await mkdtemp(path.join(tmpdir(),'keel-runtime-negative-')),wire=await authoredRuntimeResolutionFixture(),prior={fetch:globalThis.fetch,url:process.env.KEEL_STUDIO_URL,token:process.env.KEEL_STUDIO_AGENT_TOKEN};let requests=0;
  try{
  process.env.KEEL_STUDIO_URL='https://studio.invalid';process.env.KEEL_STUDIO_AGENT_TOKEN='keel_agent_'+'x'.repeat(32);
  globalThis.fetch=async(url,options)=>{requests++;assert.equal(new URL(url).origin,'https://studio.invalid');assert.equal(options.redirect,'error');assert.ok(options.signal);

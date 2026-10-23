@@ -1,0 +1,442 @@
+TAP version 13
+# Subtest: a repeated build removes stale modules while retaining source, evidence and assets
+ok 1 - a repeated build removes stale modules while retaining source, evidence and assets
+  ---
+  duration_ms: 37.610084
+  type: 'test'
+  ...
+# Subtest: cleaning a linked dist preserves the external target
+ok 2 - cleaning a linked dist preserves the external target
+  ---
+  duration_ms: 3.112458
+  type: 'test'
+  ...
+# Subtest: actual parsed imports infer exact supported runtime and preserve explicit version pins
+ok 3 - actual parsed imports infer exact supported runtime and preserve explicit version pins
+  ---
+  duration_ms: 4.382917
+  type: 'test'
+  ...
+# Subtest: automatic runtime resolver http-401 rejects without retry or alternate origin
+ok 4 - automatic runtime resolver http-401 rejects without retry or alternate origin
+  ---
+  duration_ms: 47.812417
+  type: 'test'
+  ...
+# Subtest: automatic runtime resolver http-403 rejects without retry or alternate origin
+ok 5 - automatic runtime resolver http-403 rejects without retry or alternate origin
+  ---
+  duration_ms: 9.72125
+  type: 'test'
+  ...
+# Subtest: automatic runtime resolver http-429 rejects without retry or alternate origin
+ok 6 - automatic runtime resolver http-429 rejects without retry or alternate origin
+  ---
+  duration_ms: 7.169041
+  type: 'test'
+  ...
+# Subtest: automatic runtime resolver http-503 rejects without retry or alternate origin
+ok 7 - automatic runtime resolver http-503 rejects without retry or alternate origin
+  ---
+  duration_ms: 8.027167
+  type: 'test'
+  ...
+# Subtest: automatic runtime resolver malformed rejects without retry or alternate origin
+ok 8 - automatic runtime resolver malformed rejects without retry or alternate origin
+  ---
+  duration_ms: 7.60325
+  type: 'test'
+  ...
+# Subtest: automatic runtime resolver oversized-header rejects without retry or alternate origin
+ok 9 - automatic runtime resolver oversized-header rejects without retry or alternate origin
+  ---
+  duration_ms: 9.700375
+  type: 'test'
+  ...
+# Subtest: automatic runtime resolver oversized-stream rejects without retry or alternate origin
+ok 10 - automatic runtime resolver oversized-stream rejects without retry or alternate origin
+  ---
+  duration_ms: 7.146584
+  type: 'test'
+  ...
+# Subtest: automatic runtime resolver wrong-chain rejects without retry or alternate origin
+ok 11 - automatic runtime resolver wrong-chain rejects without retry or alternate origin
+  ---
+  duration_ms: 10.084
+  type: 'test'
+  ...
+# Subtest: automatic runtime resolver wrong-version rejects without retry or alternate origin
+ok 12 - automatic runtime resolver wrong-version rejects without retry or alternate origin
+  ---
+  duration_ms: 10.87
+  type: 'test'
+  ...
+# Subtest: automatic runtime resolver source-digest rejects without retry or alternate origin
+ok 13 - automatic runtime resolver source-digest rejects without retry or alternate origin
+  ---
+  duration_ms: 16.333667
+  type: 'test'
+  ...
+# Subtest: automatic runtime resolver wrong-alias rejects without retry or alternate origin
+ok 14 - automatic runtime resolver wrong-alias rejects without retry or alternate origin
+  ---
+  duration_ms: 11.691875
+  type: 'test'
+  ...
+# Subtest: automatic runtime resolver wrong-license rejects without retry or alternate origin
+ok 15 - automatic runtime resolver wrong-license rejects without retry or alternate origin
+  ---
+  duration_ms: 11.941917
+  type: 'test'
+  ...
+# Subtest: automatic runtime resolver missing-closure rejects without retry or alternate origin
+ok 16 - automatic runtime resolver missing-closure rejects without retry or alternate origin
+  ---
+  duration_ms: 8.382708
+  type: 'test'
+  ...
+# Subtest: automatic runtime resolver wrong-fragment-codec rejects without retry or alternate origin
+ok 17 - automatic runtime resolver wrong-fragment-codec rejects without retry or alternate origin
+  ---
+  duration_ms: 11.953916
+  type: 'test'
+  ...
+# Subtest: automatic runtime resolver missing-reader-receipt rejects without retry or alternate origin
+ok 18 - automatic runtime resolver missing-reader-receipt rejects without retry or alternate origin
+  ---
+  duration_ms: 8.767375
+  type: 'test'
+  ...
+# Subtest: QA authored authority cross-origin
+ok 19 - QA authored authority cross-origin
+  ---
+  duration_ms: 5.00475
+  type: 'test'
+  ...
+# Subtest: QA authored authority denial-redaction
+ok 20 - QA authored authority denial-redaction
+  ---
+  duration_ms: 10.760958
+  type: 'test'
+  ...
+# Subtest: QA authored authority redirect
+ok 21 - QA authored authority redirect
+  ---
+  duration_ms: 1.163708
+  type: 'test'
+  ...
+# Subtest: QA authored authority wrong-content-type
+ok 22 - QA authored authority wrong-content-type
+  ---
+  duration_ms: 1.326292
+  type: 'test'
+  ...
+# Subtest: QA authored authority invalid-utf8
+ok 23 - QA authored authority invalid-utf8
+  ---
+  duration_ms: 1.467542
+  type: 'test'
+  ...
+# Subtest: QA authored authority malformed-pin
+ok 24 - QA authored authority malformed-pin
+  ---
+  duration_ms: 49.5225
+  type: 'test'
+  ...
+# Subtest: new executable planning defaults to actual authored tool without technical creator questions
+ok 25 - new executable planning defaults to actual authored tool without technical creator questions
+  ---
+  duration_ms: 0.905542
+  type: 'test'
+  ...
+# Subtest: author creates exact reachable functional source modules and small generated boundaries
+ok 26 - author creates exact reachable functional source modules and small generated boundaries
+  ---
+  duration_ms: 31.94
+  type: 'test'
+  ...
+# Subtest: authored default rejects one flattened module
+ok 27 - authored default rejects one flattened module
+  ---
+  duration_ms: 0.253542
+  type: 'test'
+  ...
+# Subtest: authored default rejects disconnected fake module
+ok 28 - authored default rejects disconnected fake module
+  ---
+  duration_ms: 1.985334
+  type: 'test'
+  ...
+# Subtest: authored default rejects unused imported placeholder
+ok 29 - authored default rejects unused imported placeholder
+  ---
+  duration_ms: 2.455542
+  type: 'test'
+  ...
+# Subtest: authored default rejects unknown external import
+ok 30 - authored default rejects unknown external import
+  ---
+  duration_ms: 2.846042
+  type: 'test'
+  ...
+# Subtest: authored default rejects unknown relative import
+ok 31 - authored default rejects unknown relative import
+  ---
+  duration_ms: 1.433334
+  type: 'test'
+  ...
+# Subtest: authored default rejects computed import
+ok 32 - authored default rejects computed import
+  ---
+  duration_ms: 1.58625
+  type: 'test'
+  ...
+# Subtest: authored default rejects live mutable export
+ok 33 - authored default rejects live mutable export
+  ---
+  duration_ms: 2.962167
+  type: 'test'
+  ...
+# Subtest: authored default rejects reassigned exported function
+ok 34 - authored default rejects reassigned exported function
+  ---
+  duration_ms: 3.029708
+  type: 'test'
+  ...
+# Subtest: authored default rejects cyclic modules
+ok 35 - authored default rejects cyclic modules
+  ---
+  duration_ms: 5.637209
+  type: 'test'
+  ...
+# Subtest: authored default rejects top-level await
+ok 36 - authored default rejects top-level await
+  ---
+  duration_ms: 1.091125
+  type: 'test'
+  ...
+# Subtest: authored default rejects import meta
+ok 37 - authored default rejects import meta
+  ---
+  duration_ms: 1.770375
+  type: 'test'
+  ...
+# Subtest: authored default rejects star reexport
+ok 38 - authored default rejects star reexport
+  ---
+  duration_ms: 3.086125
+  type: 'test'
+  ...
+# Subtest: authored default rejects combined import clause
+ok 39 - authored default rejects combined import clause
+  ---
+  duration_ms: 1.652375
+  type: 'test'
+  ...
+# Subtest: authored default rejects remote fetch
+ok 40 - authored default rejects remote fetch
+  ---
+  duration_ms: 3.320833
+  type: 'test'
+  ...
+# Subtest: authored default rejects escaped remote URL
+ok 41 - authored default rejects escaped remote URL
+  ---
+  duration_ms: 2.888583
+  type: 'test'
+  ...
+# Subtest: authored default rejects computed image URL
+ok 42 - authored default rejects computed image URL
+  ---
+  duration_ms: 3.437209
+  type: 'test'
+  ...
+# Subtest: authored default rejects executable DOM injection
+ok 43 - authored default rejects executable DOM injection
+  ---
+  duration_ms: 2.592459
+  type: 'test'
+  ...
+# Subtest: authored default rejects encoded executable content
+ok 44 - authored default rejects encoded executable content
+  ---
+  duration_ms: 7.503542
+  type: 'test'
+  ...
+# Subtest: authored default rejects external CSS URL
+ok 45 - authored default rejects external CSS URL
+  ---
+  duration_ms: 4.876
+  type: 'test'
+  ...
+# Subtest: authored default rejects CommonJS loader
+ok 46 - authored default rejects CommonJS loader
+  ---
+  duration_ms: 1.200959
+  type: 'test'
+  ...
+# Subtest: authored default rejects closing-over local scope cannot be faked by chunks
+ok 47 - authored default rejects closing-over local scope cannot be faked by chunks
+  ---
+  duration_ms: 1.117875
+  type: 'test'
+  ...
+# Subtest: authored default rejects invalid UTF-8 surrogate
+ok 48 - authored default rejects invalid UTF-8 surrogate
+  ---
+  duration_ms: 0.092708
+  type: 'test'
+  ...
+# Subtest: editing one functional module preserves paths and only changes that module fragment
+ok 49 - editing one functional module preserves paths and only changes that module fragment
+  ---
+  duration_ms: 30.726125
+  type: 'test'
+  ...
+# Subtest: source/graph drift blocks SDK stage before any request; supplied self-contained uploads remain exact
+ok 50 - source/graph drift blocks SDK stage before any request; supplied self-contained uploads remain exact
+  ---
+  duration_ms: 4.7255
+  type: 'test'
+  ...
+# Subtest: studio-upload remains browser safe with authored commitment checking
+ok 51 - studio-upload remains browser safe with authored commitment checking
+  ---
+  duration_ms: 48.486583
+  type: 'test'
+  ...
+# Subtest: actual MCP author/recovery/stage validates graph then sends exact stable logical source paths
+ok 52 - actual MCP author/recovery/stage validates graph then sends exact stable logical source paths
+  ---
+  duration_ms: 103.955875
+  type: 'test'
+  ...
+# Subtest: comments and SVG namespace identifiers are not false network dependencies
+ok 53 - comments and SVG namespace identifiers are not false network dependencies
+  ---
+  duration_ms: 4.946917
+  type: 'test'
+  ...
+# Subtest: declared exact binary data gets a real graph edge; orphan and computed data fail closed
+ok 54 - declared exact binary data gets a real graph edge; orphan and computed data fail closed
+  ---
+  duration_ms: 16.730125
+  type: 'test'
+  ...
+# Subtest: Raw retains separately qualified original module bytes and rejects automatic gzip
+ok 55 - Raw retains separately qualified original module bytes and rejects automatic gzip
+  ---
+  duration_ms: 23.276667
+  type: 'test'
+  ...
+# Subtest: exact maintained core/main closure contributes real imports without entering staged creator bytes
+ok 56 - exact maintained core/main closure contributes real imports without entering staged creator bytes
+  ---
+  duration_ms: 101.82
+  type: 'test'
+  ...
+# Subtest: published authored missing-core fails closed
+ok 57 - published authored missing-core fails closed
+  ---
+  duration_ms: 3.636083
+  type: 'test'
+  ...
+# Subtest: published authored wrong-chain fails closed
+ok 58 - published authored wrong-chain fails closed
+  ---
+  duration_ms: 3.486
+  type: 'test'
+  ...
+# Subtest: published authored wrong-hash fails closed
+ok 59 - published authored wrong-hash fails closed
+  ---
+  duration_ms: 3.252792
+  type: 'test'
+  ...
+# Subtest: published authored different-store fails closed
+ok 60 - published authored different-store fails closed
+  ---
+  duration_ms: 3.205959
+  type: 'test'
+  ...
+# Subtest: published authored unsupported-custom fails closed
+ok 61 - published authored unsupported-custom fails closed
+  ---
+  duration_ms: 3.207542
+  type: 'test'
+  ...
+# Subtest: published authored bad-interface fails closed
+ok 62 - published authored bad-interface fails closed
+  ---
+  duration_ms: 29.735042
+  type: 'test'
+  ...
+# Subtest: published authored source-corruption fails closed
+ok 63 - published authored source-corruption fails closed
+  ---
+  duration_ms: 3.422167
+  type: 'test'
+  ...
+# Subtest: normal MCP author infers Three, resolves its current catalog and privately caches public sources before staging zero library bytes
+ok 64 - normal MCP author infers Three, resolves its current catalog and privately caches public sources before staging zero library bytes
+  ---
+  duration_ms: 181.314875
+  type: 'test'
+  ...
+# Subtest: a changed shared runtime binding cannot masquerade as an unchanged creator-only revision
+ok 65 - a changed shared runtime binding cannot masquerade as an unchanged creator-only revision
+  ---
+  duration_ms: 65.959792
+  type: 'test'
+  ...
+# Subtest: the packaged default published reader retains its exact maintained source identity
+ok 66 - the packaged default published reader retains its exact maintained source identity
+  ---
+  duration_ms: 84.784916
+  type: 'test'
+  ...
+# Subtest: a clean copied package authenticates actual reader bytes and fails closed on missing or changed assets
+ok 67 - a clean copied package authenticates actual reader bytes and fails closed on missing or changed assets
+  ---
+  duration_ms: 566.752208
+  type: 'test'
+  ...
+# Subtest: raw slot preserves BOM, UTF-8 bytes, digests and script terminators without Base64 conversion
+ok 68 - raw slot preserves BOM, UTF-8 bytes, digests and script terminators without Base64 conversion
+  ---
+  duration_ms: 2.839583
+  type: 'test'
+  ...
+# Subtest: fresh modules, HTML entry, text asset and platform display helper default to raw text
+ok 69 - fresh modules, HTML entry, text asset and platform display helper default to raw text
+  ---
+  duration_ms: 3.30525
+  type: 'test'
+  ...
+# Subtest: published raw-text module verifier preserves exact BOM bytes and legacy gzip module bytes
+ok 70 - published raw-text module verifier preserves exact BOM bytes and legacy gzip module bytes
+  ---
+  duration_ms: 2.167292
+  type: 'test'
+  ...
+# Subtest: legacy binary and compressed slots keep their exact original serialized bytes and both readers
+ok 71 - legacy binary and compressed slots keep their exact original serialized bytes and both readers
+  ---
+  duration_ms: 6.333875
+  type: 'test'
+  ...
+# Subtest: readers reject ambiguous, compressed-text, malformed UTF-16 and altered raw-text commitments
+ok 72 - readers reject ambiguous, compressed-text, malformed UTF-16 and altered raw-text commitments
+  ---
+  duration_ms: 0.873458
+  type: 'test'
+  ...
+1..72
+# tests 72
+# suites 0
+# pass 72
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1043.791209

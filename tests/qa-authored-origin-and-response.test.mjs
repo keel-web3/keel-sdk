@@ -1,10 +1,12 @@
+import path from 'node:path';
+import {tmpdir} from 'node:os';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {mkdtemp,rm} from 'node:fs/promises';
 import {resolveAuthoredRuntime} from '../packages/mcp/dist/authored-runtime-resolution.js';
 import {authoredRuntimeResolutionFixture} from './helpers/authored-published-fixture.mjs';
 for(const mode of ['cross-origin','denial-redaction','redirect','wrong-content-type','invalid-utf8','malformed-pin'])test(`QA authored authority ${mode}`,async()=>{
- const root=await mkdtemp('/private/tmp/keel-qa-authored-origin-'),prior={fetch:globalThis.fetch,url:process.env.KEEL_STUDIO_URL,token:process.env.KEEL_STUDIO_AGENT_TOKEN};let requests=0;
+ const root=await mkdtemp(path.join(tmpdir(),'keel-qa-authored-origin-')),prior={fetch:globalThis.fetch,url:process.env.KEEL_STUDIO_URL,token:process.env.KEEL_STUDIO_AGENT_TOKEN};let requests=0;
  try{
  process.env.KEEL_STUDIO_URL='https://studio.invalid';process.env.KEEL_STUDIO_AGENT_TOKEN='keel_agent_'+'q'.repeat(32);
  globalThis.fetch=async(url,options)=>{requests++;assert.equal(new URL(url).origin,'https://studio.invalid');assert.ok(!String(url).includes(process.env.KEEL_STUDIO_AGENT_TOKEN));assert.equal(options.headers.authorization,'Bearer '+process.env.KEEL_STUDIO_AGENT_TOKEN);assert.equal(options.redirect,'error');

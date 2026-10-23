@@ -1,0 +1,30 @@
+{
+  "schema": "keel.linux-ci-portable-harness-evidence@1",
+  "files": [
+    {
+      "path": "39891738922.log",
+      "bytes": 1801228,
+      "sha256": "8c803b351c398fe22e116acd603984284a7cdd1887b6e26ded94f888d3449ef2"
+    },
+    {
+      "path": "39891739026.log",
+      "bytes": 264298,
+      "sha256": "513664a76c3ea3d021a92455db61e4fb47f89e5a46b1add70b3119042fa3a48a"
+    },
+    {
+      "path": "README.md",
+      "bytes": 1907,
+      "sha256": "b3a410d47659c09393219587f3d2453cfa7af2aa26885699b4ce7426496e34f7"
+    },
+    {
+      "path": "package-rebuild.txt",
+      "bytes": 175,
+      "sha256": "2a7d5940caadebf53af28719491e1f85bfeadc3d3142de5a28996859eb779004"
+    },
+    {
+      "path": "portable-harness-targeted.tap",
+      "bytes": 14692,
+      "sha256": "8ce1fc2bb74b712fdcc1ab7694da39c67750b7de8f3a509bc47c0cbbe2a519d5"
+    }
+  ]
+}
