@@ -1,0 +1,50 @@
+{
+  "siteSource": "230c8cff0e2075042cc0784c03beece7ddf14900",
+  "siteLeaf": "/private/tmp/keel-publish-entry-20261021-01/apps/studio/src/lib/media-capabilities.ts",
+  "siteLeafSHA256": "a2123692965524c365d209f851dbc0a727bb5ce1e05dcc690e55376ee030f489",
+  "scope": "read-only actual Site consumer with actual candidate SDK capabilities; no UI/browser/HTTP/live claim",
+  "results": [
+    {
+      "source": {
+        "movie": true,
+        "animated": true,
+        "hasAudio": false
+      },
+      "formats": [
+        "webp",
+        "avif",
+        "mp4",
+        "mov"
+      ],
+      "unavailable": "WEBM conversion is unavailable on this server for this media. Your saved edits and original are retained."
+    },
+    {
+      "source": {
+        "movie": true,
+        "animated": true,
+        "hasAudio": true
+      },
+      "formats": [
+        "webp",
+        "avif",
+        "mp4",
+        "mov"
+      ],
+      "unavailable": "WEBM conversion is unavailable on this server for this media. Your saved edits and original are retained."
+    },
+    {
+      "source": {
+        "movie": false,
+        "animated": false,
+        "hasAudio": false
+      },
+      "formats": [
+        "webp",
+        "avif",
+        "mp4",
+        "mov"
+      ],
+      "unavailable": "WEBM conversion is unavailable on this server for this media. Your saved edits and original are retained."
+    }
+  ]
+}

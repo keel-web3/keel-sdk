@@ -1,0 +1,162 @@
+TAP version 13
+# Subtest: unchanged unqualified MOV webp cannot invent lossless color authority
+ok 1 - unchanged unqualified MOV webp cannot invent lossless color authority
+  ---
+  duration_ms: 67.862
+  type: 'test'
+  ...
+# Subtest: unchanged unqualified MOV avif cannot invent lossless color authority
+ok 2 - unchanged unqualified MOV avif cannot invent lossless color authority
+  ---
+  duration_ms: 52.115042
+  type: 'test'
+  ...
+# Subtest: server capability must not advertise a WebM conversion absent a preserving WebM verifier
+not ok 3 - server capability must not advertise a WebM conversion absent a preserving WebM verifier
+  ---
+  duration_ms: 98.343042
+  type: 'test'
+  location: '/private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/reviewer-acceptance-media-capability.test.mjs:12:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    WebM has no complete preserving verifier; do not advertise it as an available server candidate
+    
+    true !== false
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/reviewer-acceptance-media-capability.test.mjs:15:9)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: edited WebM lossless refuses before probing while retaining source and saved recipe
+not ok 4 - edited WebM lossless refuses before probing while retaining source and saved recipe
+  ---
+  duration_ms: 85.057083
+  type: 'test'
+  location: '/private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/tests/media-conversion-capabilities.test.mjs:15:40'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /WebM conversion is unavailable/. Input:
+    
+    'Movie creator metadata or unmodelled container semantics require an exact preserving adapter; native media is retained.'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: 'Movie creator metadata or unmodelled container semantics require an exact preserving adapter; native media is retained.'
+  operator: 'match'
+  stack: |-
+    Object.<anonymous> (file:///private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/tests/media-conversion-capabilities.test.mjs:17:149)
+    expectedException (node:assert:576:17)
+    expectsError (node:assert:701:21)
+    Function.rejects (node:assert:767:3)
+    async TestContext.<anonymous> (file:///private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/tests/media-conversion-capabilities.test.mjs:17:2)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: edited WebM lossy refuses before probing while retaining source and saved recipe
+not ok 5 - edited WebM lossy refuses before probing while retaining source and saved recipe
+  ---
+  duration_ms: 74.736291
+  type: 'test'
+  location: '/private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/tests/media-conversion-capabilities.test.mjs:15:40'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /WebM conversion is unavailable/. Input:
+    
+    'Movie creator metadata or unmodelled container semantics require an exact preserving adapter; native media is retained.'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: 'Movie creator metadata or unmodelled container semantics require an exact preserving adapter; native media is retained.'
+  operator: 'match'
+  stack: |-
+    Object.<anonymous> (file:///private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/tests/media-conversion-capabilities.test.mjs:17:149)
+    expectedException (node:assert:576:17)
+    expectsError (node:assert:701:21)
+    Function.rejects (node:assert:767:3)
+    async TestContext.<anonymous> (file:///private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/tests/media-conversion-capabilities.test.mjs:17:2)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: candidate formats exclude unavailable WebM and keep conditional qualified adapters
+not ok 6 - candidate formats exclude unavailable WebM and keep conditional qualified adapters
+  ---
+  duration_ms: 29.394541
+  type: 'test'
+  location: '/private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/tests/media-conversion-capabilities.test.mjs:20:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      [
+        'webp',
+        'avif',
+    +   'webm',
+        'mp4',
+        'mov'
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 'webp'
+    1: 'avif'
+    2: 'mp4'
+    3: 'mov'
+  actual:
+    0: 'webp'
+    1: 'avif'
+    2: 'webm'
+    3: 'mp4'
+    4: 'mov'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/tests/media-conversion-capabilities.test.mjs:21:60)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: native Original WebM and MOV exports remain exact without decoder or lossless claims
+ok 7 - native Original WebM and MOV exports remain exact without decoder or lossless claims
+  ---
+  duration_ms: 2.864333
+  type: 'test'
+  ...
+# Subtest: real portable MCP has identical capabilities, actionable WebM refusal and unchanged native Original
+not ok 8 - real portable MCP has identical capabilities, actionable WebM refusal and unchanged native Original
+  ---
+  duration_ms: 232.0955
+  type: 'test'
+  location: '/private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/tests/media-conversion-capabilities.test.mjs:26:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /WebM conversion is unavailable/. Input:
+    
+    'Movie creator metadata or unmodelled container semantics require an exact preserving adapter; native media is retained.'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: 'Movie creator metadata or unmodelled container semantics require an exact preserving adapter; native media is retained.'
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/tests/media-conversion-capabilities.test.mjs:30:260)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 3
+# fail 5
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1937.593292

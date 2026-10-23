@@ -1,0 +1,70 @@
+TAP version 13
+# Subtest: unchanged unqualified MOV webp cannot invent lossless color authority
+ok 1 - unchanged unqualified MOV webp cannot invent lossless color authority
+  ---
+  duration_ms: 73.639459
+  type: 'test'
+  ...
+# Subtest: unchanged unqualified MOV avif cannot invent lossless color authority
+ok 2 - unchanged unqualified MOV avif cannot invent lossless color authority
+  ---
+  duration_ms: 54.569291
+  type: 'test'
+  ...
+# Subtest: server capability must not advertise a WebM conversion absent a preserving WebM verifier
+not ok 3 - server capability must not advertise a WebM conversion absent a preserving WebM verifier
+  ---
+  duration_ms: 101.784541
+  type: 'test'
+  location: '/private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/reviewer-acceptance-media-capability.test.mjs:12:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    WebM has no complete preserving verifier; do not advertise it as an available server candidate
+    
+    true !== false
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/reviewer-acceptance-media-capability.test.mjs:15:9)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# node:internal/modules/run_main:123
+#     triggerUncaughtException(
+#     ^
+# AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+# 1349 !== 1489
+#     at file:///private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/tests/media-conversion-capabilities.test.mjs:14:194 {
+#   generatedMessage: true,
+#   code: 'ERR_ASSERTION',
+#   actual: 1349,
+#   expected: 1489,
+#   operator: 'strictEqual',
+#   diff: 'simple'
+# }
+# Node.js v22.22.1
+# Subtest: tests/media-conversion-capabilities.test.mjs
+not ok 2 - tests/media-conversion-capabilities.test.mjs
+  ---
+  duration_ms: 539.971208
+  type: 'test'
+  location: '/private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/tests/media-conversion-capabilities.test.mjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 2
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 918.611916

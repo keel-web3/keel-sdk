@@ -1,0 +1,56 @@
+{
+  "source": "d46961461df319e26d4c947030fddf06337ed7f7",
+  "productionCommit": "471b26a572531ccd56e926bdb8fd682ce2f4ab4e",
+  "base": "0dc7e6f342b228515b1eecf783c9fd3629802eef",
+  "os": "macOS-15.6.1-arm64-arm-64bit-Mach-O",
+  "tools": [
+    {
+      "path": "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "byteLength": 112972416,
+      "sha256": "245e0321af97d3c21dd4e7104457334dfe3c3ba7982d0db75363e354565f8cbb"
+    },
+    {
+      "path": "/private/tmp/keel-sdk-integration-20261022-01/node_modules/.pnpm/ffmpeg-static@5.3.0/node_modules/ffmpeg-static/ffmpeg",
+      "byteLength": 45568216,
+      "sha256": "a90e3db6a3fd35f6074b013f948b1aa45b31c6375489d39e572bea3f18336584"
+    }
+  ],
+  "files": [
+    {
+      "path": "/private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/packages/builder/src/media-preparation.ts",
+      "byteLength": 50747,
+      "sha256": "ac8c12c9cd823123abfff0072f6291434431e8cf77531c0ea97b29d5f43d8b0c"
+    },
+    {
+      "path": "/private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js",
+      "byteLength": 50117,
+      "sha256": "1aa7527ea890cf39801cea1754ea57c9dd95b7fea8589c6a8be8a8fc981e999f"
+    },
+    {
+      "path": "/private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/tests/fixtures/media-conversion-capabilities/fixture.mov",
+      "byteLength": 1927,
+      "sha256": "ea3b962dc878b4514ae1798fa10c90a10bac04d3f96459eccfec1d8ce8a4e736"
+    },
+    {
+      "path": "/private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/tests/fixtures/media-conversion-capabilities/fixture.webm",
+      "byteLength": 1489,
+      "sha256": "6013f6fd732009e925ecdeb7db2f784e7c7faa64c569efce3bcf7c3b5ca54015"
+    },
+    {
+      "path": "/private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/tests/acceptance-media-fixture-parity.test.mjs",
+      "byteLength": 16256,
+      "sha256": "71625818283b913f1bdcb7fa77d9a774027684aaca50a67f438572ecc82ff2a1"
+    },
+    {
+      "path": "/private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/tests/media-conversion-capabilities.test.mjs",
+      "byteLength": 4671,
+      "sha256": "eaeb783f9466a2d50358d8cacd550ea2696265632e9b2bb7e6dd14474da55a15"
+    },
+    {
+      "path": "/private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/reviewer-acceptance-media-capability.test.mjs",
+      "byteLength": 1618,
+      "sha256": "db78fd8e1078ac869dc6a1a00194cb0cbb6c8cbe7e3192006002cee98e2c4a76"
+    }
+  ],
+  "network": "none; no browser, HTTP API, provider, signing or deployment proof claimed"
+}
