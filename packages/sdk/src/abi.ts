@@ -1352,7 +1352,12 @@ export const keelManagerAbi = [
 
 /** The proof ladder behind a wrapped token, including how its viewer document
  * gets the artwork it renders. `viewerCarriage` is read from the viewer
- * composite's own part list, not from anything the document claims. */
+ * composite's own part list, not from anything the document claims.
+ *
+ * The Onchaininator ships from its own repository and vendors its own ABIs.
+ * This copy is not that inventory: it is the shape Studio's read relay decodes
+ * with, paired with `keelDirectReadPolicy["onchaininator-proof-ledger"]`, and
+ * it stays here because the relay is Keel's. */
 export const onchaininatorProofLedgerAbi = [
   "function viewerCarriage(address wrapper,uint256 tokenId) view returns (uint8)",
   "function viewerOf(address wrapper,uint256 tokenId) view returns (bytes32 objectId,bytes32 digest)",
@@ -1363,9 +1368,6 @@ export const onchaininatorProofLedgerAbi = [
   "function linkedImageURI(bytes32 assetObjectId) view returns (string)",
   "function projectedReadGas(uint256 artworkBytes) pure returns (uint256)",
 ] as const;
-
-/** @deprecated Use {@link onchaininatorProofLedgerAbi}. */
-export const keelBackpackProofLedgerAbi = onchaininatorProofLedgerAbi;
 
 export const keelCreatorProfileRegistryAbi = [
   "function CREATOR_ID_DOMAIN() view returns (bytes32)",
