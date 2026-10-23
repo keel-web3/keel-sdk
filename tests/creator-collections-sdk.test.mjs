@@ -179,8 +179,14 @@ test("creator deployment resolution requires one exact factory and renderer inst
 test("published module ABIs expose creator collections and exact item drops", async () => {
   assert.deepEqual(
     moduleAbiContracts("keel-die").filter((name) => name.startsWith("KeelCreator") || name === "KeelArtifactTokenRenderer" || name === "KeelShared1155"),
-    ["KeelArtifactTokenRenderer", "KeelCreator1155", "KeelCreator721", "KeelCreator721A", "KeelCreatorFactory", "KeelCreatorSeeded721A", "KeelShared1155"],
+    ["KeelArtifactTokenRenderer", "KeelCreator1155", "KeelCreator721", "KeelCreator721A", "KeelCreator721AC", "KeelCreator721C", "KeelCreatorFactory", "KeelCreatorSeeded721A", "KeelShared1155"],
   );
+  for (const name of ["KeelCreator721C", "KeelCreator721AC"]) {
+    const abi = await moduleAbi("keel-die", name);
+    for (const method of ["setTransferValidator", "getTransferValidator", "getTransferValidationFunction", "supportsInterface"]) {
+      assert.ok(abi.some(entry => entry.type === "function" && entry.name === method), `${name} preserves ${method}`);
+    }
+  }
   const factoryAbi = await moduleAbi("keel-die", "KeelCreatorFactory");
   const rendererAbi = await moduleAbi("keel-die", "KeelArtifactTokenRenderer");
   const controllerAbi = await moduleAbi("keel-mint-access", "OneMintController");
