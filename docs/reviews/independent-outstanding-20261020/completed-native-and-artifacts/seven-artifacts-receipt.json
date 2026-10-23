@@ -1,0 +1,2450 @@
+{
+  "schema": "keel-independent-compiled-seven-artifacts@1",
+  "compiledSourceCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+  "sourceTree": "ca4598ec37b7418a898449f30c86151c93e91d77",
+  "verifiedEquivalentSolidityCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb",
+  "forgeVersion": "1.7.1/4072e48705af9d93e3c0f6e29e93b5e9a40caed8",
+  "independentColdCompile": true,
+  "solcCompileSeconds": 1219.15,
+  "fullForgeSuiteResult": "INCOMPLETE: original process gone without final summary/exit receipt; no PASS claim",
+  "sourceAndDependencyProfileDiffAgainst8e8": "EMPTY",
+  "fixtureOrMockReplacement": false,
+  "metadataComparisonNormalization": [
+    "Top-level ABI declaration order only",
+    "Absent function outputs equals empty outputs[]",
+    "Absent fallback inputs equals empty inputs[]",
+    "Empty remapping context leading colon only; no source/settings/value ignored",
+    "Forge parsed NatSpec may omit documentation fields; full rawMetadata+originalartifact retained and hash-bound, all compiler/settings/source/ABI execution fields compared"
+  ],
+  "artifacts": [
+    {
+      "name": "KeelCreator1155",
+      "path": "out/KeelCreator1155.sol/KeelCreator1155.json",
+      "bytes": 185272,
+      "sha256": "fecd49feb576b225d241095f02a0a7b07f4fe6342d39aac70456b4bfaf42df67",
+      "compiler": {
+        "version": "0.8.36+commit.8a079791"
+      },
+      "settings": {
+        "compilationTarget": {
+          "src/modules/keel-die/KeelCreator1155.sol": "KeelCreator1155"
+        },
+        "evmVersion": "prague",
+        "libraries": {},
+        "metadata": {
+          "appendCBOR": false,
+          "bytecodeHash": "none"
+        },
+        "optimizer": {
+          "enabled": true,
+          "runs": 50
+        },
+        "remappings": [
+          ":@app-test/=test/apps/",
+          ":@app/=src/apps/",
+          ":@keel-test/=test/modules/",
+          ":@keel/=src/modules/",
+          ":@openzeppelin/contracts/=node_modules/@openzeppelin/contracts/",
+          ":erc721a-upgradeable/=node_modules/erc721a-upgradeable/",
+          ":erc721a/=node_modules/erc721a/"
+        ],
+        "viaIR": true
+      },
+      "rawMetadataSHA256": "5a04aae447380a0c03d2b5abd625b43494c0cc75f269131825ae01d4bfef72a9",
+      "abiSHA256": "df4b48d3198e3f8ce92a91857319d24defcf57dc7a5d143b7c96f629776851f9",
+      "creationBytecodeTextSHA256": "f488b9577084b11d1c82e1f709af2769ae7de0fc6074968187ea5a05510485ce",
+      "runtimeBytecodeTextSHA256": "354a310474137def95c328f95bcb9fe694fb69a29b2e9daf48bc7df390aed5d4",
+      "sources": [
+        "node_modules/@openzeppelin/contracts/interfaces/IERC2981.sol",
+        "node_modules/@openzeppelin/contracts/interfaces/draft-IERC6093.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC1155/ERC1155.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC1155/IERC1155.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC1155/utils/ERC1155Utils.sol",
+        "node_modules/@openzeppelin/contracts/token/common/ERC2981.sol",
+        "node_modules/@openzeppelin/contracts/utils/Arrays.sol",
+        "node_modules/@openzeppelin/contracts/utils/Comparators.sol",
+        "node_modules/@openzeppelin/contracts/utils/Context.sol",
+        "node_modules/@openzeppelin/contracts/utils/Panic.sol",
+        "node_modules/@openzeppelin/contracts/utils/SlotDerivation.sol",
+        "node_modules/@openzeppelin/contracts/utils/StorageSlot.sol",
+        "node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol",
+        "node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "src/modules/keel-die/KeelCreator1155.sol",
+        "src/modules/keel-die/interfaces/IKeelCreator1155Events.sol",
+        "src/modules/keel-die/interfaces/IKeelCreatorCollectionErrors.sol",
+        "src/modules/keel-die/interfaces/IKeelCreatorDirectory.sol",
+        "src/modules/keel-die/interfaces/IKeelCreatorItemErrors.sol",
+        "src/modules/keel-die/interfaces/IKeelCreatorLifecycleEvents.sol",
+        "src/modules/keel-die/interfaces/IKeelItemBatchMintTarget.sol",
+        "src/modules/keel-die/interfaces/IKeelItemCapacityEvents.sol",
+        "src/modules/keel-die/interfaces/IKeelItemMintTarget.sol",
+        "src/modules/keel-die/interfaces/IKeelMetadataReceiver.sol",
+        "src/modules/keel-die/interfaces/IKeelMintBatchErrors.sol",
+        "src/modules/keel-die/interfaces/IKeelMintTargetErrors.sol",
+        "src/modules/keel-die/interfaces/IKeelTokenRenderer.sol",
+        "src/modules/keel-kernel/interfaces/IKeelMetadataRelay.sol",
+        "src/modules/keel-kernel/libraries/KeelMetadataSubscriptions.sol"
+      ]
+    },
+    {
+      "name": "KeelCreatorFactory",
+      "path": "out/KeelCreatorFactory.sol/KeelCreatorFactory.json",
+      "bytes": 277896,
+      "sha256": "7dc05636ed8fa497f5530a554a10ddd37fe10fac2daa69b0af224335dce8d303",
+      "compiler": {
+        "version": "0.8.36+commit.8a079791"
+      },
+      "settings": {
+        "compilationTarget": {
+          "src/modules/keel-die/KeelCreatorFactory.sol": "KeelCreatorFactory"
+        },
+        "evmVersion": "prague",
+        "libraries": {},
+        "metadata": {
+          "appendCBOR": false,
+          "bytecodeHash": "none"
+        },
+        "optimizer": {
+          "enabled": true,
+          "runs": 50
+        },
+        "remappings": [
+          ":@app-test/=test/apps/",
+          ":@app/=src/apps/",
+          ":@keel-test/=test/modules/",
+          ":@keel/=src/modules/",
+          ":@openzeppelin/contracts/=node_modules/@openzeppelin/contracts/",
+          ":erc721a-upgradeable/=node_modules/erc721a-upgradeable/",
+          ":erc721a/=node_modules/erc721a/"
+        ],
+        "viaIR": true
+      },
+      "rawMetadataSHA256": "f13e3bdc5b3fd2a29bf0412af05da90defe4d0d15975971e9a9be747ce7ca8c7",
+      "abiSHA256": "42d8738c6e14affeb01c94bfea0ebedeedfa6cd99717825e2a35e1830b95ade0",
+      "creationBytecodeTextSHA256": "ff103fcffa59c73c95b6dd266e4684d219dabad0a99ff7e44e801784c453511f",
+      "runtimeBytecodeTextSHA256": "2ff02c3e3b35af53ca1cdd2f867f652b0256e318bedb8083765837bef4820a1c",
+      "sources": [
+        "node_modules/@openzeppelin/contracts/interfaces/IERC2981.sol",
+        "node_modules/@openzeppelin/contracts/interfaces/draft-IERC6093.sol",
+        "node_modules/@openzeppelin/contracts/proxy/Clones.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC1155/ERC1155.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC1155/IERC1155.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC1155/utils/ERC1155Utils.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC721/IERC721.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC721/utils/ERC721Utils.sol",
+        "node_modules/@openzeppelin/contracts/token/common/ERC2981.sol",
+        "node_modules/@openzeppelin/contracts/utils/Arrays.sol",
+        "node_modules/@openzeppelin/contracts/utils/Bytes.sol",
+        "node_modules/@openzeppelin/contracts/utils/Comparators.sol",
+        "node_modules/@openzeppelin/contracts/utils/Context.sol",
+        "node_modules/@openzeppelin/contracts/utils/Create2.sol",
+        "node_modules/@openzeppelin/contracts/utils/Errors.sol",
+        "node_modules/@openzeppelin/contracts/utils/LowLevelCall.sol",
+        "node_modules/@openzeppelin/contracts/utils/Panic.sol",
+        "node_modules/@openzeppelin/contracts/utils/SlotDerivation.sol",
+        "node_modules/@openzeppelin/contracts/utils/StorageSlot.sol",
+        "node_modules/@openzeppelin/contracts/utils/Strings.sol",
+        "node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol",
+        "node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SignedMath.sol",
+        "node_modules/erc721a-upgradeable/contracts/ERC721AStorage.sol",
+        "node_modules/erc721a-upgradeable/contracts/ERC721AUpgradeable.sol",
+        "node_modules/erc721a-upgradeable/contracts/ERC721A__Initializable.sol",
+        "node_modules/erc721a-upgradeable/contracts/ERC721A__InitializableStorage.sol",
+        "node_modules/erc721a-upgradeable/contracts/IERC721AUpgradeable.sol",
+        "src/modules/keel-codecs/libraries/KeelRlp.sol",
+        "src/modules/keel-die/KeelCreator1155.sol",
+        "src/modules/keel-die/KeelCreator721.sol",
+        "src/modules/keel-die/KeelCreator721A.sol",
+        "src/modules/keel-die/KeelCreatorFactory.sol",
+        "src/modules/keel-die/KeelCreatorSeeded721A.sol",
+        "src/modules/keel-die/KeelSeedBlockArchive.sol",
+        "src/modules/keel-die/KeelShared1155.sol",
+        "src/modules/keel-die/interfaces/IKeelCampaignAuthorizer.sol",
+        "src/modules/keel-die/interfaces/IKeelCreator1155Events.sol",
+        "src/modules/keel-die/interfaces/IKeelCreatorCollectionErrors.sol",
+        "src/modules/keel-die/interfaces/IKeelCreatorCollectionEvents.sol",
+        "src/modules/keel-die/interfaces/IKeelCreatorDirectory.sol",
+        "src/modules/keel-die/interfaces/IKeelCreatorFactoryErrors.sol",
+        "src/modules/keel-die/interfaces/IKeelCreatorFactoryEvents.sol",
+        "src/modules/keel-die/interfaces/IKeelCreatorItemErrors.sol",
+        "src/modules/keel-die/interfaces/IKeelCreatorLifecycleEvents.sol",
+        "src/modules/keel-die/interfaces/IKeelCreatorSeedErrors.sol",
+        "src/modules/keel-die/interfaces/IKeelCreatorSeedEvents.sol",
+        "src/modules/keel-die/interfaces/IKeelDeferredCollectionResolver.sol",
+        "src/modules/keel-die/interfaces/IKeelDeferredMintSetup.sol",
+        "src/modules/keel-die/interfaces/IKeelItemBatchMintTarget.sol",
+        "src/modules/keel-die/interfaces/IKeelItemCapacityEvents.sol",
+        "src/modules/keel-die/interfaces/IKeelItemMintTarget.sol",
+        "src/modules/keel-die/interfaces/IKeelMetadataEvents.sol",
+        "src/modules/keel-die/interfaces/IKeelMetadataReceiver.sol",
+        "src/modules/keel-die/interfaces/IKeelMintBatchErrors.sol",
+        "src/modules/keel-die/interfaces/IKeelMintCapacity.sol",
+        "src/modules/keel-die/interfaces/IKeelMintDataSource.sol",
+        "src/modules/keel-die/interfaces/IKeelMintTargetErrors.sol",
+        "src/modules/keel-die/interfaces/IKeelMintable.sol",
+        "src/modules/keel-die/interfaces/IKeelSeedVrf.sol",
+        "src/modules/keel-die/interfaces/IKeelShared1155Errors.sol",
+        "src/modules/keel-die/interfaces/IKeelShared1155Events.sol",
+        "src/modules/keel-die/interfaces/IKeelStrikeCapacityEvents.sol",
+        "src/modules/keel-die/interfaces/IKeelTokenRenderer.sol",
+        "src/modules/keel-die/libraries/KeelSeedBlockEntropy.sol",
+        "src/modules/keel-kernel/interfaces/IKeelMetadataRelay.sol",
+        "src/modules/keel-kernel/interfaces/IKeelMintSeededBatchErrors.sol",
+        "src/modules/keel-kernel/interfaces/IKeelMintSeededData.sol",
+        "src/modules/keel-kernel/libraries/KeelMetadataSubscriptions.sol",
+        "src/modules/keel-kernel/libraries/KeelMintSeededBatches.sol",
+        "src/modules/keel-kernel/libraries/KeelPause.sol"
+      ]
+    },
+    {
+      "name": "KeelMintRouteRegistry",
+      "path": "out/KeelMintRouteRegistry.sol/KeelMintRouteRegistry.json",
+      "bytes": 336695,
+      "sha256": "3202149e0f4ce5fc5a5c855ea1f8258ab1a7ba4407ba797f4932be37d99f518f",
+      "compiler": {
+        "version": "0.8.36+commit.8a079791"
+      },
+      "settings": {
+        "compilationTarget": {
+          "src/modules/keel-mint-access/KeelMintRouteRegistry.sol": "KeelMintRouteRegistry"
+        },
+        "evmVersion": "prague",
+        "libraries": {},
+        "metadata": {
+          "appendCBOR": false,
+          "bytecodeHash": "none"
+        },
+        "optimizer": {
+          "enabled": true,
+          "runs": 50
+        },
+        "remappings": [
+          ":@app-test/=test/apps/",
+          ":@app/=src/apps/",
+          ":@keel-test/=test/modules/",
+          ":@keel/=src/modules/",
+          ":@openzeppelin/contracts/=node_modules/@openzeppelin/contracts/",
+          ":erc721a-upgradeable/=node_modules/erc721a-upgradeable/",
+          ":erc721a/=node_modules/erc721a/"
+        ],
+        "viaIR": true
+      },
+      "rawMetadataSHA256": "f52f727514c014b9e0c00b9bc906d3bc98517ed468ed2a3750721bc5b8eabd23",
+      "abiSHA256": "b6e4976325677248d4498871578785498cb4252b13220464391e1a88ab6008c6",
+      "creationBytecodeTextSHA256": "c8c72ee3555c0b0e349181fe0e7aa9a8ddc340b0e19d335e2f362c23d8036007",
+      "runtimeBytecodeTextSHA256": "5229539e5c6ed9e9b468802ab4333c89d7b09bd0a52540d2195e5ea42320814a",
+      "sources": [
+        "node_modules/@openzeppelin/contracts/access/AccessControl.sol",
+        "node_modules/@openzeppelin/contracts/access/IAccessControl.sol",
+        "node_modules/@openzeppelin/contracts/interfaces/IERC2981.sol",
+        "node_modules/@openzeppelin/contracts/interfaces/draft-IERC6093.sol",
+        "node_modules/@openzeppelin/contracts/proxy/Clones.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC1155/ERC1155.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC1155/IERC1155.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC1155/utils/ERC1155Utils.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC721/IERC721.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC721/utils/ERC721Utils.sol",
+        "node_modules/@openzeppelin/contracts/token/common/ERC2981.sol",
+        "node_modules/@openzeppelin/contracts/utils/Arrays.sol",
+        "node_modules/@openzeppelin/contracts/utils/Bytes.sol",
+        "node_modules/@openzeppelin/contracts/utils/Comparators.sol",
+        "node_modules/@openzeppelin/contracts/utils/Context.sol",
+        "node_modules/@openzeppelin/contracts/utils/Create2.sol",
+        "node_modules/@openzeppelin/contracts/utils/Errors.sol",
+        "node_modules/@openzeppelin/contracts/utils/LowLevelCall.sol",
+        "node_modules/@openzeppelin/contracts/utils/Panic.sol",
+        "node_modules/@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol",
+        "node_modules/@openzeppelin/contracts/utils/SlotDerivation.sol",
+        "node_modules/@openzeppelin/contracts/utils/StorageSlot.sol",
+        "node_modules/@openzeppelin/contracts/utils/Strings.sol",
+        "node_modules/@openzeppelin/contracts/utils/TransientSlot.sol",
+        "node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol",
+        "node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SignedMath.sol",
+        "node_modules/erc721a-upgradeable/contracts/ERC721AStorage.sol",
+        "node_modules/erc721a-upgradeable/contracts/ERC721AUpgradeable.sol",
+        "node_modules/erc721a-upgradeable/contracts/ERC721A__Initializable.sol",
+        "node_modules/erc721a-upgradeable/contracts/ERC721A__InitializableStorage.sol",
+        "node_modules/erc721a-upgradeable/contracts/IERC721AUpgradeable.sol",
+        "src/modules/keel-codecs/libraries/KeelRlp.sol",
+        "src/modules/keel-die/KeelCreator1155.sol",
+        "src/modules/keel-die/KeelCreator721.sol",
+        "src/modules/keel-die/KeelCreator721A.sol",
+        "src/modules/keel-die/KeelCreatorFactory.sol",
+        "src/modules/keel-die/KeelCreatorSeeded721A.sol",
+        "src/modules/keel-die/KeelSeedBlockArchive.sol",
+        "src/modules/keel-die/KeelShared1155.sol",
+        "src/modules/keel-die/interfaces/IKeelCampaignAuthorizer.sol",
+        "src/modules/keel-die/interfaces/IKeelCreator1155Events.sol",
+        "src/modules/keel-die/interfaces/IKeelCreatorCollectionErrors.sol",
+        "src/modules/keel-die/interfaces/IKeelCreatorCollectionEvents.sol",
+        "src/modules/keel-die/interfaces/IKeelCreatorDirectory.sol",
+        "src/modules/keel-die/interfaces/IKeelCreatorFactoryErrors.sol",
+        "src/modules/keel-die/interfaces/IKeelCreatorFactoryEvents.sol",
+        "src/modules/keel-die/interfaces/IKeelCreatorItemErrors.sol",
+        "src/modules/keel-die/interfaces/IKeelCreatorLifecycleEvents.sol",
+        "src/modules/keel-die/interfaces/IKeelCreatorSeedErrors.sol",
+        "src/modules/keel-die/interfaces/IKeelCreatorSeedEvents.sol",
+        "src/modules/keel-die/interfaces/IKeelDeferredCollectionResolver.sol",
+        "src/modules/keel-die/interfaces/IKeelDeferredMintSetup.sol",
+        "src/modules/keel-die/interfaces/IKeelItemBatchMintTarget.sol",
+        "src/modules/keel-die/interfaces/IKeelItemCapacityEvents.sol",
+        "src/modules/keel-die/interfaces/IKeelItemMintTarget.sol",
+        "src/modules/keel-die/interfaces/IKeelMetadataEvents.sol",
+        "src/modules/keel-die/interfaces/IKeelMetadataReceiver.sol",
+        "src/modules/keel-die/interfaces/IKeelMintBatchErrors.sol",
+        "src/modules/keel-die/interfaces/IKeelMintCapacity.sol",
+        "src/modules/keel-die/interfaces/IKeelMintDataSource.sol",
+        "src/modules/keel-die/interfaces/IKeelMintTargetErrors.sol",
+        "src/modules/keel-die/interfaces/IKeelMintable.sol",
+        "src/modules/keel-die/interfaces/IKeelSeedVrf.sol",
+        "src/modules/keel-die/interfaces/IKeelShared1155Errors.sol",
+        "src/modules/keel-die/interfaces/IKeelShared1155Events.sol",
+        "src/modules/keel-die/interfaces/IKeelStrikeCapacityEvents.sol",
+        "src/modules/keel-die/interfaces/IKeelTokenRenderer.sol",
+        "src/modules/keel-die/libraries/KeelSeedBlockEntropy.sol",
+        "src/modules/keel-kernel/KeelLocalPause.sol",
+        "src/modules/keel-kernel/SafeAdminAccessControl.sol",
+        "src/modules/keel-kernel/interfaces/IKeelMetadataRelay.sol",
+        "src/modules/keel-kernel/interfaces/IKeelMintSeededBatchErrors.sol",
+        "src/modules/keel-kernel/interfaces/IKeelMintSeededData.sol",
+        "src/modules/keel-kernel/libraries/KeelMetadataSubscriptions.sol",
+        "src/modules/keel-kernel/libraries/KeelMintSeededBatches.sol",
+        "src/modules/keel-kernel/libraries/KeelPause.sol",
+        "src/modules/keel-mint-access/KeelMintReleaseInspector.sol",
+        "src/modules/keel-mint-access/KeelMintReleases.sol",
+        "src/modules/keel-mint-access/KeelMintRouteRegistry.sol",
+        "src/modules/keel-mint-access/interfaces/IKeelMintBatchRouteRegistry.sol",
+        "src/modules/keel-mint-access/interfaces/IKeelMintHook.sol",
+        "src/modules/keel-mint-access/interfaces/IKeelMintRouteErrors.sol",
+        "src/modules/keel-mint-access/interfaces/IKeelMintRouteEvents.sol",
+        "src/modules/keel-mint-access/interfaces/IKeelMintRouteRegistry.sol",
+        "src/modules/keel-mint-access/interfaces/IKeelReleaseErrors.sol",
+        "src/modules/keel-mint-access/interfaces/IKeelReleaseEvents.sol",
+        "src/modules/keel-mint-access/libraries/KeelReleasePolicy.sol"
+      ]
+    },
+    {
+      "name": "KEEL721",
+      "path": "out/KEEL721.sol/KEEL721.json",
+      "bytes": 297734,
+      "sha256": "0959a76bb998f92a196e6265eeb12d54e1e6ce9681248ff5f15419a803d0ff3d",
+      "compiler": {
+        "version": "0.8.36+commit.8a079791"
+      },
+      "settings": {
+        "compilationTarget": {
+          "src/modules/keel-die/KEEL721.sol": "KEEL721"
+        },
+        "evmVersion": "prague",
+        "libraries": {},
+        "metadata": {
+          "appendCBOR": false,
+          "bytecodeHash": "none"
+        },
+        "optimizer": {
+          "enabled": true,
+          "runs": 50
+        },
+        "remappings": [
+          ":@app-test/=test/apps/",
+          ":@app/=src/apps/",
+          ":@keel-test/=test/modules/",
+          ":@keel/=src/modules/",
+          ":@openzeppelin/contracts/=node_modules/@openzeppelin/contracts/",
+          ":erc721a-upgradeable/=node_modules/erc721a-upgradeable/",
+          ":erc721a/=node_modules/erc721a/"
+        ],
+        "viaIR": true
+      },
+      "rawMetadataSHA256": "c4d4b02d9ea3ace405d2d68722dcf1141673bdc5963644fa3e284bf1b67fe80f",
+      "abiSHA256": "22232cf51c652984902460cf20f3f01f79733aa2298371ba073fc1b21ae3fdd7",
+      "creationBytecodeTextSHA256": "b62d4f7618b02cab6f805a25cd65bd01152118502da490f77082b96dd2475719",
+      "runtimeBytecodeTextSHA256": "5980ebc802faccce13fbd89b8accdebb3e86c3d7f3811b850a8e8c1a7e4a9f51",
+      "sources": [
+        "node_modules/@openzeppelin/contracts/access/AccessControl.sol",
+        "node_modules/@openzeppelin/contracts/access/IAccessControl.sol",
+        "node_modules/@openzeppelin/contracts/interfaces/IERC2981.sol",
+        "node_modules/@openzeppelin/contracts/interfaces/draft-IERC6093.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC721/IERC721.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC721/utils/ERC721Utils.sol",
+        "node_modules/@openzeppelin/contracts/token/common/ERC2981.sol",
+        "node_modules/@openzeppelin/contracts/utils/Base64.sol",
+        "node_modules/@openzeppelin/contracts/utils/Bytes.sol",
+        "node_modules/@openzeppelin/contracts/utils/Context.sol",
+        "node_modules/@openzeppelin/contracts/utils/Panic.sol",
+        "node_modules/@openzeppelin/contracts/utils/Strings.sol",
+        "node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol",
+        "node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SignedMath.sol",
+        "src/modules/keel-die/KEEL721.sol",
+        "src/modules/keel-die/Keel721State.sol",
+        "src/modules/keel-die/interfaces/IKeel721Errors.sol",
+        "src/modules/keel-die/interfaces/IKeel721Events.sol",
+        "src/modules/keel-die/interfaces/IKeelCampaignAuthorizer.sol",
+        "src/modules/keel-die/interfaces/IKeelMetadataEvents.sol",
+        "src/modules/keel-die/interfaces/IKeelMintCapacity.sol",
+        "src/modules/keel-die/interfaces/IKeelMintTargetErrors.sol",
+        "src/modules/keel-die/interfaces/IKeelMintable.sol",
+        "src/modules/keel-die/interfaces/IKeelStrikeCapacityEvents.sol",
+        "src/modules/keel-die/libraries/Keel721MetadataFormatting.sol",
+        "src/modules/keel-harness/interfaces/IKeelHarnessBuilder.sol",
+        "src/modules/keel-harness/interfaces/IKeelPercentTokenURIBuilder.sol",
+        "src/modules/keel-harness/interfaces/IKeelRawTokenURIBuilder.sol",
+        "src/modules/keel-harness/libraries/KeelHarnessContextDispatch.sol",
+        "src/modules/keel-hold/interfaces/IKeelHold.sol",
+        "src/modules/keel-hold/interfaces/IKeelHoldErrors.sol",
+        "src/modules/keel-hold/interfaces/IKeelHoldHarness.sol",
+        "src/modules/keel-hold/interfaces/IKeelHoldSeal.sol",
+        "src/modules/keel-hold/interfaces/IKeelIndexMetadataReceiver.sol",
+        "src/modules/keel-hold/libraries/KeelSealValidation.sol",
+        "src/modules/keel-kernel/SafeAdminAccessControl.sol",
+        "src/modules/keel-kernel/interfaces/IKeelMetadataRelay.sol",
+        "src/modules/keel-kernel/libraries/JsonEscape.sol",
+        "src/modules/keel-kernel/libraries/KeelMetadataSubscriptions.sol",
+        "src/modules/keel-kernel/libraries/KeelPause.sol",
+        "src/modules/keel-kernel/libraries/KeelTokenURIEnvelope.sol",
+        "src/modules/keel-presentation/interfaces/IKeelPresentationRegistry.sol"
+      ]
+    },
+    {
+      "name": "KeelManager",
+      "path": "out/KeelManager.sol/KeelManager.json",
+      "bytes": 343904,
+      "sha256": "48cc5e36c3b87811af9fed3795ec6a5f37da54a18e5813583bdf5dbbbf58e583",
+      "compiler": {
+        "version": "0.8.36+commit.8a079791"
+      },
+      "settings": {
+        "compilationTarget": {
+          "src/modules/keel-artifacts/KeelManager.sol": "KeelManager"
+        },
+        "evmVersion": "prague",
+        "libraries": {},
+        "metadata": {
+          "appendCBOR": false,
+          "bytecodeHash": "none"
+        },
+        "optimizer": {
+          "enabled": true,
+          "runs": 50
+        },
+        "remappings": [
+          ":@app-test/=test/apps/",
+          ":@app/=src/apps/",
+          ":@keel-test/=test/modules/",
+          ":@keel/=src/modules/",
+          ":@openzeppelin/contracts/=node_modules/@openzeppelin/contracts/",
+          ":erc721a-upgradeable/=node_modules/erc721a-upgradeable/",
+          ":erc721a/=node_modules/erc721a/"
+        ],
+        "viaIR": true
+      },
+      "rawMetadataSHA256": "3e1961d7f8ac029ce7150c11325df596886372ebfe0035956a596877b8316444",
+      "abiSHA256": "e934c4fd7ddf6f7738b05972d73128db44e9856e2aaabe7a3e713d53d35f4dbf",
+      "creationBytecodeTextSHA256": "7427062684152fa3a213a5b7f684a8b0a3036a49c65e8afe93d4dabada6029ce",
+      "runtimeBytecodeTextSHA256": "dd5e0eaa48b7c648d3ada795e6d2815531e4fb666eaa9f6c97b204f71082328c",
+      "sources": [
+        "node_modules/@openzeppelin/contracts/access/IAccessControl.sol",
+        "node_modules/@openzeppelin/contracts/interfaces/IERC1271.sol",
+        "node_modules/@openzeppelin/contracts/interfaces/IERC1967.sol",
+        "node_modules/@openzeppelin/contracts/interfaces/IERC5267.sol",
+        "node_modules/@openzeppelin/contracts/interfaces/IERC7913.sol",
+        "node_modules/@openzeppelin/contracts/interfaces/draft-IERC1822.sol",
+        "node_modules/@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol",
+        "node_modules/@openzeppelin/contracts/proxy/beacon/IBeacon.sol",
+        "node_modules/@openzeppelin/contracts/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts/utils/Address.sol",
+        "node_modules/@openzeppelin/contracts/utils/Bytes.sol",
+        "node_modules/@openzeppelin/contracts/utils/Errors.sol",
+        "node_modules/@openzeppelin/contracts/utils/LowLevelCall.sol",
+        "node_modules/@openzeppelin/contracts/utils/Panic.sol",
+        "node_modules/@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol",
+        "node_modules/@openzeppelin/contracts/utils/ShortStrings.sol",
+        "node_modules/@openzeppelin/contracts/utils/StorageSlot.sol",
+        "node_modules/@openzeppelin/contracts/utils/Strings.sol",
+        "node_modules/@openzeppelin/contracts/utils/TransientSlot.sol",
+        "node_modules/@openzeppelin/contracts/utils/cryptography/ECDSA.sol",
+        "node_modules/@openzeppelin/contracts/utils/cryptography/EIP712.sol",
+        "node_modules/@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol",
+        "node_modules/@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol",
+        "node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SignedMath.sol",
+        "src/modules/keel-artifacts/KeelManager.sol",
+        "src/modules/keel-artifacts/KeelManagerRpcPolicy.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelManagerErrors.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelManagerEvents.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelManagerRpcErrors.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelManagerRpcEvents.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelManagerTypes.sol",
+        "src/modules/keel-artifacts/libraries/KeelManagerGovernorState.sol",
+        "src/modules/keel-kernel/libraries/KeelGovernance.sol",
+        "src/modules/keel-kernel/libraries/KeelPause.sol"
+      ]
+    },
+    {
+      "name": "KeelManagerProxy",
+      "path": "out/KeelManagerProxy.sol/KeelManagerProxy.json",
+      "bytes": 95088,
+      "sha256": "b031af88a7f63ca235969ffb9925539891164020ff0dd82d0058ea5f0ab263da",
+      "compiler": {
+        "version": "0.8.36+commit.8a079791"
+      },
+      "settings": {
+        "compilationTarget": {
+          "src/modules/keel-artifacts/KeelManagerProxy.sol": "KeelManagerProxy"
+        },
+        "evmVersion": "prague",
+        "libraries": {},
+        "metadata": {
+          "appendCBOR": false,
+          "bytecodeHash": "none"
+        },
+        "optimizer": {
+          "enabled": true,
+          "runs": 50
+        },
+        "remappings": [
+          ":@app-test/=test/apps/",
+          ":@app/=src/apps/",
+          ":@keel-test/=test/modules/",
+          ":@keel/=src/modules/",
+          ":@openzeppelin/contracts/=node_modules/@openzeppelin/contracts/",
+          ":erc721a-upgradeable/=node_modules/erc721a-upgradeable/",
+          ":erc721a/=node_modules/erc721a/"
+        ],
+        "viaIR": true
+      },
+      "rawMetadataSHA256": "2686c97ad7e1093586a0a51ee9e7da19a1dd09402422958dac078c0a3a61c8ac",
+      "abiSHA256": "2e9e3b11b1b12e0a8b8196d1cd5ce1868eb26e6d57dc4bea70eea67393830182",
+      "creationBytecodeTextSHA256": "a042b5a41215eaa55ce7b2d051cc7a3e25e4d004475754a31dd01a5a9ea69706",
+      "runtimeBytecodeTextSHA256": "736427e46945af28cad51d2df92a5199a069a082c21c709968c61725efe0d8fc",
+      "sources": [
+        "node_modules/@openzeppelin/contracts/access/IAccessControl.sol",
+        "node_modules/@openzeppelin/contracts/interfaces/IERC1271.sol",
+        "node_modules/@openzeppelin/contracts/interfaces/IERC1967.sol",
+        "node_modules/@openzeppelin/contracts/interfaces/IERC5267.sol",
+        "node_modules/@openzeppelin/contracts/interfaces/IERC7913.sol",
+        "node_modules/@openzeppelin/contracts/interfaces/draft-IERC1822.sol",
+        "node_modules/@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol",
+        "node_modules/@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol",
+        "node_modules/@openzeppelin/contracts/proxy/Proxy.sol",
+        "node_modules/@openzeppelin/contracts/proxy/beacon/IBeacon.sol",
+        "node_modules/@openzeppelin/contracts/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts/utils/Address.sol",
+        "node_modules/@openzeppelin/contracts/utils/Bytes.sol",
+        "node_modules/@openzeppelin/contracts/utils/Errors.sol",
+        "node_modules/@openzeppelin/contracts/utils/LowLevelCall.sol",
+        "node_modules/@openzeppelin/contracts/utils/Panic.sol",
+        "node_modules/@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol",
+        "node_modules/@openzeppelin/contracts/utils/ShortStrings.sol",
+        "node_modules/@openzeppelin/contracts/utils/StorageSlot.sol",
+        "node_modules/@openzeppelin/contracts/utils/Strings.sol",
+        "node_modules/@openzeppelin/contracts/utils/TransientSlot.sol",
+        "node_modules/@openzeppelin/contracts/utils/cryptography/ECDSA.sol",
+        "node_modules/@openzeppelin/contracts/utils/cryptography/EIP712.sol",
+        "node_modules/@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol",
+        "node_modules/@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol",
+        "node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SignedMath.sol",
+        "src/modules/keel-artifacts/KeelManager.sol",
+        "src/modules/keel-artifacts/KeelManagerProxy.sol",
+        "src/modules/keel-artifacts/KeelManagerRecovery.sol",
+        "src/modules/keel-artifacts/KeelManagerRpcPolicy.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelManagerErrors.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelManagerEvents.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelManagerRecoveryErrors.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelManagerRecoveryEvents.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelManagerRpcErrors.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelManagerRpcEvents.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelManagerTypes.sol",
+        "src/modules/keel-artifacts/libraries/KeelManagerGovernorState.sol",
+        "src/modules/keel-kernel/KeelRecoveryGroups.sol",
+        "src/modules/keel-kernel/interfaces/IKeelRecoveryErrors.sol",
+        "src/modules/keel-kernel/libraries/KeelGovernance.sol",
+        "src/modules/keel-kernel/libraries/KeelPause.sol"
+      ]
+    },
+    {
+      "name": "KeelShared1155",
+      "path": "out/KeelShared1155.sol/KeelShared1155.json",
+      "bytes": 195721,
+      "sha256": "1b012ea99a59ee9f36039ffead1a6ba5e658ee698f81d50157b70dede1cc5370",
+      "compiler": {
+        "version": "0.8.36+commit.8a079791"
+      },
+      "settings": {
+        "compilationTarget": {
+          "src/modules/keel-die/KeelShared1155.sol": "KeelShared1155"
+        },
+        "evmVersion": "prague",
+        "libraries": {},
+        "metadata": {
+          "appendCBOR": false,
+          "bytecodeHash": "none"
+        },
+        "optimizer": {
+          "enabled": true,
+          "runs": 50
+        },
+        "remappings": [
+          ":@app-test/=test/apps/",
+          ":@app/=src/apps/",
+          ":@keel-test/=test/modules/",
+          ":@keel/=src/modules/",
+          ":@openzeppelin/contracts/=node_modules/@openzeppelin/contracts/",
+          ":erc721a-upgradeable/=node_modules/erc721a-upgradeable/",
+          ":erc721a/=node_modules/erc721a/"
+        ],
+        "viaIR": true
+      },
+      "rawMetadataSHA256": "d26ca5a088b48f8a13e5314fe572818e487536722b5f9c02fc15abec23fb5a9e",
+      "abiSHA256": "9e053806546c17ac79c696872496e64c74062c775071bd57e4bf1244a228ad95",
+      "creationBytecodeTextSHA256": "fd8f4d60b410e5998f13599ac73b0e7c3ed1e5b362520a6a834030360db954cd",
+      "runtimeBytecodeTextSHA256": "c5abbf07b93b1538e171905208563727b0bdbeee38e17f8d25af2d5a13440c3d",
+      "sources": [
+        "node_modules/@openzeppelin/contracts/interfaces/IERC2981.sol",
+        "node_modules/@openzeppelin/contracts/interfaces/draft-IERC6093.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC1155/ERC1155.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC1155/IERC1155.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC1155/utils/ERC1155Utils.sol",
+        "node_modules/@openzeppelin/contracts/token/common/ERC2981.sol",
+        "node_modules/@openzeppelin/contracts/utils/Arrays.sol",
+        "node_modules/@openzeppelin/contracts/utils/Comparators.sol",
+        "node_modules/@openzeppelin/contracts/utils/Context.sol",
+        "node_modules/@openzeppelin/contracts/utils/Panic.sol",
+        "node_modules/@openzeppelin/contracts/utils/SlotDerivation.sol",
+        "node_modules/@openzeppelin/contracts/utils/StorageSlot.sol",
+        "node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol",
+        "node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "src/modules/keel-die/KeelShared1155.sol",
+        "src/modules/keel-die/interfaces/IKeelCreatorDirectory.sol",
+        "src/modules/keel-die/interfaces/IKeelItemBatchMintTarget.sol",
+        "src/modules/keel-die/interfaces/IKeelItemMintTarget.sol",
+        "src/modules/keel-die/interfaces/IKeelMetadataReceiver.sol",
+        "src/modules/keel-die/interfaces/IKeelMintBatchErrors.sol",
+        "src/modules/keel-die/interfaces/IKeelMintTargetErrors.sol",
+        "src/modules/keel-die/interfaces/IKeelShared1155Errors.sol",
+        "src/modules/keel-die/interfaces/IKeelShared1155Events.sol",
+        "src/modules/keel-die/interfaces/IKeelTokenRenderer.sol",
+        "src/modules/keel-kernel/interfaces/IKeelMetadataRelay.sol",
+        "src/modules/keel-kernel/libraries/KeelMetadataSubscriptions.sol"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "path": "node_modules/@openzeppelin/contracts/interfaces/IERC2981.sol",
+      "bytes": 1114,
+      "sha256": "ea5f52ef580b9cb7c97091fd8164ec3ff211f5bdec359d18191eac4fcf7fcf76",
+      "keccak256": "0xafab0e6c71905303c47dd254168cb31efc91f0ae284cde609b0202f97f85469e",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/interfaces/draft-IERC6093.sol",
+      "bytes": 6540,
+      "sha256": "fa7068f56bc180571a6095be6eaef06d51dbe81e30cb128397d993c9599ecc30",
+      "keccak256": "0x1b88b3fb3d85ba5496d7d5f396f83ee1fddcdd6762059ff65992655b67920998",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/token/ERC1155/ERC1155.sol",
+      "bytes": 15710,
+      "sha256": "35ad182b74ce08152cde00fd41226850c635e1b9445f3a9d7b4888f2ba55717e",
+      "keccak256": "0x405aba2c4c654f9ee77437739109afc694bec03a074f978733c11205927d774b",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/token/ERC1155/IERC1155.sol",
+      "bytes": 4750,
+      "sha256": "62760e5ca354484140a29dddfa03b576c2e9e3adea6eb021eb28b394c085f3e4",
+      "keccak256": "0xf189f9b417fe1931e1ab706838aff1128528694a9fcdb5ff7665197f2ca57d09",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol",
+      "bytes": 2599,
+      "sha256": "3df310870e0187a59020ea48e910ed2693778b1f758b57b97a47365d74b92af5",
+      "keccak256": "0x6ec6d7fce29668ede560c7d2e10f9d10de3473f5298e431e70a5767db42fa620",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI.sol",
+      "bytes": 677,
+      "sha256": "d5a148ccf8ac24f69f734cb2bcfba55ecc1d24209bf7aaa022cf3bde4bbe274f",
+      "keccak256": "0x98c32de9b02f43eba7c0aba9fadf331cffb35a8d2076dce1d556c8f2cad704aa",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/token/ERC1155/utils/ERC1155Utils.sol",
+      "bytes": 3554,
+      "sha256": "8d75a5dd3db8f1c85362ef688d6f3cf5b2892dc62424bfe35678a49ce0d87956",
+      "keccak256": "0xaeca1511f7da49bdb16e44aa0f09dca76b51ba079bd068b2f80b8fe6d22b5fa1",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/token/common/ERC2981.sol",
+      "bytes": 5323,
+      "sha256": "bac8f7ccae3c561a105a18cd1600ade43bb8856f9b7c9e0acc98d950af9ffa81",
+      "keccak256": "0xa33062c6e0675a74a27b06a4ae4c6ad4d3b7219e27d9c146a4ac57295096d393",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/Arrays.sol",
+      "bytes": 35171,
+      "sha256": "d0a51abdcac27c02821939ed07419b88950bac4117ee75e105010674ef6593c0",
+      "keccak256": "0xb3b81029526a4c3acf39e57cc446407141ebce338cc99585942af1340e1a69e0",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/Comparators.sol",
+      "bytes": 443,
+      "sha256": "52fb1c8f57967d42a3214bde4a8a414ab25c2e3a844d00e171ca56487024e009",
+      "keccak256": "0x302eecd8cf323b4690e3494a7d960b3cbce077032ab8ef655b323cdd136cec58",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/Context.sol",
+      "bytes": 963,
+      "sha256": "847fda5460fee70f56f4200f59b82ae622bb03c79c77e67af010e31b7e2cc5b6",
+      "keccak256": "0x493033a8d1b176a037b2cc6a04dad01a5c157722049bbecf632ca876224dd4b2",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/Panic.sol",
+      "bytes": 1973,
+      "sha256": "270fc8401c1a13fae6a7a4a2dd6e381b95d658896701e51f0d3e2688acab3dec",
+      "keccak256": "0xf7fe324703a64fc51702311dc51562d5cb1497734f074e4f483bfb6717572d7a",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/SlotDerivation.sol",
+      "bytes": 5317,
+      "sha256": "f8e5f2c672918a21720ce3b5e2637c6366aa0652d085c0478fc0d0d6edb76386",
+      "keccak256": "0x94045fd4f268edf2b2d01ef119268548c320366d6f5294ad30c1b8f9d4f5225f",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/StorageSlot.sol",
+      "bytes": 4182,
+      "sha256": "75704538dcb223239280c6726d9a31cf769a7816718517c997fc7d63bdb70778",
+      "keccak256": "0xcf74f855663ce2ae00ed8352666b7935f6cddea2932fdf2c3ecd30a9b1cd0e97",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol",
+      "bytes": 879,
+      "sha256": "61a2b12c96857aaa35f48aeda67a4281637a42494c0b3795be0ae976aa7b3793",
+      "keccak256": "0x2d9dc2fe26180f74c11c13663647d38e259e45f95eb88f57b61d2160b0109d3e",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol",
+      "bytes": 871,
+      "sha256": "9055c2994b37dea1a41b7b7926dcb510f05dbe2540b0aafc5fbee9558fffd0ca",
+      "keccak256": "0x8891738ffe910f0cf2da09566928589bf5d63f4524dd734fd9cedbac3274dd5c",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+      "bytes": 32664,
+      "sha256": "bdfdbe133991c0c78042957ff5cd97167926fcaf6d15664f3835a076cb066457",
+      "keccak256": "0x59973a93b1f983f94e10529f46ca46544a9fec2b5f56fb1390bbe9e0dc79f857",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+      "bytes": 34940,
+      "sha256": "5779bc848bde39f1ad7bc02b4f708a0040888e0083b1a33f119cd94639350134",
+      "keccak256": "0xc8cae21c9ae4a46e5162ff9bf5b351d6fa6a6eba72d515f3bc1bdfeda7fdf083",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "src/modules/keel-die/KeelCreator1155.sol",
+      "bytes": 23661,
+      "sha256": "64db2f1ea4681251231cdf302d8edb7ec423c741abbcaa14b08773818e99f6ed",
+      "keccak256": "0x28e04b27da154b8d756a1778ef9d439673f30a98d887a02a5f26c4537cf3de25",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelCreator1155Events.sol",
+      "bytes": 2901,
+      "sha256": "20f60ad883e773c9d907494630f56a58032a720a85bee43b3df9c07ca00f66da",
+      "keccak256": "0xcd8d9f76989f2ae00bebbc204d2f3cfe9f88ccc96a621230d65c974f92099e6e",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelCreatorCollectionErrors.sol",
+      "bytes": 2880,
+      "sha256": "d9061331849a80e0956f3d28672601fa270d3bc6a42c4d3e02d506257a4fe6f6",
+      "keccak256": "0xf708614cecc9e6d404136068702136789e297a7977699211871fe394aea35c5a",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelCreatorDirectory.sol",
+      "bytes": 3051,
+      "sha256": "9a11c37aceb92af77a9866d19ba6dd88a4e7054a54b2618b63ee85bb974ad8d9",
+      "keccak256": "0x1737bb533e4a8269a4fa2e1bfa1a1bf8e3631853e5db97c5900dba72d58e8ffc",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelCreatorItemErrors.sol",
+      "bytes": 2244,
+      "sha256": "38065d5ae28f388250536542d7e74cbea759f2b1f2705f0196c63353e8c2c8e4",
+      "keccak256": "0x5b0eb7a683153ac188ce6b29704f43f950f336bfb8d6badd8ae2cf0d39c65737",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelCreatorLifecycleEvents.sol",
+      "bytes": 3521,
+      "sha256": "484261014c1130c292f9489fdb43702acfd961b5194f56e5cd428a588a5c08a0",
+      "keccak256": "0x0d61ed1d5552fbd7e25fcb5043e010de329b453783f6d23bb7819276875474cd",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelItemBatchMintTarget.sol",
+      "bytes": 2949,
+      "sha256": "54bb7b110648dd705fb05880f86e27c4a90bd071be5a61ee6fdd394f19cecd3f",
+      "keccak256": "0x3e3a47aa12ad8d2319fbb74ec3621e33528b91dfce5b3fe1bedb333d4b74c5a1",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelItemCapacityEvents.sol",
+      "bytes": 3442,
+      "sha256": "8b9fd77d9c12091571ddcdb2e81fa1ade85008315b4eca7200aca500b8369252",
+      "keccak256": "0x20d663187c5a84702ef78b52de4f12c469b91169ac29f1cf02504523fa33f491",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelItemMintTarget.sol",
+      "bytes": 4604,
+      "sha256": "452c1d3335f5981bc665579858a0ce1f06d4ed45ff4e37835dc409346a4cdd39",
+      "keccak256": "0x7af91ae7bac5e65954241c8f9377bb92b44573164c0c72e9ad067394f6b89cf0",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelMetadataReceiver.sol",
+      "bytes": 2994,
+      "sha256": "ef6e74ddb5446207eceb6d8814d1f2464f0717d671ca06735a4fd5b83896d5e6",
+      "keccak256": "0xb5a5242d2e0a9d094b5b94d91494a4b7d612ad719698a5b45d0866c9c0e8314b",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelMintBatchErrors.sol",
+      "bytes": 2331,
+      "sha256": "ad858db891dad365dc85bfd5356ca3131ba32dc3c215d26c19790d47f30ccc3c",
+      "keccak256": "0x513833ea89e40771c432e281192b12ef5157e0765a4e72968bd59cafb1265418",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelMintTargetErrors.sol",
+      "bytes": 2910,
+      "sha256": "a3ff2b3daf899733411ac28517afc8283c0f3fb42f0ff199b01be32e2e906646",
+      "keccak256": "0x3814173736c2d6b334165b27d2f5d3c076794d15fc978abe07c4fe972ebec131",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelTokenRenderer.sol",
+      "bytes": 3584,
+      "sha256": "5fbbab809a0f082bcbbee104e24b5b50af8acad205207caea2ae3ff751a93a7a",
+      "keccak256": "0xc14eaddf4575a4cc06a9883f65d458879eb30c9f259d0783aa2231a61d08f8fd",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-kernel/interfaces/IKeelMetadataRelay.sol",
+      "bytes": 4732,
+      "sha256": "5d0615094237be284ea5d5dafe1d75fb7f9461c61e026e7007fb1e8fe37fb87b",
+      "keccak256": "0x7c2685af8d5b7475db3796a31c2e3a03c557f4002d138c415c8dfbaac8eef7d7",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-kernel/libraries/KeelMetadataSubscriptions.sol",
+      "bytes": 4748,
+      "sha256": "34c5688c4d48a5864633a346fca4033f0ed6bfc299598f314a4ef5d49186774d",
+      "keccak256": "0xc16f272750982c3fdfd6ec6366bf403734b22caffa23b7f8e6b1e346d6efd9e5",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/proxy/Clones.sol",
+      "bytes": 14522,
+      "sha256": "06c768a2b794ea59dd6d6c1bfe33cf5098a4a8921aec14cf066576a2bffafce6",
+      "keccak256": "0x5a1847c0c6b92d60711f04cba9eaff572ae1f657cff1b8ca4ba065bcdbd68d8b",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol",
+      "bytes": 16201,
+      "sha256": "ef8e2398c78851bd2ec12bc48d923058c557889d5a3d5ee4919c17ff0fb3517e",
+      "keccak256": "0xf6bb0dc431a9c50e25756412ec14cfcd4dc61dd40b8dc0e1b58ec09fce6d5564",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/token/ERC721/IERC721.sol",
+      "bytes": 4929,
+      "sha256": "ff0eb9902bf0ac099205615fac90eacf34fae637571b05aab3ea35dea53d5f17",
+      "keccak256": "0xf78f05f3b8c9f75570e85300d7b4600d7f6f6a198449273f31d44c1641adb46f",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol",
+      "bytes": 997,
+      "sha256": "eafee3ffdc7cb2fba4bf6bd16fb28f8e5b4679742e81c2ad42a1b1df5c179feb",
+      "keccak256": "0x88cd5e3bee2e8c36b8d9058fbcaa81ad5704281b25634122234b55ea853d8055",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol",
+      "bytes": 792,
+      "sha256": "33223782ea652dca413702ce92f9f59d91d758a035065b24bbedb7dc60c63a78",
+      "keccak256": "0xf46268c37522320bb2119a5a394bc5c739a95c0c574c8d08e8c643f4d06e5c76",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/token/ERC721/utils/ERC721Utils.sol",
+      "bytes": 1923,
+      "sha256": "b48e95db8c85866c1d88af8e82f346e0d22d24b5aac5b936079d958c72e13b9f",
+      "keccak256": "0xc7efbc23214ad7dced8bf2249460f4bda114d57f6a0079f84040654280f455bd",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/Bytes.sol",
+      "bytes": 14737,
+      "sha256": "3ce9120a27934c75a074cb785d3a88868069ef6529dbe4dc6b845af0836f3c70",
+      "keccak256": "0xf80e4b96b6849936ea0fabd76cf81b13d7276295fddb1e1c07afb3ddf650b0ac",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/Create2.sol",
+      "bytes": 4372,
+      "sha256": "9623aa59745a23a72f313adc5adbf583968bf366a7cbf3fc43c1148d7d2c3c86",
+      "keccak256": "0xe06ddfff69f3ba154d92102d9a85db2780e045303a587360cf12195216e851ca",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/Errors.sol",
+      "bytes": 896,
+      "sha256": "0704b9d6c032cca8512a3bc3f30f49f86f1f03102d2896a3d23e794b82efea66",
+      "keccak256": "0x6afa713bfd42cf0f7656efa91201007ac465e42049d7de1d50753a373648c123",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/LowLevelCall.sol",
+      "bytes": 5547,
+      "sha256": "e128cbe9c6c406d5a42c26e4079c0a95b369ce552f2d0c3dfd2fcb836c5708f2",
+      "keccak256": "0x6ba3db1346fc75a832aa6cd075e12f6f1fa172fa2122a020f324c319fe5be75e",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/Strings.sol",
+      "bytes": 21538,
+      "sha256": "e318709bbe73a7831d64c1351e8bdc43780b245f25191234e361e6ab9b98c67b",
+      "keccak256": "0x1fdc2de9585ab0f1c417f02a873a2b6343cd64bb7ffec6b00ffa11a4a158d9e8",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/math/SignedMath.sol",
+      "bytes": 2613,
+      "sha256": "1ed50b1056af886752f0fb48a0165d381e69bb4a4b18b893b066dc144a7e08d7",
+      "keccak256": "0xb1970fac7b64e6c09611e6691791e848d5e3fe410fa5899e7df2e0afd77a99e3",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/erc721a-upgradeable/contracts/ERC721AStorage.sol",
+      "bytes": 2115,
+      "sha256": "3bf55e5da98aedfd99173c92ab7bb4cc1ae85df759d580c4536077478c4b5923",
+      "keccak256": "0x682166ae85d0e8e16775b7ea10b45873df0158206de5036a68a155f9a6dd8207",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "erc721a-upgradeable",
+        "version": "4.3.0",
+        "packageJSONSHA256": "04a0812defad199d745e3cbe9b2a614f80935cb81ea1887e475ae24e60ee40ca",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/erc721a-upgradeable/contracts/ERC721AUpgradeable.sol",
+      "bytes": 50246,
+      "sha256": "e7861a4d639001b9c8cd53683758712632796b5b1f9a52e0d2e1ceca183c5a70",
+      "keccak256": "0x1fa5506f629732d362af3a913e0c941aad69e268c852d570eae4ceedd99ab84a",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "erc721a-upgradeable",
+        "version": "4.3.0",
+        "packageJSONSHA256": "04a0812defad199d745e3cbe9b2a614f80935cb81ea1887e475ae24e60ee40ca",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/erc721a-upgradeable/contracts/ERC721A__Initializable.sol",
+      "bytes": 3355,
+      "sha256": "9e5238952e80f94db1632c4d6348b564fae2fa8aabdd01431100e9e72dc523dc",
+      "keccak256": "0x4a78c3bccd097e704d6c37cf90af892eae0e3fcb13dcc37e5c1ad6c36f4240f0",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "erc721a-upgradeable",
+        "version": "4.3.0",
+        "packageJSONSHA256": "04a0812defad199d745e3cbe9b2a614f80935cb81ea1887e475ae24e60ee40ca",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/erc721a-upgradeable/contracts/ERC721A__InitializableStorage.sol",
+      "bytes": 752,
+      "sha256": "c56a5341e28e3bdcbdebd27e6d11068785ad9a00ae7678672fe7b83de208952f",
+      "keccak256": "0x361a8f273736b37718a98049c3f210381c41e4241ff24a36360e417b94ad87b4",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "erc721a-upgradeable",
+        "version": "4.3.0",
+        "packageJSONSHA256": "04a0812defad199d745e3cbe9b2a614f80935cb81ea1887e475ae24e60ee40ca",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/erc721a-upgradeable/contracts/IERC721AUpgradeable.sol",
+      "bytes": 9314,
+      "sha256": "bbbc8762b8e18a7bfcf2daf93b80c98311ec7ba34014d0bdf2c792ccd4e274c9",
+      "keccak256": "0xaeabed185f4b889c097e61ef486a003e64cdc2d048b569ebcd315ff52a63367b",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "erc721a-upgradeable",
+        "version": "4.3.0",
+        "packageJSONSHA256": "04a0812defad199d745e3cbe9b2a614f80935cb81ea1887e475ae24e60ee40ca",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "src/modules/keel-codecs/libraries/KeelRlp.sol",
+      "bytes": 6304,
+      "sha256": "c53b82335d54336683aac06426c18bcfcada3186d88aa4026706a655e0e786d8",
+      "keccak256": "0xac4e07e2f1a1a7a3a616aa4af8ec0b09b6cd831fe3d87f6f6bafb111ba6bb9b1",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/KeelCreator721.sol",
+      "bytes": 20900,
+      "sha256": "8b1440cd278114d3bdd845a1acd81747672689aac0b1072a71963f016a0deefd",
+      "keccak256": "0x636e43a8d4e5cc5994dc6a58fe26c973c2cb9ba5f2ac4ae76c9a5051720ef327",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/KeelCreator721A.sol",
+      "bytes": 21593,
+      "sha256": "8fc160674388093c2385b00303cb4ffdc4fae54bea26855efcdd97472c5733aa",
+      "keccak256": "0x46a69e67200bb5fb2ec28b6f74394e973c351dbc5f158dae1a82fde6e1f4b2b9",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/KeelCreatorFactory.sol",
+      "bytes": 52028,
+      "sha256": "12e774ed74e6c3c46222e4ec7cb216c239cd2d1caaa83799986793f24e0a0bc7",
+      "keccak256": "0x8c42bcc30b9f94a73935a0e6f58881dc0c8e0682644d7f567f2a00a15b6c7880",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/KeelCreatorSeeded721A.sol",
+      "bytes": 20114,
+      "sha256": "6fa431e82275881cc40159c53f7e0af02a1a12a2a11db14305d824c24848945d",
+      "keccak256": "0xf6c265e6263c6747bfc5fbef15d88fc6860e76510f7ebef10e975aaae252768e",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/KeelSeedBlockArchive.sol",
+      "bytes": 4678,
+      "sha256": "649f6bd927bec4cedd93d48543e6658a30fe491ffee9495ce9960a69734a80de",
+      "keccak256": "0x7ef94fc1a377bc345bcb8fe261fb466a55f0b730fab6f2665141966cb84ee82d",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/KeelShared1155.sol",
+      "bytes": 27924,
+      "sha256": "a658063eb929e93af52e6f2761dffa53933ce237a4ac977579569d1030e6a52d",
+      "keccak256": "0x749077851a341194d9a5b6e649677c1f56da0ca220498f3d3f4ad9b63b073ecd",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelCampaignAuthorizer.sol",
+      "bytes": 2141,
+      "sha256": "102daa0ff124457b5bd425587ea67ee53b41d3a5f2f03e407b5c8a80f3039c0a",
+      "keccak256": "0xcc1099dfa635a6ce6989cef6e764a55efddf532e869ecf4acf6716ee07905d38",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelCreatorCollectionEvents.sol",
+      "bytes": 2561,
+      "sha256": "0058fa0dbad98a9d669e669eb2c1a9134f7d934f089be3529813cc2e0011db2c",
+      "keccak256": "0x21ad6f7e6e15fbdf0a4746c322a65bb8021a24b9a528cd07b5ba076ff8e7ae25",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelCreatorFactoryErrors.sol",
+      "bytes": 4347,
+      "sha256": "38ddda53340d1b6dfcffcd303cae3ec81c4c7288563dec0dd207b139ced4e73f",
+      "keccak256": "0x5055bd18191ee1b0f880f11959b2820aaf2affb2df224b42a19b879751b40fc3",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelCreatorFactoryEvents.sol",
+      "bytes": 6805,
+      "sha256": "8bbe0f057c85444826a3683157b9616689d231d5df98adcaae89669941bb7a2f",
+      "keccak256": "0xaf8b6761bca4ce124f77bece9c95b22f85871102f30709be60887c72694f9495",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelCreatorSeedErrors.sol",
+      "bytes": 3633,
+      "sha256": "8c00f79ab4b5830d688febc651187fe84ee4e6a7968e274ee34702f2b910bd2b",
+      "keccak256": "0x11a66665bbf12c39e4729c5ca4d4ac7a7d7147a93d242cc1c614cdbcc87c23d3",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelCreatorSeedEvents.sol",
+      "bytes": 4518,
+      "sha256": "f6ba04f54aba7900df778c3f2986fcb12932e16593acdd5d1a62336947a95cff",
+      "keccak256": "0xb3a4ab47ee98d42474db70fe224e5fb8d8cb550b42302a786781f9cfd9491a98",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelDeferredCollectionResolver.sol",
+      "bytes": 3631,
+      "sha256": "f3f73ba46db57cd25f1ec5dd33af44a347d4a114ce240755b1ed04d569150cf7",
+      "keccak256": "0x2c7b1869bd849fa5f5fb2292585011eead44fc1a0926f95e7b1c85e687526dd7",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelDeferredMintSetup.sol",
+      "bytes": 3443,
+      "sha256": "5abcdf9fb42f3e9dfad254e0252b98c6ec313a90901185d11b91a9606bddee34",
+      "keccak256": "0xdf0e1d6e3420bd2053c61fb5ccb512e35a4e6314f6ca51e92911b33b73850a3c",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelMetadataEvents.sol",
+      "bytes": 2960,
+      "sha256": "81483c9a9833e6551e9995646c1f945543d88ec8cf783cc6396421c9a08aa713",
+      "keccak256": "0x65881d75471335cf6323fdb2575011adbf5b9a182e4119fc171e81e7cec2e275",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelMintCapacity.sol",
+      "bytes": 3359,
+      "sha256": "eb42b40fae6c621b7a23435a265d6937acfe35029f9d164e6316b93d541913c4",
+      "keccak256": "0xab581966b89cd719eefb95d621444dcf48b85ec0e696185ad14fbf2ad7c6e901",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelMintDataSource.sol",
+      "bytes": 3587,
+      "sha256": "ad7c1a263f69542b116a7202db1acab270d87ed58d024bdc5135d8c57f38fb2d",
+      "keccak256": "0x6086f35656cd60498eccbfc12b6e7819aff815ceccb0a8ad37131fa16bc5b1d1",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelMintable.sol",
+      "bytes": 2298,
+      "sha256": "c952c8924116dbf80bebd13d88ef04a4c1e9cb0e6503ccda81ea4973e5221f87",
+      "keccak256": "0xe4bdb8fb443a0eb4c36e844f6bdc1592cdf6b41a131fc641d93544691ef30189",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelSeedVrf.sol",
+      "bytes": 4542,
+      "sha256": "7f6451b5e7db0ba6f0c0aa88a510653e71be9ed6f656aad471f17b290950c511",
+      "keccak256": "0x426a0b32f9b2f13ccc809518622e7e9a3dc49a5bbc91af71d15128915f9fa21d",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelShared1155Errors.sol",
+      "bytes": 2903,
+      "sha256": "feed4c0d824c6a63e8b55085350ff1862695d786113f84fde37494ddff5473ab",
+      "keccak256": "0x4f605b5222c6af5d0160833da5d2e39a68351f5ed83683e9818535a4ad552669",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelShared1155Events.sol",
+      "bytes": 4907,
+      "sha256": "27a2ce85685715dca8952aab1b7cb388ece313cb861bf7e706796f53a6bf7fee",
+      "keccak256": "0x6cdca8fbc5246667678cbd55aab9b6535bcbddeb215e23bc802fa47b110afe98",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeelStrikeCapacityEvents.sol",
+      "bytes": 4343,
+      "sha256": "74b1056dcef75ace0830fbc6725994661bcc38b72e5ec2da9797c688d568c89d",
+      "keccak256": "0x6a549bb752e344666ef640620cd952841bb19d84488a54b96833812908b76810",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/libraries/KeelSeedBlockEntropy.sol",
+      "bytes": 3768,
+      "sha256": "879da0fde2616ab8a587556e6026caf84f505681a6ff23ea7e33b5fbf512c052",
+      "keccak256": "0xdcc1f6d5a01b738a1c07ca92c37eac11987bcb5391006f8b02ed26d7c8dfca81",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-kernel/interfaces/IKeelMintSeededBatchErrors.sol",
+      "bytes": 2475,
+      "sha256": "906ec83ae75f5dd2b80b503824909fc28068f3b01ea786bfcaf128227520f91f",
+      "keccak256": "0xc51caf872becf55a828282eabfb7be6dcee286bf8850ec1aad92c0550275adfe",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-kernel/interfaces/IKeelMintSeededData.sol",
+      "bytes": 4298,
+      "sha256": "cc0ba8b15f72a86154849591b61c5db703ba83d784dbe3943872a4c4bc6947f9",
+      "keccak256": "0x955c8a44be90e477158f091494e7fe180aca8d92a211ddbf5d2db305dbd159f8",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-kernel/libraries/KeelMintSeededBatches.sol",
+      "bytes": 8867,
+      "sha256": "50f23e79d9f579ffcd4d909f84fd23bf002a37f5c24d65fc02ccdf30115e3efb",
+      "keccak256": "0x39ce1ea1347d91dde14259e356111af5b476d571d286868a01620b292ddf4f45",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-kernel/libraries/KeelPause.sol",
+      "bytes": 5764,
+      "sha256": "136bef7f906730ffab29ba8a18feb864d8a0595dad087b5d85a1eb84057ff71f",
+      "keccak256": "0x5ec1344de76189122cd3b4f75ac2a6388df1260db337360795c8461f6edee500",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/access/AccessControl.sol",
+      "bytes": 7018,
+      "sha256": "97abba9ae4ee97f16f17b7b688d90f6f1195b79edfba344eacc58406e088b51e",
+      "keccak256": "0x4686ec784d75f95beaf2bf5b5f26e5f946d4c864aaee9c3c62bdc18381f5e017",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/access/IAccessControl.sol",
+      "bytes": 3343,
+      "sha256": "140304b7e99d517c57a13f391dfd3b550ca633a507f7b2af130f391b6cd89cc5",
+      "keccak256": "0xbff9f59c84e5337689161ce7641c0ef8e872d6a7536fbc1f5133f128887aba3c",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol",
+      "bytes": 2848,
+      "sha256": "cff7c20aed945d939b764d876adbd42e1b7725d62d5b1f2bd303db237567b575",
+      "keccak256": "0x8b95459390767d84c984d18faee298ce913e69cf0be8d2fe7785e2ad487ffed8",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/TransientSlot.sol",
+      "bytes": 5075,
+      "sha256": "ea92f361d697ba8b1fbd322b4d84b989998862c21fbebfa4b45289dc94a9eea2",
+      "keccak256": "0xac673fa1e374d9e6107504af363333e3e5f6344d2e83faf57d9bfd41d77cc946",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "src/modules/keel-kernel/KeelLocalPause.sol",
+      "bytes": 7027,
+      "sha256": "7ea718efbfd115326554923403e817796605fcecdd3ed2e4192ba6f72a17d696",
+      "keccak256": "0x90e330ff216d6d2ac02eb953c6c4750c9dd009b5a5ca29221a8210311438a384",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-kernel/SafeAdminAccessControl.sol",
+      "bytes": 4515,
+      "sha256": "75f66bf4583c6788f3ec394a80128972ab1d0ffea6e7460f07f3f5990c13da6b",
+      "keccak256": "0xee0f698afc95bedab617fb34390ef22785ad14cec1148341729ddf7fcdaec4ae",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-mint-access/KeelMintReleaseInspector.sol",
+      "bytes": 5322,
+      "sha256": "6c8ada7e9c6b1a2aeec236c6dc989ed747ca442bf7084bf741eb45cab22275c3",
+      "keccak256": "0xe6b288dfc56595efedd0b07f2b74b065d36767101fc982745b1b809a2b2cca4a",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-mint-access/KeelMintReleases.sol",
+      "bytes": 14882,
+      "sha256": "27c8aed4f4a13b2683b7a4c8fec4e2f344d57102c3eb5da614408879bfbfa9f5",
+      "keccak256": "0xb92f17d0ba9a365c75ad2b055446240e53dbbc2c50ee04de2d02222cca127e17",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-mint-access/KeelMintRouteRegistry.sol",
+      "bytes": 44656,
+      "sha256": "17523dc5dcdb6484d9da066d172b590e3660b8f6185543b28ca4982ab71bfa51",
+      "keccak256": "0x07fcfd1f918853513e0bd4e64995931ca05449e3482895a4d24612dc249d3302",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-mint-access/interfaces/IKeelMintBatchRouteRegistry.sol",
+      "bytes": 1870,
+      "sha256": "eb83a75a2cec1d00b2e481a4e29b3cf8570bc987570c334a0f80ed9db66f72dc",
+      "keccak256": "0x07b82d822496102efda4eedbccf71d20f5a9c1ac02aedb7767fd1bf28d3fdfba",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-mint-access/interfaces/IKeelMintHook.sol",
+      "bytes": 1881,
+      "sha256": "7732863acf57c513be5feb1bdae1d16b70e7a9294590861fc6e415075c74861b",
+      "keccak256": "0xa701a25770ef513d3421a2b158b3dccb70fd7406fd1f510fa40fdf3d17795142",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-mint-access/interfaces/IKeelMintRouteErrors.sol",
+      "bytes": 1597,
+      "sha256": "ee999e8f78f36db7c182a486bc759d43c537b4896327bfab911fd3abb6fbe3dd",
+      "keccak256": "0x6323719185290e5f5ecef795ff6f42e48e7332671725c136ee41abc4338a6eb8",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-mint-access/interfaces/IKeelMintRouteEvents.sol",
+      "bytes": 3071,
+      "sha256": "c17d884bd6d46eabdf1a8af8b52069dace6de1bef216b98d06c88d243b455753",
+      "keccak256": "0xdf73ea2fd8b04fa9abc674883d07032d27bdfca01e89503ba240b0939f5dac94",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-mint-access/interfaces/IKeelMintRouteRegistry.sol",
+      "bytes": 3650,
+      "sha256": "8b7e8f3d0446bcd2a42ea52f6eb0399a10b173ae838a7b0563c2c699840a063b",
+      "keccak256": "0x99154de72d9f9e5e911719a4a09ac0ded41e92206068b103abb1ff4b6e3eb84c",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-mint-access/interfaces/IKeelReleaseErrors.sol",
+      "bytes": 1635,
+      "sha256": "9d4387908e66f7fb2437bffbb7b185c1119dd9c186a0944521cabc96533c38ae",
+      "keccak256": "0xe044e6d7c403892b48691570157f6a233869b5ad3bc54be86795f04a37b6ace7",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-mint-access/interfaces/IKeelReleaseEvents.sol",
+      "bytes": 1950,
+      "sha256": "063885cd121525e01b0fa066003b67dd0c24ba319c4440dcbc9618d7994b37c5",
+      "keccak256": "0xe559764e875047c1be9793629f5036c698ef8370ec4d7605b286deac7de3dd70",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-mint-access/libraries/KeelReleasePolicy.sol",
+      "bytes": 4577,
+      "sha256": "b325aea16fc0b4cd11d5243a8970f55ba812bee42bc80fb2ffee3a70784ce814",
+      "keccak256": "0x8a8eaa674b5cc5b3817a909a468b0fd094e0a76621e388ed9c1d1c147fc3a86c",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/Base64.sol",
+      "bytes": 10656,
+      "sha256": "1c143572893f50f04fe8e507d89f9997cd3242102ba4200c8de0803ecbaf8cec",
+      "keccak256": "0xe802369c4d2d254590d371eca16c8d247d7e0782ad2faaaa0180159ea8e736af",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "src/modules/keel-die/KEEL721.sol",
+      "bytes": 44310,
+      "sha256": "7862d2fdcfd8935cdf94007e939bb1dac526b422cb3e446590d4415d884400fd",
+      "keccak256": "0xc9e4c9033c149edde984353195514f0d29c340971f578700a51f098785dd08f9",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/Keel721State.sol",
+      "bytes": 10062,
+      "sha256": "19155b93d833aba47a0b9fbb87576c99217210513e098495cedffaf8bb3616a1",
+      "keccak256": "0x7323c001ee45acd80389c0c864b0e8977983558f74a9575fdd9aaf26d9b354b9",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeel721Errors.sol",
+      "bytes": 3008,
+      "sha256": "e8811ab64c33fbdbb7106da2727c845c1248f47f4a16a27f349c16c77f4656a3",
+      "keccak256": "0x7a48b4685ab83e8cc8be7d6c203098c0680aaa4eaaef2cf1e8bc7c842afc5cee",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/interfaces/IKeel721Events.sol",
+      "bytes": 4962,
+      "sha256": "81a47cd35349c90f3fe91a60be7ca10025bf1292bac615da10ca056bac14a34a",
+      "keccak256": "0x290a3f4c0781fd8b977403acd0c833c09c508b84d42aec016e5b628734128012",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-die/libraries/Keel721MetadataFormatting.sol",
+      "bytes": 7483,
+      "sha256": "13bbe5d3881d557195bf57a2d3cd4fd0b735f3c0977c5018d922ceb918459e11",
+      "keccak256": "0x388c15d39bbff28f9fab4c6df94e18e8f569735750a3bb1229593557b8a62126",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-harness/interfaces/IKeelHarnessBuilder.sol",
+      "bytes": 9363,
+      "sha256": "8a2302cda996d69b7d102b692f8e2bee4ba170129ca14e87beb8eb99cf9805cd",
+      "keccak256": "0xea6cca4e12a4eb48c24267ab0734ccf8a1fdb5553c49e96d07531220f26da830",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-harness/interfaces/IKeelPercentTokenURIBuilder.sol",
+      "bytes": 1821,
+      "sha256": "e10f8860a572e5db51708464067a0baabc662aa678fcba7c3db22f5242960637",
+      "keccak256": "0x665fcc435bdb6a8bbe233279253242d73c0747f380025209a871b956f77c19fd",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-harness/interfaces/IKeelRawTokenURIBuilder.sol",
+      "bytes": 2405,
+      "sha256": "4b4947589ce291d929f483be53714073cf7b9f3c8f72a642d5e267c1c40764cb",
+      "keccak256": "0x3153c17a109066698c67a72f00511c461174bfc6980dafc39a56d9c35b10f06a",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-harness/libraries/KeelHarnessContextDispatch.sol",
+      "bytes": 2349,
+      "sha256": "5429d4d807aefad1689d10ad2d9c8a8c2e05be9b3296a5b5279b70b9d0f2b447",
+      "keccak256": "0x59006e255478a6ee0034894bd579e229ff2b025407ec2e11230915b4e732773d",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-hold/interfaces/IKeelHold.sol",
+      "bytes": 6261,
+      "sha256": "23b018a722626f223ae61fea97e4a149c00b399493a3a6e8c63918447af16eec",
+      "keccak256": "0x258633b1108a48ee5b6695b8a9f84c32853dbcb8bf1b442c288a6e8fb55fd511",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-hold/interfaces/IKeelHoldErrors.sol",
+      "bytes": 4027,
+      "sha256": "90f6f86e6d20585534ee40169dbaca5c6d82e554aaf7b54126eb5e3c2d124213",
+      "keccak256": "0x95732cbf5be663cda681cb8c1670e4c19b7fa8d1badc0e5999ebf71b7e3a8245",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-hold/interfaces/IKeelHoldHarness.sol",
+      "bytes": 6756,
+      "sha256": "2f78f084fd5149f1a472347f384d7f8598054a5228a427c71efae0dffafc5555",
+      "keccak256": "0xee2fb81e925cea0edd298c700a5896d3a9511f86ba06685781c270e83b09f1bd",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-hold/interfaces/IKeelHoldSeal.sol",
+      "bytes": 11765,
+      "sha256": "66ba8945e52a068e64d2cf18a9f242f57ae7f4b0cb4a1759e2880b7585dbd607",
+      "keccak256": "0xb834517897c32ef1ecaa1c80f27d6c85ba832b54f420922f75510d00a52ec586",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-hold/interfaces/IKeelIndexMetadataReceiver.sol",
+      "bytes": 2529,
+      "sha256": "7dcb03531c23fd23b4443de89b86ea3038788d0043d0097b62cc9cc4848e4be2",
+      "keccak256": "0x9afd6841c92b2751d987200cc49ca2415467c78d95b733ac1d075aba4b287ac2",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-hold/libraries/KeelSealValidation.sol",
+      "bytes": 4193,
+      "sha256": "7e4749c9ea1582adfb440b3fe435ec2c29e02b8756dc284842828ed360437a5b",
+      "keccak256": "0xf47f3cc8b68a544a598d2e07615eca6f783796742b20adeccef0c1dbf34348fc",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-kernel/libraries/JsonEscape.sol",
+      "bytes": 8712,
+      "sha256": "449dd76f4b4697b5cd2bd0f6fa2fe84a6ba3667932f0683f10eb3ac3eb599a00",
+      "keccak256": "0x62745ecb642e25b9c710b7ca36159b2751e3c6c540b61856f83310ade7726842",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-kernel/libraries/KeelTokenURIEnvelope.sol",
+      "bytes": 8140,
+      "sha256": "8b090c3908bf8cf17a0ef5f21e16a3f650cb73bcaba0e6ddc250af178d91a9f0",
+      "keccak256": "0x3b1b4baaa981f749bba6a0116b81eed2ce5c9feb13979d11b2454e5bd0e77c68",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-presentation/interfaces/IKeelPresentationRegistry.sol",
+      "bytes": 2422,
+      "sha256": "620fd8c88bceb9eb1e8e3b0ebddbea05a411ee79ca5a2d3515106ac07dfe79d4",
+      "keccak256": "0xab7f47ce651fb419cdc426166a496ba5a40093a0f703c898fad5d1b096e1334e",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/interfaces/IERC1271.sol",
+      "bytes": 656,
+      "sha256": "2d17bba201aa2f9c55e317315b872272a60361848dfceb6b1e77081265c79a27",
+      "keccak256": "0x66c7ec42c6c43712be2107a50ab4529379bc76a632b425babec698d9da921ac6",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/interfaces/IERC1967.sol",
+      "bytes": 637,
+      "sha256": "c4e901318ab6d4963582c62c62ce988a34c68dbae71846b67decacde79e9a317",
+      "keccak256": "0xbf2aefe54b76d7f7bcd4f6da1080b7b1662611937d870b880db584d09cea56b5",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/interfaces/IERC5267.sol",
+      "bytes": 740,
+      "sha256": "f89772d2d4fafcbef8b73bb10ee9a3373edec2eedb2f1b302320915b351dc3d1",
+      "keccak256": "0xfb223a85dd0b2175cfbbaa325a744e2cd74ecd17c3df2b77b0722f991d2725ee",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/interfaces/IERC7913.sol",
+      "bytes": 674,
+      "sha256": "f66aad4249885b0f11369bfa825dded60aa4baa0d76d9becdac9daa48c350350",
+      "keccak256": "0xe5a126930df1d54e4a6dd5fea09010c4a7db0ea974c6c17a1e6082879f5a032b",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/interfaces/draft-IERC1822.sol",
+      "bytes": 882,
+      "sha256": "73653312bc2eda0ec231553a5295242eaef2d4f46a023532d45fe76cbd0f565f",
+      "keccak256": "0x82f757819bf2429a0d4db141b99a4bbe5039e4ef86dfb94e2e6d40577ed5b28b",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol",
+      "bytes": 6260,
+      "sha256": "a89ba2032ab25959c6fde1e508ebf8f966ff632703d3ef79684f578a8fa8033f",
+      "keccak256": "0x3d8b816f00b4cabe9a9fb7e84908ef785d6e5b0ef988bcd3c52fe811b4559686",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/proxy/beacon/IBeacon.sol",
+      "bytes": 473,
+      "sha256": "c1c9726bbb0ec4c540c7c98059dcded69a8586b46c168036672381033ee76239",
+      "keccak256": "0x20462ddb2665e9521372c76b001d0ce196e59dbbd989de9af5576cad0bd5628b",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/proxy/utils/Initializable.sol",
+      "bytes": 9279,
+      "sha256": "f527a063813c2bf60c153fb08e38539578935402894fcc36fac42324ca325d3b",
+      "keccak256": "0xdb4d24ee2c087c391d587cd17adfe5b3f9d93b3110b1388c2ab6c7c0ad1dcd05",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol",
+      "bytes": 6323,
+      "sha256": "b5af3bfd79a32c6da2d09b0be38d9b63dcd0d159a1a4a0198431fd00acc1fd52",
+      "keccak256": "0x1a26353563a2c63b4120ea0b94727253eeff84fe2241d42c1452308b9080e66a",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/Address.sol",
+      "bytes": 6803,
+      "sha256": "73e54e15285455f0e01e136c3663732641537614723ae5dbd820eb3cb036b1fd",
+      "keccak256": "0x0fa9e0d3a859900b5a46f70a03c73adf259603d5e05027a37fe0b45529d85346",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/ShortStrings.sol",
+      "bytes": 4310,
+      "sha256": "1cfa08d3c551e9ec0b9cd249b09987f04e7e90f352e1a5e3b0d6a3bc426b3de7",
+      "keccak256": "0x0768b3bdb701fe4994b3be932ca8635551dfebe04c645f77500322741bebf57c",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/cryptography/ECDSA.sol",
+      "bytes": 12152,
+      "sha256": "ba7c2d314fcd61c9783e0b3f0c664d004b76b408fda6a84edc8267d17c5012d6",
+      "keccak256": "0xbeb5cad8aaabe0d35d2ec1a8414d91e81e5a8ca679add4cf57e2f33476861f40",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/cryptography/EIP712.sol",
+      "bytes": 6695,
+      "sha256": "2845caaaf70757b6cce612ae4ffbec2c382cb3d1cb9765c98fa649c0f5f1c794",
+      "keccak256": "0x8440117ea216b97a7bad690a67449fd372c840d073c8375822667e14702782b4",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol",
+      "bytes": 8631,
+      "sha256": "538a0d7c4f0ec5a8562f58561890f7b49d14580674ecf58bc5f505b45c73df65",
+      "keccak256": "0x6d8579873b9650426bfbd2a754092d1725049ca05e4e3c8c2c82dd9f3453129d",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol",
+      "bytes": 8202,
+      "sha256": "acc520422fac0a9edb85d7268085a63219a0db9e4406cd155d5c74c94e35f590",
+      "keccak256": "0x0d53049a9969f2bc5cb88b32c909e2729a5fa157d258305b42b502427ad492c6",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "src/modules/keel-artifacts/KeelManager.sol",
+      "bytes": 64156,
+      "sha256": "19976049c786405ebbcaea528d764bca44ee9df0904dcaeee3a13fa683a0fa7f",
+      "keccak256": "0x96b5098c35836cfc9c4e875c589da1d20443fd9ad6632e8671de8095ba88c8db",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-artifacts/KeelManagerRpcPolicy.sol",
+      "bytes": 8865,
+      "sha256": "4a97d7ccf88ce3a0e541f44a604c3a3c3cfab01d053128155b39944c5f08a8ad",
+      "keccak256": "0x2a4b82ded585473738218b32dfc3646ccf96df31a3c39768b354a917f00986d2",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-artifacts/interfaces/IKeelManagerErrors.sol",
+      "bytes": 7238,
+      "sha256": "eb9fb6aca69a749a3b069ee9c002c6978286e8fe897b153d3135b51ed269c2e4",
+      "keccak256": "0xf68da5916c972a713fb504b7490e6413a22ce061ab9551fbfe66e854354b45e8",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-artifacts/interfaces/IKeelManagerEvents.sol",
+      "bytes": 7868,
+      "sha256": "353b62ef5b135bde685c3f0db0ecae2cd969e691856f24d57a3d4f88fac45863",
+      "keccak256": "0x68c4d157aad33e1827d4c7418bcb863fd857ffa5deaad2278b11ab49c57623a0",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-artifacts/interfaces/IKeelManagerRpcErrors.sol",
+      "bytes": 2372,
+      "sha256": "50870f86471ae5693c11d67f00a8d1938589f0cd0aa9c302f0bf11a33826d845",
+      "keccak256": "0x6aff97dac51e65523c31d4e848a9a450f89a46426eb887afb73fafdabc151462",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-artifacts/interfaces/IKeelManagerRpcEvents.sol",
+      "bytes": 2611,
+      "sha256": "e0b16ccb3d257b212e2687ffb25f6ad842cb500dc067b33b1dbb02089634f14b",
+      "keccak256": "0x61e310abc570c59720cda9d9255f87e1c8a732098efaaec084abb055cab9976e",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-artifacts/interfaces/IKeelManagerTypes.sol",
+      "bytes": 3299,
+      "sha256": "8eedd0d300a50a5f1e5219f7357e6ae499b4f88a0673bd13a3207ec76a4ac153",
+      "keccak256": "0x6933a497a6b80a68f92807436b23bd3bfee7e1cf5ad3089360851a9a73b1f854",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-artifacts/libraries/KeelManagerGovernorState.sol",
+      "bytes": 2721,
+      "sha256": "c40a5e6763c07c24a43b3d33cb2055b410da2e0cd39f010edcdac8d85c916e86",
+      "keccak256": "0x0d152cd2456ea8969801e6505d9f3c8f3150ac79058496b3cc2c7e5a85844972",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-kernel/libraries/KeelGovernance.sol",
+      "bytes": 3511,
+      "sha256": "28b9c2165ec9ae4588a277a28a0d83b678705a8424707ca506500a3ef5356705",
+      "keccak256": "0x3655cc5b8825bdea3648379ccc8312d85910c6a8aae26d16eac229f138cd7ae2",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol",
+      "bytes": 2636,
+      "sha256": "41a3040398d53999dea3251ff8906e11ec1a699362a1d8f4a55bfc7709cc00f3",
+      "keccak256": "0x0ba33f46520b83144086db1c93072c12228edc7cc70a9edd09b530f5a40ce440",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/proxy/Proxy.sol",
+      "bytes": 2697,
+      "sha256": "fa8aae37b2939371fcbce48b814c0d5c7e57e3e267f348459f29941937746c98",
+      "keccak256": "0x80935e4fae2c414f4e7789e13a820d06901182a5733ab006f8d68b5b09db993f",
+      "origin": {
+        "kind": "locked-dependency",
+        "package": "@openzeppelin/contracts",
+        "version": "5.6.1",
+        "packageJSONSHA256": "3c1a597cb911ffc2988c038d83ee93e1f8bf0ad17769d6bb0368d08bc350d773",
+        "lockSHA256": "f39a1b7b365a8fc88b16b5af0c13d03ad9d40e7b46e9cd891290e3c5b6956119",
+        "freshFrozenInstall": true
+      }
+    },
+    {
+      "path": "src/modules/keel-artifacts/KeelManagerProxy.sol",
+      "bytes": 10020,
+      "sha256": "df671c06a6822062dd46dad620a1cbf67d8e800a2596a97893fe7e8d35ff5bfe",
+      "keccak256": "0x559eeda47c381a94fe35053f349b5d24206c1e0eb9dbf77cc03f1f507f3c2266",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-artifacts/KeelManagerRecovery.sol",
+      "bytes": 4974,
+      "sha256": "77696597b9caffcdbb4c0edd8cac2175c39e07d5b58ddc4f556392f7a5ed824e",
+      "keccak256": "0x7b30c57943679ab3ae7af5b554ccc0599bbba7477b16b49d79ee42e5113d7f0a",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-artifacts/interfaces/IKeelManagerRecoveryErrors.sol",
+      "bytes": 1893,
+      "sha256": "d103bdc054efdaa3d913bd278ac159f5cd4c60484ce64b742ae1c9aa58a2cf3c",
+      "keccak256": "0xce6469ee9751ded3ba273d2ddf023883b76e406fdad6bdd8d7d894e11d12f952",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-artifacts/interfaces/IKeelManagerRecoveryEvents.sol",
+      "bytes": 2571,
+      "sha256": "5bf3fddd76a87e7ebbe4e9f91f755e8e7574dc8d5a2d7f83077c32d2b5576577",
+      "keccak256": "0x618dce4f80eac02dd3fa8caff90873815c489494e2cc51b1b68b8af480f6046a",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-kernel/KeelRecoveryGroups.sol",
+      "bytes": 17677,
+      "sha256": "78a5486122d3a144b62b53932ad0597e174dfb43e372edda1b5171695651c170",
+      "keccak256": "0xcba0e6b3e320e1500238b2fbd2231477c0a983118c30a4a75a499e4b67da6a96",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    },
+    {
+      "path": "src/modules/keel-kernel/interfaces/IKeelRecoveryErrors.sol",
+      "bytes": 2805,
+      "sha256": "e6dfb1bbcb23e73cdc46993f26389fd2096155bebd34d8b564ede60b4bbd800a",
+      "keccak256": "0xbc59244a3856aaf7146584d7d9e77c585171e2ad0033f960af91125a6902512d",
+      "origin": {
+        "kind": "git",
+        "compiledCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+        "verifiedEquivalentCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb"
+      }
+    }
+  ],
+  "publicChainProof": false,
+  "productionOperations": 0
+}

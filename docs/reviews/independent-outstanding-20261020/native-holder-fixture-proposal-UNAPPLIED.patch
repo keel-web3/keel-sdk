@@ -1,0 +1,66 @@
+--- a/test/modules/keel-die/KeelNativeMediaPresentationCompatibility.t.sol
++++ b/test/modules/keel-die/KeelNativeMediaPresentationCompatibility.t.sol
+@@ -37,6 +37,19 @@
+         collection.setPresentationModule(address(module));
+         collection.setDefaultPresentation("ipfs://manifest", sha256("manifest"), "ipfs://fallback", "");
+         collection.adminStrike(HOLDER, 2);
++    }
++
++    function testHolderCannotEditOrFreezeWithoutCreatorOptIn() public {
++        assertFalse(collection.tokenOwnerCanEdit());
++        vm.prank(HOLDER);
++        vm.expectRevert(IKeel721Errors.UnauthorizedPresentationEditor.selector);
++        module.setTokenURIRoute(address(collection), 1, "ipfs://holder", "", false);
++        vm.prank(HOLDER);
++        vm.expectRevert(IKeel721Errors.UnauthorizedPresentationEditor.selector);
++        module.setImageSource(address(collection), 1, address(0), bytes32(0));
++        vm.prank(HOLDER);
++        vm.expectRevert(IKeel721Errors.UnauthorizedPresentationEditor.selector);
++        collection.freezePresentation(1);
+     }
+ 
+     function testStandardOnlyCollectionCanFreezeWithoutAKeelManifest() public {
+@@ -52,6 +65,7 @@
+     }
+ 
+     function testStandardTemplatesOverridesAndExplicitKeelFallback() public {
++        collection.setTokenOwnerCanEdit(true);
+         module.setTokenURIRoute(address(collection), 0, "ipfs://metadata/", ".json", true);
+         assertEq(collection.tokenURI(1), "ipfs://metadata/1.json");
+         assertEq(collection.tokenURI(2), "ipfs://metadata/2.json");
+@@ -67,6 +81,7 @@
+     }
+ 
+     function testImageBytesComeFromHoldIncludingAbove32K() public {
++        collection.setTokenOwnerCanEdit(true);
+         bytes memory chunk = new bytes(17_000);
+         for (uint256 i; i < chunk.length; ++i) {
+             chunk[i] = "a";
+@@ -97,6 +112,7 @@
+     }
+ 
+     function testFreezePinsInheritedImageAndURIRoute() public {
++        collection.setTokenOwnerCanEdit(true);
+         bytes32 first = _image(bytes("first"));
+         bytes32 second = _image(bytes("second"));
+         module.setImageSource(address(collection), 0, address(store), first);
+--- a/test/modules/keel-die/KeelNativeMediaPresentationSecurityCompatibility.t.sol
++++ b/test/modules/keel-die/KeelNativeMediaPresentationSecurityCompatibility.t.sol
+@@ -93,6 +93,7 @@
+     }
+ 
+     function testOwnershipTransferMovesEditPermissionButNeverUnfreezes() public {
++        collection.setTokenOwnerCanEdit(true);
+         vm.prank(HOLDER);
+         collection.transferFrom(HOLDER, NEXT_HOLDER, 1);
+         vm.prank(HOLDER);
+--- a/test/modules/keel-die/KeelNativeMediaPresentation.t.sol
++++ b/test/modules/keel-die/KeelNativeMediaPresentation.t.sol
+@@ -221,6 +221,7 @@
+     }
+ 
+     function testFreezePinsNativeSourceWhileOtherTokensFollowUpdatedDefault() public {
++        collection.setTokenOwnerCanEdit(true);
+         bytes32 first = _object(bytes("GIF89a first"), "image/gif");
+         bytes32 second = _object(bytes("GIF89a second"), "image/gif");
+         _route(0, KeelNativeMediaPresentation.NativeMediaRoute.ImageOnlyInline, first, false);

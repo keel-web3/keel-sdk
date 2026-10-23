@@ -1,0 +1,481 @@
+{
+  "schema": "keel-independent-link-browser-artifact-closure@1",
+  "compiledSourceCommit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+  "verifiedEquivalentSourceCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb",
+  "currentTestOnlySuccessor": "e9f202a5030b75ad7032800f210b622193166d1b",
+  "test": {
+    "path": "tests/link-assembly-browser.test.mjs",
+    "sdkCommit": "e4985920593539f468c16524e2f74d2adf2878c3",
+    "sha256": "3fe0fa8f22857d78b5162beba7d3c1396cf77ab34b0aa9b9903d5667a24767b1",
+    "allSixDeployCallsCovered": true
+  },
+  "independentColdCompile": true,
+  "artifacts": [
+    {
+      "name": "LinkEnumProbe",
+      "path": "out/KeelLinkURIBuilder.t.sol/LinkEnumProbe.json",
+      "bytes": 17532,
+      "sha256": "0cec4ba01f75696686c68127ac4ce9283bd6159f9b11cf431fbf930610c77872",
+      "rawMetadataSHA256": "991f4b2cbb86928b2599743a7023764fcf85311e94f3967b4a1325812078c7cf",
+      "compiler": {
+        "version": "0.8.36+commit.8a079791"
+      },
+      "settings": {
+        "compilationTarget": {
+          "test/modules/keel-artifacts/KeelLinkURIBuilder.t.sol": "LinkEnumProbe"
+        },
+        "evmVersion": "prague",
+        "libraries": {},
+        "metadata": {
+          "appendCBOR": false,
+          "bytecodeHash": "none"
+        },
+        "optimizer": {
+          "enabled": true,
+          "runs": 50
+        },
+        "remappings": [
+          ":@app-test/=test/apps/",
+          ":@app/=src/apps/",
+          ":@keel-test/=test/modules/",
+          ":@keel/=src/modules/",
+          ":@openzeppelin/contracts/=node_modules/@openzeppelin/contracts/",
+          ":erc721a-upgradeable/=node_modules/erc721a-upgradeable/",
+          ":erc721a/=node_modules/erc721a/"
+        ],
+        "viaIR": true
+      },
+      "abiSHA256": "f286b2b37207004025551bb02dbbcebbb7b9ae033dfd1d8b7bb25d2f7edb4f4e",
+      "metadataSources": [
+        "node_modules/@openzeppelin/contracts/utils/Base64.sol",
+        "node_modules/@openzeppelin/contracts/utils/Bytes.sol",
+        "node_modules/@openzeppelin/contracts/utils/Panic.sol",
+        "node_modules/@openzeppelin/contracts/utils/Strings.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SignedMath.sol",
+        "src/modules/keel-artifacts/KeelLinkRegistry.sol",
+        "src/modules/keel-artifacts/KeelLinkURIBuilder.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelArtifactRegistry.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelLinkRegistryErrors.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelLinkRegistryEvents.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelLinkURIBuilder.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelLinkURIBuilderErrors.sol",
+        "src/modules/keel-hold/interfaces/IKeelHold.sol",
+        "src/modules/keel-hold/interfaces/IKeelHoldErrors.sol",
+        "src/modules/keel-kernel/libraries/KeelGovernance.sol",
+        "test/TestBase.sol",
+        "test/modules/keel-artifacts/KeelLinkURIBuilder.t.sol"
+      ]
+    },
+    {
+      "name": "LinkAssemblyStore",
+      "path": "out/KeelLinkURIBuilder.t.sol/LinkAssemblyStore.json",
+      "bytes": 25865,
+      "sha256": "d2e4763c2caad77d2d04422d67256c443f548bb934330ce5576842083ead9300",
+      "rawMetadataSHA256": "da80e665398b492e3185f3bf0d8f4d69d461b7f01c8e0a1be6e3919d54181035",
+      "compiler": {
+        "version": "0.8.36+commit.8a079791"
+      },
+      "settings": {
+        "compilationTarget": {
+          "test/modules/keel-artifacts/KeelLinkURIBuilder.t.sol": "LinkAssemblyStore"
+        },
+        "evmVersion": "prague",
+        "libraries": {},
+        "metadata": {
+          "appendCBOR": false,
+          "bytecodeHash": "none"
+        },
+        "optimizer": {
+          "enabled": true,
+          "runs": 50
+        },
+        "remappings": [
+          ":@app-test/=test/apps/",
+          ":@app/=src/apps/",
+          ":@keel-test/=test/modules/",
+          ":@keel/=src/modules/",
+          ":@openzeppelin/contracts/=node_modules/@openzeppelin/contracts/",
+          ":erc721a-upgradeable/=node_modules/erc721a-upgradeable/",
+          ":erc721a/=node_modules/erc721a/"
+        ],
+        "viaIR": true
+      },
+      "abiSHA256": "6e3cb59f810818271e37ce550bb096c2d9bb11cbe40f8dbaf6457d97ad8de4a5",
+      "metadataSources": [
+        "node_modules/@openzeppelin/contracts/utils/Base64.sol",
+        "node_modules/@openzeppelin/contracts/utils/Bytes.sol",
+        "node_modules/@openzeppelin/contracts/utils/Panic.sol",
+        "node_modules/@openzeppelin/contracts/utils/Strings.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SignedMath.sol",
+        "src/modules/keel-artifacts/KeelLinkRegistry.sol",
+        "src/modules/keel-artifacts/KeelLinkURIBuilder.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelArtifactRegistry.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelLinkRegistryErrors.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelLinkRegistryEvents.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelLinkURIBuilder.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelLinkURIBuilderErrors.sol",
+        "src/modules/keel-hold/interfaces/IKeelHold.sol",
+        "src/modules/keel-hold/interfaces/IKeelHoldErrors.sol",
+        "src/modules/keel-kernel/libraries/KeelGovernance.sol",
+        "test/TestBase.sol",
+        "test/modules/keel-artifacts/KeelLinkURIBuilder.t.sol"
+      ]
+    },
+    {
+      "name": "LinkAssemblyManager",
+      "path": "out/KeelLinkURIBuilder.t.sol/LinkAssemblyManager.json",
+      "bytes": 17162,
+      "sha256": "ea65d01fd6583dc32cb609cde6736151b8792a2fa0e2bc0a6278d0335b04623d",
+      "rawMetadataSHA256": "909a2f6dab8a46413f01334848087905328cd7d5b5be194ecab8ad6f603e2049",
+      "compiler": {
+        "version": "0.8.36+commit.8a079791"
+      },
+      "settings": {
+        "compilationTarget": {
+          "test/modules/keel-artifacts/KeelLinkURIBuilder.t.sol": "LinkAssemblyManager"
+        },
+        "evmVersion": "prague",
+        "libraries": {},
+        "metadata": {
+          "appendCBOR": false,
+          "bytecodeHash": "none"
+        },
+        "optimizer": {
+          "enabled": true,
+          "runs": 50
+        },
+        "remappings": [
+          ":@app-test/=test/apps/",
+          ":@app/=src/apps/",
+          ":@keel-test/=test/modules/",
+          ":@keel/=src/modules/",
+          ":@openzeppelin/contracts/=node_modules/@openzeppelin/contracts/",
+          ":erc721a-upgradeable/=node_modules/erc721a-upgradeable/",
+          ":erc721a/=node_modules/erc721a/"
+        ],
+        "viaIR": true
+      },
+      "abiSHA256": "fe3e05cc9b52d5da6a2f5d79c5b6f294763af817f03d86fa1d190fa21d3fb7b1",
+      "metadataSources": [
+        "node_modules/@openzeppelin/contracts/utils/Base64.sol",
+        "node_modules/@openzeppelin/contracts/utils/Bytes.sol",
+        "node_modules/@openzeppelin/contracts/utils/Panic.sol",
+        "node_modules/@openzeppelin/contracts/utils/Strings.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SignedMath.sol",
+        "src/modules/keel-artifacts/KeelLinkRegistry.sol",
+        "src/modules/keel-artifacts/KeelLinkURIBuilder.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelArtifactRegistry.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelLinkRegistryErrors.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelLinkRegistryEvents.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelLinkURIBuilder.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelLinkURIBuilderErrors.sol",
+        "src/modules/keel-hold/interfaces/IKeelHold.sol",
+        "src/modules/keel-hold/interfaces/IKeelHoldErrors.sol",
+        "src/modules/keel-kernel/libraries/KeelGovernance.sol",
+        "test/TestBase.sol",
+        "test/modules/keel-artifacts/KeelLinkURIBuilder.t.sol"
+      ]
+    },
+    {
+      "name": "LinkAssemblyRegistry",
+      "path": "out/KeelLinkURIBuilder.t.sol/LinkAssemblyRegistry.json",
+      "bytes": 23413,
+      "sha256": "64bbb6b65df60ff43ad46a1171487e7a22b84839d2ee1e4510f562b7a5d05d8e",
+      "rawMetadataSHA256": "7cae482e758c661e58624f552501696b3f49be5d4314d4317f03179c922212ea",
+      "compiler": {
+        "version": "0.8.36+commit.8a079791"
+      },
+      "settings": {
+        "compilationTarget": {
+          "test/modules/keel-artifacts/KeelLinkURIBuilder.t.sol": "LinkAssemblyRegistry"
+        },
+        "evmVersion": "prague",
+        "libraries": {},
+        "metadata": {
+          "appendCBOR": false,
+          "bytecodeHash": "none"
+        },
+        "optimizer": {
+          "enabled": true,
+          "runs": 50
+        },
+        "remappings": [
+          ":@app-test/=test/apps/",
+          ":@app/=src/apps/",
+          ":@keel-test/=test/modules/",
+          ":@keel/=src/modules/",
+          ":@openzeppelin/contracts/=node_modules/@openzeppelin/contracts/",
+          ":erc721a-upgradeable/=node_modules/erc721a-upgradeable/",
+          ":erc721a/=node_modules/erc721a/"
+        ],
+        "viaIR": true
+      },
+      "abiSHA256": "4012b07d11e18b6c5962ae1fc0fcb4bf1b8304e39b55d2e0411645d66ea3a51a",
+      "metadataSources": [
+        "node_modules/@openzeppelin/contracts/utils/Base64.sol",
+        "node_modules/@openzeppelin/contracts/utils/Bytes.sol",
+        "node_modules/@openzeppelin/contracts/utils/Panic.sol",
+        "node_modules/@openzeppelin/contracts/utils/Strings.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SignedMath.sol",
+        "src/modules/keel-artifacts/KeelLinkRegistry.sol",
+        "src/modules/keel-artifacts/KeelLinkURIBuilder.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelArtifactRegistry.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelLinkRegistryErrors.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelLinkRegistryEvents.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelLinkURIBuilder.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelLinkURIBuilderErrors.sol",
+        "src/modules/keel-hold/interfaces/IKeelHold.sol",
+        "src/modules/keel-hold/interfaces/IKeelHoldErrors.sol",
+        "src/modules/keel-kernel/libraries/KeelGovernance.sol",
+        "test/TestBase.sol",
+        "test/modules/keel-artifacts/KeelLinkURIBuilder.t.sol"
+      ]
+    },
+    {
+      "name": "KeelLinkRegistry",
+      "path": "out/KeelLinkRegistry.sol/KeelLinkRegistry.json",
+      "bytes": 106159,
+      "sha256": "cf8a5e2580aaecb1df5e44fea7abb25b755e0d0f6110c72437bb3fb759bf03ad",
+      "rawMetadataSHA256": "de25b5a12dbe3ab93990df268fb3963206fe7769190eea6e2642290732e0f572",
+      "compiler": {
+        "version": "0.8.36+commit.8a079791"
+      },
+      "settings": {
+        "compilationTarget": {
+          "src/modules/keel-artifacts/KeelLinkRegistry.sol": "KeelLinkRegistry"
+        },
+        "evmVersion": "prague",
+        "libraries": {},
+        "metadata": {
+          "appendCBOR": false,
+          "bytecodeHash": "none"
+        },
+        "optimizer": {
+          "enabled": true,
+          "runs": 50
+        },
+        "remappings": [
+          ":@app-test/=test/apps/",
+          ":@app/=src/apps/",
+          ":@keel-test/=test/modules/",
+          ":@keel/=src/modules/",
+          ":@openzeppelin/contracts/=node_modules/@openzeppelin/contracts/",
+          ":erc721a-upgradeable/=node_modules/erc721a-upgradeable/",
+          ":erc721a/=node_modules/erc721a/"
+        ],
+        "viaIR": true
+      },
+      "abiSHA256": "3e917dcfd4ea9afe13065e2474d79e918ddae2b76d91e46e83ab9dc7bc06188e",
+      "metadataSources": [
+        "src/modules/keel-artifacts/KeelLinkRegistry.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelArtifactRegistry.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelLinkRegistryErrors.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelLinkRegistryEvents.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelLinkURIBuilder.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelLinkURIBuilderErrors.sol",
+        "src/modules/keel-kernel/libraries/KeelGovernance.sol"
+      ]
+    },
+    {
+      "name": "KeelLinkURIBuilder",
+      "path": "out/KeelLinkURIBuilder.sol/KeelLinkURIBuilder.json",
+      "bytes": 66131,
+      "sha256": "f74863bbab8fa8cbdb802ec20ae5e6001378ef925c6506d1ab3b36c7c1712d5b",
+      "rawMetadataSHA256": "45fd158bb34c5c0a9299cd2b6e647238c37997221ad800ccab94439d25a22dd9",
+      "compiler": {
+        "version": "0.8.36+commit.8a079791"
+      },
+      "settings": {
+        "compilationTarget": {
+          "src/modules/keel-artifacts/KeelLinkURIBuilder.sol": "KeelLinkURIBuilder"
+        },
+        "evmVersion": "prague",
+        "libraries": {},
+        "metadata": {
+          "appendCBOR": false,
+          "bytecodeHash": "none"
+        },
+        "optimizer": {
+          "enabled": true,
+          "runs": 50
+        },
+        "remappings": [
+          ":@app-test/=test/apps/",
+          ":@app/=src/apps/",
+          ":@keel-test/=test/modules/",
+          ":@keel/=src/modules/",
+          ":@openzeppelin/contracts/=node_modules/@openzeppelin/contracts/",
+          ":erc721a-upgradeable/=node_modules/erc721a-upgradeable/",
+          ":erc721a/=node_modules/erc721a/"
+        ],
+        "viaIR": true
+      },
+      "abiSHA256": "f419441b217529e0509370b36211185463f53b342d1dd40776f4135c0d44dc27",
+      "metadataSources": [
+        "node_modules/@openzeppelin/contracts/utils/Base64.sol",
+        "node_modules/@openzeppelin/contracts/utils/Bytes.sol",
+        "node_modules/@openzeppelin/contracts/utils/Panic.sol",
+        "node_modules/@openzeppelin/contracts/utils/Strings.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SignedMath.sol",
+        "src/modules/keel-artifacts/KeelLinkRegistry.sol",
+        "src/modules/keel-artifacts/KeelLinkURIBuilder.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelArtifactRegistry.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelLinkRegistryErrors.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelLinkRegistryEvents.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelLinkURIBuilder.sol",
+        "src/modules/keel-artifacts/interfaces/IKeelLinkURIBuilderErrors.sol",
+        "src/modules/keel-hold/interfaces/IKeelHold.sol",
+        "src/modules/keel-hold/interfaces/IKeelHoldErrors.sol",
+        "src/modules/keel-kernel/libraries/KeelGovernance.sol"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/Base64.sol",
+      "bytes": 10656,
+      "sha256": "1c143572893f50f04fe8e507d89f9997cd3242102ba4200c8de0803ecbaf8cec",
+      "keccak256": "0xe802369c4d2d254590d371eca16c8d247d7e0782ad2faaaa0180159ea8e736af",
+      "origin": "locked-@openzeppelin/contracts@5.6.1"
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/Bytes.sol",
+      "bytes": 14737,
+      "sha256": "3ce9120a27934c75a074cb785d3a88868069ef6529dbe4dc6b845af0836f3c70",
+      "keccak256": "0xf80e4b96b6849936ea0fabd76cf81b13d7276295fddb1e1c07afb3ddf650b0ac",
+      "origin": "locked-@openzeppelin/contracts@5.6.1"
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/Panic.sol",
+      "bytes": 1973,
+      "sha256": "270fc8401c1a13fae6a7a4a2dd6e381b95d658896701e51f0d3e2688acab3dec",
+      "keccak256": "0xf7fe324703a64fc51702311dc51562d5cb1497734f074e4f483bfb6717572d7a",
+      "origin": "locked-@openzeppelin/contracts@5.6.1"
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/Strings.sol",
+      "bytes": 21538,
+      "sha256": "e318709bbe73a7831d64c1351e8bdc43780b245f25191234e361e6ab9b98c67b",
+      "keccak256": "0x1fdc2de9585ab0f1c417f02a873a2b6343cd64bb7ffec6b00ffa11a4a158d9e8",
+      "origin": "locked-@openzeppelin/contracts@5.6.1"
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+      "bytes": 32664,
+      "sha256": "bdfdbe133991c0c78042957ff5cd97167926fcaf6d15664f3835a076cb066457",
+      "keccak256": "0x59973a93b1f983f94e10529f46ca46544a9fec2b5f56fb1390bbe9e0dc79f857",
+      "origin": "locked-@openzeppelin/contracts@5.6.1"
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+      "bytes": 34940,
+      "sha256": "5779bc848bde39f1ad7bc02b4f708a0040888e0083b1a33f119cd94639350134",
+      "keccak256": "0xc8cae21c9ae4a46e5162ff9bf5b351d6fa6a6eba72d515f3bc1bdfeda7fdf083",
+      "origin": "locked-@openzeppelin/contracts@5.6.1"
+    },
+    {
+      "path": "node_modules/@openzeppelin/contracts/utils/math/SignedMath.sol",
+      "bytes": 2613,
+      "sha256": "1ed50b1056af886752f0fb48a0165d381e69bb4a4b18b893b066dc144a7e08d7",
+      "keccak256": "0xb1970fac7b64e6c09611e6691791e848d5e3fe410fa5899e7df2e0afd77a99e3",
+      "origin": "locked-@openzeppelin/contracts@5.6.1"
+    },
+    {
+      "path": "src/modules/keel-artifacts/KeelLinkRegistry.sol",
+      "bytes": 21252,
+      "sha256": "038862ca1baf71be9c171b01d21b529ae9974aefd265e5024c8b1dcf78cb0036",
+      "keccak256": "0xacdd04e0b932214d5f129d93f5e7ccdfd15e7e7f9213be40a74b86e8c6a687cb",
+      "origin": "git-86b-byte-identical-8e8"
+    },
+    {
+      "path": "src/modules/keel-artifacts/KeelLinkURIBuilder.sol",
+      "bytes": 10851,
+      "sha256": "8749e0076101ed420d73d51ef30f34a2fcc5ff34df8451b8ac19ae0f4f089161",
+      "keccak256": "0xb0bd64ffd393adfed58fe8f22f4510e8ba718b864a39dba0e942cb5699cd57d5",
+      "origin": "git-86b-byte-identical-8e8"
+    },
+    {
+      "path": "src/modules/keel-artifacts/interfaces/IKeelArtifactRegistry.sol",
+      "bytes": 4981,
+      "sha256": "26e3dad3480e2b97f928c3637f63f3abf79d760a68acc9df40de887c84c37975",
+      "keccak256": "0xe2fb7702ba4dd25b69f4713e9d9cd68a6777541090a4fdff4812ac9fbb0316f9",
+      "origin": "git-86b-byte-identical-8e8"
+    },
+    {
+      "path": "src/modules/keel-artifacts/interfaces/IKeelLinkRegistryErrors.sol",
+      "bytes": 3536,
+      "sha256": "166fa18b1cf98dba9bdaeb1b57d5dbe3cbdfb5ab87602893c38c81fd771edcbe",
+      "keccak256": "0xb0f51b1e110cb30cce102c0e8f9b3779fb7791b5b1a4613db9fa4c38422794ad",
+      "origin": "git-86b-byte-identical-8e8"
+    },
+    {
+      "path": "src/modules/keel-artifacts/interfaces/IKeelLinkRegistryEvents.sol",
+      "bytes": 2861,
+      "sha256": "6dce0559860b3f1e25b415d7052ac71cdd82f03ceabd5ab32f751a4afc987ec7",
+      "keccak256": "0x1206b8a89186f2b4c716499f4dd957ca08e45307d86f1ef3fad421c59ac089e8",
+      "origin": "git-86b-byte-identical-8e8"
+    },
+    {
+      "path": "src/modules/keel-artifacts/interfaces/IKeelLinkURIBuilder.sol",
+      "bytes": 2028,
+      "sha256": "a5fe684a94728b576d5be6da05400d88afd14334bf5a4f69b081c8f1d28ef387",
+      "keccak256": "0xc2426857fb8b748d107ee8061544ab0ca68adc181fb891f067e3e8ef3f329737",
+      "origin": "git-86b-byte-identical-8e8"
+    },
+    {
+      "path": "src/modules/keel-artifacts/interfaces/IKeelLinkURIBuilderErrors.sol",
+      "bytes": 1866,
+      "sha256": "9226bc92ab571484565b24dc4c1f4b2bd16c812097fe4b3440c1fd7cb3c352d5",
+      "keccak256": "0xc41170c3eebd6cd14d75940465664e64d7bad223fb202497922c587b11a7d616",
+      "origin": "git-86b-byte-identical-8e8"
+    },
+    {
+      "path": "src/modules/keel-hold/interfaces/IKeelHold.sol",
+      "bytes": 6261,
+      "sha256": "23b018a722626f223ae61fea97e4a149c00b399493a3a6e8c63918447af16eec",
+      "keccak256": "0x258633b1108a48ee5b6695b8a9f84c32853dbcb8bf1b442c288a6e8fb55fd511",
+      "origin": "git-86b-byte-identical-8e8"
+    },
+    {
+      "path": "src/modules/keel-hold/interfaces/IKeelHoldErrors.sol",
+      "bytes": 4027,
+      "sha256": "90f6f86e6d20585534ee40169dbaca5c6d82e554aaf7b54126eb5e3c2d124213",
+      "keccak256": "0x95732cbf5be663cda681cb8c1670e4c19b7fa8d1badc0e5999ebf71b7e3a8245",
+      "origin": "git-86b-byte-identical-8e8"
+    },
+    {
+      "path": "src/modules/keel-kernel/libraries/KeelGovernance.sol",
+      "bytes": 3511,
+      "sha256": "28b9c2165ec9ae4588a277a28a0d83b678705a8424707ca506500a3ef5356705",
+      "keccak256": "0x3655cc5b8825bdea3648379ccc8312d85910c6a8aae26d16eac229f138cd7ae2",
+      "origin": "git-86b-byte-identical-8e8"
+    },
+    {
+      "path": "test/TestBase.sol",
+      "bytes": 3213,
+      "sha256": "3f7001853b88cd6fd30ca5e77b3931821824bdc8986dcb5dc46dbbcbea4ec609",
+      "keccak256": "0xcf42e85dff41840941deee14045e293d8bddb3128fa7c06bdd1c16ff89cc0c8b",
+      "origin": "git-86b-byte-identical-8e8"
+    },
+    {
+      "path": "test/modules/keel-artifacts/KeelLinkURIBuilder.t.sol",
+      "bytes": 12112,
+      "sha256": "c09dd55ac02418a5f89a3426e886b89438c0bf08071d1044e5c5acf634e58ea2",
+      "keccak256": "0xdba17ba8e455b2ebcc317f78f2ea9a8dd3b92aeb492356fcb4f22e225d844d4a",
+      "origin": "git-86b-byte-identical-8e8"
+    }
+  ],
+  "fixtureReplacement": false,
+  "browserTestResult": "NOT RUN by artifact supplier",
+  "publicChainOperations": 0
+}

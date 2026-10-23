@@ -1,0 +1,10 @@
+Compiled Michelson validation: 8 artifacts passed
+Octez PASS collection_route_creator_profile/step_001_cont_0_contract.tz
+Octez PASS collection_route_collection/step_001_cont_0_contract.tz
+Octez PASS collection_route_seeded_collection/step_001_cont_0_contract.tz
+Octez PASS collection_route_index/step_001_cont_0_contract.tz
+Octez PASS collection_route_hold/step_001_cont_0_contract.tz
+Octez PASS collection_route_mint_gate/step_001_cont_0_contract.tz
+Octez PASS collection_route_presentation/step_001_cont_0_contract.tz
+Octez PASS collection_route_one_mint/step_001_cont_0_contract.tz
+Octez typechecking: 8 distinct scripts passed

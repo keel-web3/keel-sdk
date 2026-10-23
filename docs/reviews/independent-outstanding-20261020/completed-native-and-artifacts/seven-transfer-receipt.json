@@ -1,0 +1,18 @@
+{
+  "schema": "keel-independent-seven-transfer@1",
+  "archiveSHA256": "810a23c18965be2930c9d24eea35eb396f24494310e1b9e58f968242221eda09",
+  "artifactReceiptSHA256": "41855e18b4d67dea6f878aae58e948b940047f05ba01b08895502f7ed357c44f",
+  "destinationCommit": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb",
+  "destination": "/root/keel-qa-final-pair-20261020/keel-contracts",
+  "checked": [
+    "out/KeelCreator1155.sol/KeelCreator1155.json",
+    "out/KeelCreatorFactory.sol/KeelCreatorFactory.json",
+    "out/KeelMintRouteRegistry.sol/KeelMintRouteRegistry.json",
+    "out/KEEL721.sol/KEEL721.json",
+    "out/KeelManager.sol/KeelManager.json",
+    "out/KeelManagerProxy.sol/KeelManagerProxy.json",
+    "out/KeelShared1155.sol/KeelShared1155.json"
+  ],
+  "existingDifferentFilesOverwritten": false,
+  "sdkDistTouched": false
+}

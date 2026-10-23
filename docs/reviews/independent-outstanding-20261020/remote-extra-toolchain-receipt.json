@@ -1,0 +1,26 @@
+{
+  "schema": "keel-independent-extra-toolchain@1",
+  "actualDistro": "Fray-Prover",
+  "prefix": "/root/keel-validation-tools-20261020",
+  "nodeVersion": "22.22.1",
+  "pnpmVersion": "10.15.0",
+  "forgeVersion": "1.7.1",
+  "smartPyVersion": "0.24.1",
+  "solcVersion": "0.8.36",
+  "files": [
+    {
+      "path": "solc-0.8.36",
+      "sha256": "c8d35afdddc3cd2743ee88b8f25e0fecd16e2bdd5f2120f37e52cd9cc45ae0e6"
+    },
+    {
+      "path": "downloads/solc-list.json",
+      "sha256": "ee1a2b4811bd1225c220cd2342e2b49a58cbe18f5687f230f456c443b29497d6"
+    },
+    {
+      "path": "downloads/solc-asset.json",
+      "sha256": "df660257e05789f77fa62c5286db6edbbfeec7a73d20015f7be090a327eda234"
+    }
+  ],
+  "globalChanges": false,
+  "credentialChanges": false
+}

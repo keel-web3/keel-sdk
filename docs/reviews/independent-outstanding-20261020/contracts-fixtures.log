@@ -1,0 +1,7 @@
+
+> @keel/contracts@0.3.0 fixtures:check /Users/ravonus/dev/wt/independent-outstanding-20261020/keel-contracts
+> node script/generate-synthetic-codec-fixtures.mjs --check
+
+synthetic-token-1.json 333 564fbca92139b456ff645eb3b0510d673594cc718672bc8f6a4e50d44e2652f5
+synthetic-large-artwork.ppm 171378 b32cf334121c50ed645fca039be97d412bd9d5f58b292b09dbab326ce1ac230c
+synthetic-collection-directory.bin 468894 ff1c6fcf35686456eb9d62e67068cfcaef2a65ef36463b83d4a91fba0f0e7006

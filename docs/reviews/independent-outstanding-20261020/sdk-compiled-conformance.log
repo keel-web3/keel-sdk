@@ -1,0 +1,22 @@
+TAP version 13
+# Subtest: the generated Tezos catalogue is current with the contract sources
+ok 1 - the generated Tezos catalogue is current with the contract sources
+  ---
+  duration_ms: 2804.323125
+  type: 'test'
+  ...
+# Subtest: SDK origination storage equals the SmartPy-compiled initial storage
+ok 2 - SDK origination storage equals the SmartPy-compiled initial storage
+  ---
+  duration_ms: 4.53375
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3388.854042

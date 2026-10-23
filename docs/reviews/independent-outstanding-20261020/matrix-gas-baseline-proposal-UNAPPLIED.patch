@@ -1,0 +1,13 @@
+--- a/.gas-snapshot
++++ b/.gas-snapshot
+@@ -64,8 +64,8 @@
+ KeelLoopStrategiesTest:testGasSeparateOne() (gas: 7415)
+ KeelLoopStrategiesTest:testGasSeparateThirtyTwo() (gas: 35868)
+ KeelLoopStrategiesTest:testGasSeparateUneven() (gas: 66801)
+-KeelMatrixDigitsTest:testGasAfterMaximumDigits() (gas: 40244)
+-KeelMatrixDigitsTest:testGasAfterZeroDigits() (gas: 33418)
++KeelMatrixDigitsTest:testGasAfterMaximumDigits() (gas: 40233)
++KeelMatrixDigitsTest:testGasAfterZeroDigits() (gas: 33403)
+ KeelMatrixDigitsTest:testGasBeforeMaximumDigits() (gas: 108483)
+ KeelMatrixDigitsTest:testGasBeforeZeroDigits() (gas: 33994)
+ KeelReferenceReadsTest:testGasAfterCountComposite() (gas: 332380)

@@ -1,0 +1,136 @@
+TAP version 13
+# Subtest: cost gate accepts equal costs and measured improvements
+ok 1 - cost gate accepts equal costs and measured improvements
+  ---
+  duration_ms: 2.151042
+  type: 'test'
+  ...
+# Subtest: cost gate rejects gas, storage and operation-size regressions
+ok 2 - cost gate rejects gas, storage and operation-size regressions
+  ---
+  duration_ms: 0.617083
+  type: 'test'
+  ...
+# Subtest: cost gate rejects missing cases, missing metrics, protocol drift and NaN
+ok 3 - cost gate rejects missing cases, missing metrics, protocol drift and NaN
+  ---
+  duration_ms: 1.680875
+  type: 'test'
+  ...
+# Subtest: recording a baseline requires all cases, successful operations and exact read-back
+ok 4 - recording a baseline requires all cases, successful operations and exact read-back
+  ---
+  duration_ms: 5.91075
+  type: 'test'
+  ...
+# Subtest: versioned budget preserves historical cases and the pinned toolchain
+ok 5 - versioned budget preserves historical cases and the pinned toolchain
+  ---
+  duration_ms: 0.593292
+  type: 'test'
+  ...
+# Subtest: published manager ABIs match their compiler output
+ok 6 - published manager ABIs match their compiler output
+  ---
+  duration_ms: 23.918583
+  type: 'test'
+  ...
+# Subtest: ABI comparison ignores only top-level entry order
+ok 7 - ABI comparison ignores only top-level entry order
+  ---
+  duration_ms: 0.516167
+  type: 'test'
+  ...
+# Subtest: manager and RPC helper cannot drift on errors or indexed event fields
+ok 8 - manager and RPC helper cannot drift on errors or indexed event fields
+  ---
+  duration_ms: 0.387083
+  type: 'test'
+  ...
+# Subtest: the proxy ABI includes the fixed recovery helper wire surface
+ok 9 - the proxy ABI includes the fixed recovery helper wire surface
+  ---
+  duration_ms: 0.225333
+  type: 'test'
+  ...
+# Subtest: checked-in module ABIs preserve ERC-4906 log encoding
+ok 10 - checked-in module ABIs preserve ERC-4906 log encoding
+  ---
+  duration_ms: 122.357167
+  type: 'test'
+  ...
+# Subtest: every Solidity source has an accurate module manifest
+ok 11 - every Solidity source has an accurate module manifest
+  ---
+  duration_ms: 412.36475
+  type: 'test'
+  ...
+# Subtest: publication depends on Hold without pulling in a cross-chain mint bridge
+ok 12 - publication depends on Hold without pulling in a cross-chain mint bridge
+  ---
+  duration_ms: 0.484542
+  type: 'test'
+  ...
+# Subtest: codecs declare no standalone deployment requirement
+ok 13 - codecs declare no standalone deployment requirement
+  ---
+  duration_ms: 0.136291
+  type: 'test'
+  ...
+# Subtest: the npm package contains only classified pinned fixtures
+ok 14 - the npm package contains only classified pinned fixtures
+  ---
+  duration_ms: 4300.802583
+  type: 'test'
+  ...
+# Subtest: shared traces retain ownership, freeze, clock, payment, and lifecycle refusals
+ok 15 - shared traces retain ownership, freeze, clock, payment, and lifecycle refusals
+  ---
+  duration_ms: 2.761083
+  type: 'test'
+  ...
+# Subtest: evm contract context bytes expose the same immutable seed and exact commitment
+ok 16 - evm contract context bytes expose the same immutable seed and exact commitment
+  ---
+  duration_ms: 2.263291
+  type: 'test'
+  ...
+# Subtest: tezos contract context bytes expose the same immutable seed and exact commitment
+ok 17 - tezos contract context bytes expose the same immutable seed and exact commitment
+  ---
+  duration_ms: 1.184792
+  type: 'test'
+  ...
+# Subtest: collection trace covers reservation isolation and role rotation through exhaustion
+ok 18 - collection trace covers reservation isolation and role rotation through exhaustion
+  ---
+  duration_ms: 0.425625
+  type: 'test'
+  ...
+# Subtest: native artifact gate catches the actual compiler and annotation failures
+ok 19 - native artifact gate catches the actual compiler and annotation failures
+  ---
+  duration_ms: 226.449875
+  type: 'test'
+  ...
+# Subtest: each native module source is catalogued beside its EVM module and has an executable scenario
+ok 20 - each native module source is catalogued beside its EVM module and has an executable scenario
+  ---
+  duration_ms: 8.480792
+  type: 'test'
+  ...
+# Subtest: native SDK discovery keeps inherited public interfaces and shared source identities
+ok 21 - native SDK discovery keeps inherited public interfaces and shared source identities
+  ---
+  duration_ms: 652.829084
+  type: 'test'
+  ...
+1..21
+# tests 21
+# suites 0
+# pass 21
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4358.633708

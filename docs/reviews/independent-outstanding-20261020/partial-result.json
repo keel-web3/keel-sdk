@@ -1,0 +1,180 @@
+{
+  "schema": "keel-independent-outstanding-partial-validation@1",
+  "frozenAtUTC": "2026-10-20T03:30:28.493968+00:00",
+  "independentOfProductionAuthors": true,
+  "source": {
+    "contracts": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+    "sdk": "ef363b6dbd34a95b5665b6d8bed4c687c9168fbe",
+    "sdkBuiltTreeSHA256": "aa9ae7e540ef740e71ad8b4d543273929966c8d58501b5cbe9d3c2436e267cf2"
+  },
+  "environment": {
+    "localNode": "22.22.1",
+    "localForge": "1.7.1/4072e487",
+    "localSmartPy": "0.24.1",
+    "localPython": "3.14.7",
+    "remote": "windows/WSL/Fray-Prover",
+    "remotePython": "3.12.3",
+    "remoteNode": "22.22.1",
+    "remoteSmartPy": "0.24.1",
+    "remoteForge": "1.7.1",
+    "pinnedOctez": "tezos/tezos@sha256:c7adc1605e0ac167743e5ccc107c88719d201994b8166dd794ea10fd0488bea2",
+    "distroPersistentTools": "/root/keel-validation-tools-20261020"
+  },
+  "completedResults": {
+    "freshSDKBuild": "PASS",
+    "SDKNativeFocused": {
+      "pass": 146,
+      "fail": 0,
+      "skip": 1,
+      "skipReason": "compiled-target outputs not yet generated at initial launch"
+    },
+    "explicitPostCompileConformance": {
+      "pass": 2,
+      "fail": 0,
+      "skip": 0,
+      "sameMissingTargetCaseActuallyExecuted": true
+    },
+    "contractsFrozenFixtureCheck": "PASS",
+    "contractsStructure": "FAIL/6 issues",
+    "contractsPythonControls": {
+      "pass": 20,
+      "fail": 0
+    },
+    "contractsStaticCatalog": {
+      "pass": 18,
+      "fail": 3,
+      "reasons": [
+        "scope/source indexes stale",
+        "13 new package fixtures unclassified",
+        "manager ABI test launched before cold compilation finished; SETUP ordering only and must rerun"
+      ]
+    },
+    "contractsSiblingCatalog": {
+      "pass": 15,
+      "fail": 1,
+      "reason": "SDK tools/module-map omits three native-media sources and creator-identity test devDependency"
+    },
+    "SmartPyRouteCompilation": "PASS/8 targets",
+    "pinnedOctezRouteTypechecks": "PASS/8 distinct scripts"
+  },
+  "running": {
+    "fullForge": {
+      "sessionId": 5396,
+      "log": "/tmp/keel-independent-contracts-forge-86b-20261020.log",
+      "checkpoint": "Solc coldcompile completed; tests RUNNING; no final result accepted"
+    },
+    "fullSmartPy": {
+      "sessionId": 80333,
+      "remoteLog": "/root/keel-independent-outstanding-20261020/smartpy-86b.log",
+      "remoteFinalReceipt": "/root/keel-independent-outstanding-20261020/smartpy-86b-result.json",
+      "checkpoint": "RUNNING; no final result accepted"
+    },
+    "entrypointOctez": {
+      "sessionId": 60954,
+      "log": "/tmp/keel-independent-contracts-entrypoint-octez-86b-20261020.log",
+      "checkpoint": "RUNNING; fixture operations progressing; no final result accepted"
+    }
+  },
+  "incompleteStopped": {
+    "MacAllSmartPy": {
+      "sessionId": 8582,
+      "exitCode": 143,
+      "reason": "Controlled owner-tree stop after load137; full fresh run moved to Fray-Prover",
+      "noPassClaim": true
+    }
+  },
+  "notRunOrNotComplete": [
+    "full pnpm test:local aggregate",
+    "gas snapshot check",
+    "runtime size check",
+    "full native Octez scripts/protocol suite",
+    "successor Contracts8e8/SDKf146 affected retest",
+    "full final SDK/Site suite"
+  ],
+  "successorPendingIndependentRetest": {
+    "sdk": "f1460ba4fc5eb675fc43a87354acc1bd42f06c29",
+    "contracts": "8e8 (exact full SHA to be verified on resumed wave)"
+  },
+  "productionFixesAuthored": false,
+  "assertionsModified": false,
+  "referenceFixturesModified": false,
+  "gasBaselineModified": false,
+  "productionOperations": 0,
+  "publicChainTransactions": 0,
+  "ownerWalletSignatures": 0,
+  "releaseApproval": false,
+  "files": [
+    {
+      "path": "contracts-entrypoint-octez-RUNNING.snapshot.log",
+      "sha256": "1604db99871fe19094e9ed1570233552a3d6311af02022fd91bfd8449d0d555d"
+    },
+    {
+      "path": "contracts-fixtures.log",
+      "sha256": "8eb19420b899ab2830a6f766c7a9487c1995ba2fcae64e6c5c54304af5b7ddbd"
+    },
+    {
+      "path": "contracts-forge-RUNNING.snapshot.log",
+      "sha256": "c30098ae2e6a670f899dbd1d9ef33b42a2b7cb76b4eca41cc0819e8451d20643"
+    },
+    {
+      "path": "contracts-octez-route.log",
+      "sha256": "ae6c2daa9198cee2d621ecd4118ad7430c3f61979bcf9a9d4f259ae8b750e0bb"
+    },
+    {
+      "path": "contracts-python.log",
+      "sha256": "afafaa0edb5c204d61f354db06245500661aa6c1bdf0434e65c3173ee3f4d2cd"
+    },
+    {
+      "path": "contracts-sdk-integration-RED.log",
+      "sha256": "bf5af9e9727da063c92ad3d9277135fb3bc5471e84e76427fb25633550578bb4"
+    },
+    {
+      "path": "contracts-smartpy-Mac-INCOMPLETE.log",
+      "sha256": "29ede2e4a6bbde2d80ff3a284b50f7579e1ad600596027fe03c01b3380e6ffe5"
+    },
+    {
+      "path": "contracts-static-catalog-RED.log",
+      "sha256": "6799b67e1c50902e8bde24a3e0265b1e6e16b5f890124eddc31383e490dd0c1e"
+    },
+    {
+      "path": "contracts-structure-RED.log",
+      "sha256": "35078a81330a9b453cf25121f907d79dd31486299b37bdc592880d0236558611"
+    },
+    {
+      "path": "octez-eight-route-typechecks.json",
+      "sha256": "f674f8c7464f4952dffaa2b37d6e019552321445c561070576b5314bbfdf5c54"
+    },
+    {
+      "path": "remote-extra-toolchain-receipt.json",
+      "sha256": "a8503d0748872bc508b4c784eefaf6503b02d52b07188936db06ac9ec6c4e049"
+    },
+    {
+      "path": "remote-native-RUNNING.snapshot.log",
+      "sha256": "ab2970f4c06150a44b4b433987905cae1dd3d5eec0307d9947f5a338a3f739e4"
+    },
+    {
+      "path": "remote-source-receipt.json",
+      "sha256": "ad830132fe08afd52b77a6224db5327af96f56cb6ffb2bc9170b03ed2110dde3"
+    },
+    {
+      "path": "remote-toolchain-receipt.json",
+      "sha256": "825220b5e30b8b9ec1d095e57c466f233e1d3537c7a9059d187158fa7fcf010e"
+    },
+    {
+      "path": "sdk-build.log",
+      "sha256": "dff36058173d78275644a0ff1183a16045bcea7713fbded2b2300249e5442173"
+    },
+    {
+      "path": "sdk-built-tree.json",
+      "sha256": "f5dad1b57d8c04b4991e8ec727a791fbf27344b454d9ddbaeae2f0743c9712e2"
+    },
+    {
+      "path": "sdk-compiled-conformance.log",
+      "sha256": "4ae29756733f87f63f702fd00a0572404410e4c41e0803908124617ea62b1234"
+    },
+    {
+      "path": "sdk-native-focused.log",
+      "sha256": "8f3f045bf8bb7f2bcdc87a3daaabe18334c47140d8c017703c5385adb9273b1f"
+    }
+  ]
+}

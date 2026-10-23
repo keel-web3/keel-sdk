@@ -1,0 +1,12 @@
+{
+  "package": "ffmpeg-static",
+  "version": "5.3.0",
+  "tag": "b6.1.1",
+  "officialPackageURL": "https://github.com/eugeneware/ffmpeg-static",
+  "platform": "linux",
+  "arch": "x64",
+  "derivedDownloadURL": "https://github.com/eugeneware/ffmpeg-static/releases/download/b6.1.1/ffmpeg-linux-x64.gz",
+  "packageJSONSHA256": "646ba194bac40bdb76856effc9629463477c0e1e7ccded3888971328ff7761c5",
+  "installScriptSHA256": "9801ce3aa35e45f72f7d13339ff04c916011b529040d1a1301c74102ed335fb9",
+  "destination": "/root/keel-qa-final-pair-20261020/keel-sdk/node_modules/.pnpm/ffmpeg-static@5.3.0/node_modules/ffmpeg-static/ffmpeg"
+}
