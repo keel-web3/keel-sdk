@@ -1,0 +1,34 @@
+{
+  "commit": "0dc7e6f",
+  "node": "v22.22.1",
+  "rows": [
+    {
+      "file": "normal-artwork.mov",
+      "mime": "video/quicktime",
+      "bytes": 1732,
+      "inferred": "application/octet-stream",
+      "viewer-type": {
+        "result": "REJECT",
+        "message": "The canonical KEEL asset-display module does not support video/quicktime."
+      },
+      "native-none-proof": {
+        "result": "REJECT",
+        "message": "Native None requires a complete supported original media container and role."
+      }
+    },
+    {
+      "file": "normal-artwork.m4v",
+      "mime": "video/x-m4v",
+      "bytes": 1775,
+      "inferred": "application/octet-stream",
+      "viewer-type": {
+        "result": "REJECT",
+        "message": "The canonical KEEL asset-display module does not support video/x-m4v."
+      },
+      "native-none-proof": {
+        "result": "REJECT",
+        "message": "Native None requires a complete supported original media container and role."
+      }
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+packages/sdk/src/inline-viewer-graph.ts(1303,7): error TS2367: This comparison appears to be unintentional because the types '"image/avif" | "image/gif" | "image/jpeg" | "image/png" | "image/webp" | "image/svg+xml" | "audio/wav" | "audio/mpeg" | "audio/ogg" | "audio/flac" | "audio/aac" | "audio/mp4" | ... 7 more ... | "text/javascript"' and '"video/quicktime"' have no overlap.

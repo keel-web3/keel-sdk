@@ -1,0 +1,16 @@
+TAP version 13
+# Subtest: actual registered rev5 frame decodes and plays exact default-None normal MP4 with verification and no external artwork requests
+ok 1 - actual registered rev5 frame decodes and plays exact default-None normal MP4 with verification and no external artwork requests
+  ---
+  duration_ms: 375.081458
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 525.521292

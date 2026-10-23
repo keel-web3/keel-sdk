@@ -1,0 +1,194 @@
+diff --git a/packages/sdk/src/asset-display.ts b/packages/sdk/src/asset-display.ts
+index 0ff57d6..86e8206 100644
+--- a/packages/sdk/src/asset-display.ts
++++ b/packages/sdk/src/asset-display.ts
+@@ -16,6 +16,8 @@ export const KEEL_ASSET_DISPLAY_MEDIA_TYPES = Object.freeze([
+   "audio/aac",
+   "audio/mp4",
+   "video/mp4",
++  "video/quicktime",
++  "video/x-m4v",
+   "video/webm",
+ ] as const);
+ 
+diff --git a/packages/sdk/src/registered-native-gzip.ts b/packages/sdk/src/registered-native-gzip.ts
+index 0c6a476..3410977 100644
+--- a/packages/sdk/src/registered-native-gzip.ts
++++ b/packages/sdk/src/registered-native-gzip.ts
+@@ -143,6 +143,9 @@ function inspectDocument(bytes: Uint8Array, binding: KeelRegisteredNativeGzipBin
+     if (stored.toString("base64") !== embedded.storedBase64 || stored.length !== embedded.storedIntegrity.byteLength || sha(stored) !== embedded.storedIntegrity.digest) throw new TypeError("Native Gzip stored source integrity mismatch.");
+     const decoded = gunzipSync(stored, { maxOutputLength: item.integrity.byteLength });
+     if (decoded.length !== item.integrity.byteLength || sha(decoded) !== item.integrity.digest) throw new TypeError("Native Gzip decoded source integrity mismatch.");
++    // Newly qualified native ISO MIME aliases require the same exact complete
++    // original container whether storage selected None or Gzip.
++    if (["video/quicktime", "video/x-m4v"].includes(item.mediaType)) assertRegisteredNativeNoneBinary({id: item.id, role: item.role, mediaType: item.mediaType, source: decoded});
+     decodedResources.push({id: item.id, role: item.role, mediaType: item.mediaType, aliases: item.aliases, source: decoded});
+     members.push({ id: item.id, mediaType: item.mediaType, integrity: { ...item.integrity }, storedIntegrity: { ...embedded.storedIntegrity } });
+   }
+diff --git a/packages/sdk/src/registered-native-none.ts b/packages/sdk/src/registered-native-none.ts
+index 4902e24..152aff8 100644
+--- a/packages/sdk/src/registered-native-none.ts
++++ b/packages/sdk/src/registered-native-none.ts
+@@ -6,7 +6,8 @@ import { inspectKeelModelMedia } from "./model-media.js";
+ const invalid = (): never => { throw new TypeError("Native None requires a complete supported original media container and role."); };
+ const text = (bytes: Uint8Array, at: number, length: number) => String.fromCharCode(...bytes.subarray(at, at + length));
+ interface Box { readonly kind: string; readonly at: number; readonly body: number; readonly end: number }
+-function inspectVideoMP4(bytes: Uint8Array): void {
++const ISO_VIDEO_MEDIA_TYPES = ["video/mp4", "video/quicktime", "video/x-m4v"] as const;
++function inspectVideoISO(bytes: Uint8Array, mediaType: string): void {
+   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+   let boxCount = 0;
+   const boxes = (start = 0, end = bytes.length): Box[] => {
+@@ -29,6 +30,11 @@ function inspectVideoMP4(bytes: Uint8Array): void {
+   };
+   const top = boxes(), ftyp = one(top, "ftyp"), moov = one(top, "moov"), mdat = top.filter(row => row.kind === "mdat" && row.end > row.body);
+   if (ftyp.at !== 0 || ftyp.end - ftyp.body < 8 || (ftyp.end - ftyp.body) % 4 || !mdat.length || top.some(row => row.kind === "moof")) invalid();
++  // Preserve the actual native MIME, not an MP4 relabel. New aliases require
++  // their known complete ISO container; brands never replace track validation.
++  const majorBrand = text(bytes, ftyp.body, 4);
++  if (mediaType === "video/quicktime" && majorBrand !== "qt  "
++    || mediaType === "video/x-m4v" && !["M4V ", "M4VH", "M4VP", "isom", "iso2", "mp41", "mp42", "avc1"].includes(majorBrand)) invalid();
+   // An AVIF/image container cannot masquerade as a video through its MIME.
+   for (let at = ftyp.body; at < ftyp.end; at += 4) if (at !== ftyp.body + 4 && ["avif", "avis", "heic", "heix", "mif1"].includes(text(bytes, at, 4))) invalid();
+   const tracks = boxes(moov.body, moov.end).filter(row => row.kind === "trak");
+@@ -140,7 +146,7 @@ function inspectVideoWebM(bytes: Uint8Array): void {
+ 
+ export function assertRegisteredNativeNoneIdentity(input: {readonly role: unknown; readonly mediaType: string}): void {
+   if (typeof input.role !== "string" || !["entrypoint", "asset", "data"].includes(input.role)) invalid();
+-  if (["video/mp4", "video/webm"].includes(input.mediaType)) return;
++  if ((ISO_VIDEO_MEDIA_TYPES as readonly string[]).includes(input.mediaType) || input.mediaType === "video/webm") return;
+   if (input.role !== "entrypoint" && ((KEEL_NATIVE_AUDIO_MEDIA_TYPES as readonly string[]).includes(input.mediaType)
+     || ["model/gltf-binary", "application/octet-stream"].includes(input.mediaType))) return;
+   return invalid();
+@@ -149,7 +155,7 @@ export function assertRegisteredNativeNoneIdentity(input: {readonly role: unknow
+ export function assertRegisteredNativeNoneBinary(input: {readonly id: string; readonly role: unknown; readonly mediaType: string; readonly source: Uint8Array}): "model" | void {
+   assertRegisteredNativeNoneIdentity(input);
+   if (!input.source.length || input.source.length > 32 * 1024 * 1024) invalid();
+-  if (input.mediaType === "video/mp4") return inspectVideoMP4(input.source);
++  if ((ISO_VIDEO_MEDIA_TYPES as readonly string[]).includes(input.mediaType)) return inspectVideoISO(input.source, input.mediaType);
+   if (input.mediaType === "video/webm") return inspectVideoWebM(input.source);
+   if ((KEEL_NATIVE_AUDIO_MEDIA_TYPES as readonly string[]).includes(input.mediaType)) {
+     // Rev5 audio uses the canonical derived HTML entry and verified audio asset,
+diff --git a/packages/studio-core/src/media.ts b/packages/studio-core/src/media.ts
+index 2589fb2..45d394f 100644
+--- a/packages/studio-core/src/media.ts
++++ b/packages/studio-core/src/media.ts
+@@ -19,6 +19,8 @@ const MEDIA_BY_EXTENSION: Readonly<Record<string, string>> = {
+   ".mjs": "text/javascript",
+   ".mp3": "audio/mpeg",
+   ".mp4": "video/mp4",
++  ".mov": "video/quicktime",
++  ".m4v": "video/x-m4v",
+   ".mtl": "text/plain",
+   ".obj": "model/obj",
+   ".ogg": "audio/ogg",
+diff --git a/tests/registered-native-none.browser.test.mjs b/tests/registered-native-none.browser.test.mjs
+index 79c38d2..020e85e 100644
+--- a/tests/registered-native-none.browser.test.mjs
++++ b/tests/registered-native-none.browser.test.mjs
+@@ -8,13 +8,17 @@ import {buildKeelInlineLocalDocument,buildKeelInlineModuleFragment,decodeKeelInl
+ import {createKeelRegisteredNativeGzipProof,KEEL_REGISTERED_NATIVE_GZIP_FRAME_PROFILE as p} from '../packages/sdk/dist/registered-native-gzip.js';
+ import {launchCspBrowser} from './helpers/marketplace-csp-browser.mjs';
+ const sha=b=>createHash('sha256').update(b).digest('hex'),delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+-test('actual registered rev5 frame decodes and plays exact default-None normal MP4 with verification and no external artwork requests',{timeout:30_000},async()=>{
+- const source=await readFile(new URL('./fixtures/registered-native-none/normal-artwork.mp4',import.meta.url));assert.equal(source.length,1786);assert.equal(sha(source),'a421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561');
++for(const variant of [
++ {name:'MP4',file:'normal-artwork.mp4',mime:'video/mp4',bytes:1786,digest:'a421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561',evidence:'mp4'},
++ {name:'MOV',file:'normal-artwork.mov',mime:'video/quicktime',bytes:1732,digest:'fe333b7dcd494dc0a7fbc755defb9fceb97aaa3aff960cdac77a570986c0d05f',evidence:'mov'},
++ {name:'M4V',file:'normal-artwork.m4v',mime:'video/x-m4v',bytes:1775,digest:'eb417767725dbb6fc81fd5e88313f1c2d2a6e91206d2bc8d88075854d5d2f719',evidence:'m4v'},
++])test(`actual registered rev5 frame decodes and plays exact default-None normal ${variant.name} with verification and no external artwork requests`,{timeout:30_000},async()=>{
++ const source=await readFile(new URL('./fixtures/registered-native-none/'+variant.file,import.meta.url));assert.equal(source.length,variant.bytes);assert.equal(sha(source),variant.digest);
+  const fixture=JSON.parse(gunzipSync(await readFile(new URL('./fixtures/registered-native-gzip-revision5.json.gz',import.meta.url))));
+  const half=side=>{const bytes=decodeKeelInlineGraphFragment(Buffer.from(fixture.fragments['compact-'+side].base64,'base64'),'application/vnd.keel.token-uri-raw-percent-fragment');assert.equal(bytes.length,p[side+'ByteLength']);assert.equal('0x'+sha(bytes),p[side+'Digest']);return{bytes,integrity:{algorithm:'sha256',digest:'0x'+sha(bytes),byteLength:bytes.length}}};
+  const shell={schema:'keel-inline-shell-fragments@1',codecProfile:'browser-gzip-deflate',prefix:half('prefix'),suffix:half('suffix')};
+  const display=await buildKeelInlineModuleFragment({moduleId:'keel.asset-display',version:'1.1.0',mediaType:'text/javascript',aliases:['keel.asset-display'],decodedBytes:await readFile(new URL('./fixtures/asset-display-1.1.0.js',import.meta.url)),compression:'gzip',execution:'classic',phase:'render',weight:0});
+- const root=await buildKeelInlineLocalDocument({shell,modules:[display],entry:{id:'artwork.mp4',mediaType:'video/mp4',source}});
++ const root=await buildKeelInlineLocalDocument({shell,modules:[display],entry:{id:variant.file,mediaType:variant.mime,source}});
+  const binding=Object.fromEntries(['chainId','revision','store','registry','reader','readerRuntimeCodeHash','metadataObjectId','readerDeploymentTransactionHash','registeredPrefixObjectId','registeredSuffixObjectId','prefixObjectId','suffixObjectId'].map(k=>[k,p[k]]));
+  Object.assign(binding,{profile:'keel.canonical-native-gzip@1',metadataIntegrity:{algorithm:'sha256',digest:p.metadataDigest,byteLength:p.metadataByteLength}});
+  createKeelRegisteredNativeGzipProof({binding,documentBytes:root.rootBytes});
+@@ -35,13 +39,14 @@ test('actual registered rev5 frame decodes and plays exact default-None normal M
+   while(Date.now()<deadline){for(const context of contexts.values()){try{if(await evaluate('typeof __KEEL_CONTENT__!=="undefined"&&!!document.querySelector("#keel-asset-display video")&&document.querySelector("video").readyState>=2',context)){child=context;break}}catch{}}
+    if(child&&await evaluate('document.body.dataset.verification==="verified"'))break;if(errors.length)break;await delay(25);
+   }
++  if(!child&&process.env.KEEL_NATIVE_NONE_BROWSER_EVIDENCE){const diagnostics=[];for(const context of contexts.values()){try{diagnostics.push(await evaluate('(()=>{const v=document.querySelector("video");return{url:location.href,verification:document.body?.dataset.verification,verified:typeof __KEEL_CONTENT__!=="undefined",entry:globalThis.__KEEL_ENTRY__,video:v?{src:v.src,readyState:v.readyState,networkState:v.networkState,error:v.error?{code:v.error.code,message:v.error.message}:null,canPlayMIME:v.canPlayType('+JSON.stringify(variant.mime)+'),canPlayMP4:v.canPlayType("video/mp4")}:null}})()',context))}catch(error){diagnostics.push({error:String(error)})}}await mkdir(process.env.KEEL_NATIVE_NONE_BROWSER_EVIDENCE,{recursive:true});await writeFile(process.env.KEEL_NATIVE_NONE_BROWSER_EVIDENCE+'/'+variant.evidence+'-failure.json',JSON.stringify({variant,diagnostics,errors,external},null,2)+'\n')}
+   assert.ok(child,'Actual native video must decode in the opaque verified child');assert.equal(await evaluate('document.body.dataset.verification'),'verified');assert.equal(await evaluate('!!document.querySelector("#verify-seal")'),true);
+   assert.equal(await evaluate('[...document.querySelectorAll("iframe")].every(frame=>frame.sandbox.contains("allow-scripts")&&!frame.sandbox.contains("allow-same-origin"))'),true);
+-  const identity=await evaluate('(async()=>{const b=__KEEL_CONTENT__.bytes("artwork.mp4"),v=document.querySelector("video"),digest=[...new Uint8Array(await crypto.subtle.digest("SHA-256",b))].map(n=>n.toString(16).padStart(2,"0")).join("");return{digest,bytes:b.length,width:v.videoWidth,height:v.videoHeight,duration:v.duration,src:v.src}})()',child);
+-  assert.equal(identity.digest,sha(source));assert.equal(identity.bytes,source.length);assert.equal(identity.width,32);assert.equal(identity.height,24);assert.ok(identity.duration>0);assert.equal(identity.src,'data:video/mp4;base64,'+source.toString('base64'));
++  const identity=await evaluate('(async()=>{const b=__KEEL_CONTENT__.bytes('+JSON.stringify(variant.file)+'),v=document.querySelector("video"),digest=[...new Uint8Array(await crypto.subtle.digest("SHA-256",b))].map(n=>n.toString(16).padStart(2,"0")).join("");return{digest,bytes:b.length,width:v.videoWidth,height:v.videoHeight,duration:v.duration,src:v.src}})()',child);
++  assert.equal(identity.digest,sha(source));assert.equal(identity.bytes,source.length);assert.equal(identity.width,32);assert.equal(identity.height,24);assert.ok(identity.duration>0);assert.equal(identity.src,'data:'+variant.mime+';base64,'+source.toString('base64'));
+   const sample=async time=>evaluate(`(async()=>{const v=document.querySelector('video');v.pause();if(Math.abs(v.currentTime-${time})>0.000001)await new Promise((resolve,reject)=>{v.addEventListener('seeked',resolve,{once:true});v.addEventListener('error',reject,{once:true});v.currentTime=${time}});const c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;const x=c.getContext('2d');x.drawImage(v,0,0);return [...x.getImageData(16,12,1,1).data]})()`,child);
+   const first=await sample(0),second=await sample(Math.min(.4,identity.duration*.75));assert.notDeepEqual(first,second,'Native encoded video frames must change at their actual source times');
+   await Promise.all(tasks);browser.assertHealthy();assert.deepEqual(errors,[]);assert.deepEqual(external,[]);
+-  if(process.env.KEEL_NATIVE_NONE_BROWSER_EVIDENCE){await mkdir(process.env.KEEL_NATIVE_NONE_BROWSER_EVIDENCE,{recursive:true});await writeFile(process.env.KEEL_NATIVE_NONE_BROWSER_EVIDENCE+'/mp4.json',JSON.stringify({identity,documentBytes:root.rootBytes.length,documentSHA256:sha(root.rootBytes),samples:[first,second],errors,external,scope:'Actual local byte-authenticated retained registered rev5 frame and native MP4 decode/seek. No fresh chain authentication, live Studio, wallet or publication proof.'},null,2)+'\n')}
++  if(process.env.KEEL_NATIVE_NONE_BROWSER_EVIDENCE){await mkdir(process.env.KEEL_NATIVE_NONE_BROWSER_EVIDENCE,{recursive:true});await writeFile(process.env.KEEL_NATIVE_NONE_BROWSER_EVIDENCE+'/'+variant.evidence+'.json',JSON.stringify({identity,documentBytes:root.rootBytes.length,documentSHA256:sha(root.rootBytes),samples:[first,second],errors,external,scope:'Actual local byte-authenticated retained registered rev5 frame and native '+variant.name+' decode/seek. No fresh chain authentication, live Studio, wallet or publication proof.'},null,2)+'\n')}
+  }finally{await browser.close();server.closeAllConnections();await new Promise(resolve=>server.close(resolve))}
+ });
+diff --git a/tests/registered-native-none.test.mjs b/tests/registered-native-none.test.mjs
+index 353ee60..d1e2021 100644
+--- a/tests/registered-native-none.test.mjs
++++ b/tests/registered-native-none.test.mjs
+@@ -7,6 +7,8 @@ import {buildKeelInlineLocalDocument,buildKeelInlineModuleFragment,decodeKeelInl
+ import {createKeelRegisteredNativeGzipProof,assertKeelRegisteredNativeGzipProof,KEEL_REGISTERED_NATIVE_GZIP_FRAME_PROFILE as p} from '../packages/sdk/dist/registered-native-gzip.js';
+ import {inspectKeelInlinePayloadCarriage,assertKeelFreshPayloadCarriage,assertKeelFreshPayloadAudit,auditKeelInlineTokenURI} from '../packages/sdk/dist/inline-transport-audit.js';
+ import {createKeelPublishReviewPlan,verifyKeelPublishReviewPlan} from '../packages/sdk/dist/publish-plan.js';
++import {inferMediaType,normalizeAssets} from '../packages/studio-core/dist/media.js';
++import {keelAssetDisplayKind} from '../packages/sdk/dist/asset-display.js';
+ const hash=b=>'0x'+createHash('sha256').update(b).digest('hex');
+ const integrity=b=>({algorithm:'sha256',digest:hash(b),byteLength:b.length});
+ const fixture=JSON.parse(gunzipSync(readFileSync(new URL('./fixtures/registered-native-gzip-revision5.json.gz',import.meta.url))));
+@@ -168,3 +170,29 @@ test('actual native None full metadata audit and COPY review survive JSON recove
+  const carriage=recovered.plan.preparedCopy.payloadCarriage;assert.equal(carriage.registeredNativeGzip.members.length,1);assert.equal(carriage.registeredNativeGzip.members[0].id,'keel.asset-display');assert.equal(carriage.registeredNativeGzip.nativeNoneMembers.length,1);assert.equal(carriage.payloads.find(payload=>payload.id==='artwork.mp4').nativeNone.role,'entrypoint');
+  delete carriage.payloads.find(payload=>payload.id==='artwork.mp4').nativeNone;assert.equal((await verifyKeelPublishReviewPlan(recovered)).valid,false);
+ });
++
++
++test('actual MOV and M4V native files retain exact source and MIME through default None proof and fresh COPY carriage',async t=>{
++ for(const [name,mime,size,digest,brand]of [
++  ['normal-artwork.mov','video/quicktime',1732,'fe333b7dcd494dc0a7fbc755defb9fceb97aaa3aff960cdac77a570986c0d05f','qt  '],
++  ['normal-artwork.m4v','video/x-m4v',1775,'eb417767725dbb6fc81fd5e88313f1c2d2a6e91206d2bc8d88075854d5d2f719','M4V '],
++ ])await t.test(mime,async()=>{
++  const source=readFileSync(new URL('./fixtures/registered-native-none/'+name,import.meta.url));assert.equal(source.length,size);assert.equal(hash(source),'0x'+digest);assert.equal(source.subarray(4,8).toString(),'ftyp');assert.equal(source.subarray(8,12).toString(),brand);assert.notDeepEqual(source,mp4);
++  for(const declared of [undefined,'application/octet-stream',mime]){
++   const normalized=normalizeAssets([{fileName:name,bytes:source,...(declared?{mediaType:declared}:{})}]);assert.equal(normalized[0].mediaType,mime);assert.equal(normalized[0].role,'video');assert.deepEqual(normalized[0].bytes,source);assert.equal(inferMediaType(name,declared),mime);
++  }
++  assert.equal(keelAssetDisplayKind(mime),'video');
++  const root=await buildKeelInlineLocalDocument({shell,modules:[display],entry:{id:name,mediaType:mime,source}}),item=entries(root).find(item=>item.id===name);assert.equal(item.mediaType,mime);assert.equal(item.embedded.compression,'none');assert.deepEqual(Buffer.from(item.embedded.storedBase64,'base64'),source);
++  const current=proof(root);assert.equal(current.members.length,1);assert.equal(current.nativeNoneMembers.length,1);assert.equal(current.nativeNoneMembers[0].mediaType,mime);assert.deepEqual(assertKeelRegisteredNativeGzipProof(current,root.rootBytes),current);
++  const audit=inspectKeelInlinePayloadCarriage(root.rootBytes,{registeredNativeGzip:current});assertKeelFreshPayloadAudit(JSON.parse(JSON.stringify(audit)));
++  const graph=await buildKeelInlineRawPercentTokenURIGraph(root,{registeredNativeGzip:current});assert.equal(graph.htmlIntegrity.digest,hash(root.rootBytes));
++  const wrongBrand=Buffer.from(source);wrongBrand.write('NOPE',8);
++  for(const compression of ['none','gzip']){
++   const valid=await buildKeelInlineLocalDocument({shell,modules:[display],entry:{id:name,mediaType:mime,source,compression}});assert.doesNotThrow(()=>proof(valid));
++   for(const [badName,bytes,badMime]of [['HTML renamed',Buffer.from('<html>not a video</html>'),mime],['truncated source',source.subarray(0,-1),mime],['wrong major brand',wrongBrand,mime],['audio-only MOV',readFileSync(new URL('./fixtures/registered-native-none/audio-only.mov',import.meta.url)),mime],['unknown video type',source,'video/x-invented']]){
++    if(badMime==='video/x-invented'){assert.throws(()=>keelAssetDisplayKind(badMime));continue}
++    const forged=await buildKeelInlineLocalDocument({shell,modules:[display],entry:{id:name,mediaType:badMime,source:bytes,compression}});assert.throws(()=>proof(forged),undefined,badName+' '+compression);
++   }
++  }
++ });
++});
+diff --git a/tests/studio-core.test.mjs b/tests/studio-core.test.mjs
+index b97db34..c19fc31 100644
+--- a/tests/studio-core.test.mjs
++++ b/tests/studio-core.test.mjs
+@@ -64,6 +64,19 @@ test("normal model folders infer exact shared MIME roles without rewriting decla
+   assert.equal(inferMediaType("nested/unsupported.fbx"), "application/octet-stream");
+ });
+ 
++test("normal MOV/M4V file names infer native video MIME while explicit MIME remains authoritative", () => {
++  for (const [name, mime] of [["clip.mov", "video/quicktime"], ["clip.m4v", "video/x-m4v"]]) {
++    for (const declared of [undefined, "", "application/octet-stream"]) {
++      assert.equal(inferMediaType(`nested/${name}`, declared), mime);
++      assert.equal(inferMediaType(`nested/${name.toUpperCase()}`, declared), mime);
++      assert.equal(inferRole(inferMediaType(name, declared), name), "video");
++    }
++    assert.equal(inferMediaType(name, "text/javascript"), "text/javascript");
++  }
++  assert.equal(inferMediaType("clip.mov.png"), "image/png");
++  assert.equal(inferMediaType("clip.m4v.bak"), "application/octet-stream");
++});
++
+ test("studio-core creates safe names and compression summaries", () => {
+   assert.equal(slugify("  Living Study #1  "), "living-study-1");
+   assert.equal(normalizeVirtualPath("/content/preview.webp"), "/content/preview.webp");

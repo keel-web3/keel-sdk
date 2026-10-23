@@ -1,0 +1,66 @@
+{
+  "schema": "keel-author-native-movie-qualification@1",
+  "sourceCommit": "e946bde7140d4ce1eb04ecac735c7ed216d2bf46",
+  "sourceCommits": [
+    "5b873b630ff2a183d078f792c7db952b59d24f26",
+    "e946bde7140d4ce1eb04ecac735c7ed216d2bf46"
+  ],
+  "baseCommit": "0dc7e6f",
+  "environment": {
+    "node": "v22.22.1",
+    "platform": "macOS-15.6.1-arm64-arm-64bit-Mach-O",
+    "browser": "Installed Chromium headless-shell1234"
+  },
+  "finalBuild": {
+    "command": "PATH=/Users/ravonus/.nvm/versions/node/v22.22.1/bin:$PATH node scripts/build.mjs",
+    "exit": 0,
+    "receipt": "final-normal-build-corrected.log",
+    "outputManifest": "exact-e946-build-output-manifest.json"
+  },
+  "focused": {
+    "command": "node --test tests/registered-native-none.test.mjs tests/studio-core.test.mjs tests/registered-native-gzip.test.mjs tests/registered-shared-module-codec.test.mjs tests/current-publication-carriage.test.mjs tests/media-viewer-adapters.test.mjs",
+    "pass": 145,
+    "fail": 0,
+    "skipped": 0,
+    "receipt": "exact-e946-focused.log"
+  },
+  "browser": {
+    "command": "node --test tests/registered-native-none.browser.test.mjs",
+    "pass": 2,
+    "fail": 0,
+    "skipped": 0,
+    "receipt": "browser-exact-e946.log",
+    "qualified": [
+      "video/mp4",
+      "video/x-m4v"
+    ]
+  },
+  "quickTime": {
+    "status": "DIRECT_PLAYBACK_UNSUPPORTED",
+    "sourceInference": "video/quicktime, original preserved",
+    "originalBrowserResult": "FAIL, retained unchanged assertion",
+    "errorCode": 4,
+    "errorMessage": "MEDIA_ELEMENT_ERROR: Unable to load URL due to content type",
+    "evidence": "browser-diagnostic/mov-failure.json",
+    "finalBehavior": "Explicit rejection with preserve-original/separate-MP4-derivative guidance; no MIME relabel or typeless bypass"
+  },
+  "notClaimed": [
+    "Independent approval",
+    "Actual normal Postgres M4V intake",
+    "Authenticated API/MCP run",
+    "Live deployment",
+    "Wallet handoff",
+    "Onchain changes"
+  ],
+  "writes": {
+    "production": 0,
+    "chain": 0,
+    "wallet": 0,
+    "credentials": 0
+  },
+  "priorEvidenceClarification": {
+    "frozen3deExplicitNode22": "179 focused +1 browser PASS in this packet",
+    "earlierShellNode25": "Recorded correctly in prior result.json; prior README environment phrase corrected here",
+    "gzipBenefit": "Previous not-beneficial assertion withdrawn; source-only gzip sizes MP4 1144/1786, MOV1103/1732, M4V1123/1775; no selection changes"
+  }
+}
