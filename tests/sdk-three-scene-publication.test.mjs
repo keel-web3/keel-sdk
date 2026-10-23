@@ -111,6 +111,7 @@ test("receipt evidence resumes the immutable scene without a second wallet appro
     savedJobId: "41",
     confirmedJobIds: [42n],
     recovery: {
+      planDigest: result.publication.planDigest,
       completedChunks: 3,
       completedOperations: 0,
       failedChunkIndexes: [2],
@@ -167,6 +168,7 @@ test("recovery omits an absent saved job id", async () => {
     plan: result,
     confirmedJobIds: [],
     recovery: {
+      planDigest: result.publication.planDigest,
       completedChunks: 0,
       completedOperations: 0,
       failedChunkIndexes: [],
@@ -177,4 +179,35 @@ test("recovery omits an absent saved job id", async () => {
 
   assert.equal("jobId" in resumed, false);
   assert.equal(resumed.walletApproval, "not-requested");
+});
+
+test("recovery rejects another immutable plan or job", async () => {
+  const result = await buildKeelImmutableThreeScenePublicationPlan(input());
+  const other = await buildKeelImmutableThreeScenePublicationPlan(input({ deadline: 2_001n }));
+  const progress = {
+    jobId: "99",
+    planDigest: result.publication.planDigest,
+    completedChunks: 1,
+    completedOperations: 0,
+    failedChunkIndexes: [],
+    failedOperationIndexes: [],
+    transactionHashes: [],
+  };
+
+  assert.throws(
+    () => recoverKeelImmutableThreeScenePublication({
+      plan: result,
+      confirmedJobIds: [42n],
+      recovery: progress,
+    }),
+    /different job/u,
+  );
+  assert.throws(
+    () => recoverKeelImmutableThreeScenePublication({
+      plan: result,
+      confirmedJobIds: [99n],
+      recovery: { ...progress, planDigest: other.publication.planDigest },
+    }),
+    /different immutable plan/u,
+  );
 });

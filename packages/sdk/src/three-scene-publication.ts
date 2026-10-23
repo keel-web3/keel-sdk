@@ -733,18 +733,36 @@ export function recoverKeelImmutableThreeScenePublication(input: {
   readonly plan: KeelImmutableThreeScenePublicationPlan;
   readonly savedJobId?: string;
   readonly confirmedJobIds: readonly bigint[];
-  readonly recovery: KeelPublicationRecovery;
+  readonly recovery: KeelPublicationRecovery & { readonly planDigest: Hex };
 }): KeelImmutableThreeSceneRecovery {
+  const planDigest = ensureBytes32(input.recovery.planDigest, "recovery.planDigest");
+  if (planDigest !== input.plan.publication.planDigest.toLowerCase()) {
+    throw new Error("The KEEL publication recovery evidence identifies a different immutable plan.");
+  }
   const jobId = selectResumableKeelJobId({
     ...(input.savedJobId === undefined ? {} : { savedJobId: input.savedJobId }),
     confirmedJobIds: input.confirmedJobIds,
   });
-  const recovery = mergeKeelPublicationRecovery(undefined, input.recovery);
+  const recoveryJobId = input.recovery.jobId === undefined
+    ? undefined
+    : selectResumableKeelJobId({ savedJobId: input.recovery.jobId, confirmedJobIds: [] });
+  if (jobId !== undefined && recoveryJobId !== undefined && jobId !== recoveryJobId) {
+    throw new Error("The KEEL publication recovery evidence identifies a different job.");
+  }
+  const selectedJobId = jobId ?? recoveryJobId;
+  const recovery = mergeKeelPublicationRecovery(undefined, {
+    ...(selectedJobId === undefined ? {} : { jobId: selectedJobId.toString() }),
+    completedChunks: input.recovery.completedChunks,
+    completedOperations: input.recovery.completedOperations,
+    failedChunkIndexes: input.recovery.failedChunkIndexes,
+    failedOperationIndexes: input.recovery.failedOperationIndexes,
+    transactionHashes: input.recovery.transactionHashes,
+  });
   return Object.freeze({
     protocol: KEEL_THREE_SCENE_PUBLICATION_PROTOCOL,
     storageMode: KEEL_NATIVE_CARRIER_V1,
-    planDigest: input.plan.publication.planDigest,
-    ...(jobId === undefined ? {} : { jobId }),
+    planDigest,
+    ...(selectedJobId === undefined ? {} : { jobId: selectedJobId }),
     recovery,
     walletApproval: "not-requested",
   });
