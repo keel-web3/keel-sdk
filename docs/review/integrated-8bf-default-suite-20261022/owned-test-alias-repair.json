@@ -1,0 +1,22 @@
+{
+  "testSourceChanged": false,
+  "sharedPathsChanged": false,
+  "rows": [
+    {
+      "path": "/private/tmp/keel-sdk-integration-20261022-01/apps/studio/node_modules/brotli-dec-wasm",
+      "target": "/private/tmp/keel-sdk-integration-20261022-01/node_modules/.pnpm/brotli-dec-wasm@2.3.2/node_modules/brotli-dec-wasm",
+      "package": "brotli-dec-wasm",
+      "version": "2.3.2",
+      "packageJSONSHA256": "d3791ae0250bd96d6bd13ee80802be4cbc79dbf17c73e9882a824412cc0bc24c",
+      "publicDependencyOnly": true
+    },
+    {
+      "path": "/private/tmp/keel-sdk-integration-20261022-01/apps/demo/node_modules/vite",
+      "target": "/private/tmp/keel-sdk-integration-20261022-01/node_modules/.pnpm/vite@7.3.6_@types+node@24.13.3_jiti@2.7.0_lightningcss@1.32.0_terser@5.44.0_yaml@2.8.2/node_modules/vite",
+      "package": "vite",
+      "version": "7.3.6",
+      "packageJSONSHA256": "e5ed0f85215f871fe22a48987dcd77fcfbe14064a53c0c9f7f48186a6b7e2cf0",
+      "publicDependencyOnly": true
+    }
+  ]
+}

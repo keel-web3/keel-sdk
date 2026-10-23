@@ -1,0 +1,47 @@
+[
+  {
+    "path": "README.md",
+    "bytes": 1841,
+    "sha256": "d7798846aad982e9522bf03962a820ae1506aabf66b011356fca042e3679855b"
+  },
+  {
+    "path": "command.json",
+    "bytes": 466,
+    "sha256": "88f7a50aec92ce7c1edc558ac24edab690a684fcb62d5c6899097b9e477de82a"
+  },
+  {
+    "path": "owned-alias-rerun.json",
+    "bytes": 427,
+    "sha256": "ef90220532db7fedbdbb7cd7bf762abd7619f27ea890e4cd4a8c9d8dc5a29e6c"
+  },
+  {
+    "path": "owned-alias-rerun.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "owned-alias-rerun.stdout",
+    "bytes": 4541,
+    "sha256": "29526ce35c1861377cd14fe0bbc3c3f595c5adea33d72d0215ec396d2a567e6f"
+  },
+  {
+    "path": "owned-test-alias-repair.json",
+    "bytes": 998,
+    "sha256": "044e725be17f1229f505e63c967ff27fcc0501d564b7b1d813136f0437a82552"
+  },
+  {
+    "path": "result.json",
+    "bytes": 339,
+    "sha256": "b7d76a6386416002cb8e89cd66e11f5a86086e3a9426f6846c0131c3f047e6d4"
+  },
+  {
+    "path": "stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "stdout.log",
+    "bytes": 754042,
+    "sha256": "78efe3f9a5652f31af0c556b46dabb552d4083f13cb1a7af262431e73858dffb"
+  }
+]

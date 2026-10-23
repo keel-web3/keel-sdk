@@ -1,0 +1,15 @@
+{
+  "source": "8bf939a5a1144605939ca48b8b1dd2e83c132355",
+  "command": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "--test",
+    "--test-concurrency=2",
+    "tests/keel-module-assurance.test.mjs",
+    "tests/keel-verification-shell.test.mjs",
+    "tests/sdk-browser-abi.test.mjs",
+    "tests/sdk-verification-wrap.test.mjs"
+  ],
+  "exit": 0,
+  "elapsed": 27.011763792019337,
+  "testSourceChanged": false
+}

@@ -1,0 +1,9 @@
+# Integrated8bf maintained SDK suite — FAIL, retained
+
+Exact SDK8bf939a5a1144605939ca48b8b1dd2e83c132355, Node22.22.1. Normal `node scripts/test.mjs` freshly clean-builds current runtime then runs all default classified files with two workers. 141.897s total:3127tests,3035PASS,7FAIL,85existing sibling skips; zero cancellations. This is not a full qualification or a release approval.
+
+Four failures were owned test-dependency setup: three standalone-shell cases could not find BrotliWASM under apps/studio/node_modules, and ABI browser bundle could not resolve Vite under apps/demo. Adding two public-package aliases ONLY in this owned checkout (exact versions2.3.2/7.3.6 and source package hashes in owned-test-alias-repair.json) fixed allfour. The exact four files were rerun unchanged:20PASS/0FAIL/0skip. No shared dependency/cache, production source or assertions changed. The original seven-failure log remains intact; no fresh full-suite PASS is inferred from the targeted repair.
+
+Three unchanged acceptance-media-fixture-parity cases fail: generated untagged-colorMOV losslessWebP/AVIF correctly refuse unknown color authority; generated WebM candidate fails strict metadata and ISO-only presentation qualification while global capabilities still advertise WebM. Independent QA is classifying required test-versus-product corrections with retained exact input/probe bytes. Do not remove cases, modify reference assets or relax color/metadata/timeline guards to manufacture a pass. Existing qualified-sRGB positive tests remain required.
+
+The later RPC merge is not part of this tested source. Native-None follow-on audit/role-shape blockers found independently after these leaf tests are also open. Actual normal PostgreSQL, Gatorrr/GIF native simulation, deployed UI/wallet and final artifact gates remain separate and BLOCKED.

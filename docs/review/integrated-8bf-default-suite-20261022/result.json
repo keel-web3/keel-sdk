@@ -1,0 +1,15 @@
+{
+  "source": "8bf939a5a1144605939ca48b8b1dd2e83c132355",
+  "exit": 1,
+  "elapsedSeconds": 141.89700079197064,
+  "counts": {
+    "tests": 3127,
+    "suites": 0,
+    "pass": 3035,
+    "fail": 7,
+    "cancelled": 0,
+    "skipped": 85,
+    "todo": 0
+  },
+  "stdoutSHA256": "78efe3f9a5652f31af0c556b46dabb552d4083f13cb1a7af262431e73858dffb"
+}

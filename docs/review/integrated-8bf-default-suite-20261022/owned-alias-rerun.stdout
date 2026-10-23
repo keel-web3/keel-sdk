@@ -1,0 +1,130 @@
+TAP version 13
+# Subtest: an author goes from zero to a build that proves itself
+ok 1 - an author goes from zero to a build that proves itself
+  ---
+  duration_ms: 2372.45425
+  type: 'test'
+  ...
+# Subtest: the compactor ships the smaller stored candidate and repeats byte for byte
+ok 2 - the compactor ships the smaller stored candidate and repeats byte for byte
+  ---
+  duration_ms: 3242.07375
+  type: 'test'
+  ...
+# Subtest: a stamped build reproduces byte exactly, and a stamp that closes its own comment is refused
+ok 3 - a stamped build reproduces byte exactly, and a stamp that closes its own comment is refused
+  ---
+  duration_ms: 3138.259
+  type: 'test'
+  ...
+# Subtest: --keep-comments puts legal comments on chain and still reproduces
+ok 4 - --keep-comments puts legal comments on chain and still reproduces
+  ---
+  duration_ms: 3240.47175
+  type: 'test'
+  ...
+# Subtest: a hand-minified candidate earns behaviorally-verified and never more
+ok 5 - a hand-minified candidate earns behaviorally-verified and never more
+  ---
+  duration_ms: 2253.8495
+  type: 'test'
+  ...
+# Subtest: a behavior-breaking candidate is rejected and leaves no receipt behind
+ok 6 - a behavior-breaking candidate is rejected and leaves no receipt behind
+  ---
+  duration_ms: 2257.585125
+  type: 'test'
+  ...
+# Subtest: a module with no vectors cannot be behaviorally verified at all
+ok 7 - a module with no vectors cannot be behaviorally verified at all
+  ---
+  duration_ms: 2167.927791
+  type: 'test'
+  ...
+# Subtest: 5a: a readable source edit is caught even when the minified bytes do not move
+ok 8 - 5a: a readable source edit is caught even when the minified bytes do not move
+  ---
+  duration_ms: 1751.724667
+  type: 'test'
+  ...
+# Subtest: 5b: a single flipped byte in the shipped output is caught by every consumer
+ok 9 - 5b: a single flipped byte in the shipped output is caught by every consumer
+  ---
+  duration_ms: 3638.903959
+  type: 'test'
+  ...
+# Subtest: 5c: editing what the recipe records about the build breaks the recipe digest
+ok 10 - 5c: editing what the recipe records about the build breaks the recipe digest
+  ---
+  duration_ms: 1903.854209
+  type: 'test'
+  ...
+# Subtest: wrapInVerificationShell returns a self-contained document and a review-only plan
+ok 11 - wrapInVerificationShell returns a self-contained document and a review-only plan
+  ---
+  duration_ms: 455.422292
+  type: 'test'
+  ...
+# Subtest: Ethereum and Tezos use the exact existing Vault character verification shell
+ok 12 - Ethereum and Tezos use the exact existing Vault character verification shell
+  ---
+  duration_ms: 162.88425
+  type: 'test'
+  ...
+# Subtest: the shared EVM and Tezos shell accepts a versioned presentation manifest without changing verifier logic
+ok 13 - the shared EVM and Tezos shell accepts a versioned presentation manifest without changing verifier logic
+  ---
+  duration_ms: 647.826875
+  type: 'test'
+  ...
+# Subtest: the existing Vault shell fails closed and refuses unsupported verifier receipts
+ok 14 - the existing Vault shell fails closed and refuses unsupported verifier receipts
+  ---
+  duration_ms: 0.649958
+  type: 'test'
+  ...
+# Subtest: the standalone verifier wraps headless entrypoints before injection
+ok 15 - the standalone verifier wraps headless entrypoints before injection
+  ---
+  duration_ms: 0.375792
+  type: 'test'
+  ...
+# Subtest: @keel/sdk publishes the ABI facade as a direct subpath
+ok 16 - @keel/sdk publishes the ABI facade as a direct subpath
+  ---
+  duration_ms: 4.817709
+  type: 'test'
+  ...
+# Subtest: a Vite browser consumer of @keel/sdk/abi stays clear of Node-only externalization
+ok 17 - a Vite browser consumer of @keel/sdk/abi stays clear of Node-only externalization
+  ---
+  duration_ms: 415.953417
+  type: 'test'
+  ...
+# Subtest: ABI canonical comparison ignores only top-level entry order
+ok 18 - ABI canonical comparison ignores only top-level entry order
+  ---
+  duration_ms: 6.130666
+  type: 'test'
+  ...
+# Subtest: wrapInVerificationShell wraps an art entry in the canonical shell with a review-only plan
+ok 19 - wrapInVerificationShell wraps an art entry in the canonical shell with a review-only plan
+  ---
+  duration_ms: 469.562208
+  type: 'test'
+  ...
+# Subtest: the studio viewer builder script and the SDK share one shell implementation
+ok 20 - the studio viewer builder script and the SDK share one shell implementation
+  ---
+  duration_ms: 25.647084
+  type: 'test'
+  ...
+1..20
+# tests 20
+# suites 0
+# pass 20
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 26940.225375

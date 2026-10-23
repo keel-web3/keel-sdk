@@ -1,0 +1,20 @@
+{
+  "source": "8bf939a5a1144605939ca48b8b1dd2e83c132355",
+  "command": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "scripts/test.mjs"
+  ],
+  "cwd": "/private/tmp/keel-sdk-integration-20261022-01",
+  "environmentKeys": [
+    "HOME",
+    "KEEL_TEST_CONCURRENCY",
+    "LANG",
+    "LC_ALL",
+    "LOGNAME",
+    "NODE_ENV",
+    "PATH",
+    "SHELL",
+    "USER"
+  ],
+  "networkScope": "ordinary classified deterministic/loopback suite; no live suite"
+}
