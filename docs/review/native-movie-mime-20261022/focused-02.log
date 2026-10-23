@@ -1,0 +1,890 @@
+TAP version 13
+# Subtest: fresh SDK exposes only compact/raw-percent carriage selectors
+ok 1 - fresh SDK exposes only compact/raw-percent carriage selectors
+  ---
+  duration_ms: 0.800542
+  type: 'test'
+  ...
+# Subtest: current source creates raw-percent metadata and HTML while preserving exact media Base64
+ok 2 - current source creates raw-percent metadata and HTML while preserving exact media Base64
+  ---
+  duration_ms: 25.954834
+  type: 'test'
+  ...
+# Subtest: acknowledgement and environment cannot revive a retired fresh constructor
+ok 3 - acknowledgement and environment cannot revive a retired fresh constructor
+  ---
+  duration_ms: 1.308209
+  type: 'test'
+  ...
+# Subtest: prepared composer and COPY readback cannot select retired graph media under an explicit policy
+ok 4 - prepared composer and COPY readback cannot select retired graph media under an explicit policy
+  ---
+  duration_ms: 0.85375
+  type: 'test'
+  ...
+# Subtest: exact raw object reuse stays zero-publication; historical byte encodings cannot be inferred
+ok 5 - exact raw object reuse stays zero-publication; historical byte encodings cannot be inferred
+  ---
+  duration_ms: 1.721958
+  type: 'test'
+  ...
+# Subtest: registered candidate source ABI is canonical-items only, never a Dense compatibility profile
+ok 6 - registered candidate source ABI is canonical-items only, never a Dense compatibility profile
+  ---
+  duration_ms: 0.5235
+  type: 'test'
+  ...
+# Subtest: current context validator retains exact ABI, all security guards, immutable copy and no getters
+ok 7 - current context validator retains exact ABI, all security guards, immutable copy and no getters
+  ---
+  duration_ms: 0.637125
+  type: 'test'
+  ...
+# Subtest: retained Base90/91 build choices cannot silently override the current fresh transport
+ok 8 - retained Base90/91 build choices cannot silently override the current fresh transport
+  ---
+  duration_ms: 0.702833
+  type: 'test'
+  ...
+# Subtest: actual MCP raw reuse remains review-only and rejects historical media without writes
+ok 9 - actual MCP raw reuse remains review-only and rejects historical media without writes
+  ---
+  duration_ms: 477.706458
+  type: 'test'
+  ...
+# Subtest: native raster adapter authenticates its exact animation-capable decoded module bytes
+ok 10 - native raster adapter authenticates its exact animation-capable decoded module bytes
+  ---
+  duration_ms: 0.89375
+  type: 'test'
+  ...
+# Subtest: native animation profile preserves existing catalog GIF, PNG and JPEG routes without a Three dependency
+ok 11 - native animation profile preserves existing catalog GIF, PNG and JPEG routes without a Three dependency
+  ---
+  duration_ms: 0.359584
+  type: 'test'
+  ...
+# Subtest: older draw-once WebP/AVIF cannot be reused for actually animated or inconclusive source bytes
+ok 12 - older draw-once WebP/AVIF cannot be reused for actually animated or inconclusive source bytes
+  ---
+  duration_ms: 0.225833
+  type: 'test'
+  ...
+# Subtest: altered module identity, bytes or version never establishes native-media compatibility
+ok 13 - altered module identity, bytes or version never establishes native-media compatibility
+  ---
+  duration_ms: 0.130708
+  type: 'test'
+  ...
+# Subtest: artwork category cannot imply unsupported audio, executable SVG or model playback
+ok 14 - artwork category cannot imply unsupported audio, executable SVG or model playback
+  ---
+  duration_ms: 0.113875
+  type: 'test'
+  ...
+# Subtest: unchanged generic fresh guard rejects actual rev5 gzip descriptor; exact recipe admits raw-percent only
+ok 15 - unchanged generic fresh guard rejects actual rev5 gzip descriptor; exact recipe admits raw-percent only
+  ---
+  duration_ms: 35.256084
+  type: 'test'
+  ...
+# Subtest: wrong chain/registration/frame/runtime cannot reuse native recipe
+ok 16 - wrong chain/registration/frame/runtime cannot reuse native recipe
+  ---
+  duration_ms: 0.955708
+  type: 'test'
+  ...
+# Subtest: changed compressed or decoded commitment, extra code and another codec remain rejected
+ok 17 - changed compressed or decoded commitment, extra code and another codec remain rejected
+  ---
+  duration_ms: 2.330792
+  type: 'test'
+  ...
+# Subtest: whole HTML Base64 carriage cannot reuse per-resource allowance
+ok 18 - whole HTML Base64 carriage cannot reuse per-resource allowance
+  ---
+  duration_ms: 10.295583
+  type: 'test'
+  ...
+# Subtest: proof and source snapshots reject mutations; explicitgzip eligible only when selected reader allows it
+ok 19 - proof and source snapshots reject mutations; explicitgzip eligible only when selected reader allows it
+  ---
+  duration_ms: 1.415708
+  type: 'test'
+  ...
+# Subtest: actual public rev5 nativeGzip whole-output candidate competes by returned URI, never source bytes alone
+ok 20 - actual public rev5 nativeGzip whole-output candidate competes by returned URI, never source bytes alone
+  ---
+  duration_ms: 37.843458
+  type: 'test'
+  ...
+# {"scope":"PROVISIONAL_TEMPLATE_NOT_ADOPTION_OR_FULL_SIMULATION","actualGatorrr":false,"source":[{"algorithm":"sha256","digest":"0xdd03cf819aecdb82a4a755ceebd0b1c8037f88b95124fac3ae175f7e65e21727","byteLength":1344},{"algorithm":"sha256","digest":"0x5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f","byteLength":77}],"candidates":[{"id":"gzip","codec":"gzip","recipeDigest":"0xd78730f1e5090acda5c66bf280b89a67655d297fc9f7bd02f9fd78fc9abcffd2","measurementScope":{"kind":"provisional-template","templateDigest":"0x16065f7a79caa45206bca9251d980a9487ccbf4597d2beea421735671caddcc3"},"tokenURICommitment":{"digest":"0xb90515e61b6f6e4279e3607fee6afa6e396f55352428595dd0e78c54591db597","byteLength":119479},"derivedMetadataDigest":"0x44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a","metadataBytes":102577,"htmlBytes":85491,"imageBytes":77,"imageURIBytes":126,"imageDelivery":"inline","externalPreviewReadAuthenticated":false,"animationURIBytes":102344,"sourceBytes":1421,"compressedPayloadBytes":155,"encodedPayloadBytes":208,"completeTokenURIBytes":119479,"newStoredBytes":1467,"reusedStoredBytes":119848,"uniqueStoredBytes":121315,"uniqueObjects":4,"decoderObjectBytes":0,"bootObjectBytes":119848,"combinedBootDecoderObjectBytes":0,"generatedHtmlSuffixBytes":0,"nativeBrowserGzip":true,"javascriptCodecDecoderBytes":0,"decoderCostScope":"exact-distinct-stored-object-roles","javascriptGzipDecoderBytes":0,"sourceByteIdentity":"verified-exact"},{"id":"none","codec":"none","recipeDigest":"0x421cb56dd903261980c396d6b4c224d0537d0b9e050b57ac65bf4a611fa42d8a","measurementScope":{"kind":"provisional-template","templateDigest":"0x16065f7a79caa45206bca9251d980a9487ccbf4597d2beea421735671caddcc3"},"tokenURICommitment":{"digest":"0x8b1bd66b052cf73bbe8c0fc7f2dd11a00b2d2da07f59d7c740e1d7cc5f999789","byteLength":122025},"derivedMetadataDigest":"0x44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a","metadataBytes":104495,"htmlBytes":86781,"imageBytes":77,"imageURIBytes":126,"imageDelivery":"inline","externalPreviewReadAuthenticated":false,"animationURIBytes":104262,"sourceBytes":1421,"compressedPayloadBytes":1421,"encodedPayloadBytes":1448,"completeTokenURIBytes":122025,"newStoredBytes":4013,"reusedStoredBytes":119848,"uniqueStoredBytes":123861,"uniqueObjects":4,"decoderObjectBytes":0,"bootObjectBytes":119848,"combinedBootDecoderObjectBytes":0,"generatedHtmlSuffixBytes":0,"nativeBrowserGzip":false,"javascriptCodecDecoderBytes":null,"decoderCostScope":"exact-distinct-stored-object-roles","sourceByteIdentity":"verified-exact"}]}
+# Subtest: typed proof reaches COPY/readback audit; wrong chain and stale returned bytes reject
+ok 21 - typed proof reaches COPY/readback audit; wrong chain and stale returned bytes reject
+  ---
+  duration_ms: 40.940167
+  type: 'test'
+  ...
+# Subtest: explicitgzip is deterministic for incompressible URI81 payloads and never coerces to Brotli/None
+ok 22 - explicitgzip is deterministic for incompressible URI81 payloads and never coerces to Brotli/None
+  ---
+  duration_ms: 141.546042
+  type: 'test'
+  ...
+# (node:67400) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: Studio core explicitgzip stores exact deterministic gzip bytes, not its old Brotli else branch
+ok 23 - Studio core explicitgzip stores exact deterministic gzip bytes, not its old Brotli else branch
+  ---
+  duration_ms: 410.243208
+  type: 'test'
+  ...
+# Subtest: exact normal1786-byte MP4 default None survives the actual registered rev5 proof
+ok 24 - exact normal1786-byte MP4 default None survives the actual registered rev5 proof
+  ---
+  duration_ms: 8.764125
+  type: 'test'
+  ...
+# Subtest: complete native WebM video and existing PCM/AAC/MP3/Ogg/FLAC audio and GLB survive exact None identity proof
+    # Subtest: audio/wav
+    ok 1 - audio/wav
+      ---
+      duration_ms: 2.484208
+      type: 'test'
+      ...
+    # Subtest: audio/aac
+    ok 2 - audio/aac
+      ---
+      duration_ms: 1.969667
+      type: 'test'
+      ...
+    # Subtest: audio/mpeg
+    ok 3 - audio/mpeg
+      ---
+      duration_ms: 1.678833
+      type: 'test'
+      ...
+    # Subtest: audio/ogg
+    ok 4 - audio/ogg
+      ---
+      duration_ms: 2.383333
+      type: 'test'
+      ...
+    # Subtest: audio/flac
+    ok 5 - audio/flac
+      ---
+      duration_ms: 2.586375
+      type: 'test'
+      ...
+    # Subtest: audio/mp4
+    ok 6 - audio/mp4
+      ---
+      duration_ms: 1.800458
+      type: 'test'
+      ...
+    # Subtest: model/gltf-binary
+    ok 7 - model/gltf-binary
+      ---
+      duration_ms: 2.255583
+      type: 'test'
+      ...
+    1..7
+ok 25 - complete native WebM video and existing PCM/AAC/MP3/Ogg/FLAC audio and GLB survive exact None identity proof
+  ---
+  duration_ms: 18.308916
+  type: 'test'
+  ...
+# Subtest: native None proof rejects spoofed types, encoded text/scripts, malformed container bytes and wrong roles
+    # Subtest: unknown MIME
+    ok 1 - unknown MIME
+      ---
+      duration_ms: 0.48675
+      type: 'test'
+      ...
+    # Subtest: encoded HTML
+    ok 2 - encoded HTML
+      ---
+      duration_ms: 0.264167
+      type: 'test'
+      ...
+    # Subtest: encoded JavaScript
+    ok 3 - encoded JavaScript
+      ---
+      duration_ms: 0.250125
+      type: 'test'
+      ...
+    # Subtest: MIME-spoofed text
+    ok 4 - MIME-spoofed text
+      ---
+      duration_ms: 0.294125
+      type: 'test'
+      ...
+    # Subtest: module role
+    ok 5 - module role
+      ---
+      duration_ms: 0.21375
+      type: 'test'
+      ...
+    # Subtest: missing role
+    ok 6 - missing role
+      ---
+      duration_ms: 0.190625
+      type: 'test'
+      ...
+    # Subtest: truncated movie
+    ok 7 - truncated movie
+      ---
+      duration_ms: 0.253792
+      type: 'test'
+      ...
+    # Subtest: incomplete box
+    ok 8 - incomplete box
+      ---
+      duration_ms: 0.218417
+      type: 'test'
+      ...
+    # Subtest: wrong handler
+    ok 9 - wrong handler
+      ---
+      duration_ms: 0.286041
+      type: 'test'
+      ...
+    # Subtest: external media range
+    ok 10 - external media range
+      ---
+      duration_ms: 0.246708
+      type: 'test'
+      ...
+    # Subtest: wrong sample count
+    ok 11 - wrong sample count
+      ---
+      duration_ms: 0.1985
+      type: 'test'
+      ...
+    # Subtest: double encoded movie
+    ok 12 - double encoded movie
+      ---
+      duration_ms: 0.211125
+      type: 'test'
+      ...
+    # Subtest: bad canonical Base64
+    ok 13 - bad canonical Base64
+      ---
+      duration_ms: 0.15925
+      type: 'test'
+      ...
+    # Subtest: decoded digest mismatch
+    ok 14 - decoded digest mismatch
+      ---
+      duration_ms: 0.186333
+      type: 'test'
+      ...
+    # Subtest: stored digest mismatch
+    ok 15 - stored digest mismatch
+      ---
+      duration_ms: 0.175792
+      type: 'test'
+      ...
+    # Subtest: ambiguous text sibling
+    ok 16 - ambiguous text sibling
+      ---
+      duration_ms: 0.163458
+      type: 'test'
+      ...
+    1..16
+ok 26 - native None proof rejects spoofed types, encoded text/scripts, malformed container bytes and wrong roles
+  ---
+  duration_ms: 5.522625
+  type: 'test'
+  ...
+# Subtest: native None cannot bypass immutable frame/binding or the mandatory genuine Gzip member
+ok 27 - native None cannot bypass immutable frame/binding or the mandatory genuine Gzip member
+  ---
+  duration_ms: 3.073917
+  type: 'test'
+  ...
+# Subtest: None external glTF buffers require the exact complete referenced model resource graph
+    # Subtest: unreferenced extra buffer
+    ok 1 - unreferenced extra buffer
+      ---
+      duration_ms: 0.475083
+      type: 'test'
+      ...
+    # Subtest: missing model
+    ok 2 - missing model
+      ---
+      duration_ms: 0.228542
+      type: 'test'
+      ...
+    # Subtest: missing actual buffer
+    ok 3 - missing actual buffer
+      ---
+      duration_ms: 0.292458
+      type: 'test'
+      ...
+    # Subtest: ambiguous alias
+    ok 4 - ambiguous alias
+      ---
+      duration_ms: 0.252541
+      type: 'test'
+      ...
+    # Subtest: path escape
+    ok 5 - path escape
+      ---
+      duration_ms: 0.243958
+      type: 'test'
+      ...
+    # Subtest: module masquerading as buffer
+    ok 6 - module masquerading as buffer
+      ---
+      duration_ms: 0.189666
+      type: 'test'
+      ...
+    # Subtest: script MIME masquerading as buffer
+    ok 7 - script MIME masquerading as buffer
+      ---
+      duration_ms: 0.373125
+      type: 'test'
+      ...
+    # Subtest: truncated actual buffer
+    ok 8 - truncated actual buffer
+      ---
+      duration_ms: 0.495167
+      type: 'test'
+      ...
+    # Subtest: external dependency
+    ok 9 - external dependency
+      ---
+      duration_ms: 0.34975
+      type: 'test'
+      ...
+    1..9
+ok 28 - None external glTF buffers require the exact complete referenced model resource graph
+  ---
+  duration_ms: 5.868875
+  type: 'test'
+  ...
+# Subtest: registered native None proof and serialized audit reject malformed roles and one-to-one identity drift
+    # Subtest: descriptor role ["entrypoint"]
+    ok 1 - descriptor role ["entrypoint"]
+      ---
+      duration_ms: 0.263417
+      type: 'test'
+      ...
+    # Subtest: descriptor role ["asset"]
+    ok 2 - descriptor role ["asset"]
+      ---
+      duration_ms: 0.188292
+      type: 'test'
+      ...
+    # Subtest: descriptor role ["data"]
+    ok 3 - descriptor role ["data"]
+      ---
+      duration_ms: 0.156375
+      type: 'test'
+      ...
+    # Subtest: descriptor role {}
+    ok 4 - descriptor role {}
+      ---
+      duration_ms: 0.14975
+      type: 'test'
+      ...
+    # Subtest: descriptor role null
+    ok 5 - descriptor role null
+      ---
+      duration_ms: 0.146208
+      type: 'test'
+      ...
+    # Subtest: descriptor role 7
+    ok 6 - descriptor role 7
+      ---
+      duration_ms: 0.142375
+      type: 'test'
+      ...
+    # Subtest: full proof None array null
+    ok 7 - full proof None array null
+      ---
+      duration_ms: 0.105083
+      type: 'test'
+      ...
+    # Subtest: full proof None array empty
+    ok 8 - full proof None array empty
+      ---
+      duration_ms: 0.058417
+      type: 'test'
+      ...
+    # Subtest: full proof missing member
+    ok 9 - full proof missing member
+      ---
+      duration_ms: 0.2105
+      type: 'test'
+      ...
+    # Subtest: full proof duplicate member
+    ok 10 - full proof duplicate member
+      ---
+      duration_ms: 0.074
+      type: 'test'
+      ...
+    # Subtest: full proof cross Gzip duplicate
+    ok 11 - full proof cross Gzip duplicate
+      ---
+      duration_ms: 0.06325
+      type: 'test'
+      ...
+    # Subtest: full proof extra member
+    ok 12 - full proof extra member
+      ---
+      duration_ms: 0.202
+      type: 'test'
+      ...
+    # Subtest: full proof unknown member field
+    ok 13 - full proof unknown member field
+      ---
+      duration_ms: 0.059292
+      type: 'test'
+      ...
+    # Subtest: full proof coerced member role
+    ok 14 - full proof coerced member role
+      ---
+      duration_ms: 0.056583
+      type: 'test'
+      ...
+    # Subtest: full proof script member MIME
+    ok 15 - full proof script member MIME
+      ---
+      duration_ms: 0.062125
+      type: 'test'
+      ...
+    # Subtest: full proof original drift
+    ok 16 - full proof original drift
+      ---
+      duration_ms: 0.066417
+      type: 'test'
+      ...
+    # Subtest: full proof stored drift
+    ok 17 - full proof stored drift
+      ---
+      duration_ms: 0.06025
+      type: 'test'
+      ...
+    # Subtest: serialized audit proof removed
+    ok 18 - serialized audit proof removed
+      ---
+      duration_ms: 0.073375
+      type: 'test'
+      ...
+    # Subtest: serialized audit None evidence removed
+    ok 19 - serialized audit None evidence removed
+      ---
+      duration_ms: 0.099625
+      type: 'test'
+      ...
+    # Subtest: serialized audit missing witness
+    ok 20 - serialized audit missing witness
+      ---
+      duration_ms: 0.104292
+      type: 'test'
+      ...
+    # Subtest: serialized audit extra witness field
+    ok 21 - serialized audit extra witness field
+      ---
+      duration_ms: 0.088167
+      type: 'test'
+      ...
+    # Subtest: serialized audit witness role array
+    ok 22 - serialized audit witness role array
+      ---
+      duration_ms: 0.090875
+      type: 'test'
+      ...
+    # Subtest: serialized audit witness role drift
+    ok 23 - serialized audit witness role drift
+      ---
+      duration_ms: 0.091792
+      type: 'test'
+      ...
+    # Subtest: serialized audit wrong payload ID
+    ok 24 - serialized audit wrong payload ID
+      ---
+      duration_ms: 0.087083
+      type: 'test'
+      ...
+    # Subtest: serialized audit wrong MIME
+    ok 25 - serialized audit wrong MIME
+      ---
+      duration_ms: 0.083917
+      type: 'test'
+      ...
+    # Subtest: serialized audit wrong encoding
+    ok 26 - serialized audit wrong encoding
+      ---
+      duration_ms: 0.083708
+      type: 'test'
+      ...
+    # Subtest: serialized audit wrong compression
+    ok 27 - serialized audit wrong compression
+      ---
+      duration_ms: 0.084625
+      type: 'test'
+      ...
+    # Subtest: serialized audit wrong original digest
+    ok 28 - serialized audit wrong original digest
+      ---
+      duration_ms: 0.260209
+      type: 'test'
+      ...
+    # Subtest: serialized audit wrong stored digest
+    ok 29 - serialized audit wrong stored digest
+      ---
+      duration_ms: 0.116583
+      type: 'test'
+      ...
+    # Subtest: serialized audit wrong byte count
+    ok 30 - serialized audit wrong byte count
+      ---
+      duration_ms: 0.114792
+      type: 'test'
+      ...
+    # Subtest: serialized audit wrong Base64 length
+    ok 31 - serialized audit wrong Base64 length
+      ---
+      duration_ms: 0.097459
+      type: 'test'
+      ...
+    # Subtest: serialized audit duplicate payload
+    ok 32 - serialized audit duplicate payload
+      ---
+      duration_ms: 0.106583
+      type: 'test'
+      ...
+    # Subtest: serialized audit missing payload
+    ok 33 - serialized audit missing payload
+      ---
+      duration_ms: 0.100333
+      type: 'test'
+      ...
+    # Subtest: serialized audit witness on Gzip
+    ok 34 - serialized audit witness on Gzip
+      ---
+      duration_ms: 0.105333
+      type: 'test'
+      ...
+    # Subtest: serialized audit null witness
+    ok 35 - serialized audit null witness
+      ---
+      duration_ms: 0.089
+      type: 'test'
+      ...
+    # Subtest: serialized audit unknown payload field
+    ok 36 - serialized audit unknown payload field
+      ---
+      duration_ms: 0.082709
+      type: 'test'
+      ...
+    # Subtest: serialized audit foreign transport profile
+    ok 37 - serialized audit foreign transport profile
+      ---
+      duration_ms: 0.081583
+      type: 'test'
+      ...
+    1..37
+ok 29 - registered native None proof and serialized audit reject malformed roles and one-to-one identity drift
+  ---
+  duration_ms: 8.822375
+  type: 'test'
+  ...
+# Subtest: actual native None full metadata audit and COPY review survive JSON recovery without changing Gzip membership
+ok 30 - actual native None full metadata audit and COPY review survive JSON recovery without changing Gzip membership
+  ---
+  duration_ms: 35.40725
+  type: 'test'
+  ...
+# Subtest: actual MOV and M4V native files retain exact source and MIME through default None proof and fresh COPY carriage
+    # Subtest: video/quicktime
+    ok 1 - video/quicktime
+      ---
+      duration_ms: 18.247292
+      type: 'test'
+      ...
+    # Subtest: video/x-m4v
+    ok 2 - video/x-m4v
+      ---
+      duration_ms: 16.632709
+      type: 'test'
+      ...
+    1..2
+ok 31 - actual MOV and M4V native files retain exact source and MIME through default None proof and fresh COPY carriage
+  ---
+  duration_ms: 35.105625
+  type: 'test'
+  ...
+# Subtest: None creator retains exact registered shared Gzip module with mandatory final proof
+ok 32 - None creator retains exact registered shared Gzip module with mandatory final proof
+  ---
+  duration_ms: 22.283875
+  type: 'test'
+  ...
+# Subtest: compressed shared unregistered cannot bypass exact module authority
+ok 33 - compressed shared unregistered cannot bypass exact module authority
+  ---
+  duration_ms: 10.815083
+  type: 'test'
+  ...
+# Subtest: compressed shared new cannot bypass exact module authority
+ok 34 - compressed shared new cannot bypass exact module authority
+  ---
+  duration_ms: 12.204167
+  type: 'test'
+  ...
+# Subtest: compressed shared boot cannot bypass exact module authority
+ok 35 - compressed shared boot cannot bypass exact module authority
+  ---
+  duration_ms: 11.985416
+  type: 'test'
+  ...
+# Subtest: compressed shared wrong-object cannot bypass exact module authority
+ok 36 - compressed shared wrong-object cannot bypass exact module authority
+  ---
+  duration_ms: 10.329459
+  type: 'test'
+  ...
+# Subtest: compressed shared wrong-bytes cannot bypass exact module authority
+ok 37 - compressed shared wrong-bytes cannot bypass exact module authority
+  ---
+  duration_ms: 9.2395
+  type: 'test'
+  ...
+# Subtest: compressed shared wrong-MIME cannot bypass exact module authority
+ok 38 - compressed shared wrong-MIME cannot bypass exact module authority
+  ---
+  duration_ms: 11.43275
+  type: 'test'
+  ...
+# Subtest: compressed shared wrong-member cannot bypass exact module authority
+ok 39 - compressed shared wrong-member cannot bypass exact module authority
+  ---
+  duration_ms: 11.756084
+  type: 'test'
+  ...
+# Subtest: compressed shared wrong-proof cannot bypass exact module authority
+ok 40 - compressed shared wrong-proof cannot bypass exact module authority
+  ---
+  duration_ms: 9.612459
+  type: 'test'
+  ...
+# Subtest: Gzip original remains forbidden under selected None even with shared module proof
+ok 41 - Gzip original remains forbidden under selected None even with shared module proof
+  ---
+  duration_ms: 12.529625
+  type: 'test'
+  ...
+# (node:67403) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: normal model folders infer exact shared MIME roles without rewriting declared MIME or original paths
+ok 42 - normal model folders infer exact shared MIME roles without rewriting declared MIME or original paths
+  ---
+  duration_ms: 0.573625
+  type: 'test'
+  ...
+# Subtest: normal MOV/M4V file names infer native video MIME while explicit MIME remains authoritative
+ok 43 - normal MOV/M4V file names infer native video MIME while explicit MIME remains authoritative
+  ---
+  duration_ms: 0.121417
+  type: 'test'
+  ...
+# Subtest: studio-core creates safe names and compression summaries
+ok 44 - studio-core creates safe names and compression summaries
+  ---
+  duration_ms: 0.513167
+  type: 'test'
+  ...
+# Subtest: canonical Inline graph is the entrypoint and never generates a replacement index.html
+ok 45 - canonical Inline graph is the entrypoint and never generates a replacement index.html
+  ---
+  duration_ms: 5.15075
+  type: 'test'
+  ...
+# Subtest: compact percent Inline graph stays the exact uncompressed entrypoint
+ok 46 - compact percent Inline graph stays the exact uncompressed entrypoint
+  ---
+  duration_ms: 0.704292
+  type: 'test'
+  ...
+# Subtest: studio-core wrapper uses virtual content paths only
+ok 47 - studio-core wrapper uses virtual content paths only
+  ---
+  duration_ms: 0.208083
+  type: 'test'
+  ...
+# Subtest: ordinary Keel modules select the creator media renderer without owning verification
+ok 48 - ordinary Keel modules select the creator media renderer without owning verification
+  ---
+  duration_ms: 0.228375
+  type: 'test'
+  ...
+# Subtest: SWF-only projects fail closed with a Ruffle requirement instead of a blocked nested frame
+ok 49 - SWF-only projects fail closed with a Ruffle requirement instead of a blocked nested frame
+  ---
+  duration_ms: 0.080208
+  type: 'test'
+  ...
+# Subtest: manifest-declared Flash runtime generates an in-sandbox Ruffle entrypoint
+ok 50 - manifest-declared Flash runtime generates an in-sandbox Ruffle entrypoint
+  ---
+  duration_ms: 8.94625
+  type: 'test'
+  ...
+# Subtest: studio-core emits a valid strict manifest
+ok 51 - studio-core emits a valid strict manifest
+  ---
+  duration_ms: 1.020084
+  type: 'test'
+  ...
+# Subtest: studio-core requires a verified image fallback for an HTML entrypoint
+ok 52 - studio-core requires a verified image fallback for an HTML entrypoint
+  ---
+  duration_ms: 0.415334
+  type: 'test'
+  ...
+# Subtest: studio-core rejects an explicit non-image fallback
+ok 53 - studio-core rejects an explicit non-image fallback
+  ---
+  duration_ms: 0.265375
+  type: 'test'
+  ...
+# Subtest: studio-core uses an image entrypoint as its own fallback
+ok 54 - studio-core uses an image entrypoint as its own fallback
+  ---
+  duration_ms: 0.311625
+  type: 'test'
+  ...
+# Subtest: ordinary media remains the direct entrypoint for the reusable KEEL asset-display module
+ok 55 - ordinary media remains the direct entrypoint for the reusable KEEL asset-display module
+  ---
+  duration_ms: 2.84775
+  type: 'test'
+  ...
+# Subtest: studio-core detects parent-hash reorgs
+ok 56 - studio-core detects parent-hash reorgs
+  ---
+  duration_ms: 0.212875
+  type: 'test'
+  ...
+# Subtest: studio-core prepares and verifies exact decoded and compressed bytes
+ok 57 - studio-core prepares and verifies exact decoded and compressed bytes
+  ---
+  duration_ms: 2.215875
+  type: 'test'
+  ...
+# Subtest: studio-core keeps the HTML entrypoint contract-readable for inline presentation
+ok 58 - studio-core keeps the HTML entrypoint contract-readable for inline presentation
+  ---
+  duration_ms: 0.3875
+  type: 'test'
+  ...
+# Subtest: studio-core exposes both stable IDs and real file paths to verified viewers
+ok 59 - studio-core exposes both stable IDs and real file paths to verified viewers
+  ---
+  duration_ms: 1.082875
+  type: 'test'
+  ...
+# Subtest: studio-core can explicitly prepare a frozen immutable 1/1 artifact
+ok 60 - studio-core can explicitly prepare a frozen immutable 1/1 artifact
+  ---
+  duration_ms: 0.481958
+  type: 'test'
+  ...
+# Subtest: studio-core keeps the existing creator revision default when immutable is omitted
+ok 61 - studio-core keeps the existing creator revision default when immutable is omitted
+  ---
+  duration_ms: 0.473042
+  type: 'test'
+  ...
+# Subtest: studio-core rejects immutable revisions other than the canonical 1/1 shape
+ok 62 - studio-core rejects immutable revisions other than the canonical 1/1 shape
+  ---
+  duration_ms: 0.353167
+  type: 'test'
+  ...
+# Subtest: studio-core automatically packs a complete OBJKT ZIP from resolved Keel resources
+ok 63 - studio-core automatically packs a complete OBJKT ZIP from resolved Keel resources
+  ---
+  duration_ms: 2.53025
+  type: 'test'
+  ...
+# Subtest: studio-core hybrid ZIP accepts only a self-verifying Keel entrypoint
+ok 64 - studio-core hybrid ZIP accepts only a self-verifying Keel entrypoint
+  ---
+  duration_ms: 0.783
+  type: 'test'
+  ...
+# Subtest: studio-core rejects uncommitted insecure remote transports
+ok 65 - studio-core rejects uncommitted insecure remote transports
+  ---
+  duration_ms: 1.017209
+  type: 'test'
+  ...
+# Subtest: generated composite entrypoints omit the fictional local file source
+ok 66 - generated composite entrypoints omit the fictional local file source
+  ---
+  duration_ms: 1.721708
+  type: 'test'
+  ...
+# Subtest: pre-encoded tokenURI fragments remain exact uncompressed contract-readable bytes
+ok 67 - pre-encoded tokenURI fragments remain exact uncompressed contract-readable bytes
+  ---
+  duration_ms: 0.472459
+  type: 'test'
+  ...
+# Subtest: Keel stores an independently compressed module graph and materializes a directory without ZIP
+ok 68 - Keel stores an independently compressed module graph and materializes a directory without ZIP
+  ---
+  duration_ms: 2.593834
+  type: 'test'
+  ...
+# Subtest: Studio builds one multi-chunk OnchFS directory with Keel bindings to the same bytes
+ok 69 - Studio builds one multi-chunk OnchFS directory with Keel bindings to the same bytes
+  ---
+  duration_ms: 65.557542
+  type: 'test'
+  ...
+# Subtest: delivery planning uses measured OnchFS limits and moves larger directories to IPFS without changing storage
+ok 70 - delivery planning uses measured OnchFS limits and moves larger directories to IPFS without changing storage
+  ---
+  duration_ms: 0.954583
+  type: 'test'
+  ...
+# Subtest: cross-chain Module Catalog merges byte-identical carriers and rejects version collisions
+ok 71 - cross-chain Module Catalog merges byte-identical carriers and rejects version collisions
+  ---
+  duration_ms: 0.916125
+  type: 'test'
+  ...
+# Subtest: built-in media profiles create exact WebP derivative receipts
+ok 72 - built-in media profiles create exact WebP derivative receipts
+  ---
+  duration_ms: 2.381959
+  type: 'test'
+  ...
+# Subtest: prepared manifests commit generated media derivatives and exact output resources
+ok 73 - prepared manifests commit generated media derivatives and exact output resources
+  ---
+  duration_ms: 2.562166
+  type: 'test'
+  ...
+# Subtest: default raw-percent saver survives editor preparation without compression or a generated wrapper
+ok 74 - default raw-percent saver survives editor preparation without compression or a generated wrapper
+  ---
+  duration_ms: 0.328792
+  type: 'test'
+  ...
+1..74
+# tests 145
+# suites 0
+# pass 145
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 923.672375

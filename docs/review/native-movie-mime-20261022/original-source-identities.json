@@ -1,0 +1,35 @@
+{
+  "source": "Actual retained synthetic MP4 plus copy-only remux fixtures; no production artwork was changed.",
+  "inputs": [
+    {
+      "file": "tests/fixtures/registered-native-none/normal-artwork.mp4",
+      "bytes": 1786,
+      "sha256": "a421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561",
+      "majorBrand": "isom",
+      "mdatBytes": 880,
+      "mdatSHA256": "8a231f9a9f7ff08ebb57548fac3e924fbc949ebe3bece1c214cb9698cd5cb64d"
+    },
+    {
+      "file": "tests/fixtures/registered-native-none/normal-artwork.mov",
+      "bytes": 1732,
+      "sha256": "fe333b7dcd494dc0a7fbc755defb9fceb97aaa3aff960cdac77a570986c0d05f",
+      "majorBrand": "qt  ",
+      "mdatBytes": 880,
+      "mdatSHA256": "8a231f9a9f7ff08ebb57548fac3e924fbc949ebe3bece1c214cb9698cd5cb64d"
+    },
+    {
+      "file": "tests/fixtures/registered-native-none/normal-artwork.m4v",
+      "bytes": 1775,
+      "sha256": "eb417767725dbb6fc81fd5e88313f1c2d2a6e91206d2bc8d88075854d5d2f719",
+      "majorBrand": "M4V ",
+      "mdatBytes": 880,
+      "mdatSHA256": "8a231f9a9f7ff08ebb57548fac3e924fbc949ebe3bece1c214cb9698cd5cb64d"
+    }
+  ],
+  "remuxCommands": [
+    "ffmpeg -hide_banner -loglevel error -i normal-artwork.mp4 -c copy -map_metadata -1 -f mov -y normal-artwork.mov",
+    "ffmpeg -hide_banner -loglevel error -i normal-artwork.mp4 -c copy -map_metadata -1 -f ipod -y normal-artwork.m4v"
+  ],
+  "remuxFFmpeg": "Homebrew FFmpeg9.0.1; -c copy, exact mdat equality independently compared",
+  "node": "v22.22.1"
+}
