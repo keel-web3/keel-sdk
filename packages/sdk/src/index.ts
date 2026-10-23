@@ -84,6 +84,7 @@ export * from "./tezos-token-bound-account.js";
 export * from "./tezos-recovery.js";
 export * from "./tezos-governance.js";
 export * from "./tezos-entrypoint-capability.js";
+export * from "./tezos-signature-authority.js";
 
 export * from "./hold-events.js";
 

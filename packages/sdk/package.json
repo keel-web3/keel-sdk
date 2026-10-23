@@ -299,6 +299,10 @@
       "types": "./dist/tezos-entrypoint-capability.d.ts",
       "import": "./dist/tezos-entrypoint-capability.js"
     },
+    "./tezos-signature-authority": {
+      "types": "./dist/tezos-signature-authority.d.ts",
+      "import": "./dist/tezos-signature-authority.js"
+    },
     "./hold-events": {
       "types": "./dist/hold-events.d.ts",
       "import": "./dist/hold-events.js"
