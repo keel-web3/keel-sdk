@@ -673,8 +673,8 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "freeze_contract_metadata",
         "freeze_default_presentation",
         "freeze_token_metadata",
-        "refresh_custody_metadata",
         "patch_token_attributes",
+        "refresh_custody_metadata",
         "release_capacity",
         "remove_administrator",
         "reserve_capacity",
@@ -703,6 +703,7 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "freeze_default_presentation",
         "freeze_token_metadata",
         "fulfill_seed_batch",
+        "patch_token_attributes",
         "refresh_custody_metadata",
         "release_capacity",
         "remove_administrator",
@@ -712,6 +713,7 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "set_custody_presentation",
         "set_default_presentation",
         "set_default_royalty",
+        "set_field_writer",
         "set_keel_index",
         "set_minter",
         "set_token_json",
@@ -800,7 +802,6 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
       "KeelFieldIncreaseOnlyValidator"
     ],
     "entrypoints": {
-      "KeelFieldIncreaseOnlyValidator": [],
       "KeelFieldReader": [],
       "KeelFieldRegistry": [
         "cancel_grant_nonces",
@@ -825,12 +826,10 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "approve",
         "retire",
         "transfer_governance"
-      ]
+      ],
+      "KeelFieldIncreaseOnlyValidator": []
     },
     "views": {
-      "KeelFieldIncreaseOnlyValidator": [
-        "validate_field"
-      ],
       "KeelFieldReader": [
         "attributes_json",
         "check_compatible",
@@ -851,6 +850,9 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
       ],
       "KeelFieldValidatorRegistry": [
         "is_approved"
+      ],
+      "KeelFieldIncreaseOnlyValidator": [
+        "validate_field"
       ]
     }
   },

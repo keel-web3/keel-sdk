@@ -1,0 +1,34 @@
+{
+  "sourceBeforeFinalFixes": "a77876cd1504",
+  "initialFullMacGate": {
+    "tests": 3279,
+    "pass": 3207,
+    "fail": 60,
+    "skip": 12
+  },
+  "failureDisposition": "Missing locked FFmpeg binary recovered; required linked synthetic block headers added without weakening runtime checks; engine setup now handles manifests without exports; catalogs regenerated; outdated legacy-error message assertions now match strict rejection.",
+  "originalBaseline": "4ac18c08d16e79d27893e0ff683dddcadae53fd5",
+  "baselineMacComparison": {
+    "tests": 23,
+    "pass": 21,
+    "fail": 2,
+    "notes": "Exact compression-size failures reproduce before integration; assets and compression assertions unchanged."
+  },
+  "linuxVerification": {
+    "image": "node@sha256:4f77a690f2f8946ab16fe1e791a3ac0667ae1c3575c3e4d0d4589e9ed5bfaf3d",
+    "tests": 23,
+    "pass": 23,
+    "fail": 0,
+    "network": "none",
+    "sourceMount": "read-only",
+    "privileges": "capabilities dropped, no-new-privileges, non-root",
+    "esbuild": "LinuxARM64 0.28.2 archive SHA512 verified against pnpm-lock.yaml"
+  },
+  "cloudFacades": {
+    "files": 17,
+    "reproducedByteForByte": 17,
+    "normalGenerator": "packages/game-engine/scripts/link-engine-features.mjs"
+  },
+  "privateHistories": "SDK-era private Trailer source belongs to the private Trailer main; it is excluded from public SDK ancestry.",
+  "productionActivation": "Not claimed by source validation; Studio release remains separate."
+}

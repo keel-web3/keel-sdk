@@ -19,7 +19,7 @@ for (const group of ['packages', 'packs', 'ai', 'systems']) {
   }
 }
 for (const { group, part, pkg } of packages) {
-  const features = Object.keys(pkg.exports).filter(key => key !== '.' && key !== './module');
+  const features = Object.keys(pkg.exports && typeof pkg.exports === "object" && !Array.isArray(pkg.exports) ? pkg.exports : {}).filter(key => key !== '.' && key !== './module');
   for (const feature of features) {
     const names = feature.endsWith('/*')
       ? (await readdir(resolve(found.root, group, part, 'src', feature.slice(2, -2)))).filter(n => n.endsWith('.ts') && n !== 'index.ts').sort().map(n => feature.slice(2, -1) + n.slice(0, -3))

@@ -151,7 +151,7 @@ test('the historical Base90 token still decodes but cannot pass a fresh-publicat
  assert.equal(audit.preparedDenseCopy.transportProfile,'base90-v1');
  assert.ok(audit.payloadCount>0);assert.equal(audit.requiresExistingPreparedReuse,true);
  assert.throws(()=>assertKeelFreshPayloadAudit(audit),/fresh payload/);
- assert.throws(()=>assertKeelFreshPayloadCarriage(html),/Legacy Base90/);
+ assert.throws(()=>assertKeelFreshPayloadCarriage(html),/retired Base90\/91 profiles/);
  const forged=structuredClone(audit);forged.requiresExistingPreparedReuse=false;for(const payload of forged.payloads)payload.requiresExistingPreparedReuse=false;
- assert.throws(()=>assertKeelFreshPayloadAudit(forged),/URI81/);
+ assert.throws(()=>assertKeelFreshPayloadAudit(forged),{name:"TypeError",message:/Fresh prepared payloads cannot use retired Base90\/compatibility profiles/});
 });
