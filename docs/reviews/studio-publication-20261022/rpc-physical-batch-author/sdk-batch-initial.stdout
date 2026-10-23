@@ -1,0 +1,109 @@
+TAP version 13
+# Subtest: same-turn logical reads use one bounded physical admission without caching latest
+ok 1 - same-turn logical reads use one bounded physical admission without caching latest
+  ---
+  duration_ms: 2.422958
+  type: 'test'
+  ...
+# Subtest: single-read defaults remain unchanged and batch support must be explicit
+ok 2 - single-read defaults remain unchanged and batch support must be explicit
+  ---
+  duration_ms: 0.490459
+  type: 'test'
+  ...
+# Subtest: 40 members split 16/16/8 while preserving exact per-item order and outcomes
+ok 3 - 40 members split 16/16/8 while preserving exact per-item order and outcomes
+  ---
+  duration_ms: 0.555333
+  type: 'test'
+  ...
+# Subtest: aggregate budget counts UTF-8 and full envelope; large existing reads remain singleton
+ok 4 - aggregate budget counts UTF-8 and full envelope; large existing reads remain singleton
+  ---
+  duration_ms: 0.552625
+  type: 'test'
+  ...
+# Subtest: request inputs are snapshotted before microtask batching
+ok 5 - request inputs are snapshotted before microtask batching
+  ---
+  duration_ms: 0.184
+  type: 'test'
+  ...
+# Subtest: genuine contract revert remains its original member error and never retries
+ok 6 - genuine contract revert remains its original member error and never retries
+  ---
+  duration_ms: 0.271125
+  type: 'test'
+  ...
+# Subtest: HTTP200 JSON-RPC401 outranks another revert and closes all queued provider reads
+ok 7 - HTTP200 JSON-RPC401 outranks another revert and closes all queued provider reads
+  ---
+  duration_ms: 0.3705
+  type: 'test'
+  ...
+# Subtest: HTTP200 JSON-RPC403 outranks another revert and closes all queued provider reads
+ok 8 - HTTP200 JSON-RPC403 outranks another revert and closes all queued provider reads
+  ---
+  duration_ms: 0.254709
+  type: 'test'
+  ...
+# Subtest: unsupported member restricts only its actual method
+ok 9 - unsupported member restricts only its actual method
+  ---
+  duration_ms: 0.374667
+  type: 'test'
+  ...
+# Subtest: 429 member keeps original error and records unchanged shared cooldown without retry
+ok 10 - 429 member keeps original error and records unchanged shared cooldown without retry
+  ---
+  duration_ms: 0.498208
+  type: 'test'
+  ...
+# Subtest: incomplete batch result cannot expose any success
+ok 11 - incomplete batch result cannot expose any success
+  ---
+  duration_ms: 0.130292
+  type: 'test'
+  ...
+# Subtest: pre-aborted owner batch never dispatches; another owner remains independent
+ok 12 - pre-aborted owner batch never dispatches; another owner remains independent
+  ---
+  duration_ms: 0.27875
+  type: 'test'
+  ...
+# Subtest: noncooperative cancelled batch retains its one physical slot until settlement
+ok 13 - noncooperative cancelled batch retains its one physical slot until settlement
+  ---
+  duration_ms: 3.404208
+  type: 'test'
+  ...
+# Subtest: bounded logical queue rejects excess before allocating unbounded batches
+ok 14 - bounded logical queue rejects excess before allocating unbounded batches
+  ---
+  duration_ms: 0.929042
+  type: 'test'
+  ...
+# Subtest: observed denial survives concurrent owner cancellation in shared admission state
+not ok 15 - observed denial survives concurrent owner cancellation in shared admission state
+  ---
+  duration_ms: 0.667583
+  type: 'test'
+  location: '/private/tmp/keel-rpc-physical-batch-sdk-20261022-01/tests/sdk-configured-read-batch.test.mjs:74:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  stack: |-
+    async TestContext.<anonymous> (file:///private/tmp/keel-rpc-physical-batch-sdk-20261022-01/tests/sdk-configured-read-batch.test.mjs:77:164)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..15
+# tests 15
+# suites 0
+# pass 14
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 245.647417

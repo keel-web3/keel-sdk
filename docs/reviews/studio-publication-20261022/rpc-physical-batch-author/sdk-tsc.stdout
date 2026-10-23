@@ -1,0 +1,16 @@
+packages/sdk/src/layered-image.ts(4,52): error TS2307: Cannot find module '@jsquash/webp/encode.js' or its corresponding type declarations.
+packages/sdk/src/layered-image.ts(5,52): error TS2307: Cannot find module '@jsquash/webp/decode.js' or its corresponding type declarations.
+packages/sdk/src/layered-image.ts(6,44): error TS2307: Cannot find module '@jsquash/png/decode.js' or its corresponding type declarations.
+packages/sdk/src/layered-image.ts(34,93): error TS7006: Parameter 'v' implicitly has an 'any' type.
+packages/sdk/src/layered-image.ts(34,95): error TS7006: Parameter 'i' implicitly has an 'any' type.
+packages/sdk/src/layered-image.ts(36,139): error TS7006: Parameter 'value' implicitly has an 'any' type.
+packages/sdk/src/layered-image.ts(36,145): error TS7006: Parameter 'index' implicitly has an 'any' type.
+packages/sdk/src/raster-strips.ts(8,41): error TS2307: Cannot find module '@jsquash/png/decode.js' or its corresponding type declarations.
+packages/sdk/src/tezos-automation.ts(23,25): error TS2307: Cannot find module '@noble/hashes/blake2b' or its corresponding type declarations.
+packages/sdk/src/tezos-automation.ts(24,24): error TS2307: Cannot find module '@noble/hashes/sha256' or its corresponding type declarations.
+packages/sdk/src/tezos-automation.ts(106,42): error TS7006: Parameter 'byte' implicitly has an 'any' type.
+packages/sdk/src/tezos-automation.ts(106,48): error TS7006: Parameter 'index' implicitly has an 'any' type.
+packages/sdk/src/tezos-entrypoint-capability.ts(26,25): error TS2307: Cannot find module '@noble/hashes/blake2b' or its corresponding type declarations.
+packages/sdk/src/tezos-live-state.ts(1,25): error TS2307: Cannot find module '@noble/hashes/blake2b' or its corresponding type declarations.
+packages/sdk/src/tezos-live-state.ts(2,24): error TS2307: Cannot find module '@noble/hashes/sha256' or its corresponding type declarations.
+packages/sdk/src/tezos-recovery.ts(31,25): error TS2307: Cannot find module '@noble/hashes/blake2b' or its corresponding type declarations.
