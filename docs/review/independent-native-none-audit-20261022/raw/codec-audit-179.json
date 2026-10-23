@@ -1,0 +1,22 @@
+{
+  "command": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "--test",
+    "reviewer-native-none-role-shape.test.mjs",
+    "reviewer-native-none-carriage.test.mjs",
+    "tests/registered-native-none.test.mjs",
+    "tests/registered-native-gzip.test.mjs",
+    "tests/registered-shared-module-codec.test.mjs",
+    "tests/native-gzip-store-case.test.mjs",
+    "tests/inline-payload-carriage.test.mjs",
+    "tests/copy-publication-enforcement.test.mjs",
+    "tests/registered-inline-candidates.test.mjs",
+    "tests/model-viewer-graph.test.mjs",
+    "tests/explicit-external-preview.test.mjs",
+    "tests/current-publication-carriage.test.mjs"
+  ],
+  "cwd": "/private/tmp/keel-independent-codec-normal-20261022-02/keel-sdk",
+  "gitCommit": "0dc7e6f342b228515b1eecf783c9fd3629802eef",
+  "exit": 0,
+  "elapsed": 4.435681104660034
+}

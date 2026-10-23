@@ -1,0 +1,27 @@
+[
+  {
+    "reason": "exception",
+    "exception": "TypeError: Current publication authority is not an exact wholly unissued cost snapshot.\n    at assertUnissuedInlineCostSnapshot (/private/tmp/keel-independent-codec-normal-20261022-02/keel-site/apps/studio/src/server/services/saved-source-preparation-service.ts:479:11)\n    at readOwnedInlineCandidateSource (/private/tmp/keel-independent-codec-normal-20261022-02/keel-site/apps/studio/src/server/services/saved-source-preparation-service.ts:263:5)\n    at async <anonymous> (/private/tmp/keel-independent-codec-normal-20261022-02/keel-site/apps/studio/src/server/services/release-service.ts:1205:25)\n    at async scope (file:///Users/ravonus/dev/keel-site/node_modules/.pnpm/postgres@3.4.9/node_modules/postgres/src/index.js:260:18)\n    at async Function.begin (file:///Users/ravonus/dev/keel-site/node_modules/.pnpm/postgres@3.4.9/node_modules/postgres/src/index.js:243:14)\n    at async captureNormalRegisteredInlineCodecs (/private/tmp/keel-independent-codec-normal-20261022-02/keel-site/apps/studio/src/server/services/release-service.ts:1192:5)\n    at async Module.captureNormalTemporalMediaContext (/private/tmp/keel-independent-codec-normal-20261022-02/keel-site/apps/studio/src/server/services/release-service.ts:1158:5)\n    at async TestContext.<anonymous> (/private/tmp/keel-independent-codec-normal-20261022-02/keel-site/apps/studio/tests/integration/temporal-media-normal-continuation.test.ts:79:50)\n    at async Test.run (node:internal/test_runner/test:1054:7)\n    at async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)",
+    "frames": [
+      {
+        "functionName": "assertUnissuedInlineCostSnapshot",
+        "url": "",
+        "location": {
+          "scriptId": "3009",
+          "lineNumber": 0,
+          "columnNumber": 40208
+        }
+      },
+      {
+        "functionName": "readOwnedInlineCandidateSource",
+        "url": "",
+        "location": {
+          "scriptId": "3009",
+          "lineNumber": 0,
+          "columnNumber": 22462
+        }
+      }
+    ],
+    "actual": "{\"artifact\":{\"chainId\":null,\"status\":\"ready\",\"creatorMatches\":true,\"revisionMatches\":true,\"manifestMatches\":true},\"release\":{\"present\":true,\"chainId\":11155111,\"status\":\"draft\",\"revisionMatches\":true,\"ownerMatches\":true},\"selectedChainId\":11155111,\"counts\":{\"plans\":3,\"releases\":1,\"replicationSources\":0,\"creatorJournals\":0,\"publicationRuns\":0,\"releaseOperations\":0,\"authorizationIssuances\":0,\"executorTransactions\":0},\"ownerWalletPresent\":true}"
+  }
+]

@@ -1,0 +1,993 @@
+{
+  "finalCounts": {
+    "jobs": 1,
+    "artifacts": 1,
+    "plans": 3,
+    "wallet_operations": 0
+  },
+  "failedJobs": [
+    {
+      "id": "f3aa945c-a93f-40c8-97f7-41f40995cb2b",
+      "status": "ready",
+      "error": null,
+      "request_digest": "0x703dc53fe6081b9c36cea78d1d9e3a6b3ecbd14fba125099cfabd8c26cd712ce",
+      "artifact_id": "825217ea-e703-4e00-a869-486590902d64",
+      "options": {
+        "name": "Temporal auto",
+        "webpQuality": 82,
+        "viewerIntent": {
+          "schema": "keel-studio-viewer-intent@1",
+          "selection": "automatic",
+          "preparation": "registered-verifier",
+          "effectiveChoice": "keel-verification-shell",
+          "requestedChoice": "keel-verification-shell",
+          "sourceInputDigest": "0x676e62dca2ab507d032a5ed9e63949c5eb50c8ce95ecac6cacdaa55e4c77965d"
+        },
+        "buildDefaults": {
+          "layers": {
+            "build": {
+              "payloadStorage": "compact",
+              "assetPresentation": "automatic"
+            },
+            "project": {},
+            "mediaType": "video/mp4"
+          },
+          "policy": {
+            "schema": "keel-effective-build-defaults@1",
+            "values": {
+              "compression": "auto",
+              "brotliQuality": 11,
+              "hybridFallback": false,
+              "payloadStorage": "compact",
+              "transportProfile": "uri81-block-v1",
+              "assetPresentation": "automatic",
+              "rpcMaxConcurrentReads": 4
+            },
+            "sources": {
+              "compression": "system",
+              "brotliQuality": "system",
+              "hybridFallback": "system",
+              "payloadStorage": "build",
+              "transportProfile": "system",
+              "assetPresentation": "build",
+              "rpcMaxConcurrentReads": "system"
+            },
+            "revision": 0,
+            "requiresFullReadValidation": true
+          }
+        },
+        "localFileCount": 2,
+        "retainedSource": {
+          "route": "creator-prepared-copy",
+          "schema": "keel-studio-creator-prepared-source@1",
+          "viewer": "keel-verification-shell",
+          "payloadStorage": "compact",
+          "sourceRevision": "0x5d93f849f00c914e228200a02ae44a39d47fbee2d16d9cc568bfb17119a859b9",
+          "sourceResources": [
+            {
+              "id": "artwork.mp4",
+              "mediaType": "video/mp4",
+              "decodedDigest": "0xa421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561",
+              "originalFileName": "artwork.mp4",
+              "decodedByteLength": 1786
+            },
+            {
+              "id": "preview.png",
+              "mediaType": "image/png",
+              "decodedDigest": "0x20c1e1ec7a62d54fe8191b5c509e7a2c88b520a429bc1b74c55e7ccf72cbcc6d",
+              "originalFileName": "preview.png",
+              "decodedByteLength": 91
+            }
+          ],
+          "posterResourceId": "preview.png",
+          "publicationReady": false,
+          "artworkResourceIds": [
+            "artwork.mp4",
+            "preview.png"
+          ],
+          "entrypointResourceId": "artwork.mp4"
+        },
+        "generatePreview": false,
+        "storageStrategy": "onchain",
+        "presentationChoice": {
+          "assetPresentation": "automatic"
+        },
+        "libraryVersionCount": 0,
+        "entrypointResourceId": "artwork.mp4",
+        "remoteReferenceCount": 0,
+        "retainedSourceIntake": {
+          "jobId": "f3aa945c-a93f-40c8-97f7-41f40995cb2b",
+          "schema": "keel-studio-retained-source-intake@1",
+          "requestDigest": "0x703dc53fe6081b9c36cea78d1d9e3a6b3ecbd14fba125099cfabd8c26cd712ce",
+          "moduleBindings": [
+            {
+              "chain": "eip155:11155111",
+              "store": "0x0a4f31d5ab08029e4c68f6f3227d9fa3a2d66267",
+              "digest": "sha256:53957405312b1fe3b187a5c49b13d13a08fd6e960953c815c6e49b53637d97f4",
+              "version": "1.1.0",
+              "moduleId": "keel.asset-display",
+              "objectId": "0x08d628e53cc139c67a093ef0b24cdc1a6327010f8b6150ebc113c0310e23748c"
+            }
+          ],
+          "sourceRevision": "0x5d93f849f00c914e228200a02ae44a39d47fbee2d16d9cc568bfb17119a859b9",
+          "preparedRevision": 1,
+          "buildDefaultsDigest": "0x30ab9ec958f0dc49ef0078f3d5dd3e8ae3500498aa54391ada65bd91209de981",
+          "entrypointResourceId": "artwork.mp4",
+          "collectorImageResourceId": "preview.png"
+        },
+        "creatorAssetInspection": {
+          "inputs": [
+            {
+              "digest": "0xa421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561",
+              "inputId": "artwork.mp4",
+              "fileName": "artwork.mp4",
+              "execution": "static",
+              "mediaType": "video/mp4",
+              "byteLength": 1786
+            },
+            {
+              "digest": "0x20c1e1ec7a62d54fe8191b5c509e7a2c88b520a429bc1b74c55e7ccf72cbcc6d",
+              "inputId": "preview.png",
+              "fileName": "preview.png",
+              "execution": "static",
+              "mediaType": "image/png",
+              "byteLength": 91
+            }
+          ],
+          "schema": "keel-studio-creator-asset-inspection@1",
+          "source": {
+            "digest": "0xa421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561",
+            "inputId": "artwork.mp4",
+            "fileName": "artwork.mp4",
+            "execution": "static",
+            "mediaType": "video/mp4",
+            "byteLength": 1786
+          },
+          "preview": {
+            "digest": "0x20c1e1ec7a62d54fe8191b5c509e7a2c88b520a429bc1b74c55e7ccf72cbcc6d",
+            "inputId": "preview.png",
+            "fileName": "preview.png",
+            "execution": "static",
+            "mediaType": "image/png",
+            "byteLength": 91
+          },
+          "execution": "static",
+          "selection": {
+            "entrypointResourceId": "artwork.mp4",
+            "collectorImageResourceId": "preview.png"
+          },
+          "inputDigest": "0x676e62dca2ab507d032a5ed9e63949c5eb50c8ce95ecac6cacdaa55e4c77965d",
+          "sourceMotion": "unknown"
+        },
+        "collectorImageResourceId": "preview.png"
+      }
+    }
+  ],
+  "site": "814a6f983c66cce23fa17660a9e376950850afa9",
+  "sdk": "edaa7446c2cfcec6eee27ca13d3f0cc4718822f7",
+  "environment": {
+    "node": "v22.22.1",
+    "postgres": "Real disposable17 fully migrated",
+    "endpoint": "https://rpc.sepolia.ethpandaops.io"
+  },
+  "input": {
+    "bytes": 1786,
+    "sha256": "a421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561",
+    "previewSHA256": "20c1e1ec7a62d54fe8191b5c509e7a2c88b520a429bc1b74c55e7ccf72cbcc6d"
+  },
+  "result": "BLOCKED_OR_FAIL",
+  "phase": "normal-intake",
+  "stages": [
+    {
+      "phase": "normal-intake",
+      "status": "FAIL_OR_EXTERNAL_GATE",
+      "error": {
+        "name": "AssertionError",
+        "message": "[\n  {\n    \"field\": \"description\",\n    \"kind\": \"invalid\",\n    \"message\": \"This answer is required.\"\n  }\n]\n\n+ actual - expected\n\n+ 'needs-input'\n- 'ready-for-review'\n",
+        "stack": "AssertionError [ERR_ASSERTION]: [\n  {\n    \"field\": \"description\",\n    \"kind\": \"invalid\",\n    \"message\": \"This answer is required.\"\n  }\n]\n\n+ actual - expected\n\n+ 'needs-input'\n- 'ready-for-review'\n\n    at make (/private/tmp/keel-independent-codec-normal-20261022-02/keel-site/apps/studio/tests/integration/temporal-media-normal-continuation.test.ts:75:75)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async TestContext.<anonymous> (/private/tmp/keel-independent-codec-normal-20261022-02/keel-site/apps/studio/tests/integration/temporal-media-normal-continuation.test.ts:78:15)\n    at async Test.run (node:internal/test_runner/test:1054:7)\n    at async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)"
+      }
+    }
+  ],
+  "publicReads": {
+    "schema": "keel.bounded-allowed-rpc-diagnostics@1",
+    "publicationChainId": 11155111,
+    "providerChainNotInferred": true,
+    "rows": [
+      {
+        "startedAt": "2026-10-23T00:56:34.500Z",
+        "durationMs": 252.43629099999998,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 872,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 202,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "d1414b3d3b1319275d3b0114803f59cd337e6d7fb7be54ebefbba6a8fe50f194",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:34.758Z",
+        "durationMs": 177.1202919999996,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 232,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 330,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "3add3770d5b09120b23ede0a1c55cda1b70d55337ec07c798f89d9c8ad2d91c2",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:34.938Z",
+        "durationMs": 156.7271249999999,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 5248,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 114,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "29429a2b1b2a5608c8891a30c34443348f593636c20b6aed58448035951cf8b1",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:35.099Z",
+        "durationMs": 150.0906670000004,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 44,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 47,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_chainId",
+            "semanticSHA256": "37047d9fa98f2102688f6d8f5163bbe33308161d4f482b3e5853043ce6c7163b",
+            "block": null
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:35.100Z",
+        "durationMs": 257.70525,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 46,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 49,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_chainId",
+            "semanticSHA256": "37047d9fa98f2102688f6d8f5163bbe33308161d4f482b3e5853043ce6c7163b",
+            "block": null
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:35.368Z",
+        "durationMs": 159.10195899999962,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 49560,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 854,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "b57dd6facad1d47b933173de90cedb0cf87d75e4bdeb1a216681568146f3ab2e",
+            "block": "latest"
+          },
+          {
+            "method": "eth_call",
+            "semanticSHA256": "b5e6276285db5df71f38afc8fa0a928bab5a9960f9ca8a2b58f70cb896bce01e",
+            "block": "latest"
+          },
+          {
+            "method": "eth_call",
+            "semanticSHA256": "0ca5f158210248c1280c7e0d268267300076faef153ac97f8e6f24627ec26dce",
+            "block": "latest"
+          },
+          {
+            "method": "eth_call",
+            "semanticSHA256": "7a00d744195ab43a8b8f07fe83fcc4468760a511482d9064fdfddf73d89ecd52",
+            "block": "latest"
+          },
+          {
+            "method": "eth_call",
+            "semanticSHA256": "83f6aa0e1f184b8ff92391e9c3d397331a4bedd100aa6f9b7e51259a8547819b",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:35.657Z",
+        "durationMs": 193.63450000000012,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 1031,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 142,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getTransactionReceipt",
+            "semanticSHA256": "eb1d6af8fbde8f2990f2f1d08b3995ebf73c50736d8d3184d531364d195b6c30",
+            "block": null
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:35.658Z",
+        "durationMs": 201.3950419999992,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 27357,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 253,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "5aba6e7bd8e612edf65839520f6442ea439007271e6d64e5283704b055ba9ffe",
+            "block": "latest"
+          },
+          {
+            "method": "eth_call",
+            "semanticSHA256": "ed47407d7fb245de244bbd651e3be33f7a12757990d6324bf79d3c5ecfbb770e",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:35.864Z",
+        "durationMs": 167.9511250000005,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 937,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 203,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "9c4af8560a8b77a460c01f68f50179fd9c988a9ab0f8d9db6c59795abd819f88",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:35.865Z",
+        "durationMs": 168.43929200000002,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 937,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 203,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "131c0eaea566e353feeff771ae3428947061d6c4480c9ffc491a0b53fff1b888",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:36.033Z",
+        "durationMs": 172.07166599999982,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 233,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 331,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "f04d4fed1018a0d2b6c63da3c0386d0f03ce11b0caf22ed14effcb4274168084",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:36.035Z",
+        "durationMs": 192.5332500000004,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 233,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 331,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "ba71b6fd58168d7d70eb9c644eb51c8e510532defdf40709791d2d472a59443a",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:36.230Z",
+        "durationMs": 172.73108300000058,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 1943,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 115,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "fe5709af4478145ade7315c5fc981bd5f3ce01b52d8bf2849d44fb403a4f153f",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:36.206Z",
+        "durationMs": 208.33891700000004,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 2411,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 115,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "4487bb038a8820d8d7e65042887913d63846eec11baca61776744a8dabbcc73e",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:36.418Z",
+        "durationMs": 159.72912499999984,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 937,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 203,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "33c85acfd7516b414b77eee5a334f96acdf065689814783391608c5c95f00243",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:36.417Z",
+        "durationMs": 190.18595800000003,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 937,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 203,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "fd5bf7783be61c7957c571fae57230845a8a26a16165310a6eba55b6c649be1a",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:36.580Z",
+        "durationMs": 155.95658400000048,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 553,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 331,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "d30ef8f2bf1a0bbcce21616a525aa17ad1429ef171d8c8f689b6a78fb717ce2c",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:36.608Z",
+        "durationMs": 195.17000000000007,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 617,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 331,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "f3b1c18ea887b69de5c16beef15871826bf80d8c0517bc0b1b95349c9ae4ff63",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:36.738Z",
+        "durationMs": 157.87204099999963,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 238049,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 685,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "0830f17dcc461683dad1a969aacf9f3cff3cf441c02fe87ed1c3553161ad2444",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "de326517218d5bac6688606d6897f4773661abfabcb9949c55e217e4a2c62695",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "3337be15f59b676decdbd02ae9f92a6d5dd8a3be2d0622994565b862ea683448",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "2f7d4f1099206853e7101b6971eba63b2a7d6bde5f44b86703de0a700038123e",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "0edd539e13ab3d56b1c538a8ca49da554caf51bddc5adf6775a4cafced190f4b",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "e6ca0fd566e87902e36f79c4190d621a9aef804d77f24a0e3f47d065356bff54",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:36.806Z",
+        "durationMs": 159.14487499999996,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 298343,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 799,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "e005c0f437fd169152e60d68f073e3e1965ab3fe1e5e9728572792e85d45bb82",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "49e2fd594351b97332b662942c7d931257f974d235167229033fe15900df4384",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "039bd05f85013d7ba50747d9a55c59de4e63a5ab52feff1ec3bc99c67a35c372",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "80c38ac5a83ba17ab80d86830d825399c4f48a0222d3381fab8ff4d5c503d540",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "41c845aff2967c5f6ef7d901b0881a6d7b718cd155d0cde4844e5df02445b656",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "b5135f982271386236ba2710626d477e59c1876f091fbd96ead5829ccda7dd4a",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "15401d1db7ea0f27ee7054f48d39e4aa744ff92a80fea5813dc2144fd6d10ba7",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:37.375Z",
+        "durationMs": 152.3080829999999,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 873,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 203,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "22a278085c5e79c9e534ada8ac787d3813857a4baba9acd77b0ba8dab47b68d5",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:37.530Z",
+        "durationMs": 155.46445799999947,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 233,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 331,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "4b1548bd29923998ac769bef7348fbb1363b61e16a23c7ce0afadeaaadaad6ba",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:37.687Z",
+        "durationMs": 152.75495899999987,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 649,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 115,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "e2c9072ab31f31ae56e99a3393dc9d33c7db11709bf4357eaa6583bbf42e6a48",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:37.845Z",
+        "durationMs": 150.99654200000077,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 937,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 203,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "131c0eaea566e353feeff771ae3428947061d6c4480c9ffc491a0b53fff1b888",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:37.845Z",
+        "durationMs": 151.85900000000038,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 937,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 203,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "33c85acfd7516b414b77eee5a334f96acdf065689814783391608c5c95f00243",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:37.999Z",
+        "durationMs": 152.85058299999946,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 553,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 331,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "d30ef8f2bf1a0bbcce21616a525aa17ad1429ef171d8c8f689b6a78fb717ce2c",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:37.997Z",
+        "durationMs": 201.72858300000007,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 233,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 331,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "ba71b6fd58168d7d70eb9c644eb51c8e510532defdf40709791d2d472a59443a",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:38.154Z",
+        "durationMs": 157.18104099999982,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 238049,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 685,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "0830f17dcc461683dad1a969aacf9f3cff3cf441c02fe87ed1c3553161ad2444",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "de326517218d5bac6688606d6897f4773661abfabcb9949c55e217e4a2c62695",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "3337be15f59b676decdbd02ae9f92a6d5dd8a3be2d0622994565b862ea683448",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "2f7d4f1099206853e7101b6971eba63b2a7d6bde5f44b86703de0a700038123e",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "0edd539e13ab3d56b1c538a8ca49da554caf51bddc5adf6775a4cafced190f4b",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "e6ca0fd566e87902e36f79c4190d621a9aef804d77f24a0e3f47d065356bff54",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:38.201Z",
+        "durationMs": 165.67216599999938,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 1943,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 115,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "fe5709af4478145ade7315c5fc981bd5f3ce01b52d8bf2849d44fb403a4f153f",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:38.372Z",
+        "durationMs": 161.8253340000001,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 937,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 203,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "a5312e10fcb7ecffe2587079b14ed1d5b38bcc00583d85e40ceff0ece77fdb41",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:38.372Z",
+        "durationMs": 176.29983400000037,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 937,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 203,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "131c0eaea566e353feeff771ae3428947061d6c4480c9ffc491a0b53fff1b888",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:38.536Z",
+        "durationMs": 151.56733299999996,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 233,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 331,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "acfe6cdb2df8b3d2acf7ccf96e3fa37e66773d34b878f1528929ad3a8fb212c3",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:38.550Z",
+        "durationMs": 155.79262500000004,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 233,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 331,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "ba71b6fd58168d7d70eb9c644eb51c8e510532defdf40709791d2d472a59443a",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:38.708Z",
+        "durationMs": 160.60708299999988,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 1943,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 115,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "fe5709af4478145ade7315c5fc981bd5f3ce01b52d8bf2849d44fb403a4f153f",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:38.689Z",
+        "durationMs": 189.44787499999984,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 8391,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 115,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "f418c5ae4865bfe2ca399a2d572029722cd28585880a5dc66819005cdb185b79",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:38.372Z",
+        "durationMs": 537.6987079999999,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 937,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 203,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "33c85acfd7516b414b77eee5a334f96acdf065689814783391608c5c95f00243",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:38.912Z",
+        "durationMs": 163.77095799999915,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 553,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 331,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "d30ef8f2bf1a0bbcce21616a525aa17ad1429ef171d8c8f689b6a78fb717ce2c",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T00:56:39.076Z",
+        "durationMs": 156.29891700000007,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 238049,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 685,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "0830f17dcc461683dad1a969aacf9f3cff3cf441c02fe87ed1c3553161ad2444",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "de326517218d5bac6688606d6897f4773661abfabcb9949c55e217e4a2c62695",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "3337be15f59b676decdbd02ae9f92a6d5dd8a3be2d0622994565b862ea683448",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "2f7d4f1099206853e7101b6971eba63b2a7d6bde5f44b86703de0a700038123e",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "0edd539e13ab3d56b1c538a8ca49da554caf51bddc5adf6775a4cafced190f4b",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "e6ca0fd566e87902e36f79c4190d621a9aef804d77f24a0e3f47d065356bff54",
+            "block": "latest"
+          }
+        ]
+      }
+    ],
+    "discarded": 0,
+    "retainedBytes": 29093,
+    "pendingReaders": 0,
+    "securityObservationFailed": false,
+    "securityObservationIncomplete": false,
+    "maxRows": 4096,
+    "maxResponseBytes": 4194304,
+    "maxResponseReaders": 8,
+    "maxRetainedBytes": 2097152,
+    "containsRawParameters": false,
+    "containsResponseBody": false,
+    "changesRetriesOrProvider": false,
+    "latch": {
+      "terminal": false,
+      "reason": null
+    }
+  },
+  "signing": "not-performed",
+  "remoteFullProgram": false,
+  "productionTouched": false
+}

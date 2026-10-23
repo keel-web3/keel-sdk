@@ -1,0 +1,17 @@
+{
+  "sdk": "0dc7e6f342b228515b1eecf783c9fd3629802eef",
+  "site": "230c8cff0e2075042cc0784c03beece7ddf14900",
+  "outputCopies": 0,
+  "outputFiles": 1821,
+  "outputManifestSHA256": "0fb37ec9049663e277ed858d48625fdd260e49b31f7302a53d743f3dbfc6be09",
+  "sourceTestsUnchanged": {
+    "role": "879b053b0471721bafe57faf38e216e7b4cfbe506c33081db10e10dbe9d91f67",
+    "carriage": "3116706b34c3885c65f16f33b7c20bf4addd700a1308c5c4e1aff49eedf29dde",
+    "normalPG": "90a28021b7e838e8a44ba06ee43ae79a240a599a9e74b4ca7cec929cb292fced"
+  },
+  "actualRegressionsPassed": 179,
+  "actualRegisteredBrowserPassed": 1,
+  "siteTSCExit": 0,
+  "signing": false,
+  "live": false
+}

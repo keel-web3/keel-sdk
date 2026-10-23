@@ -1,0 +1,1095 @@
+TAP version 13
+# Subtest: validated actual registered MP4 None recipe must pass the full fresh-carriage guard
+ok 1 - validated actual registered MP4 None recipe must pass the full fresh-carriage guard
+  ---
+  duration_ms: 2.952125
+  type: 'test'
+  ...
+# {"documentBytes":91189,"documentSHA256":"0x275595be7db399755d79352981708d92ddbdcceec6df6a193097d3c2853a30a8","sourceIntegrity":{"algorithm":"sha256","digest":"0xa421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561","byteLength":1786},"members":[{"id":"keel.asset-display","mediaType":"text/javascript","integrity":{"algorithm":"sha256","byteLength":6172,"digest":"0x53957405312b1fe3b187a5c49b13d13a08fd6e960953c815c6e49b53637d97f4"},"storedIntegrity":{"algorithm":"sha256","byteLength":2619,"digest":"0x147ea4661e9e8a459528ef5d689ae9bd14ce0b3c40b85ee2f91520388d474490"}}],"payloads":[{"id":"keel.asset-display","mediaType":"text/javascript","encoding":"base64","compression":"gzip","binaryBytes":2619,"textCarriageBytes":3492,"directImage":false,"requiresExistingPreparedReuse":false},{"id":"artwork.mp4","mediaType":"video/mp4","encoding":"base64","compression":"none","binaryBytes":1786,"textCarriageBytes":2384,"directImage":false,"requiresExistingPreparedReuse":false,"nativeNone":{"role":"entrypoint","integrity":{"algorithm":"sha256","byteLength":1786,"digest":"0xa421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561"},"storedIntegrity":{"algorithm":"sha256","byteLength":1786,"digest":"0xa421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561"}}}]}
+# Subtest: the same encoded MP4 without exact authenticated recipe remains rejected
+ok 2 - the same encoded MP4 without exact authenticated recipe remains rejected
+  ---
+  duration_ms: 0.328042
+  type: 'test'
+  ...
+# Subtest: native None public proof rejects non-string role ["entrypoint"]
+ok 3 - native None public proof rejects non-string role ["entrypoint"]
+  ---
+  duration_ms: 1.258334
+  type: 'test'
+  ...
+# Subtest: native None public proof rejects non-string role ["asset"]
+ok 4 - native None public proof rejects non-string role ["asset"]
+  ---
+  duration_ms: 0.363458
+  type: 'test'
+  ...
+# Subtest: native None public proof rejects non-string role ["data"]
+ok 5 - native None public proof rejects non-string role ["data"]
+  ---
+  duration_ms: 0.294209
+  type: 'test'
+  ...
+# Subtest: shared planner no longer auto-acknowledges a fresh Base64 carriage
+ok 6 - shared planner no longer auto-acknowledges a fresh Base64 carriage
+  ---
+  duration_ms: 36.4095
+  type: 'test'
+  ...
+# Subtest: environment configuration cannot bypass fresh encoding review
+ok 7 - environment configuration cannot bypass fresh encoding review
+  ---
+  duration_ms: 0.18025
+  type: 'test'
+  ...
+# Subtest: complete compact COPY retains exact prepared bytes and binds the plan
+ok 8 - complete compact COPY retains exact prepared bytes and binds the plan
+  ---
+  duration_ms: 92.923042
+  type: 'test'
+  ...
+# Subtest: complete raw-percent COPY retains exact prepared bytes and binds the plan
+ok 9 - complete raw-percent COPY retains exact prepared bytes and binds the plan
+  ---
+  duration_ms: 88.988292
+  type: 'test'
+  ...
+# Subtest: SDK refuses a prepared viewer plan with missing full-return evidence
+ok 10 - SDK refuses a prepared viewer plan with missing full-return evidence
+  ---
+  duration_ms: 51.76075
+  type: 'test'
+  ...
+# Subtest: SDK stops a different return, transport or source before producing a plan
+ok 11 - SDK stops a different return, transport or source before producing a plan
+  ---
+  duration_ms: 49.881333
+  type: 'test'
+  ...
+# Subtest: COPY checks are commitment-bound and cannot be stripped or moved to another chain/store
+ok 12 - COPY checks are commitment-bound and cannot be stripped or moved to another chain/store
+  ---
+  duration_ms: 60.912083
+  type: 'test'
+  ...
+# Subtest: read caps use the selected chain boundary and never stand in for authenticated gas proof
+ok 13 - read caps use the selected chain boundary and never stand in for authenticated gas proof
+  ---
+  duration_ms: 46.72375
+  type: 'test'
+  ...
+# Subtest: fresh MCP cannot select an alternative carriage under another presentation label
+ok 14 - fresh MCP cannot select an alternative carriage under another presentation label
+  ---
+  duration_ms: 184.786833
+  type: 'test'
+  ...
+# Subtest: MCP publish-plan requires evidence, reruns the SDK gate and rejects file tampering
+ok 15 - MCP publish-plan requires evidence, reruns the SDK gate and rejects file tampering
+  ---
+  duration_ms: 124.112542
+  type: 'test'
+  ...
+# Subtest: publication rejects browser-tolerated unescaped outer metadata
+ok 16 - publication rejects browser-tolerated unescaped outer metadata
+  ---
+  duration_ms: 49.235084
+  type: 'test'
+  ...
+# Subtest: publication rejects unescaped animation even when outer metadata is escaped
+ok 17 - publication rejects unescaped animation even when outer metadata is escaped
+  ---
+  duration_ms: 44.572125
+  type: 'test'
+  ...
+# Subtest: MCP publication check rejects unescaped characters at either URI boundary
+ok 18 - MCP publication check rejects unescaped characters at either URI boundary
+  ---
+  duration_ms: 97.531041
+  type: 'test'
+  ...
+# Subtest: fresh SDK exposes only compact/raw-percent carriage selectors
+ok 19 - fresh SDK exposes only compact/raw-percent carriage selectors
+  ---
+  duration_ms: 0.757084
+  type: 'test'
+  ...
+# Subtest: current source creates raw-percent metadata and HTML while preserving exact media Base64
+ok 20 - current source creates raw-percent metadata and HTML while preserving exact media Base64
+  ---
+  duration_ms: 51.50125
+  type: 'test'
+  ...
+# Subtest: acknowledgement and environment cannot revive a retired fresh constructor
+ok 21 - acknowledgement and environment cannot revive a retired fresh constructor
+  ---
+  duration_ms: 10.790583
+  type: 'test'
+  ...
+# Subtest: prepared composer and COPY readback cannot select retired graph media under an explicit policy
+ok 22 - prepared composer and COPY readback cannot select retired graph media under an explicit policy
+  ---
+  duration_ms: 9.938584
+  type: 'test'
+  ...
+# Subtest: exact raw object reuse stays zero-publication; historical byte encodings cannot be inferred
+ok 23 - exact raw object reuse stays zero-publication; historical byte encodings cannot be inferred
+  ---
+  duration_ms: 6.855791
+  type: 'test'
+  ...
+# Subtest: registered candidate source ABI is canonical-items only, never a Dense compatibility profile
+ok 24 - registered candidate source ABI is canonical-items only, never a Dense compatibility profile
+  ---
+  duration_ms: 0.610833
+  type: 'test'
+  ...
+# Subtest: current context validator retains exact ABI, all security guards, immutable copy and no getters
+ok 25 - current context validator retains exact ABI, all security guards, immutable copy and no getters
+  ---
+  duration_ms: 1.503875
+  type: 'test'
+  ...
+# Subtest: retained Base90/91 build choices cannot silently override the current fresh transport
+ok 26 - retained Base90/91 build choices cannot silently override the current fresh transport
+  ---
+  duration_ms: 2.307625
+  type: 'test'
+  ...
+# Subtest: actual MCP raw reuse remains review-only and rejects historical media without writes
+ok 27 - actual MCP raw reuse remains review-only and rejects historical media without writes
+  ---
+  duration_ms: 675.872291
+  type: 'test'
+  ...
+# Subtest: explicit exact https: preview works through actual final compiler/audit/COPY with no SDK fetch
+ok 28 - explicit exact https: preview works through actual final compiler/audit/COPY with no SDK fetch
+  ---
+  duration_ms: 122.678083
+  type: 'test'
+  ...
+# Subtest: explicit exact ipfs: preview works through actual final compiler/audit/COPY with no SDK fetch
+ok 29 - explicit exact ipfs: preview works through actual final compiler/audit/COPY with no SDK fetch
+  ---
+  duration_ms: 80.963
+  type: 'test'
+  ...
+# Subtest: default collector policy still rejects external images; exact URI, source and canonical animation remain mandatory
+ok 30 - default collector policy still rejects external images; exact URI, source and canonical animation remain mandatory
+  ---
+  duration_ms: 74.92875
+  type: 'test'
+  ...
+# Subtest: constructor validates exact saved bytes, MIME and safe URI without normalization
+ok 31 - constructor validates exact saved bytes, MIME and safe URI without normalization
+  ---
+  duration_ms: 0.998584
+  type: 'test'
+  ...
+# Subtest: commitment snapshots reject extra/getter/symbol/prototype fields without reading accessors and resist mutation during async hash
+ok 32 - commitment snapshots reject extra/getter/symbol/prototype fields without reading accessors and resist mutation during async hash
+  ---
+  duration_ms: 0.463834
+  type: 'test'
+  ...
+# Subtest: exact native Gzip recipe still required alongside an external preview
+ok 33 - exact native Gzip recipe still required alongside an external preview
+  ---
+  duration_ms: 75.119417
+  type: 'test'
+  ...
+# Subtest: actual COPY review serializes exact external proof in plan digest; mutations and unknown/getter proof fail
+ok 34 - actual COPY review serializes exact external proof in plan digest; mutations and unknown/getter proof fail
+  ---
+  duration_ms: 76.922875
+  type: 'test'
+  ...
+# Subtest: bounded token readback threads exact external preview without fetching its URI
+ok 35 - bounded token readback threads exact external preview without fetching its URI
+  ---
+  duration_ms: 87.350833
+  type: 'test'
+  ...
+# Subtest: fresh text is byte-identical through the stored slot, script JSON and both URI layers
+ok 36 - fresh text is byte-identical through the stored slot, script JSON and both URI layers
+  ---
+  duration_ms: 5.678625
+  type: 'test'
+  ...
+# Subtest: fresh canonical graph refuses hidden compressed Base64 body under raw-percent outer HTML
+ok 37 - fresh canonical graph refuses hidden compressed Base64 body under raw-percent outer HTML
+  ---
+  duration_ms: 71.6455
+  type: 'test'
+  ...
+# Subtest: audit measures base64 inflation while fresh publication rejects it
+ok 38 - audit measures base64 inflation while fresh publication rejects it
+  ---
+  duration_ms: 1.781417
+  type: 'test'
+  ...
+# Subtest: audit measures hex inflation while fresh publication rejects it
+ok 39 - audit measures hex inflation while fresh publication rejects it
+  ---
+  duration_ms: 1.41825
+  type: 'test'
+  ...
+# Subtest: a compressed child cannot bypass the body policy by claiming to be an image
+ok 40 - a compressed child cannot bypass the body policy by claiming to be an image
+  ---
+  duration_ms: 0.336625
+  type: 'test'
+  ...
+# Subtest: actual direct image carriage retains original bytes
+ok 41 - actual direct image carriage retains original bytes
+  ---
+  duration_ms: 0.283375
+  type: 'test'
+  ...
+# Subtest: audit rejects headers and URL delimiters that would make native decoding differ
+ok 42 - audit rejects headers and URL delimiters that would make native decoding differ
+  ---
+  duration_ms: 0.860833
+  type: 'test'
+  ...
+# Subtest: text byte corruption, conflicting representations and false compression fail
+ok 43 - text byte corruption, conflicting representations and false compression fail
+  ---
+  duration_ms: 0.522167
+  type: 'test'
+  ...
+# Subtest: serialized fresh-plan audit derives representation policy and totals instead of trusting flags
+ok 44 - serialized fresh-plan audit derives representation policy and totals instead of trusting flags
+  ---
+  duration_ms: 0.768334
+  type: 'test'
+  ...
+# Subtest: public audit pins the full call to a block, rechecks identity and never signs or submits
+ok 45 - public audit pins the full call to a block, rechecks identity and never signs or submits
+  ---
+  duration_ms: 12.465583
+  type: 'test'
+  ...
+# Subtest: public read rejects chain drift, block drift, ABI corruption and oversize before evidence
+ok 46 - public read rejects chain drift, block drift, ABI corruption and oversize before evidence
+  ---
+  duration_ms: 31.683083
+  type: 'test'
+  ...
+# Subtest: MCP exposes the body rule and a read-only public-token audit, and blocks explicit encoded preparation
+ok 47 - MCP exposes the body rule and a read-only public-token audit, and blocks explicit encoded preparation
+  ---
+  duration_ms: 155.173959
+  type: 'test'
+  ...
+# Subtest: model renderer and maintained loader descriptors pin complete exact licensed source bytes
+ok 48 - model renderer and maintained loader descriptors pin complete exact licensed source bytes
+  ---
+  duration_ms: 4.014458
+  type: 'test'
+  ...
+# Subtest: registered none module reuse reports every cost from exact authenticated return bytes
+ok 49 - registered none module reuse reports every cost from exact authenticated return bytes
+  ---
+  duration_ms: 461.360375
+  type: 'test'
+  ...
+# {"scope":"Synthetic pinned-block exact-readback callbacks; not live registry proof","publishedCompression":"none","originalDigest":"0x6c836f043d3d7ba771fc13a1498a4cc1ad872c8297f8a15c7b912a1a8c0157d2","localHTML":364274,"returnedHTML":630140,"escapedHTML":704046,"rawPercentGraph":777952,"creatorPublicationBytes":4105}
+# Subtest: registered gzip module reuse reports every cost from exact authenticated return bytes
+ok 50 - registered gzip module reuse reports every cost from exact authenticated return bytes
+  ---
+  duration_ms: 337.973542
+  type: 'test'
+  ...
+# {"scope":"Synthetic pinned-block exact-readback callbacks; not live registry proof","publishedCompression":"gzip","originalDigest":"0x6c836f043d3d7ba771fc13a1498a4cc1ad872c8297f8a15c7b912a1a8c0157d2","localHTML":364274,"returnedHTML":364274,"escapedHTML":382806,"rawPercentGraph":401338,"creatorPublicationBytes":4105}
+# Subtest: final registered model metadata uses actual percent-carried bytes at the unchanged two-megabyte read boundary
+ok 51 - final registered model metadata uses actual percent-carried bytes at the unchanged two-megabyte read boundary
+  ---
+  duration_ms: 694.244375
+  type: 'test'
+  ...
+# Subtest: synthetic selected-chain model reuse requires exact pinned-block object and registry reads for every reusable fragment
+ok 52 - synthetic selected-chain model reuse requires exact pinned-block object and registry reads for every reusable fragment
+  ---
+  duration_ms: 239.374333
+  type: 'test'
+  ...
+# Subtest: synthetic wrong chain, absent registration, altered read-back and changed block never qualify model reuse
+ok 53 - synthetic wrong chain, absent registration, altered read-back and changed block never qualify model reuse
+  ---
+  duration_ms: 681.328834
+  type: 'test'
+  ...
+# Subtest: model preparation snapshots original bytes, module closure, ordered reuse and block assumptions before asynchronous reads
+ok 54 - model preparation snapshots original bytes, module closure, ordered reuse and block assumptions before asynchronous reads
+  ---
+  duration_ms: 221.484625
+  type: 'test'
+  ...
+# Subtest: local source profiles cannot become registered model authority without the exact current reader contract
+ok 55 - local source profiles cannot become registered model authority without the exact current reader contract
+  ---
+  duration_ms: 203.268542
+  type: 'test'
+  ...
+# Subtest: stale current-reader reauthentication and swapped shell object IDs reject before assembly
+ok 56 - stale current-reader reauthentication and swapped shell object IDs reject before assembly
+  ---
+  duration_ms: 490.399333
+  type: 'test'
+  ...
+# Subtest: current model recipe counts complete source descriptors and explicitly retains binary Gzip rather than an inadmissible None body
+ok 57 - current model recipe counts complete source descriptors and explicitly retains binary Gzip rather than an inadmissible None body
+  ---
+  duration_ms: 147.424583
+  type: 'test'
+  ...
+# Subtest: complete glb originals use an exact typed loader graph and retain every original dependency
+ok 58 - complete glb originals use an exact typed loader graph and retain every original dependency
+  ---
+  duration_ms: 65.600792
+  type: 'test'
+  ...
+# Subtest: complete gltf originals use an exact typed loader graph and retain every original dependency
+ok 59 - complete gltf originals use an exact typed loader graph and retain every original dependency
+  ---
+  duration_ms: 65.70675
+  type: 'test'
+  ...
+# Subtest: complete obj originals use an exact typed loader graph and retain every original dependency
+ok 60 - complete obj originals use an exact typed loader graph and retain every original dependency
+  ---
+  duration_ms: 73.149583
+  type: 'test'
+  ...
+# Subtest: the exact original four-byte GLB placeholder fails before preparation and never selects the prototype
+ok 61 - the exact original four-byte GLB placeholder fails before preparation and never selects the prototype
+  ---
+  duration_ms: 63.667708
+  type: 'test'
+  ...
+# Subtest: missing, extra, reordered and aliased model modules fail the exact graph
+ok 62 - missing, extra, reordered and aliased model modules fail the exact graph
+  ---
+  duration_ms: 151.982833
+  type: 'test'
+  ...
+# Subtest: missing, extra, ambiguous, external and escaping model dependencies fail closed
+ok 63 - missing, extra, ambiguous, external and escaping model dependencies fail closed
+  ---
+  duration_ms: 108.887917
+  type: 'test'
+  ...
+# Subtest: unsupported required decoders and truncated model buffers never degrade to a partial success
+ok 64 - unsupported required decoders and truncated model buffers never degrade to a partial success
+  ---
+  duration_ms: 0.975458
+  type: 'test'
+  ...
+# Subtest: unchanged authentic native gzip frame and lower-case store pass actual COPY readback
+ok 65 - unchanged authentic native gzip frame and lower-case store pass actual COPY readback
+  ---
+  duration_ms: 65.658916
+  type: 'test'
+  ...
+# Subtest: same valid registered store with case-only spelling retains actual COPY readback
+ok 66 - same valid registered store with case-only spelling retains actual COPY readback
+  ---
+  duration_ms: 26.706584
+  type: 'test'
+  ...
+# Subtest: wrong store remains rejected before a COPY readback can qualify
+ok 67 - wrong store remains rejected before a COPY readback can qualify
+  ---
+  duration_ms: 21.23125
+  type: 'test'
+  ...
+# Subtest: actual current canonical None and native-Gzip builds compare complete metadata, decoder/boot and source bytes
+ok 68 - actual current canonical None and native-Gzip builds compare complete metadata, decoder/boot and source bytes
+  ---
+  duration_ms: 200.663125
+  type: 'test'
+  ...
+# {"actualRetainedGatorrr":false,"registrationEvidence":"named-local-fixture-not-live-proof","candidates":[{"id":"gzip","codec":"gzip","recipeDigest":"0x38e45a3a7b07762581e72a9578b6b969868331337811a700a3fe79cc929abb3a","measurementScope":{"kind":"provisional-template","templateDigest":"0xe4ca806bc3dba5af14719520ea6b7ae2edc488d2552fa623527af7a8e69da06f"},"tokenURICommitment":{"digest":"0x5fbb1f9247a941ac98e2a965481ee58b37c1d26bb47e67edb1617556a81f276f","byteLength":119635},"derivedMetadataDigest":"0x44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a","metadataBytes":102709,"htmlBytes":85600,"imageBytes":77,"imageURIBytes":126,"imageDelivery":"inline","externalPreviewReadAuthenticated":false,"animationURIBytes":102453,"sourceBytes":10989,"compressedPayloadBytes":245,"encodedPayloadBytes":328,"completeTokenURIBytes":119635,"newStoredBytes":1702,"reusedStoredBytes":119848,"uniqueStoredBytes":121550,"uniqueObjects":5,"decoderObjectBytes":0,"bootObjectBytes":0,"combinedBootDecoderObjectBytes":119848,"generatedHtmlSuffixBytes":0,"nativeBrowserGzip":true,"javascriptCodecDecoderBytes":0,"decoderCostScope":"exact-distinct-stored-object-roles","javascriptGzipDecoderBytes":0,"sourceByteIdentity":"verified-exact"},{"id":"none","codec":"none","recipeDigest":"0xa848bc44aa02c22b42d15ab50ad04852f67d6907aeed436c2fac3145f287c3c2","measurementScope":{"kind":"provisional-template","templateDigest":"0xe4ca806bc3dba5af14719520ea6b7ae2edc488d2552fa623527af7a8e69da06f"},"tokenURICommitment":{"digest":"0xd18b053fcebd9c126ac8d08215069cb0c33d662c2a68acf22cfa74a1779d6561","byteLength":229929},"derivedMetadataDigest":"0x44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a","metadataBytes":203429,"htmlBytes":176746,"imageBytes":77,"imageURIBytes":126,"imageDelivery":"inline","externalPreviewReadAuthenticated":false,"animationURIBytes":203173,"sourceBytes":10989,"compressedPayloadBytes":10989,"encodedPayloadBytes":11016,"completeTokenURIBytes":229929,"newStoredBytes":28082,"reusedStoredBytes":205572,"uniqueStoredBytes":233654,"uniqueObjects":4,"decoderObjectBytes":0,"bootObjectBytes":0,"combinedBootDecoderObjectBytes":205572,"generatedHtmlSuffixBytes":0,"nativeBrowserGzip":false,"javascriptCodecDecoderBytes":null,"decoderCostScope":"exact-distinct-stored-object-roles","sourceByteIdentity":"verified-exact"}]}
+# Subtest: actual returned UTF8 footprint wins over smaller compressed bytes; stable-ID tie and explicit codec are deterministic
+ok 69 - actual returned UTF8 footprint wins over smaller compressed bytes; stable-ID tie and explicit codec are deterministic
+  ---
+  duration_ms: 123.434833
+  type: 'test'
+  ...
+# Subtest: same reused boot object is charged once even when used twice; conflicting identity rejects
+ok 70 - same reused boot object is charged once even when used twice; conflicting identity rejects
+  ---
+  duration_ms: 65.783958
+  type: 'test'
+  ...
+# Subtest: corrupt metadata stops selection instead of hiding behind another successful candidate
+ok 71 - corrupt metadata stops selection instead of hiding behind another successful candidate
+  ---
+  duration_ms: 68.156292
+  type: 'test'
+  ...
+# Subtest: corrupt image stops selection instead of hiding behind another successful candidate
+ok 72 - corrupt image stops selection instead of hiding behind another successful candidate
+  ---
+  duration_ms: 58.441
+  type: 'test'
+  ...
+# Subtest: corrupt source-membership stops selection instead of hiding behind another successful candidate
+ok 73 - corrupt source-membership stops selection instead of hiding behind another successful candidate
+  ---
+  duration_ms: 44.990834
+  type: 'test'
+  ...
+# Subtest: corrupt coverage stops selection instead of hiding behind another successful candidate
+ok 74 - corrupt coverage stops selection instead of hiding behind another successful candidate
+  ---
+  duration_ms: 52.062542
+  type: 'test'
+  ...
+# Subtest: corrupt recipe stops selection instead of hiding behind another successful candidate
+ok 75 - corrupt recipe stops selection instead of hiding behind another successful candidate
+  ---
+  duration_ms: 39.132541
+  type: 'test'
+  ...
+# Subtest: corrupt registered-bytes stops selection instead of hiding behind another successful candidate
+ok 76 - corrupt registered-bytes stops selection instead of hiding behind another successful candidate
+  ---
+  duration_ms: 57.015458
+  type: 'test'
+  ...
+# Subtest: corrupt auxiliary-image stops selection instead of hiding behind another successful candidate
+ok 77 - corrupt auxiliary-image stops selection instead of hiding behind another successful candidate
+  ---
+  duration_ms: 55.8605
+  type: 'test'
+  ...
+# Subtest: denial, timeout and malformed build remain terminal, with no retries or fallback
+ok 78 - denial, timeout and malformed build remain terminal, with no retries or fallback
+  ---
+  duration_ms: 125.507667
+  type: 'test'
+  ...
+# Subtest: abort, builder mutation, external source mutation, recipe drift and bounded intake cannot authorize a plan
+ok 79 - abort, builder mutation, external source mutation, recipe drift and bounded intake cannot authorize a plan
+  ---
+  duration_ms: 77.500833
+  type: 'test'
+  ...
+# Subtest: final exact context identity is measured separately and never becomes funding authority
+ok 80 - final exact context identity is measured separately and never becomes funding authority
+  ---
+  duration_ms: 45.104458
+  type: 'test'
+  ...
+# Subtest: explicit external collector URI is measured exactly without network/authentication claims
+ok 81 - explicit external collector URI is measured exactly without network/authentication claims
+  ---
+  duration_ms: 28.167958
+  type: 'test'
+  ...
+# Subtest: reused creator objects require distinct receipt-bound attribution; count each once
+ok 82 - reused creator objects require distinct receipt-bound attribution; count each once
+  ---
+  duration_ms: 24.98075
+  type: 'test'
+  ...
+# Subtest: retired tableDigest cannot authorize current candidate selection
+ok 83 - retired tableDigest cannot authorize current candidate selection
+  ---
+  duration_ms: 36.135209
+  type: 'test'
+  ...
+# Subtest: retired sharedImageProgram cannot authorize current candidate selection
+ok 84 - retired sharedImageProgram cannot authorize current candidate selection
+  ---
+  duration_ms: 30.561959
+  type: 'test'
+  ...
+# Subtest: unchanged generic fresh guard rejects actual rev5 gzip descriptor; exact recipe admits raw-percent only
+ok 85 - unchanged generic fresh guard rejects actual rev5 gzip descriptor; exact recipe admits raw-percent only
+  ---
+  duration_ms: 61.4345
+  type: 'test'
+  ...
+# Subtest: wrong chain/registration/frame/runtime cannot reuse native recipe
+ok 86 - wrong chain/registration/frame/runtime cannot reuse native recipe
+  ---
+  duration_ms: 2.752917
+  type: 'test'
+  ...
+# Subtest: changed compressed or decoded commitment, extra code and another codec remain rejected
+ok 87 - changed compressed or decoded commitment, extra code and another codec remain rejected
+  ---
+  duration_ms: 3.924375
+  type: 'test'
+  ...
+# Subtest: whole HTML Base64 carriage cannot reuse per-resource allowance
+ok 88 - whole HTML Base64 carriage cannot reuse per-resource allowance
+  ---
+  duration_ms: 16.286833
+  type: 'test'
+  ...
+# Subtest: proof and source snapshots reject mutations; explicitgzip eligible only when selected reader allows it
+ok 89 - proof and source snapshots reject mutations; explicitgzip eligible only when selected reader allows it
+  ---
+  duration_ms: 2.518208
+  type: 'test'
+  ...
+# Subtest: actual public rev5 nativeGzip whole-output candidate competes by returned URI, never source bytes alone
+ok 90 - actual public rev5 nativeGzip whole-output candidate competes by returned URI, never source bytes alone
+  ---
+  duration_ms: 60.153334
+  type: 'test'
+  ...
+# {"scope":"PROVISIONAL_TEMPLATE_NOT_ADOPTION_OR_FULL_SIMULATION","actualGatorrr":false,"source":[{"algorithm":"sha256","digest":"0xdd03cf819aecdb82a4a755ceebd0b1c8037f88b95124fac3ae175f7e65e21727","byteLength":1344},{"algorithm":"sha256","digest":"0x5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f","byteLength":77}],"candidates":[{"id":"gzip","codec":"gzip","recipeDigest":"0xd78730f1e5090acda5c66bf280b89a67655d297fc9f7bd02f9fd78fc9abcffd2","measurementScope":{"kind":"provisional-template","templateDigest":"0x16065f7a79caa45206bca9251d980a9487ccbf4597d2beea421735671caddcc3"},"tokenURICommitment":{"digest":"0xb90515e61b6f6e4279e3607fee6afa6e396f55352428595dd0e78c54591db597","byteLength":119479},"derivedMetadataDigest":"0x44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a","metadataBytes":102577,"htmlBytes":85491,"imageBytes":77,"imageURIBytes":126,"imageDelivery":"inline","externalPreviewReadAuthenticated":false,"animationURIBytes":102344,"sourceBytes":1421,"compressedPayloadBytes":155,"encodedPayloadBytes":208,"completeTokenURIBytes":119479,"newStoredBytes":1467,"reusedStoredBytes":119848,"uniqueStoredBytes":121315,"uniqueObjects":4,"decoderObjectBytes":0,"bootObjectBytes":119848,"combinedBootDecoderObjectBytes":0,"generatedHtmlSuffixBytes":0,"nativeBrowserGzip":true,"javascriptCodecDecoderBytes":0,"decoderCostScope":"exact-distinct-stored-object-roles","javascriptGzipDecoderBytes":0,"sourceByteIdentity":"verified-exact"},{"id":"none","codec":"none","recipeDigest":"0x421cb56dd903261980c396d6b4c224d0537d0b9e050b57ac65bf4a611fa42d8a","measurementScope":{"kind":"provisional-template","templateDigest":"0x16065f7a79caa45206bca9251d980a9487ccbf4597d2beea421735671caddcc3"},"tokenURICommitment":{"digest":"0x8b1bd66b052cf73bbe8c0fc7f2dd11a00b2d2da07f59d7c740e1d7cc5f999789","byteLength":122025},"derivedMetadataDigest":"0x44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a","metadataBytes":104495,"htmlBytes":86781,"imageBytes":77,"imageURIBytes":126,"imageDelivery":"inline","externalPreviewReadAuthenticated":false,"animationURIBytes":104262,"sourceBytes":1421,"compressedPayloadBytes":1421,"encodedPayloadBytes":1448,"completeTokenURIBytes":122025,"newStoredBytes":4013,"reusedStoredBytes":119848,"uniqueStoredBytes":123861,"uniqueObjects":4,"decoderObjectBytes":0,"bootObjectBytes":119848,"combinedBootDecoderObjectBytes":0,"generatedHtmlSuffixBytes":0,"nativeBrowserGzip":false,"javascriptCodecDecoderBytes":null,"decoderCostScope":"exact-distinct-stored-object-roles","sourceByteIdentity":"verified-exact"}]}
+# Subtest: typed proof reaches COPY/readback audit; wrong chain and stale returned bytes reject
+ok 91 - typed proof reaches COPY/readback audit; wrong chain and stale returned bytes reject
+  ---
+  duration_ms: 59.764417
+  type: 'test'
+  ...
+# (node:47106) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: explicitgzip is deterministic for incompressible URI81 payloads and never coerces to Brotli/None
+ok 92 - explicitgzip is deterministic for incompressible URI81 payloads and never coerces to Brotli/None
+  ---
+  duration_ms: 129.6005
+  type: 'test'
+  ...
+# Subtest: Studio core explicitgzip stores exact deterministic gzip bytes, not its old Brotli else branch
+ok 93 - Studio core explicitgzip stores exact deterministic gzip bytes, not its old Brotli else branch
+  ---
+  duration_ms: 739.252375
+  type: 'test'
+  ...
+# Subtest: exact normal1786-byte MP4 default None survives the actual registered rev5 proof
+ok 94 - exact normal1786-byte MP4 default None survives the actual registered rev5 proof
+  ---
+  duration_ms: 19.550292
+  type: 'test'
+  ...
+# Subtest: complete native WebM video and existing PCM/AAC/MP3/Ogg/FLAC audio and GLB survive exact None identity proof
+    # Subtest: audio/wav
+    ok 1 - audio/wav
+      ---
+      duration_ms: 2.674
+      type: 'test'
+      ...
+    # Subtest: audio/aac
+    ok 2 - audio/aac
+      ---
+      duration_ms: 4.079167
+      type: 'test'
+      ...
+    # Subtest: audio/mpeg
+    ok 3 - audio/mpeg
+      ---
+      duration_ms: 2.86425
+      type: 'test'
+      ...
+    # Subtest: audio/ogg
+    ok 4 - audio/ogg
+      ---
+      duration_ms: 6.029708
+      type: 'test'
+      ...
+    # Subtest: audio/flac
+    ok 5 - audio/flac
+      ---
+      duration_ms: 7.946417
+      type: 'test'
+      ...
+    # Subtest: audio/mp4
+    ok 6 - audio/mp4
+      ---
+      duration_ms: 5.18125
+      type: 'test'
+      ...
+    # Subtest: model/gltf-binary
+    ok 7 - model/gltf-binary
+      ---
+      duration_ms: 3.610167
+      type: 'test'
+      ...
+    1..7
+ok 95 - complete native WebM video and existing PCM/AAC/MP3/Ogg/FLAC audio and GLB survive exact None identity proof
+  ---
+  duration_ms: 38.657375
+  type: 'test'
+  ...
+# Subtest: native None proof rejects spoofed types, encoded text/scripts, malformed container bytes and wrong roles
+    # Subtest: unknown MIME
+    ok 1 - unknown MIME
+      ---
+      duration_ms: 1.210291
+      type: 'test'
+      ...
+    # Subtest: encoded HTML
+    ok 2 - encoded HTML
+      ---
+      duration_ms: 1.552917
+      type: 'test'
+      ...
+    # Subtest: encoded JavaScript
+    ok 3 - encoded JavaScript
+      ---
+      duration_ms: 0.663042
+      type: 'test'
+      ...
+    # Subtest: MIME-spoofed text
+    ok 4 - MIME-spoofed text
+      ---
+      duration_ms: 1.518167
+      type: 'test'
+      ...
+    # Subtest: module role
+    ok 5 - module role
+      ---
+      duration_ms: 0.515834
+      type: 'test'
+      ...
+    # Subtest: missing role
+    ok 6 - missing role
+      ---
+      duration_ms: 0.278542
+      type: 'test'
+      ...
+    # Subtest: truncated movie
+    ok 7 - truncated movie
+      ---
+      duration_ms: 0.277333
+      type: 'test'
+      ...
+    # Subtest: incomplete box
+    ok 8 - incomplete box
+      ---
+      duration_ms: 0.220917
+      type: 'test'
+      ...
+    # Subtest: wrong handler
+    ok 9 - wrong handler
+      ---
+      duration_ms: 0.32675
+      type: 'test'
+      ...
+    # Subtest: external media range
+    ok 10 - external media range
+      ---
+      duration_ms: 0.299
+      type: 'test'
+      ...
+    # Subtest: wrong sample count
+    ok 11 - wrong sample count
+      ---
+      duration_ms: 0.222917
+      type: 'test'
+      ...
+    # Subtest: double encoded movie
+    ok 12 - double encoded movie
+      ---
+      duration_ms: 0.388375
+      type: 'test'
+      ...
+    # Subtest: bad canonical Base64
+    ok 13 - bad canonical Base64
+      ---
+      duration_ms: 0.633833
+      type: 'test'
+      ...
+    # Subtest: decoded digest mismatch
+    ok 14 - decoded digest mismatch
+      ---
+      duration_ms: 0.474708
+      type: 'test'
+      ...
+    # Subtest: stored digest mismatch
+    ok 15 - stored digest mismatch
+      ---
+      duration_ms: 0.428834
+      type: 'test'
+      ...
+    # Subtest: ambiguous text sibling
+    ok 16 - ambiguous text sibling
+      ---
+      duration_ms: 0.284666
+      type: 'test'
+      ...
+    1..16
+ok 96 - native None proof rejects spoofed types, encoded text/scripts, malformed container bytes and wrong roles
+  ---
+  duration_ms: 12.8685
+  type: 'test'
+  ...
+# Subtest: native None cannot bypass immutable frame/binding or the mandatory genuine Gzip member
+ok 97 - native None cannot bypass immutable frame/binding or the mandatory genuine Gzip member
+  ---
+  duration_ms: 9.672084
+  type: 'test'
+  ...
+# Subtest: None external glTF buffers require the exact complete referenced model resource graph
+    # Subtest: unreferenced extra buffer
+    ok 1 - unreferenced extra buffer
+      ---
+      duration_ms: 1.332708
+      type: 'test'
+      ...
+    # Subtest: missing model
+    ok 2 - missing model
+      ---
+      duration_ms: 0.810208
+      type: 'test'
+      ...
+    # Subtest: missing actual buffer
+    ok 3 - missing actual buffer
+      ---
+      duration_ms: 0.995208
+      type: 'test'
+      ...
+    # Subtest: ambiguous alias
+    ok 4 - ambiguous alias
+      ---
+      duration_ms: 1.106625
+      type: 'test'
+      ...
+    # Subtest: path escape
+    ok 5 - path escape
+      ---
+      duration_ms: 0.46875
+      type: 'test'
+      ...
+    # Subtest: module masquerading as buffer
+    ok 6 - module masquerading as buffer
+      ---
+      duration_ms: 0.520708
+      type: 'test'
+      ...
+    # Subtest: script MIME masquerading as buffer
+    ok 7 - script MIME masquerading as buffer
+      ---
+      duration_ms: 0.246333
+      type: 'test'
+      ...
+    # Subtest: truncated actual buffer
+    ok 8 - truncated actual buffer
+      ---
+      duration_ms: 0.612541
+      type: 'test'
+      ...
+    # Subtest: external dependency
+    ok 9 - external dependency
+      ---
+      duration_ms: 1.056334
+      type: 'test'
+      ...
+    1..9
+ok 98 - None external glTF buffers require the exact complete referenced model resource graph
+  ---
+  duration_ms: 12.277083
+  type: 'test'
+  ...
+# Subtest: registered native None proof and serialized audit reject malformed roles and one-to-one identity drift
+    # Subtest: descriptor role ["entrypoint"]
+    ok 1 - descriptor role ["entrypoint"]
+      ---
+      duration_ms: 0.354
+      type: 'test'
+      ...
+    # Subtest: descriptor role ["asset"]
+    ok 2 - descriptor role ["asset"]
+      ---
+      duration_ms: 0.218542
+      type: 'test'
+      ...
+    # Subtest: descriptor role ["data"]
+    ok 3 - descriptor role ["data"]
+      ---
+      duration_ms: 0.1795
+      type: 'test'
+      ...
+    # Subtest: descriptor role {}
+    ok 4 - descriptor role {}
+      ---
+      duration_ms: 1.60025
+      type: 'test'
+      ...
+    # Subtest: descriptor role null
+    ok 5 - descriptor role null
+      ---
+      duration_ms: 0.23975
+      type: 'test'
+      ...
+    # Subtest: descriptor role 7
+    ok 6 - descriptor role 7
+      ---
+      duration_ms: 0.195917
+      type: 'test'
+      ...
+    # Subtest: full proof None array null
+    ok 7 - full proof None array null
+      ---
+      duration_ms: 0.150167
+      type: 'test'
+      ...
+    # Subtest: full proof None array empty
+    ok 8 - full proof None array empty
+      ---
+      duration_ms: 0.070667
+      type: 'test'
+      ...
+    # Subtest: full proof missing member
+    ok 9 - full proof missing member
+      ---
+      duration_ms: 0.249334
+      type: 'test'
+      ...
+    # Subtest: full proof duplicate member
+    ok 10 - full proof duplicate member
+      ---
+      duration_ms: 0.091583
+      type: 'test'
+      ...
+    # Subtest: full proof cross Gzip duplicate
+    ok 11 - full proof cross Gzip duplicate
+      ---
+      duration_ms: 0.070292
+      type: 'test'
+      ...
+    # Subtest: full proof extra member
+    ok 12 - full proof extra member
+      ---
+      duration_ms: 0.238291
+      type: 'test'
+      ...
+    # Subtest: full proof unknown member field
+    ok 13 - full proof unknown member field
+      ---
+      duration_ms: 0.073916
+      type: 'test'
+      ...
+    # Subtest: full proof coerced member role
+    ok 14 - full proof coerced member role
+      ---
+      duration_ms: 0.070208
+      type: 'test'
+      ...
+    # Subtest: full proof script member MIME
+    ok 15 - full proof script member MIME
+      ---
+      duration_ms: 0.074
+      type: 'test'
+      ...
+    # Subtest: full proof original drift
+    ok 16 - full proof original drift
+      ---
+      duration_ms: 0.077042
+      type: 'test'
+      ...
+    # Subtest: full proof stored drift
+    ok 17 - full proof stored drift
+      ---
+      duration_ms: 0.084917
+      type: 'test'
+      ...
+    # Subtest: serialized audit proof removed
+    ok 18 - serialized audit proof removed
+      ---
+      duration_ms: 0.091459
+      type: 'test'
+      ...
+    # Subtest: serialized audit None evidence removed
+    ok 19 - serialized audit None evidence removed
+      ---
+      duration_ms: 0.120041
+      type: 'test'
+      ...
+    # Subtest: serialized audit missing witness
+    ok 20 - serialized audit missing witness
+      ---
+      duration_ms: 0.110667
+      type: 'test'
+      ...
+    # Subtest: serialized audit extra witness field
+    ok 21 - serialized audit extra witness field
+      ---
+      duration_ms: 0.100584
+      type: 'test'
+      ...
+    # Subtest: serialized audit witness role array
+    ok 22 - serialized audit witness role array
+      ---
+      duration_ms: 0.09925
+      type: 'test'
+      ...
+    # Subtest: serialized audit witness role drift
+    ok 23 - serialized audit witness role drift
+      ---
+      duration_ms: 0.097333
+      type: 'test'
+      ...
+    # Subtest: serialized audit wrong payload ID
+    ok 24 - serialized audit wrong payload ID
+      ---
+      duration_ms: 0.094334
+      type: 'test'
+      ...
+    # Subtest: serialized audit wrong MIME
+    ok 25 - serialized audit wrong MIME
+      ---
+      duration_ms: 0.094042
+      type: 'test'
+      ...
+    # Subtest: serialized audit wrong encoding
+    ok 26 - serialized audit wrong encoding
+      ---
+      duration_ms: 0.091333
+      type: 'test'
+      ...
+    # Subtest: serialized audit wrong compression
+    ok 27 - serialized audit wrong compression
+      ---
+      duration_ms: 0.095708
+      type: 'test'
+      ...
+    # Subtest: serialized audit wrong original digest
+    ok 28 - serialized audit wrong original digest
+      ---
+      duration_ms: 0.263583
+      type: 'test'
+      ...
+    # Subtest: serialized audit wrong stored digest
+    ok 29 - serialized audit wrong stored digest
+      ---
+      duration_ms: 0.136625
+      type: 'test'
+      ...
+    # Subtest: serialized audit wrong byte count
+    ok 30 - serialized audit wrong byte count
+      ---
+      duration_ms: 0.129125
+      type: 'test'
+      ...
+    # Subtest: serialized audit wrong Base64 length
+    ok 31 - serialized audit wrong Base64 length
+      ---
+      duration_ms: 0.109541
+      type: 'test'
+      ...
+    # Subtest: serialized audit duplicate payload
+    ok 32 - serialized audit duplicate payload
+      ---
+      duration_ms: 0.121292
+      type: 'test'
+      ...
+    # Subtest: serialized audit missing payload
+    ok 33 - serialized audit missing payload
+      ---
+      duration_ms: 0.193959
+      type: 'test'
+      ...
+    # Subtest: serialized audit witness on Gzip
+    ok 34 - serialized audit witness on Gzip
+      ---
+      duration_ms: 0.122416
+      type: 'test'
+      ...
+    # Subtest: serialized audit null witness
+    ok 35 - serialized audit null witness
+      ---
+      duration_ms: 0.103875
+      type: 'test'
+      ...
+    # Subtest: serialized audit unknown payload field
+    ok 36 - serialized audit unknown payload field
+      ---
+      duration_ms: 0.102583
+      type: 'test'
+      ...
+    # Subtest: serialized audit foreign transport profile
+    ok 37 - serialized audit foreign transport profile
+      ---
+      duration_ms: 0.101625
+      type: 'test'
+      ...
+    1..37
+ok 99 - registered native None proof and serialized audit reject malformed roles and one-to-one identity drift
+  ---
+  duration_ms: 15.6315
+  type: 'test'
+  ...
+# Subtest: actual native None full metadata audit and COPY review survive JSON recovery without changing Gzip membership
+ok 100 - actual native None full metadata audit and COPY review survive JSON recovery without changing Gzip membership
+  ---
+  duration_ms: 56.422
+  type: 'test'
+  ...
+# Subtest: None creator retains exact registered shared Gzip module with mandatory final proof
+ok 101 - None creator retains exact registered shared Gzip module with mandatory final proof
+  ---
+  duration_ms: 55.879541
+  type: 'test'
+  ...
+# Subtest: compressed shared unregistered cannot bypass exact module authority
+ok 102 - compressed shared unregistered cannot bypass exact module authority
+  ---
+  duration_ms: 23.280292
+  type: 'test'
+  ...
+# Subtest: compressed shared new cannot bypass exact module authority
+ok 103 - compressed shared new cannot bypass exact module authority
+  ---
+  duration_ms: 25.795166
+  type: 'test'
+  ...
+# Subtest: compressed shared boot cannot bypass exact module authority
+ok 104 - compressed shared boot cannot bypass exact module authority
+  ---
+  duration_ms: 15.928375
+  type: 'test'
+  ...
+# Subtest: compressed shared wrong-object cannot bypass exact module authority
+ok 105 - compressed shared wrong-object cannot bypass exact module authority
+  ---
+  duration_ms: 15.04375
+  type: 'test'
+  ...
+# Subtest: compressed shared wrong-bytes cannot bypass exact module authority
+ok 106 - compressed shared wrong-bytes cannot bypass exact module authority
+  ---
+  duration_ms: 13.961084
+  type: 'test'
+  ...
+# Subtest: compressed shared wrong-MIME cannot bypass exact module authority
+ok 107 - compressed shared wrong-MIME cannot bypass exact module authority
+  ---
+  duration_ms: 16.316208
+  type: 'test'
+  ...
+# Subtest: compressed shared wrong-member cannot bypass exact module authority
+ok 108 - compressed shared wrong-member cannot bypass exact module authority
+  ---
+  duration_ms: 16.258125
+  type: 'test'
+  ...
+# Subtest: compressed shared wrong-proof cannot bypass exact module authority
+ok 109 - compressed shared wrong-proof cannot bypass exact module authority
+  ---
+  duration_ms: 13.722959
+  type: 'test'
+  ...
+# Subtest: Gzip original remains forbidden under selected None even with shared module proof
+ok 110 - Gzip original remains forbidden under selected None even with shared module proof
+  ---
+  duration_ms: 17.811375
+  type: 'test'
+  ...
+1..110
+# tests 179
+# suites 0
+# pass 179
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4394.622584

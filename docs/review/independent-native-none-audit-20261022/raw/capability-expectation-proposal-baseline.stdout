@@ -1,0 +1,230 @@
+TAP version 13
+# (node:59347) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: fixture image/png: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 1 - fixture image/png: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 7.712458
+  type: 'test'
+  ...
+# Subtest: fixture image/jpeg: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 2 - fixture image/jpeg: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 2.641333
+  type: 'test'
+  ...
+# Subtest: fixture image/gif: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 3 - fixture image/gif: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 2.470333
+  type: 'test'
+  ...
+# Subtest: fixture image/webp: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 4 - fixture image/webp: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 2.282791
+  type: 'test'
+  ...
+# Subtest: fixture image/avif: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 5 - fixture image/avif: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 2.677542
+  type: 'test'
+  ...
+# Subtest: fixture image/svg+xml: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 6 - fixture image/svg+xml: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 2.820708
+  type: 'test'
+  ...
+# Subtest: fixture video/mp4: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 7 - fixture video/mp4: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 4.311375
+  type: 'test'
+  ...
+# Subtest: fixture video/quicktime: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 8 - fixture video/quicktime: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 4.064041
+  type: 'test'
+  ...
+# Subtest: fixture video/webm: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 9 - fixture video/webm: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 3.784375
+  type: 'test'
+  ...
+# Subtest: fixture audio/wav: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 10 - fixture audio/wav: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 2.511042
+  type: 'test'
+  ...
+# Subtest: fixture text/html: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 11 - fixture text/html: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 1.519667
+  type: 'test'
+  ...
+# Subtest: fixture application/wasm: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 12 - fixture application/wasm: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 1.294708
+  type: 'test'
+  ...
+# Subtest: fixture font/ttf: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 13 - fixture font/ttf: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 2.417
+  type: 'test'
+  ...
+# Subtest: fixture model/gltf-binary: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 14 - fixture model/gltf-binary: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 1.617042
+  type: 'test'
+  ...
+# Subtest: fixture model/gltf+json: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 15 - fixture model/gltf+json: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 1.447
+  type: 'test'
+  ...
+# Subtest: fixture text/css: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 16 - fixture text/css: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 1.318208
+  type: 'test'
+  ...
+# Subtest: fixture text/javascript: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 17 - fixture text/javascript: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 1.529167
+  type: 'test'
+  ...
+# Subtest: fixture application/json: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 18 - fixture application/json: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 1.184
+  type: 'test'
+  ...
+# Subtest: fixture text/plain: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 19 - fixture text/plain: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 1.158167
+  type: 'test'
+  ...
+# Subtest: fixture application/octet-stream: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 20 - fixture application/octet-stream: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 1.09975
+  type: 'test'
+  ...
+# Subtest: encoded webp: SDK/MCP decoded parity, measured output integrity and source preservation
+ok 21 - encoded webp: SDK/MCP decoded parity, measured output integrity and source preservation
+  ---
+  duration_ms: 115.863042
+  type: 'test'
+  ...
+# Subtest: encoded avif: SDK/MCP decoded parity, measured output integrity and source preservation
+ok 22 - encoded avif: SDK/MCP decoded parity, measured output integrity and source preservation
+  ---
+  duration_ms: 115.319
+  type: 'test'
+  ...
+# Subtest: encoded mp4: SDK/MCP decoded parity, measured output integrity and source preservation
+ok 23 - encoded mp4: SDK/MCP decoded parity, measured output integrity and source preservation
+  ---
+  duration_ms: 417.877208
+  type: 'test'
+  ...
+# Subtest: encoded mov: SDK/MCP decoded parity, measured output integrity and source preservation
+ok 24 - encoded mov: SDK/MCP decoded parity, measured output integrity and source preservation
+  ---
+  duration_ms: 421.36275
+  type: 'test'
+  ...
+# Subtest: encoded webm: SDK/MCP decoded parity, measured output integrity and source preservation
+not ok 25 - encoded webm: SDK/MCP decoded parity, measured output integrity and source preservation
+  ---
+  duration_ms: 74.978166
+  type: 'test'
+  location: '/private/tmp/keel-independent-codec-normal-20261022-02/keel-sdk/tests/reviewer-acceptance-media-expectation-proposed.test.mjs:120:9'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /WebM conversion is unavailable/. Input:
+    
+    'Movie creator metadata or unmodelled container semantics require an exact preserving adapter; native media is retained.'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: 'Movie creator metadata or unmodelled container semantics require an exact preserving adapter; native media is retained.'
+  operator: 'match'
+  stack: |-
+    Object.<anonymous> (file:///private/tmp/keel-independent-codec-normal-20261022-02/keel-sdk/tests/reviewer-acceptance-media-expectation-proposed.test.mjs:129:28)
+    expectedException (node:assert:576:17)
+    expectsError (node:assert:701:21)
+    Function.rejects (node:assert:767:3)
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-codec-normal-20261022-02/keel-sdk/tests/reviewer-acceptance-media-expectation-proposed.test.mjs:126:17)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: SDK/MCP synchronized compare parity on exact image frame
+ok 26 - SDK/MCP synchronized compare parity on exact image frame
+  ---
+  duration_ms: 9.55525
+  type: 'test'
+  ...
+# Subtest: SDK/MCP capability parity reports conditional decode, not universal publication
+ok 27 - SDK/MCP capability parity reports conditional decode, not universal publication
+  ---
+  duration_ms: 62.208417
+  type: 'test'
+  ...
+# Subtest: bad-format corrupt.png: edit rejected SDK/MCP, original retained without decode claim
+ok 28 - bad-format corrupt.png: edit rejected SDK/MCP, original retained without decode claim
+  ---
+  duration_ms: 82.149584
+  type: 'test'
+  ...
+# Subtest: bad-format truncated.mp4: edit rejected SDK/MCP, original retained without decode claim
+ok 29 - bad-format truncated.mp4: edit rejected SDK/MCP, original retained without decode claim
+  ---
+  duration_ms: 65.235083
+  type: 'test'
+  ...
+# Subtest: bad-format unsupported.wasm: edit rejected SDK/MCP, original retained without decode claim
+ok 30 - bad-format unsupported.wasm: edit rejected SDK/MCP, original retained without decode claim
+  ---
+  duration_ms: 4.135
+  type: 'test'
+  ...
+# Subtest: bad-format playlist.m3u8: edit rejected SDK/MCP, original retained without decode claim
+ok 31 - bad-format playlist.m3u8: edit rejected SDK/MCP, original retained without decode claim
+  ---
+  duration_ms: 1.381125
+  type: 'test'
+  ...
+# Subtest: media slots preserve explicit shell-off across every fixture MIME and reject full-read boundary violations
+ok 32 - media slots preserve explicit shell-off across every fixture MIME and reject full-read boundary violations
+  ---
+  duration_ms: 4.16675
+  type: 'test'
+  ...
+# Subtest: MCP invalid quality, traversal, unexpected operations and negative time reject without source writes
+ok 33 - MCP invalid quality, traversal, unexpected operations and negative time reject without source writes
+  ---
+  duration_ms: 0.664417
+  type: 'test'
+  ...
+1..33
+# tests 33
+# suites 0
+# pass 32
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2245.202417

@@ -1,0 +1,8 @@
+
+node:inspector:69
+    this.#connection = new Connection((message) => this.#onMessage(message));
+                       ^
+This Environment was initialized without a V8::Inspector
+(Use `node --trace-uncaught ...` to show where the exception was thrown)
+
+Node.js v22.22.1

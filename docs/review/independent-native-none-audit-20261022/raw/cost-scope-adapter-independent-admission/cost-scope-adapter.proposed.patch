@@ -1,0 +1,18 @@
+--- a/apps/studio/tests/unit/never-issued-inline-cost-scope.test.ts
++++ b/apps/studio/tests/unit/never-issued-inline-cost-scope.test.ts
+@@ -22,6 +22,7 @@
+ import * as sourceInventory from "../../src/server/services/creator-prepared-source";
+ import * as replan from "../../src/lib/unfunded-preview-replan";
+ import * as deadline from "../../src/lib/unfunded-publication-deadline";
++import * as mediaTransition from "../../src/server/services/media-source-transition";
+ import { deadlineFixture, generation } from "./support/unfunded-deadline-fixture";
+ const require = createRequire(import.meta.url);
+ const app = path.resolve(import.meta.dirname, "../..");
+@@ -128,6 +129,7 @@
+     "./inline-fragment-catalog-service": { readConfiguredInlineFragmentCatalog: async () => selectedCatalog,
+       readSavedCreatorMediaSelection: () => ({ entrypointResourceId: "original", collectorImageResourceId: "poster" }) },
+     "./module-binding-service": { resolveModuleBindings: async () => [] }, "./creator-prepared-source": sourceInventory,
++    "./media-source-transition": mediaTransition,
+     "./artifact-build-defaults-service": { readCurrentArtifactBuildDefaultsSnapshot: async () => { counters.defaults++; throw defaultsBoundary; } },
+     "~/lib/creator-prepared-publication-capability": { creatorPreparedPublicationCapability: { available: false } },
+   };

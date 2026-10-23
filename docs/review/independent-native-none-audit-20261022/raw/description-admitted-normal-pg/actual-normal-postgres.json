@@ -1,0 +1,2373 @@
+{
+  "finalCounts": {
+    "jobs": 1,
+    "artifacts": 1,
+    "plans": 3,
+    "wallet_operations": 0
+  },
+  "failedJobs": [
+    {
+      "id": "4c98539f-8743-4119-a4b6-2f6842a282ad",
+      "status": "ready",
+      "error": null,
+      "request_digest": "0x703dc53fe6081b9c36cea78d1d9e3a6b3ecbd14fba125099cfabd8c26cd712ce",
+      "artifact_id": "96028146-d4c7-47eb-84fe-d69ea2f3e3e2",
+      "options": {
+        "name": "Temporal auto",
+        "webpQuality": 82,
+        "viewerIntent": {
+          "schema": "keel-studio-viewer-intent@1",
+          "selection": "automatic",
+          "preparation": "registered-verifier",
+          "effectiveChoice": "keel-verification-shell",
+          "requestedChoice": "keel-verification-shell",
+          "sourceInputDigest": "0x676e62dca2ab507d032a5ed9e63949c5eb50c8ce95ecac6cacdaa55e4c77965d"
+        },
+        "buildDefaults": {
+          "layers": {
+            "build": {
+              "payloadStorage": "compact",
+              "assetPresentation": "automatic"
+            },
+            "project": {},
+            "mediaType": "video/mp4"
+          },
+          "policy": {
+            "schema": "keel-effective-build-defaults@1",
+            "values": {
+              "compression": "auto",
+              "brotliQuality": 11,
+              "hybridFallback": false,
+              "payloadStorage": "compact",
+              "transportProfile": "uri81-block-v1",
+              "assetPresentation": "automatic",
+              "rpcMaxConcurrentReads": 4
+            },
+            "sources": {
+              "compression": "system",
+              "brotliQuality": "system",
+              "hybridFallback": "system",
+              "payloadStorage": "build",
+              "transportProfile": "system",
+              "assetPresentation": "build",
+              "rpcMaxConcurrentReads": "system"
+            },
+            "revision": 0,
+            "requiresFullReadValidation": true
+          }
+        },
+        "localFileCount": 2,
+        "retainedSource": {
+          "route": "creator-prepared-copy",
+          "schema": "keel-studio-creator-prepared-source@1",
+          "viewer": "keel-verification-shell",
+          "payloadStorage": "compact",
+          "sourceRevision": "0x5d93f849f00c914e228200a02ae44a39d47fbee2d16d9cc568bfb17119a859b9",
+          "sourceResources": [
+            {
+              "id": "artwork.mp4",
+              "mediaType": "video/mp4",
+              "decodedDigest": "0xa421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561",
+              "originalFileName": "artwork.mp4",
+              "decodedByteLength": 1786
+            },
+            {
+              "id": "preview.png",
+              "mediaType": "image/png",
+              "decodedDigest": "0x20c1e1ec7a62d54fe8191b5c509e7a2c88b520a429bc1b74c55e7ccf72cbcc6d",
+              "originalFileName": "preview.png",
+              "decodedByteLength": 91
+            }
+          ],
+          "posterResourceId": "preview.png",
+          "publicationReady": false,
+          "artworkResourceIds": [
+            "artwork.mp4",
+            "preview.png"
+          ],
+          "entrypointResourceId": "artwork.mp4"
+        },
+        "generatePreview": false,
+        "storageStrategy": "onchain",
+        "presentationChoice": {
+          "assetPresentation": "automatic"
+        },
+        "libraryVersionCount": 0,
+        "entrypointResourceId": "artwork.mp4",
+        "remoteReferenceCount": 0,
+        "retainedSourceIntake": {
+          "jobId": "4c98539f-8743-4119-a4b6-2f6842a282ad",
+          "schema": "keel-studio-retained-source-intake@1",
+          "requestDigest": "0x703dc53fe6081b9c36cea78d1d9e3a6b3ecbd14fba125099cfabd8c26cd712ce",
+          "moduleBindings": [
+            {
+              "chain": "eip155:11155111",
+              "store": "0x0a4f31d5ab08029e4c68f6f3227d9fa3a2d66267",
+              "digest": "sha256:53957405312b1fe3b187a5c49b13d13a08fd6e960953c815c6e49b53637d97f4",
+              "version": "1.1.0",
+              "moduleId": "keel.asset-display",
+              "objectId": "0x08d628e53cc139c67a093ef0b24cdc1a6327010f8b6150ebc113c0310e23748c"
+            }
+          ],
+          "sourceRevision": "0x5d93f849f00c914e228200a02ae44a39d47fbee2d16d9cc568bfb17119a859b9",
+          "preparedRevision": 1,
+          "buildDefaultsDigest": "0x30ab9ec958f0dc49ef0078f3d5dd3e8ae3500498aa54391ada65bd91209de981",
+          "entrypointResourceId": "artwork.mp4",
+          "collectorImageResourceId": "preview.png"
+        },
+        "creatorAssetInspection": {
+          "inputs": [
+            {
+              "digest": "0xa421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561",
+              "inputId": "artwork.mp4",
+              "fileName": "artwork.mp4",
+              "execution": "static",
+              "mediaType": "video/mp4",
+              "byteLength": 1786
+            },
+            {
+              "digest": "0x20c1e1ec7a62d54fe8191b5c509e7a2c88b520a429bc1b74c55e7ccf72cbcc6d",
+              "inputId": "preview.png",
+              "fileName": "preview.png",
+              "execution": "static",
+              "mediaType": "image/png",
+              "byteLength": 91
+            }
+          ],
+          "schema": "keel-studio-creator-asset-inspection@1",
+          "source": {
+            "digest": "0xa421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561",
+            "inputId": "artwork.mp4",
+            "fileName": "artwork.mp4",
+            "execution": "static",
+            "mediaType": "video/mp4",
+            "byteLength": 1786
+          },
+          "preview": {
+            "digest": "0x20c1e1ec7a62d54fe8191b5c509e7a2c88b520a429bc1b74c55e7ccf72cbcc6d",
+            "inputId": "preview.png",
+            "fileName": "preview.png",
+            "execution": "static",
+            "mediaType": "image/png",
+            "byteLength": 91
+          },
+          "execution": "static",
+          "selection": {
+            "entrypointResourceId": "artwork.mp4",
+            "collectorImageResourceId": "preview.png"
+          },
+          "inputDigest": "0x676e62dca2ab507d032a5ed9e63949c5eb50c8ce95ecac6cacdaa55e4c77965d",
+          "sourceMotion": "unknown"
+        },
+        "collectorImageResourceId": "preview.png"
+      }
+    }
+  ],
+  "site": "814a6f983c66cce23fa17660a9e376950850afa9",
+  "sdk": "edaa7446c2cfcec6eee27ca13d3f0cc4718822f7",
+  "environment": {
+    "node": "v22.22.1",
+    "postgres": "Real disposable17 fully migrated",
+    "endpoint": "https://rpc.sepolia.ethpandaops.io"
+  },
+  "input": {
+    "bytes": 1786,
+    "sha256": "a421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561",
+    "previewSHA256": "20c1e1ec7a62d54fe8191b5c509e7a2c88b520a429bc1b74c55e7ccf72cbcc6d"
+  },
+  "result": "BLOCKED_OR_FAIL",
+  "phase": "actual-normal-context",
+  "stages": [
+    {
+      "phase": "normal-intake",
+      "f": {
+        "project": "96028146-d4c7-47eb-84fe-d69ea2f3e3e2",
+        "release": "59c36034-7a1e-4f58-a02f-9e9359fe6b06",
+        "revision": 2
+      },
+      "before": {
+        "artifact": {
+          "id": "96028146-d4c7-47eb-84fe-d69ea2f3e3e2",
+          "name": "Temporal auto",
+          "slug": "temporal-auto-96028146",
+          "status": "ready",
+          "chain_id": null,
+          "manifest": {
+            "id": "96028146-d4c7-47eb-84fe-d69ea2f3e3e2",
+            "name": "Temporal auto",
+            "stack": {
+              "protocol": "keel-project-stack@1",
+              "components": [
+                {
+                  "id": "preview.png",
+                  "role": "image",
+                  "label": "preview.png",
+                  "order": 0,
+                  "format": "asset",
+                  "updates": {
+                    "mode": "manual"
+                  },
+                  "resource": "preview.png",
+                  "resourceIntegrity": {
+                    "digest": "0x20c1e1ec7a62d54fe8191b5c509e7a2c88b520a429bc1b74c55e7ccf72cbcc6d",
+                    "algorithm": "sha256",
+                    "byteLength": 91
+                  }
+                },
+                {
+                  "id": "keel-inline-part-graph-00-shell-prefix",
+                  "role": "other",
+                  "label": "keel-inline-part-graph-00-shell-prefix.fragment",
+                  "order": 1,
+                  "format": "asset",
+                  "updates": {
+                    "mode": "manual"
+                  },
+                  "resource": "keel-inline-part-graph-00-shell-prefix",
+                  "resourceIntegrity": {
+                    "digest": "0xc461a1fdb1d8ab23bafe018dd27d1ca9eea2e170055c06a280496c228c7cc098",
+                    "algorithm": "sha256",
+                    "byteLength": 950
+                  }
+                },
+                {
+                  "id": "keel-inline-part-graph-01-module-keel.asset-display",
+                  "role": "other",
+                  "label": "keel-inline-part-graph-01-module-keel.asset-display.fragment",
+                  "order": 2,
+                  "format": "asset",
+                  "updates": {
+                    "mode": "manual"
+                  },
+                  "resource": "keel-inline-part-graph-01-module-keel.asset-display",
+                  "resourceIntegrity": {
+                    "digest": "0xc3ea0bd8f76247673b4ea1723c23659b8d46b4c3bf9a6ae5a27d36dc78e2121c",
+                    "algorithm": "sha256",
+                    "byteLength": 4174
+                  }
+                },
+                {
+                  "id": "keel-inline-part-graph-02-entrypoint",
+                  "role": "other",
+                  "label": "keel-inline-part-graph-02-entrypoint.fragment",
+                  "order": 3,
+                  "format": "asset",
+                  "updates": {
+                    "mode": "manual"
+                  },
+                  "resource": "keel-inline-part-graph-02-entrypoint",
+                  "resourceIntegrity": {
+                    "digest": "0x249a48324ff681ea0e3f50f275eb0e175473b784317bbfd4acda879dc8941dde",
+                    "algorithm": "sha256",
+                    "byteLength": 3059
+                  }
+                },
+                {
+                  "id": "keel-inline-part-graph-03-shell-suffix",
+                  "role": "other",
+                  "label": "keel-inline-part-graph-03-shell-suffix.fragment",
+                  "order": 4,
+                  "format": "asset",
+                  "updates": {
+                    "mode": "manual"
+                  },
+                  "resource": "keel-inline-part-graph-03-shell-suffix",
+                  "resourceIntegrity": {
+                    "digest": "0x8c2bddf618b50916f63d19f17b88719831884d32c12029ed16f329ff0adbaf6d",
+                    "algorithm": "sha256",
+                    "byteLength": 118898
+                  }
+                },
+                {
+                  "id": "keel-inline-token-uri-fragment",
+                  "role": "entrypoint",
+                  "label": "keel-inline-token-uri.fragment",
+                  "order": 5,
+                  "format": "asset",
+                  "updates": {
+                    "mode": "manual"
+                  },
+                  "resource": "keel-inline-token-uri-fragment",
+                  "resourceIntegrity": {
+                    "digest": "0xa076184830a1b991d0af2fbaea294775c882024a99087feae666751d1085e5b1",
+                    "algorithm": "sha256",
+                    "byteLength": 127081
+                  }
+                }
+              ]
+            },
+            "schema": "keel-manifest@2",
+            "runtime": {
+              "engine": {
+                "protocol": "keel-runtime@1",
+                "renderer": "browser",
+                "viewerProtocol": "keel-viewer@1"
+              },
+              "content": {
+                "mode": "verified-only",
+                "protocol": "keel-content-gateway@1",
+                "manifestTrust": "digest",
+                "ipfsPathPrefix": "/ipfs/",
+                "blockUndeclared": true,
+                "externalSources": "host-verified",
+                "onchainPathPrefix": "/onchain/",
+                "resourcePathPrefix": "/content/"
+              },
+              "sandbox": "strict",
+              "timeoutMs": 30000,
+              "determinism": {
+                "mode": "live"
+              },
+              "capabilities": {
+                "downloads": false,
+                "webAssembly": false
+              },
+              "maxResources": 265,
+              "maxTotalBytes": 134471890,
+              "maxResourceBytes": 134217728,
+              "maxRecursionDepth": 32
+            },
+            "fallback": {
+              "image": "preview.png"
+            },
+            "revision": {
+              "number": 1,
+              "policy": "creator",
+              "compatibility": {
+                "max": 1,
+                "min": 1
+              }
+            },
+            "resources": [
+              {
+                "id": "preview.png",
+                "role": "preview",
+                "aliases": [
+                  "/content/preview.png"
+                ],
+                "sources": [
+                  {
+                    "uri": "./preview.png",
+                    "kind": "uri",
+                    "immutable": true,
+                    "integrity": {
+                      "digest": "0x20c1e1ec7a62d54fe8191b5c509e7a2c88b520a429bc1b74c55e7ccf72cbcc6d",
+                      "algorithm": "sha256",
+                      "byteLength": 91
+                    }
+                  }
+                ],
+                "mediaType": "image/png",
+                "executable": false,
+                "extensions": {
+                  "studio": {
+                    "compression": "none",
+                    "storedIntegrity": {
+                      "digest": "0x20c1e1ec7a62d54fe8191b5c509e7a2c88b520a429bc1b74c55e7ccf72cbcc6d",
+                      "algorithm": "sha256",
+                      "byteLength": 91
+                    },
+                    "storedByteLength": 91
+                  }
+                },
+                "description": "Exact selected collector preview; original bytes preserved.",
+                "originalName": "preview.png"
+              },
+              {
+                "id": "keel-inline-part-graph-00-shell-prefix",
+                "role": "data",
+                "aliases": [
+                  "/content/keel-inline-part-graph-00-shell-prefix",
+                  "/content/keel-inline-part-graph-00-shell-prefix.fragment"
+                ],
+                "sources": [
+                  {
+                    "kind": "onchain",
+                    "store": "0x0a4f31d5ab08029e4c68f6f3227d9fa3a2d66267",
+                    "chainId": 11155111,
+                    "objectId": "0xe9a47cc4f074a03ac1ba6ad69804f051db5c54fac0c5afba6a31d6c81689377c",
+                    "integrity": {
+                      "digest": "0xc461a1fdb1d8ab23bafe018dd27d1ca9eea2e170055c06a280496c228c7cc098",
+                      "algorithm": "sha256",
+                      "byteLength": 950
+                    },
+                    "compression": "none"
+                  }
+                ],
+                "mediaType": "application/vnd.keel.token-uri-raw-percent-fragment",
+                "executable": false,
+                "extensions": {
+                  "studio": {
+                    "compression": "none",
+                    "storedIntegrity": {
+                      "digest": "0xc461a1fdb1d8ab23bafe018dd27d1ca9eea2e170055c06a280496c228c7cc098",
+                      "algorithm": "sha256",
+                      "byteLength": 950
+                    },
+                    "storedByteLength": 950
+                  }
+                },
+                "description": "Reusable onchain KEEL shell top.",
+                "originalName": "keel-inline-part-graph-00-shell-prefix.fragment"
+              },
+              {
+                "id": "keel-inline-part-graph-01-module-keel.asset-display",
+                "role": "library",
+                "aliases": [
+                  "/content/keel-inline-part-graph-01-module-keel.asset-display",
+                  "/content/keel-inline-part-graph-01-module-keel.asset-display.fragment"
+                ],
+                "sources": [
+                  {
+                    "kind": "onchain",
+                    "store": "0x0a4f31d5ab08029e4c68f6f3227d9fa3a2d66267",
+                    "chainId": 11155111,
+                    "objectId": "0x0fe8d08a66b4943381b464eaad35ecf2016244b957c9f73d1bb4730c8972ebf7",
+                    "integrity": {
+                      "digest": "0xc3ea0bd8f76247673b4ea1723c23659b8d46b4c3bf9a6ae5a27d36dc78e2121c",
+                      "algorithm": "sha256",
+                      "byteLength": 4174
+                    },
+                    "compression": "none"
+                  }
+                ],
+                "mediaType": "application/vnd.keel.token-uri-raw-percent-fragment",
+                "executable": false,
+                "extensions": {
+                  "studio": {
+                    "compression": "none",
+                    "storedIntegrity": {
+                      "digest": "0xc3ea0bd8f76247673b4ea1723c23659b8d46b4c3bf9a6ae5a27d36dc78e2121c",
+                      "algorithm": "sha256",
+                      "byteLength": 4174
+                    },
+                    "storedByteLength": 4174
+                  }
+                },
+                "description": "keel.asset-display inserted in the user-selected middle of the KEEL shell.",
+                "originalName": "keel-inline-part-graph-01-module-keel.asset-display.fragment"
+              },
+              {
+                "id": "keel-inline-part-graph-02-entrypoint",
+                "role": "script",
+                "aliases": [
+                  "/content/keel-inline-part-graph-02-entrypoint",
+                  "/content/keel-inline-part-graph-02-entrypoint.fragment"
+                ],
+                "sources": [
+                  {
+                    "uri": "./keel-inline-part-graph-02-entrypoint.fragment",
+                    "kind": "uri",
+                    "immutable": true,
+                    "integrity": {
+                      "digest": "0x249a48324ff681ea0e3f50f275eb0e175473b784317bbfd4acda879dc8941dde",
+                      "algorithm": "sha256",
+                      "byteLength": 3059
+                    }
+                  }
+                ],
+                "mediaType": "application/vnd.keel.token-uri-raw-percent-fragment",
+                "executable": false,
+                "extensions": {
+                  "studio": {
+                    "compression": "none",
+                    "storedIntegrity": {
+                      "digest": "0x249a48324ff681ea0e3f50f275eb0e175473b784317bbfd4acda879dc8941dde",
+                      "algorithm": "sha256",
+                      "byteLength": 3059
+                    },
+                    "storedByteLength": 3059
+                  }
+                },
+                "description": "Creator-specific entry resolved inside the selected KEEL shell.",
+                "originalName": "keel-inline-part-graph-02-entrypoint.fragment"
+              },
+              {
+                "id": "keel-inline-part-graph-03-shell-suffix",
+                "role": "data",
+                "aliases": [
+                  "/content/keel-inline-part-graph-03-shell-suffix",
+                  "/content/keel-inline-part-graph-03-shell-suffix.fragment"
+                ],
+                "sources": [
+                  {
+                    "kind": "onchain",
+                    "store": "0x0a4f31d5ab08029e4c68f6f3227d9fa3a2d66267",
+                    "chainId": 11155111,
+                    "objectId": "0x2a8f3e49f6535a3d319f7ecafd075e0f780f16879af28fa8e3ee966ef051eda0",
+                    "integrity": {
+                      "digest": "0x8c2bddf618b50916f63d19f17b88719831884d32c12029ed16f329ff0adbaf6d",
+                      "algorithm": "sha256",
+                      "byteLength": 118898
+                    },
+                    "compression": "none"
+                  }
+                ],
+                "mediaType": "application/vnd.keel.token-uri-raw-percent-fragment",
+                "executable": false,
+                "extensions": {
+                  "studio": {
+                    "compression": "none",
+                    "storedIntegrity": {
+                      "digest": "0x8c2bddf618b50916f63d19f17b88719831884d32c12029ed16f329ff0adbaf6d",
+                      "algorithm": "sha256",
+                      "byteLength": 118898
+                    },
+                    "storedByteLength": 118898
+                  }
+                },
+                "description": "Reusable onchain KEEL shell bottom.",
+                "originalName": "keel-inline-part-graph-03-shell-suffix.fragment"
+              },
+              {
+                "id": "keel-inline-token-uri-fragment",
+                "role": "entrypoint",
+                "aliases": [
+                  "/content/keel-inline-token-uri-fragment",
+                  "/content/keel-inline-token-uri.fragment"
+                ],
+                "sources": [
+                  {
+                    "kind": "composite",
+                    "parts": [
+                      "keel-inline-part-graph-00-shell-prefix",
+                      "keel-inline-part-graph-01-module-keel.asset-display",
+                      "keel-inline-part-graph-02-entrypoint",
+                      "keel-inline-part-graph-03-shell-suffix"
+                    ],
+                    "integrity": {
+                      "digest": "0xa076184830a1b991d0af2fbaea294775c882024a99087feae666751d1085e5b1",
+                      "algorithm": "sha256",
+                      "byteLength": 127081
+                    }
+                  }
+                ],
+                "mediaType": "application/vnd.keel.token-uri-raw-percent-fragment",
+                "executable": true,
+                "extensions": {
+                  "studio": {
+                    "compression": "none",
+                    "storedIntegrity": {
+                      "digest": "0xa076184830a1b991d0af2fbaea294775c882024a99087feae666751d1085e5b1",
+                      "algorithm": "sha256",
+                      "byteLength": 127081
+                    },
+                    "storedByteLength": 127081
+                  }
+                },
+                "description": "Canonical KEEL Inline graph (pinned): chosen shell top, ordered middle, creator entry, and chosen shell bottom.",
+                "originalName": "keel-inline-token-uri.fragment"
+              }
+            ],
+            "thumbnail": {
+              "image": "preview.png",
+              "maxBytes": 2097152,
+              "protocol": "keel-thumbnail@1"
+            },
+            "entrypoint": {
+              "mode": "html",
+              "resource": "keel-inline-token-uri-fragment"
+            },
+            "extensions": {
+              "studio": {
+                "stats": {
+                  "bytesSaved": 0,
+                  "resourceCount": 6,
+                  "compressionRatio": 1,
+                  "storedByteLength": 254253,
+                  "decodedByteLength": 254253,
+                  "executableResourceCount": 1
+                },
+                "preparedBy": "@keel/studio-core"
+              },
+              "keel:viewer": {
+                "choice": "keel-verification-shell",
+                "canonicalProtection": true
+              },
+              "keel:source-files": [
+                {
+                  "name": "artwork.mp4",
+                  "byteLength": 1786
+                },
+                {
+                  "name": "preview.png",
+                  "byteLength": 91
+                }
+              ],
+              "keel:viewer-intent": {
+                "schema": "keel-studio-viewer-intent@1",
+                "selection": "automatic",
+                "preparation": "registered-verifier",
+                "effectiveChoice": "keel-verification-shell",
+                "requestedChoice": "keel-verification-shell",
+                "sourceInputDigest": "0x676e62dca2ab507d032a5ed9e63949c5eb50c8ce95ecac6cacdaa55e4c77965d"
+              },
+              "keel:payload-storage": {
+                "mode": "compact",
+                "storedRepresentation": "native-bytes"
+              },
+              "keel:retained-source": {
+                "route": "creator-prepared-copy",
+                "schema": "keel-studio-creator-prepared-source@1",
+                "viewer": "keel-verification-shell",
+                "payloadStorage": "compact",
+                "sourceRevision": "0x5d93f849f00c914e228200a02ae44a39d47fbee2d16d9cc568bfb17119a859b9",
+                "sourceResources": [
+                  {
+                    "id": "artwork.mp4",
+                    "mediaType": "video/mp4",
+                    "decodedDigest": "0xa421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561",
+                    "originalFileName": "artwork.mp4",
+                    "decodedByteLength": 1786
+                  },
+                  {
+                    "id": "preview.png",
+                    "mediaType": "image/png",
+                    "decodedDigest": "0x20c1e1ec7a62d54fe8191b5c509e7a2c88b520a429bc1b74c55e7ccf72cbcc6d",
+                    "originalFileName": "preview.png",
+                    "decodedByteLength": 91
+                  }
+                ],
+                "posterResourceId": "preview.png",
+                "publicationReady": false,
+                "artworkResourceIds": [
+                  "artwork.mp4",
+                  "preview.png"
+                ],
+                "entrypointResourceId": "artwork.mp4"
+              },
+              "keel:asset-presentation": {
+                "schema": "keel-asset-presentation-choice@1",
+                "publicationReady": false,
+                "assetPresentation": "automatic",
+                "creatorInputEvidence": {
+                  "jobId": "4c98539f-8743-4119-a4b6-2f6842a282ad",
+                  "inputDigest": "0x676e62dca2ab507d032a5ed9e63949c5eb50c8ce95ecac6cacdaa55e4c77965d",
+                  "requestDigest": "0x703dc53fe6081b9c36cea78d1d9e3a6b3ecbd14fba125099cfabd8c26cd712ce",
+                  "preparedRevision": 1
+                },
+                "creatorAssetInspection": {
+                  "inputs": [
+                    {
+                      "digest": "0xa421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561",
+                      "inputId": "artwork.mp4",
+                      "fileName": "artwork.mp4",
+                      "execution": "static",
+                      "mediaType": "video/mp4",
+                      "byteLength": 1786
+                    },
+                    {
+                      "digest": "0x20c1e1ec7a62d54fe8191b5c509e7a2c88b520a429bc1b74c55e7ccf72cbcc6d",
+                      "inputId": "preview.png",
+                      "fileName": "preview.png",
+                      "execution": "static",
+                      "mediaType": "image/png",
+                      "byteLength": 91
+                    }
+                  ],
+                  "schema": "keel-studio-creator-asset-inspection@1",
+                  "source": {
+                    "digest": "0xa421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561",
+                    "inputId": "artwork.mp4",
+                    "fileName": "artwork.mp4",
+                    "execution": "static",
+                    "mediaType": "video/mp4",
+                    "byteLength": 1786
+                  },
+                  "preview": {
+                    "digest": "0x20c1e1ec7a62d54fe8191b5c509e7a2c88b520a429bc1b74c55e7ccf72cbcc6d",
+                    "inputId": "preview.png",
+                    "fileName": "preview.png",
+                    "execution": "static",
+                    "mediaType": "image/png",
+                    "byteLength": 91
+                  },
+                  "execution": "static",
+                  "selection": {
+                    "entrypointResourceId": "artwork.mp4",
+                    "collectorImageResourceId": "preview.png"
+                  },
+                  "inputDigest": "0x676e62dca2ab507d032a5ed9e63949c5eb50c8ce95ecac6cacdaa55e4c77965d",
+                  "sourceMotion": "unknown"
+                }
+              },
+              "keel:registered-native-gzip": {
+                "schema": "keel-registered-native-gzip-proof@1",
+                "binding": {
+                  "store": "0x0a4f31d5ab08029e4c68f6f3227d9fa3a2d66267",
+                  "reader": "0xfbbb2a0c470ac0e81ed35de6722e26ca8ff8134d",
+                  "chainId": 11155111,
+                  "profile": "keel.canonical-native-gzip@1",
+                  "registry": "0x63a172ae55a6c7413a2f80be9de9cd9cb106973d",
+                  "revision": 5,
+                  "prefixObjectId": "0xe9a47cc4f074a03ac1ba6ad69804f051db5c54fac0c5afba6a31d6c81689377c",
+                  "suffixObjectId": "0x2a8f3e49f6535a3d319f7ecafd075e0f780f16879af28fa8e3ee966ef051eda0",
+                  "metadataObjectId": "0x6aee9cecc863b0282d10ea1f475a8e0d3fd6211ec4ce53dfddcfddf1a493fd52",
+                  "metadataIntegrity": {
+                    "digest": "0x02185406cc4bf392af5012384e397095584f2401575cd8bf28888d7468c10a90",
+                    "algorithm": "sha256",
+                    "byteLength": 303
+                  },
+                  "readerRuntimeCodeHash": "0x4b38e44025978596b6940908c5494c2358125b832e3086b54291bca626b35c2c",
+                  "registeredPrefixObjectId": "0xbbf6276ebdae7e2ae63fd717b7a11d926efba10ba781e1235fe3c169a612cdfd",
+                  "registeredSuffixObjectId": "0x45fec4ee001146ca2a2fe93ffbe4692abcd13f316c8a8ef5fb28b3092322c0b5",
+                  "readerDeploymentTransactionHash": "0x66ee037713d4878d90a1b551c58b53e62dad8a8ada51edc2ec27ee4c65af4cf2"
+                },
+                "members": [
+                  {
+                    "id": "keel.asset-display",
+                    "integrity": {
+                      "digest": "0x53957405312b1fe3b187a5c49b13d13a08fd6e960953c815c6e49b53637d97f4",
+                      "algorithm": "sha256",
+                      "byteLength": 6172
+                    },
+                    "mediaType": "text/javascript",
+                    "storedIntegrity": {
+                      "digest": "0xec5ce35411d27ba2bbe334bebc8015f94eeac189220fe9818d4cf7c01d88f2e8",
+                      "algorithm": "sha256",
+                      "byteLength": 2603
+                    }
+                  }
+                ],
+                "bindingDigest": "0x8cd798d10e96ea4a2744b1ade1fac43cccf04041590b84074b6c74518b1c1b9b",
+                "documentIntegrity": {
+                  "digest": "0x470f84532c209ca87b84062df2f74e693d360b10352b231337ca1ca8a477743b",
+                  "algorithm": "sha256",
+                  "byteLength": 91205
+                },
+                "nativeNoneMembers": [
+                  {
+                    "id": "artwork.mp4",
+                    "role": "entrypoint",
+                    "integrity": {
+                      "digest": "0xa421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561",
+                      "algorithm": "sha256",
+                      "byteLength": 1786
+                    },
+                    "mediaType": "video/mp4",
+                    "storedIntegrity": {
+                      "digest": "0xa421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561",
+                      "algorithm": "sha256",
+                      "byteLength": 1786
+                    }
+                  }
+                ]
+              },
+              "keel:retained-source-intake": {
+                "jobId": "4c98539f-8743-4119-a4b6-2f6842a282ad",
+                "schema": "keel-studio-retained-source-intake@1",
+                "requestDigest": "0x703dc53fe6081b9c36cea78d1d9e3a6b3ecbd14fba125099cfabd8c26cd712ce",
+                "moduleBindings": [
+                  {
+                    "chain": "eip155:11155111",
+                    "store": "0x0a4f31d5ab08029e4c68f6f3227d9fa3a2d66267",
+                    "digest": "sha256:53957405312b1fe3b187a5c49b13d13a08fd6e960953c815c6e49b53637d97f4",
+                    "version": "1.1.0",
+                    "moduleId": "keel.asset-display",
+                    "objectId": "0x08d628e53cc139c67a093ef0b24cdc1a6327010f8b6150ebc113c0310e23748c"
+                  }
+                ],
+                "sourceRevision": "0x5d93f849f00c914e228200a02ae44a39d47fbee2d16d9cc568bfb17119a859b9",
+                "preparedRevision": 1,
+                "buildDefaultsDigest": "0x30ab9ec958f0dc49ef0078f3d5dd3e8ae3500498aa54391ada65bd91209de981",
+                "entrypointResourceId": "artwork.mp4",
+                "collectorImageResourceId": "preview.png"
+              },
+              "keel:creator-media-selection": {
+                "schema": "keel-creator-media-selection@1",
+                "entrypointResourceId": "artwork.mp4",
+                "collectorImageResourceId": "preview.png"
+              }
+            },
+            "provenance": {
+              "creator": "0x1111111111111111111111111111111111111111",
+              "createdAt": "2026-10-23T01:05:08.382Z"
+            },
+            "description": "Owned synthetic real-PG continuation",
+            "canonicalization": "RFC8785"
+          },
+          "token_id": null,
+          "created_at": "2026-10-22T19:05:08.475463-06:00",
+          "creator_id": "c7841c60-d1c4-4ad1-acf6-637e08532c89",
+          "updated_at": "2026-10-22T19:05:08.475463-06:00",
+          "description": "Owned synthetic real-PG continuation",
+          "published_at": null,
+          "failure_reason": null,
+          "release_intent": null,
+          "resource_count": 6,
+          "active_revision": 1,
+          "manifest_digest": "0x91b7545ce7ab6536afc26d88ce9ef4c4c461ae2b1286947c0fa8a26e1a574378",
+          "registry_address": null,
+          "storage_strategy": "onchain",
+          "collection_address": null,
+          "total_stored_bytes": 254253,
+          "deployment_estimate": {
+            "schema": "keel-studio-deployment-estimate@1",
+            "resources": [
+              {
+                "treeDepth": 0,
+                "chunkCount": 1,
+                "resourceId": "preview.png",
+                "leafObjectCount": 1,
+                "storedByteLength": 91,
+                "transactionCount": 2,
+                "decodedByteLength": 91,
+                "compositeObjectCount": 0,
+                "approximateCalldataBytes": 475
+              },
+              {
+                "treeDepth": 0,
+                "chunkCount": 1,
+                "resourceId": "keel-inline-part-graph-00-shell-prefix",
+                "leafObjectCount": 1,
+                "storedByteLength": 950,
+                "transactionCount": 2,
+                "decodedByteLength": 950,
+                "compositeObjectCount": 0,
+                "approximateCalldataBytes": 1334
+              },
+              {
+                "treeDepth": 0,
+                "chunkCount": 1,
+                "resourceId": "keel-inline-part-graph-01-module-keel.asset-display",
+                "leafObjectCount": 1,
+                "storedByteLength": 4174,
+                "transactionCount": 2,
+                "decodedByteLength": 4174,
+                "compositeObjectCount": 0,
+                "approximateCalldataBytes": 4558
+              },
+              {
+                "treeDepth": 0,
+                "chunkCount": 1,
+                "resourceId": "keel-inline-part-graph-02-entrypoint",
+                "leafObjectCount": 1,
+                "storedByteLength": 3059,
+                "transactionCount": 2,
+                "decodedByteLength": 3059,
+                "compositeObjectCount": 0,
+                "approximateCalldataBytes": 3443
+              },
+              {
+                "treeDepth": 0,
+                "chunkCount": 6,
+                "resourceId": "keel-inline-part-graph-03-shell-suffix",
+                "leafObjectCount": 1,
+                "storedByteLength": 118898,
+                "transactionCount": 3,
+                "decodedByteLength": 118898,
+                "compositeObjectCount": 0,
+                "approximateCalldataBytes": 119474
+              },
+              {
+                "treeDepth": 0,
+                "chunkCount": 6,
+                "resourceId": "keel-inline-token-uri-fragment",
+                "leafObjectCount": 1,
+                "storedByteLength": 127081,
+                "transactionCount": 3,
+                "decodedByteLength": 127081,
+                "compositeObjectCount": 0,
+                "approximateCalldataBytes": 127657
+              },
+              {
+                "treeDepth": 0,
+                "chunkCount": 1,
+                "resourceId": "manifest.json",
+                "leafObjectCount": 1,
+                "storedByteLength": 14662,
+                "transactionCount": 2,
+                "decodedByteLength": 14662,
+                "compositeObjectCount": 0,
+                "approximateCalldataBytes": 15046
+              }
+            ],
+            "chunkBytes": 23000,
+            "maxChildren": 128,
+            "transactionCount": 16,
+            "approximateCalldataBytes": 271987
+          },
+          "total_decoded_bytes": 254253,
+          "manifest_blob_digest": "0x91b7545ce7ab6536afc26d88ce9ef4c4c461ae2b1286947c0fa8a26e1a574378",
+          "manifest_byte_length": 14662,
+          "entrypoint_resource_id": "keel-inline-token-uri-fragment",
+          "executable_resource_count": 1,
+          "fallback_image_resource_id": "preview.png"
+        },
+        "release": {
+          "id": "59c36034-7a1e-4f58-a02f-9e9359fe6b06",
+          "slug": "temporal-auto",
+          "story": "",
+          "title": "Temporal auto",
+          "status": "draft",
+          "supply": "1",
+          "drop_id": null,
+          "ends_at": null,
+          "chain_id": 11155111,
+          "currency": "ETH",
+          "revision": 2,
+          "price_wei": "0",
+          "starts_at": null,
+          "created_at": "2026-10-22T19:05:08.500714-06:00",
+          "creator_id": "c7841c60-d1c4-4ad1-acf6-637e08532c89",
+          "last_error": null,
+          "page_state": {
+            "studio": {
+              "fray": false,
+              "guidedPlan": {
+                "mode": "guided",
+                "schema": "keel-release-plan-state@1",
+                "answers": {
+                  "sale": "fixed-price",
+                  "title": "Temporal auto",
+                  "hasEnd": false,
+                  "supply": 1,
+                  "delivery": "inline",
+                  "priceEth": "0",
+                  "scheduled": false,
+                  "accessMode": "public",
+                  "description": "Owned synthetic real-PG continuation",
+                  "releaseType": "one-of-one",
+                  "maxPerWallet": 1,
+                  "maxPerTransaction": 1
+                },
+                "defaults": {
+                  "revision": "no-saved-project-defaults"
+                },
+                "lastCommand": {
+                  "id": "bd1189ef-1f0d-453e-81c6-8a897537bff1",
+                  "digest": "6a90595473c6515cf9a066533d4fb68b1c57502adbc6ae04b4a91ad4fea8fd40",
+                  "revision": 2
+                },
+                "nativeAnswers": {
+                  "sale": "fixed-price",
+                  "title": "Temporal auto",
+                  "hasEnd": false,
+                  "supply": 1,
+                  "delivery": "inline",
+                  "priceEth": "0",
+                  "scheduled": false,
+                  "accessMode": "public",
+                  "description": "Owned synthetic real-PG continuation",
+                  "releaseType": "one-of-one",
+                  "maxPerWallet": 1,
+                  "maxPerTransaction": 1
+                },
+                "answerContexts": {
+                  "sale": "{}",
+                  "title": "{}",
+                  "hasEnd": "{}",
+                  "supply": "{\"releaseType\":\"one-of-one\"}",
+                  "delivery": "{}",
+                  "priceEth": "{\"sale\":\"fixed-price\"}",
+                  "scheduled": "{}",
+                  "accessMode": "{}",
+                  "description": "{}",
+                  "releaseType": "{}",
+                  "maxPerWallet": "{\"releaseType\":\"one-of-one\"}",
+                  "maxPerTransaction": "{\"maxPerWallet\":null,\"releaseType\":\"one-of-one\"}"
+                },
+                "currentFieldId": "review",
+                "reviewedConfiguration": "{\"answers\":{\"accessMode\":\"public\",\"delivery\":\"inline\",\"description\":\"Owned synthetic real-PG continuation\",\"hasEnd\":false,\"priceEth\":\"0\",\"releaseType\":\"one-of-one\",\"sale\":\"fixed-price\",\"scheduled\":false,\"title\":\"Temporal auto\"},\"capabilityRevision\":\"{\\\"capabilityRevision\\\":\\\"554b0c1a2a2842a151875769ca355f73f94f8821e49660919c579b4ae5a56166\\\",\\\"phases\\\":[]}\",\"mediaType\":\"application/octet-stream\",\"projectId\":\"96028146-d4c7-47eb-84fe-d69ea2f3e3e2\",\"resources\":[{\"byteLength\":14662,\"digest\":\"0x91b7545ce7ab6536afc26d88ce9ef4c4c461ae2b1286947c0fa8a26e1a574378\",\"id\":\"96028146-d4c7-47eb-84fe-d69ea2f3e3e2:revision:1\",\"mediaType\":\"application/vnd.keel.manifest+json\",\"source\":{\"kind\":\"local\",\"path\":\"prepared-manifest.json\"}}],\"schema\":\"keel-studio-plan-matrix@1\"}"
+              },
+              "projectKind": "drop",
+              "accessPhases": [],
+              "royaltiesBps": 0,
+              "saleMechanism": "fixed-price",
+              "completedSteps": [],
+              "releaseProgram": {
+                "lanes": [],
+                "compiler": "draft-only-v1",
+                "changePolicy": "creator-editable"
+              },
+              "separatePreview": "required",
+              "presentationMode": "inline",
+              "collectorRewardBps": 0
+            },
+            "sections": []
+          },
+          "updated_at": "2026-10-22T19:05:08.515-06:00",
+          "access_mode": "public",
+          "artifact_id": "96028146-d4c7-47eb-84fe-d69ea2f3e3e2",
+          "description": "Owned synthetic real-PG continuation",
+          "sync_status": "unknown",
+          "published_at": null,
+          "release_type": "one-of-one",
+          "mint_route_id": null,
+          "network_label": null,
+          "max_per_wallet": 1,
+          "payout_address": null,
+          "token_standard": "erc721-die",
+          "target_token_id": null,
+          "testnet_parent_id": null,
+          "collection_address": null,
+          "controller_address": null,
+          "last_checked_block": null,
+          "eligibility_summary": {
+            "mode": "public",
+            "resolvedBy": "keel"
+          },
+          "max_per_transaction": 1,
+          "mint_router_address": null,
+          "shared_collection_id": null,
+          "prepared_metadata_digest": null,
+          "publish_transaction_hash": null
+        },
+        "jobs": [
+          {
+            "id": "4c98539f-8743-4119-a4b6-2f6842a282ad",
+            "step": "complete",
+            "error": null,
+            "result": {
+              "id": "96028146-d4c7-47eb-84fe-d69ea2f3e3e2",
+              "name": "Temporal auto",
+              "slug": "temporal-auto-96028146",
+              "jobId": "4c98539f-8743-4119-a4b6-2f6842a282ad",
+              "bytesSaved": 0,
+              "manifestUri": "https://temporal.local.test/api/content/96028146-d4c7-47eb-84fe-d69ea2f3e3e2/manifest.json",
+              "resourceCount": 6,
+              "manifestDigest": "0x91b7545ce7ab6536afc26d88ce9ef4c4c461ae2b1286947c0fa8a26e1a574378",
+              "storedByteLength": 254253,
+              "decodedByteLength": 254253,
+              "uploadTransactions": 16
+            },
+            "status": "ready",
+            "options": {
+              "name": "Temporal auto",
+              "webpQuality": 82,
+              "viewerIntent": {
+                "schema": "keel-studio-viewer-intent@1",
+                "selection": "automatic",
+                "preparation": "registered-verifier",
+                "effectiveChoice": "keel-verification-shell",
+                "requestedChoice": "keel-verification-shell",
+                "sourceInputDigest": "0x676e62dca2ab507d032a5ed9e63949c5eb50c8ce95ecac6cacdaa55e4c77965d"
+              },
+              "buildDefaults": {
+                "layers": {
+                  "build": {
+                    "payloadStorage": "compact",
+                    "assetPresentation": "automatic"
+                  },
+                  "project": {},
+                  "mediaType": "video/mp4"
+                },
+                "policy": {
+                  "schema": "keel-effective-build-defaults@1",
+                  "values": {
+                    "compression": "auto",
+                    "brotliQuality": 11,
+                    "hybridFallback": false,
+                    "payloadStorage": "compact",
+                    "transportProfile": "uri81-block-v1",
+                    "assetPresentation": "automatic",
+                    "rpcMaxConcurrentReads": 4
+                  },
+                  "sources": {
+                    "compression": "system",
+                    "brotliQuality": "system",
+                    "hybridFallback": "system",
+                    "payloadStorage": "build",
+                    "transportProfile": "system",
+                    "assetPresentation": "build",
+                    "rpcMaxConcurrentReads": "system"
+                  },
+                  "revision": 0,
+                  "requiresFullReadValidation": true
+                }
+              },
+              "localFileCount": 2,
+              "retainedSource": {
+                "route": "creator-prepared-copy",
+                "schema": "keel-studio-creator-prepared-source@1",
+                "viewer": "keel-verification-shell",
+                "payloadStorage": "compact",
+                "sourceRevision": "0x5d93f849f00c914e228200a02ae44a39d47fbee2d16d9cc568bfb17119a859b9",
+                "sourceResources": [
+                  {
+                    "id": "artwork.mp4",
+                    "mediaType": "video/mp4",
+                    "decodedDigest": "0xa421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561",
+                    "originalFileName": "artwork.mp4",
+                    "decodedByteLength": 1786
+                  },
+                  {
+                    "id": "preview.png",
+                    "mediaType": "image/png",
+                    "decodedDigest": "0x20c1e1ec7a62d54fe8191b5c509e7a2c88b520a429bc1b74c55e7ccf72cbcc6d",
+                    "originalFileName": "preview.png",
+                    "decodedByteLength": 91
+                  }
+                ],
+                "posterResourceId": "preview.png",
+                "publicationReady": false,
+                "artworkResourceIds": [
+                  "artwork.mp4",
+                  "preview.png"
+                ],
+                "entrypointResourceId": "artwork.mp4"
+              },
+              "generatePreview": false,
+              "storageStrategy": "onchain",
+              "presentationChoice": {
+                "assetPresentation": "automatic"
+              },
+              "libraryVersionCount": 0,
+              "entrypointResourceId": "artwork.mp4",
+              "remoteReferenceCount": 0,
+              "retainedSourceIntake": {
+                "jobId": "4c98539f-8743-4119-a4b6-2f6842a282ad",
+                "schema": "keel-studio-retained-source-intake@1",
+                "requestDigest": "0x703dc53fe6081b9c36cea78d1d9e3a6b3ecbd14fba125099cfabd8c26cd712ce",
+                "moduleBindings": [
+                  {
+                    "chain": "eip155:11155111",
+                    "store": "0x0a4f31d5ab08029e4c68f6f3227d9fa3a2d66267",
+                    "digest": "sha256:53957405312b1fe3b187a5c49b13d13a08fd6e960953c815c6e49b53637d97f4",
+                    "version": "1.1.0",
+                    "moduleId": "keel.asset-display",
+                    "objectId": "0x08d628e53cc139c67a093ef0b24cdc1a6327010f8b6150ebc113c0310e23748c"
+                  }
+                ],
+                "sourceRevision": "0x5d93f849f00c914e228200a02ae44a39d47fbee2d16d9cc568bfb17119a859b9",
+                "preparedRevision": 1,
+                "buildDefaultsDigest": "0x30ab9ec958f0dc49ef0078f3d5dd3e8ae3500498aa54391ada65bd91209de981",
+                "entrypointResourceId": "artwork.mp4",
+                "collectorImageResourceId": "preview.png"
+              },
+              "creatorAssetInspection": {
+                "inputs": [
+                  {
+                    "digest": "0xa421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561",
+                    "inputId": "artwork.mp4",
+                    "fileName": "artwork.mp4",
+                    "execution": "static",
+                    "mediaType": "video/mp4",
+                    "byteLength": 1786
+                  },
+                  {
+                    "digest": "0x20c1e1ec7a62d54fe8191b5c509e7a2c88b520a429bc1b74c55e7ccf72cbcc6d",
+                    "inputId": "preview.png",
+                    "fileName": "preview.png",
+                    "execution": "static",
+                    "mediaType": "image/png",
+                    "byteLength": 91
+                  }
+                ],
+                "schema": "keel-studio-creator-asset-inspection@1",
+                "source": {
+                  "digest": "0xa421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561",
+                  "inputId": "artwork.mp4",
+                  "fileName": "artwork.mp4",
+                  "execution": "static",
+                  "mediaType": "video/mp4",
+                  "byteLength": 1786
+                },
+                "preview": {
+                  "digest": "0x20c1e1ec7a62d54fe8191b5c509e7a2c88b520a429bc1b74c55e7ccf72cbcc6d",
+                  "inputId": "preview.png",
+                  "fileName": "preview.png",
+                  "execution": "static",
+                  "mediaType": "image/png",
+                  "byteLength": 91
+                },
+                "execution": "static",
+                "selection": {
+                  "entrypointResourceId": "artwork.mp4",
+                  "collectorImageResourceId": "preview.png"
+                },
+                "inputDigest": "0x676e62dca2ab507d032a5ed9e63949c5eb50c8ce95ecac6cacdaa55e4c77965d",
+                "sourceMotion": "unknown"
+              },
+              "collectorImageResourceId": "preview.png"
+            },
+            "progress": 100,
+            "created_at": "2026-10-22T19:05:03.171053-06:00",
+            "creator_id": "c7841c60-d1c4-4ad1-acf6-637e08532c89",
+            "started_at": "2026-10-22T19:05:03.17-06:00",
+            "updated_at": "2026-10-22T19:05:08.485-06:00",
+            "artifact_id": "96028146-d4c7-47eb-84fe-d69ea2f3e3e2",
+            "completed_at": "2026-10-22T19:05:08.485-06:00",
+            "request_digest": "0x703dc53fe6081b9c36cea78d1d9e3a6b3ecbd14fba125099cfabd8c26cd712ce",
+            "idempotency_key": "492a3daf-8ad7-47de-9bb0-ec45d1eabe09"
+          }
+        ],
+        "plans": [
+          {
+            "id": "01113629-6ab6-49f8-940c-c662a2484a8f",
+            "plan": {
+              "root": "inline-token-uri-root",
+              "schema": "keel-recursive-upload-plan@2",
+              "objects": [
+                {
+                  "id": "existing-000-shell-prefix",
+                  "kind": "existing",
+                  "level": 0,
+                  "store": "0x0a4f31d5ab08029e4c68f6f3227d9fa3a2d66267",
+                  "chainId": 11155111,
+                  "objectId": "0xe9a47cc4f074a03ac1ba6ad69804f051db5c54fac0c5afba6a31d6c81689377c",
+                  "integrity": {
+                    "digest": "0xc461a1fdb1d8ab23bafe018dd27d1ca9eea2e170055c06a280496c228c7cc098",
+                    "algorithm": "sha256",
+                    "byteLength": 950
+                  },
+                  "mediaType": "application/vnd.keel.token-uri-raw-percent-fragment",
+                  "byteLength": 950,
+                  "byteOffset": 0,
+                  "compression": "none",
+                  "storedByteLength": 950
+                },
+                {
+                  "id": "existing-001-module",
+                  "kind": "existing",
+                  "level": 0,
+                  "store": "0x0a4f31d5ab08029e4c68f6f3227d9fa3a2d66267",
+                  "chainId": 11155111,
+                  "objectId": "0x0fe8d08a66b4943381b464eaad35ecf2016244b957c9f73d1bb4730c8972ebf7",
+                  "integrity": {
+                    "digest": "0xc3ea0bd8f76247673b4ea1723c23659b8d46b4c3bf9a6ae5a27d36dc78e2121c",
+                    "algorithm": "sha256",
+                    "byteLength": 4174
+                  },
+                  "mediaType": "application/vnd.keel.token-uri-raw-percent-fragment",
+                  "byteLength": 4174,
+                  "byteOffset": 950,
+                  "compression": "none",
+                  "storedByteLength": 4174
+                },
+                {
+                  "id": "creator-leaf-00000",
+                  "kind": "leaf",
+                  "level": 0,
+                  "chunks": [
+                    {
+                      "file": "creator/objects/leaf-00000/chunks/00000.bin",
+                      "index": 0,
+                      "offset": 0,
+                      "integrity": {
+                        "digest": "0x249a48324ff681ea0e3f50f275eb0e175473b784317bbfd4acda879dc8941dde",
+                        "algorithm": "sha256",
+                        "byteLength": 3059
+                      },
+                      "byteLength": 3059
+                    }
+                  ],
+                  "integrity": {
+                    "digest": "0x249a48324ff681ea0e3f50f275eb0e175473b784317bbfd4acda879dc8941dde",
+                    "algorithm": "sha256",
+                    "byteLength": 3059
+                  },
+                  "mediaType": "application/octet-stream",
+                  "byteLength": 3059,
+                  "byteOffset": 5124,
+                  "compression": "none",
+                  "storedByteLength": 3059
+                },
+                {
+                  "id": "existing-002-shell-suffix",
+                  "kind": "existing",
+                  "level": 0,
+                  "store": "0x0a4f31d5ab08029e4c68f6f3227d9fa3a2d66267",
+                  "chainId": 11155111,
+                  "objectId": "0x2a8f3e49f6535a3d319f7ecafd075e0f780f16879af28fa8e3ee966ef051eda0",
+                  "integrity": {
+                    "digest": "0x8c2bddf618b50916f63d19f17b88719831884d32c12029ed16f329ff0adbaf6d",
+                    "algorithm": "sha256",
+                    "byteLength": 118898
+                  },
+                  "mediaType": "application/vnd.keel.token-uri-raw-percent-fragment",
+                  "byteLength": 118898,
+                  "byteOffset": 8183,
+                  "compression": "none",
+                  "storedByteLength": 118898
+                },
+                {
+                  "id": "inline-token-uri-root",
+                  "kind": "composite",
+                  "level": 1,
+                  "parts": [
+                    "existing-000-shell-prefix",
+                    "existing-001-module",
+                    "creator-leaf-00000",
+                    "existing-002-shell-suffix"
+                  ],
+                  "integrity": {
+                    "digest": "0xa076184830a1b991d0af2fbaea294775c882024a99087feae666751d1085e5b1",
+                    "algorithm": "sha256",
+                    "byteLength": 127081
+                  },
+                  "mediaType": "application/vnd.keel.token-uri-raw-percent-fragment",
+                  "byteLength": 127081,
+                  "byteOffset": 0
+                }
+              ],
+              "integrity": {
+                "digest": "0xa076184830a1b991d0af2fbaea294775c882024a99087feae666751d1085e5b1",
+                "algorithm": "sha256",
+                "byteLength": 127081
+              },
+              "mediaType": "application/vnd.keel.token-uri-raw-percent-fragment",
+              "treeDepth": 1,
+              "byteLength": 127081,
+              "objectName": "keel-inline-token-uri.fragment",
+              "maxChildren": 128,
+              "indexEncoding": "keel-object-index@1",
+              "maxChunkBytes": 23000,
+              "leafDecodedBytes": 524288,
+              "maxPartsPerComposite": 64
+            },
+            "status": "ready",
+            "metrics": {
+              "chunks": 1,
+              "treeDepth": 1,
+              "savedBytes": 124022,
+              "compression": "none",
+              "leafObjects": 1,
+              "storedBytes": 3059,
+              "decodedBytes": 127081,
+              "savingsRatio": 0.9759287383637207,
+              "compositeObjects": 1,
+              "estimatedTransactions": 3
+            },
+            "chain_id": null,
+            "created_at": "2026-10-22T19:05:08.475463-06:00",
+            "last_error": null,
+            "updated_at": "2026-10-22T19:05:08.475463-06:00",
+            "artifact_id": "96028146-d4c7-47eb-84fe-d69ea2f3e3e2",
+            "resource_id": "keel-inline-token-uri-fragment",
+            "store_address": null,
+            "plan_directory": "/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-temporal-normal-pg-ddjoDz/plans/96028146-d4c7-47eb-84fe-d69ea2f3e3e2/7c53451557e41d44e2fdf389877e8495c2b1d975e8b48df5bbc0d17ac166ba90-generations/e53a7da2-2c74-4a84-b19e-bfa6bd336767",
+            "root_object_id": null,
+            "publication_state": {
+              "planGeneration": "e53a7da2-2c74-4a84-b19e-bfa6bd336767",
+              "approvalBoundary": "keel-persist-before-approval@1",
+              "publicationGeneration": "e53a7da2-2c74-4a84-b19e-bfa6bd336767"
+            },
+            "artifact_resource_id": "eb5ffd8b-a9c2-4573-9c4d-68afc86418f3"
+          },
+          {
+            "id": "8933cc9e-f41d-408f-8c9a-bff59dfcd8b0",
+            "plan": {
+              "root": "leaf-00000",
+              "schema": "keel-recursive-upload-plan@2",
+              "objects": [
+                {
+                  "id": "leaf-00000",
+                  "kind": "leaf",
+                  "level": 0,
+                  "chunks": [
+                    {
+                      "file": "objects/leaf-00000/chunks/00000.bin",
+                      "index": 0,
+                      "offset": 0,
+                      "integrity": {
+                        "digest": "0xe0a7a952471b2739e179ee7186044759e078a497f9335356afab26d8d0ec4ddc",
+                        "algorithm": "sha256",
+                        "byteLength": 3119
+                      },
+                      "byteLength": 3119
+                    }
+                  ],
+                  "integrity": {
+                    "digest": "0x91b7545ce7ab6536afc26d88ce9ef4c4c461ae2b1286947c0fa8a26e1a574378",
+                    "algorithm": "sha256",
+                    "byteLength": 14662
+                  },
+                  "mediaType": "application/json",
+                  "byteLength": 14662,
+                  "byteOffset": 0,
+                  "compression": "brotli",
+                  "storedByteLength": 3119
+                }
+              ],
+              "integrity": {
+                "digest": "0x91b7545ce7ab6536afc26d88ce9ef4c4c461ae2b1286947c0fa8a26e1a574378",
+                "algorithm": "sha256",
+                "byteLength": 14662
+              },
+              "mediaType": "application/json",
+              "treeDepth": 0,
+              "byteLength": 14662,
+              "objectName": "manifest.json",
+              "maxChildren": 128,
+              "indexEncoding": "keel-object-index@1",
+              "maxChunkBytes": 23000,
+              "leafDecodedBytes": 524288,
+              "maxPartsPerComposite": 64
+            },
+            "status": "ready",
+            "metrics": {
+              "chunks": 1,
+              "treeDepth": 0,
+              "savedBytes": 11543,
+              "compression": "brotli",
+              "leafObjects": 1,
+              "storedBytes": 3119,
+              "decodedBytes": 14662,
+              "savingsRatio": 0.7872732232983222,
+              "compositeObjects": 0,
+              "estimatedTransactions": 2
+            },
+            "chain_id": null,
+            "created_at": "2026-10-22T19:05:08.475463-06:00",
+            "last_error": null,
+            "updated_at": "2026-10-22T19:05:08.475463-06:00",
+            "artifact_id": "96028146-d4c7-47eb-84fe-d69ea2f3e3e2",
+            "resource_id": "manifest.json",
+            "store_address": null,
+            "plan_directory": "/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-temporal-normal-pg-ddjoDz/plans/96028146-d4c7-47eb-84fe-d69ea2f3e3e2/ffa5b716b5a57837f7929dfcca4b4dfdeb97210a7fd5a12d2f1978846d6f1743-generations/e53a7da2-2c74-4a84-b19e-bfa6bd336767",
+            "root_object_id": null,
+            "publication_state": {
+              "planGeneration": "e53a7da2-2c74-4a84-b19e-bfa6bd336767",
+              "approvalBoundary": "keel-persist-before-approval@1",
+              "publicationGeneration": "e53a7da2-2c74-4a84-b19e-bfa6bd336767"
+            },
+            "artifact_resource_id": null
+          },
+          {
+            "id": "3e400ae2-8d7f-4028-9c60-b1e9b5a10c1a",
+            "plan": {
+              "root": "leaf-00000",
+              "schema": "keel-recursive-upload-plan@2",
+              "objects": [
+                {
+                  "id": "leaf-00000",
+                  "kind": "leaf",
+                  "level": 0,
+                  "chunks": [
+                    {
+                      "file": "objects/leaf-00000/chunks/00000.bin",
+                      "index": 0,
+                      "offset": 0,
+                      "integrity": {
+                        "digest": "0x20c1e1ec7a62d54fe8191b5c509e7a2c88b520a429bc1b74c55e7ccf72cbcc6d",
+                        "algorithm": "sha256",
+                        "byteLength": 91
+                      },
+                      "byteLength": 91
+                    }
+                  ],
+                  "integrity": {
+                    "digest": "0x20c1e1ec7a62d54fe8191b5c509e7a2c88b520a429bc1b74c55e7ccf72cbcc6d",
+                    "algorithm": "sha256",
+                    "byteLength": 91
+                  },
+                  "mediaType": "image/png",
+                  "byteLength": 91,
+                  "byteOffset": 0,
+                  "compression": "none",
+                  "storedByteLength": 91
+                }
+              ],
+              "integrity": {
+                "digest": "0x20c1e1ec7a62d54fe8191b5c509e7a2c88b520a429bc1b74c55e7ccf72cbcc6d",
+                "algorithm": "sha256",
+                "byteLength": 91
+              },
+              "mediaType": "image/png",
+              "treeDepth": 0,
+              "byteLength": 91,
+              "objectName": "preview.png",
+              "maxChildren": 128,
+              "indexEncoding": "keel-object-index@1",
+              "maxChunkBytes": 23000,
+              "leafDecodedBytes": 524288,
+              "maxPartsPerComposite": 64
+            },
+            "status": "ready",
+            "metrics": {
+              "chunks": 1,
+              "treeDepth": 0,
+              "savedBytes": 0,
+              "compression": "none",
+              "leafObjects": 1,
+              "storedBytes": 91,
+              "decodedBytes": 91,
+              "savingsRatio": 0,
+              "compositeObjects": 0,
+              "estimatedTransactions": 2
+            },
+            "chain_id": null,
+            "created_at": "2026-10-22T19:05:08.475463-06:00",
+            "last_error": null,
+            "updated_at": "2026-10-22T19:05:08.475463-06:00",
+            "artifact_id": "96028146-d4c7-47eb-84fe-d69ea2f3e3e2",
+            "resource_id": "preview.png",
+            "store_address": null,
+            "plan_directory": "/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-temporal-normal-pg-ddjoDz/plans/96028146-d4c7-47eb-84fe-d69ea2f3e3e2/d53de3d4e8e9ef98ef13ad2979a2e3ff7b939ac6ce4608bd431f0430fdf5e911-generations/e53a7da2-2c74-4a84-b19e-bfa6bd336767",
+            "root_object_id": null,
+            "publication_state": {
+              "planGeneration": "e53a7da2-2c74-4a84-b19e-bfa6bd336767",
+              "approvalBoundary": "keel-persist-before-approval@1",
+              "publicationGeneration": "e53a7da2-2c74-4a84-b19e-bfa6bd336767"
+            },
+            "artifact_resource_id": "b1d75ad9-d753-44b7-97ad-d3d5c4d7a4c6"
+          }
+        ],
+        "operations": []
+      }
+    },
+    {
+      "phase": "actual-normal-context",
+      "status": "FAIL_OR_EXTERNAL_GATE",
+      "error": {
+        "name": "ReleaseServiceError",
+        "message": "The fresh codec forecast requires the exact unissued physical plans.",
+        "stack": "ReleaseServiceError: The fresh codec forecast requires the exact unissued physical plans.\n    at <anonymous> (/private/tmp/keel-independent-codec-normal-20261022-02/keel-site/apps/studio/src/server/services/release-service.ts:1207:81)\n    at async scope (file:///Users/ravonus/dev/keel-site/node_modules/.pnpm/postgres@3.4.9/node_modules/postgres/src/index.js:260:18)\n    at async Function.begin (file:///Users/ravonus/dev/keel-site/node_modules/.pnpm/postgres@3.4.9/node_modules/postgres/src/index.js:243:14)\n    at async captureNormalRegisteredInlineCodecs (/private/tmp/keel-independent-codec-normal-20261022-02/keel-site/apps/studio/src/server/services/release-service.ts:1192:5)\n    at async Module.captureNormalTemporalMediaContext (/private/tmp/keel-independent-codec-normal-20261022-02/keel-site/apps/studio/src/server/services/release-service.ts:1158:5)\n    at async TestContext.<anonymous> (/private/tmp/keel-independent-codec-normal-20261022-02/keel-site/apps/studio/tests/integration/temporal-media-normal-continuation.test.ts:79:50)\n    at async Test.run (node:internal/test_runner/test:1054:7)\n    at async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)"
+      }
+    }
+  ],
+  "publicReads": {
+    "schema": "keel.bounded-allowed-rpc-diagnostics@1",
+    "publicationChainId": 11155111,
+    "providerChainNotInferred": true,
+    "rows": [
+      {
+        "startedAt": "2026-10-23T01:05:03.201Z",
+        "durationMs": 243.89616699999988,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 872,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 202,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "d1414b3d3b1319275d3b0114803f59cd337e6d7fb7be54ebefbba6a8fe50f194",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:03.451Z",
+        "durationMs": 178.197584,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 232,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 330,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "3add3770d5b09120b23ede0a1c55cda1b70d55337ec07c798f89d9c8ad2d91c2",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:03.632Z",
+        "durationMs": 200.87487499999997,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 5248,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 114,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "29429a2b1b2a5608c8891a30c34443348f593636c20b6aed58448035951cf8b1",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:03.846Z",
+        "durationMs": 189.54074999999966,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 44,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 47,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_chainId",
+            "semanticSHA256": "37047d9fa98f2102688f6d8f5163bbe33308161d4f482b3e5853043ce6c7163b",
+            "block": null
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:03.847Z",
+        "durationMs": 203.91291699999965,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 46,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 49,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_chainId",
+            "semanticSHA256": "37047d9fa98f2102688f6d8f5163bbe33308161d4f482b3e5853043ce6c7163b",
+            "block": null
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:04.058Z",
+        "durationMs": 278.28537499999993,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 49560,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 854,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "b57dd6facad1d47b933173de90cedb0cf87d75e4bdeb1a216681568146f3ab2e",
+            "block": "latest"
+          },
+          {
+            "method": "eth_call",
+            "semanticSHA256": "b5e6276285db5df71f38afc8fa0a928bab5a9960f9ca8a2b58f70cb896bce01e",
+            "block": "latest"
+          },
+          {
+            "method": "eth_call",
+            "semanticSHA256": "0ca5f158210248c1280c7e0d268267300076faef153ac97f8e6f24627ec26dce",
+            "block": "latest"
+          },
+          {
+            "method": "eth_call",
+            "semanticSHA256": "7a00d744195ab43a8b8f07fe83fcc4468760a511482d9064fdfddf73d89ecd52",
+            "block": "latest"
+          },
+          {
+            "method": "eth_call",
+            "semanticSHA256": "83f6aa0e1f184b8ff92391e9c3d397331a4bedd100aa6f9b7e51259a8547819b",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:04.469Z",
+        "durationMs": 164.2352919999994,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 1031,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 142,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getTransactionReceipt",
+            "semanticSHA256": "eb1d6af8fbde8f2990f2f1d08b3995ebf73c50736d8d3184d531364d195b6c30",
+            "block": null
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:04.470Z",
+        "durationMs": 205.58345800000006,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 27357,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 253,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "5aba6e7bd8e612edf65839520f6442ea439007271e6d64e5283704b055ba9ffe",
+            "block": "latest"
+          },
+          {
+            "method": "eth_call",
+            "semanticSHA256": "ed47407d7fb245de244bbd651e3be33f7a12757990d6324bf79d3c5ecfbb770e",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:04.810Z",
+        "durationMs": 179.06641599999966,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 937,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 203,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "131c0eaea566e353feeff771ae3428947061d6c4480c9ffc491a0b53fff1b888",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:04.809Z",
+        "durationMs": 187.7724159999998,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 937,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 203,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "9c4af8560a8b77a460c01f68f50179fd9c988a9ab0f8d9db6c59795abd819f88",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:04.994Z",
+        "durationMs": 155.16233399999965,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 233,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 331,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "ba71b6fd58168d7d70eb9c644eb51c8e510532defdf40709791d2d472a59443a",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:05.000Z",
+        "durationMs": 179.52820799999972,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 233,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 331,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "f04d4fed1018a0d2b6c63da3c0386d0f03ce11b0caf22ed14effcb4274168084",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:05.153Z",
+        "durationMs": 165.592584,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 1943,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 115,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "fe5709af4478145ade7315c5fc981bd5f3ce01b52d8bf2849d44fb403a4f153f",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:05.182Z",
+        "durationMs": 156.72433400000045,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 2411,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 115,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "4487bb038a8820d8d7e65042887913d63846eec11baca61776744a8dabbcc73e",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:05.344Z",
+        "durationMs": 156.4984170000007,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 937,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 203,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "33c85acfd7516b414b77eee5a334f96acdf065689814783391608c5c95f00243",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:05.343Z",
+        "durationMs": 157.78049999999985,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 937,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 203,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "fd5bf7783be61c7957c571fae57230845a8a26a16165310a6eba55b6c649be1a",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:05.504Z",
+        "durationMs": 153.0662080000002,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 553,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 331,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "d30ef8f2bf1a0bbcce21616a525aa17ad1429ef171d8c8f689b6a78fb717ce2c",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:05.504Z",
+        "durationMs": 159.53400000000056,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 617,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 331,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "f3b1c18ea887b69de5c16beef15871826bf80d8c0517bc0b1b95349c9ae4ff63",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:05.667Z",
+        "durationMs": 159.41787499999919,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 298343,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 799,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "e005c0f437fd169152e60d68f073e3e1965ab3fe1e5e9728572792e85d45bb82",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "49e2fd594351b97332b662942c7d931257f974d235167229033fe15900df4384",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "039bd05f85013d7ba50747d9a55c59de4e63a5ab52feff1ec3bc99c67a35c372",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "80c38ac5a83ba17ab80d86830d825399c4f48a0222d3381fab8ff4d5c503d540",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "41c845aff2967c5f6ef7d901b0881a6d7b718cd155d0cde4844e5df02445b656",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "b5135f982271386236ba2710626d477e59c1876f091fbd96ead5829ccda7dd4a",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "15401d1db7ea0f27ee7054f48d39e4aa744ff92a80fea5813dc2144fd6d10ba7",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:05.662Z",
+        "durationMs": 184.51070900000013,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 238049,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 685,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "0830f17dcc461683dad1a969aacf9f3cff3cf441c02fe87ed1c3553161ad2444",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "de326517218d5bac6688606d6897f4773661abfabcb9949c55e217e4a2c62695",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "3337be15f59b676decdbd02ae9f92a6d5dd8a3be2d0622994565b862ea683448",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "2f7d4f1099206853e7101b6971eba63b2a7d6bde5f44b86703de0a700038123e",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "0edd539e13ab3d56b1c538a8ca49da554caf51bddc5adf6775a4cafced190f4b",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "e6ca0fd566e87902e36f79c4190d621a9aef804d77f24a0e3f47d065356bff54",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:06.243Z",
+        "durationMs": 150.15970899999957,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 873,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 203,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "22a278085c5e79c9e534ada8ac787d3813857a4baba9acd77b0ba8dab47b68d5",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:06.395Z",
+        "durationMs": 155.88949999999932,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 233,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 331,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "4b1548bd29923998ac769bef7348fbb1363b61e16a23c7ce0afadeaaadaad6ba",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:06.553Z",
+        "durationMs": 152.52812499999982,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 649,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 115,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "e2c9072ab31f31ae56e99a3393dc9d33c7db11709bf4357eaa6583bbf42e6a48",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:06.720Z",
+        "durationMs": 153.45408399999997,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 937,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 203,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "131c0eaea566e353feeff771ae3428947061d6c4480c9ffc491a0b53fff1b888",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:06.720Z",
+        "durationMs": 206.79212500000085,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 937,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 203,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "33c85acfd7516b414b77eee5a334f96acdf065689814783391608c5c95f00243",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:06.876Z",
+        "durationMs": 151.7552080000005,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 233,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 331,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "ba71b6fd58168d7d70eb9c644eb51c8e510532defdf40709791d2d472a59443a",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:06.930Z",
+        "durationMs": 157.72691599999962,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 553,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 331,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "d30ef8f2bf1a0bbcce21616a525aa17ad1429ef171d8c8f689b6a78fb717ce2c",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:07.030Z",
+        "durationMs": 153.6252089999998,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 1943,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 115,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "fe5709af4478145ade7315c5fc981bd5f3ce01b52d8bf2849d44fb403a4f153f",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:07.091Z",
+        "durationMs": 162.7635419999997,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 238049,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 685,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "0830f17dcc461683dad1a969aacf9f3cff3cf441c02fe87ed1c3553161ad2444",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "de326517218d5bac6688606d6897f4773661abfabcb9949c55e217e4a2c62695",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "3337be15f59b676decdbd02ae9f92a6d5dd8a3be2d0622994565b862ea683448",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "2f7d4f1099206853e7101b6971eba63b2a7d6bde5f44b86703de0a700038123e",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "0edd539e13ab3d56b1c538a8ca49da554caf51bddc5adf6775a4cafced190f4b",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "e6ca0fd566e87902e36f79c4190d621a9aef804d77f24a0e3f47d065356bff54",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:07.531Z",
+        "durationMs": 189.81066700000065,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 937,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 203,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "131c0eaea566e353feeff771ae3428947061d6c4480c9ffc491a0b53fff1b888",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:07.532Z",
+        "durationMs": 205.04812499999935,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 937,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 203,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "33c85acfd7516b414b77eee5a334f96acdf065689814783391608c5c95f00243",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:07.531Z",
+        "durationMs": 239.57758300000023,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 937,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 203,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "a5312e10fcb7ecffe2587079b14ed1d5b38bcc00583d85e40ceff0ece77fdb41",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:07.725Z",
+        "durationMs": 156.4057499999999,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 233,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 331,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "ba71b6fd58168d7d70eb9c644eb51c8e510532defdf40709791d2d472a59443a",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:07.739Z",
+        "durationMs": 163.80662499999926,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 553,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 331,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "d30ef8f2bf1a0bbcce21616a525aa17ad1429ef171d8c8f689b6a78fb717ce2c",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:07.774Z",
+        "durationMs": 160.0659999999998,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 233,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 331,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "acfe6cdb2df8b3d2acf7ccf96e3fa37e66773d34b878f1528929ad3a8fb212c3",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:07.883Z",
+        "durationMs": 152.99345799999992,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 1943,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 115,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "fe5709af4478145ade7315c5fc981bd5f3ce01b52d8bf2849d44fb403a4f153f",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:07.905Z",
+        "durationMs": 195.5537920000006,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 238049,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 685,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "0830f17dcc461683dad1a969aacf9f3cff3cf441c02fe87ed1c3553161ad2444",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "de326517218d5bac6688606d6897f4773661abfabcb9949c55e217e4a2c62695",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "3337be15f59b676decdbd02ae9f92a6d5dd8a3be2d0622994565b862ea683448",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "2f7d4f1099206853e7101b6971eba63b2a7d6bde5f44b86703de0a700038123e",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "0edd539e13ab3d56b1c538a8ca49da554caf51bddc5adf6775a4cafced190f4b",
+            "block": "latest"
+          },
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "e6ca0fd566e87902e36f79c4190d621a9aef804d77f24a0e3f47d065356bff54",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:07.937Z",
+        "durationMs": 185.87662499999988,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 8391,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 115,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "f418c5ae4865bfe2ca399a2d572029722cd28585880a5dc66819005cdb185b79",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:08.567Z",
+        "durationMs": 168.12645799999882,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 873,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 203,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "d1414b3d3b1319275d3b0114803f59cd337e6d7fb7be54ebefbba6a8fe50f194",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:08.738Z",
+        "durationMs": 153.37145800000144,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 233,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 331,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_call",
+            "semanticSHA256": "3add3770d5b09120b23ede0a1c55cda1b70d55337ec07c798f89d9c8ad2d91c2",
+            "block": "latest"
+          }
+        ]
+      },
+      {
+        "startedAt": "2026-10-23T01:05:08.893Z",
+        "durationMs": 157.8585409999996,
+        "status": 200,
+        "requestMeasurement": "exact-string",
+        "responseBytes": 5249,
+        "responseCount": "complete",
+        "physicalHTTPBodyBytes": 115,
+        "canonicalRecipientSHA256": "95d3909a51ad7a5d0b1f0ccc981c569f63d0e575f496533427ab6df1195197fd",
+        "items": [
+          {
+            "method": "eth_getCode",
+            "semanticSHA256": "29429a2b1b2a5608c8891a30c34443348f593636c20b6aed58448035951cf8b1",
+            "block": "latest"
+          }
+        ]
+      }
+    ],
+    "discarded": 0,
+    "retainedBytes": 31124,
+    "pendingReaders": 0,
+    "securityObservationFailed": false,
+    "securityObservationIncomplete": false,
+    "maxRows": 4096,
+    "maxResponseBytes": 4194304,
+    "maxResponseReaders": 8,
+    "maxRetainedBytes": 2097152,
+    "containsRawParameters": false,
+    "containsResponseBody": false,
+    "changesRetriesOrProvider": false,
+    "latch": {
+      "terminal": false,
+      "reason": null
+    }
+  },
+  "signing": "not-performed",
+  "remoteFullProgram": false,
+  "productionTouched": false
+}

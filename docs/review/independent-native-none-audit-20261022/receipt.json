@@ -1,0 +1,29 @@
+{
+  "verdict": "APPROVE SCOPED CODEC/AUDIT SOURCE; NORMAL STUDIO CONTEXT BLOCKED",
+  "approvedSource": "3de2c2710fcb5812f96a1b1ddcc047325a70e08b",
+  "sdkTested": "0dc7e6f342b228515b1eecf783c9fd3629802eef",
+  "siteTested": "230c8cff0e2075042cc0784c03beece7ddf14900",
+  "independentProductionFixAuthorship": false,
+  "fresh179": {
+    "pass": 179,
+    "fail": 0,
+    "skip": 0
+  },
+  "actualRegisteredChromium": {
+    "pass": 1,
+    "fail": 0,
+    "skip": 0
+  },
+  "standardSDKBuildExit": 0,
+  "siteTSCExit": 0,
+  "normalOriginalTest": "90a28021b7e838e8a44ba06ee43ae79a240a599a9e74b4ca7cec929cb292fced",
+  "normalAdmittedDescriptionTest": "8c7e76a133bb78541f04ba339e2fbb2f4f857162f72a9eddbe7e681c7955bca9",
+  "normalContextResult": "FAIL product unissued artifact.chainId null exclusion",
+  "normalCounts": {
+    "jobs": 1,
+    "artifacts": 1,
+    "physicalPlans": 3,
+    "walletOperations": 0
+  },
+  "liveOrSigningApproval": false
+}

@@ -1,0 +1,8 @@
+{
+  "reason": "Own lean alias inventory omitted sibling site-domain dependency; first TSC14 setup diagnostics retained",
+  "path": "keel-site/packages/site-domain/node_modules/zod",
+  "target": "/Users/ravonus/dev/keel-site/node_modules/.pnpm/zod@4.4.3/node_modules/zod",
+  "version": "4.4.3",
+  "packageSHA256": "c630bd10b52dcf71c112a2bf78dbf2734b9db58d62de663b8d86c2ec2c8cda2e",
+  "sourceOrAssertionsChanged": false
+}

@@ -1,0 +1,29 @@
+{
+  "command": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "--import",
+    "/private/tmp/keel-independent-codec-normal-20261022-02/observe-unissued-throw.mjs",
+    "--conditions=react-server",
+    "--import",
+    "tsx",
+    "--test",
+    "--test-concurrency=1",
+    "tests/integration/temporal-media-normal-continuation.test.ts"
+  ],
+  "cwd": "/private/tmp/keel-independent-codec-normal-20261022-02/keel-site/apps/studio",
+  "siteCommit": "230c8cff0e2075042cc0784c03beece7ddf14900",
+  "sdkCommit": "0dc7e6f342b228515b1eecf783c9fd3629802eef",
+  "integrationTestSHA256": "8c7e76a133bb78541f04ba339e2fbb2f4f857162f72a9eddbe7e681c7955bca9",
+  "environmentKeys": [
+    "LC_ALL",
+    "LANG",
+    "PATH",
+    "HOME",
+    "TMPDIR",
+    "KEEL_TEST_POSTGRES_BIN_DIR",
+    "KEEL_TEMPORAL_NORMAL_EVIDENCE"
+  ],
+  "exit": 1,
+  "elapsed": 9.163336992263794,
+  "productionTouched": false
+}

@@ -1,0 +1,21 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import {readFileSync} from 'node:fs';
+import {gunzipSync} from 'node:zlib';
+import {createHash} from 'node:crypto';
+import {buildKeelInlineLocalDocument,buildKeelInlineModuleFragment,decodeKeelInlineGraphFragment} from './packages/sdk/dist/inline-viewer-graph.js';
+import {createKeelRegisteredNativeGzipProof,assertKeelRegisteredNativeGzipProof,KEEL_REGISTERED_NATIVE_GZIP_FRAME_PROFILE as p} from './packages/sdk/dist/registered-native-gzip.js';
+const hash=b=>'0x'+createHash('sha256').update(b).digest('hex'),integrity=b=>({algorithm:'sha256',digest:hash(b),byteLength:b.length});
+const fixture=JSON.parse(gunzipSync(readFileSync(new URL('./tests/fixtures/registered-native-gzip-revision5.json.gz',import.meta.url))));
+const half=side=>{const bytes=decodeKeelInlineGraphFragment(Buffer.from(fixture.fragments['compact-'+side].base64,'base64'),'application/vnd.keel.token-uri-raw-percent-fragment');return{bytes,integrity:integrity(bytes)}};
+const shell={schema:'keel-inline-shell-fragments@1',codecProfile:'browser-gzip-deflate',prefix:half('prefix'),suffix:half('suffix')};
+const binding=Object.fromEntries(['chainId','revision','store','registry','reader','readerRuntimeCodeHash','metadataObjectId','readerDeploymentTransactionHash','registeredPrefixObjectId','registeredSuffixObjectId','prefixObjectId','suffixObjectId'].map(k=>[k,p[k]]));Object.assign(binding,{profile:'keel.canonical-native-gzip@1',metadataIntegrity:{algorithm:'sha256',digest:p.metadataDigest,byteLength:p.metadataByteLength}});
+const source=readFileSync(new URL('./tests/fixtures/registered-native-none/normal-artwork.mp4',import.meta.url));
+const display=await buildKeelInlineModuleFragment({moduleId:'keel.asset-display',version:'1.1.0',mediaType:'text/javascript',aliases:['keel.asset-display'],decodedBytes:readFileSync(new URL('./tests/fixtures/asset-display-1.1.0.js',import.meta.url)),execution:'classic',phase:'render',weight:0,compression:'gzip'});
+const root=await buildKeelInlineLocalDocument({shell,modules:[display],entry:{id:'artwork.mp4',mediaType:'video/mp4',source}});
+const original=JSON.parse('[null'+Buffer.from(root.rootBytes).toString().slice(p.prefixByteLength,-p.suffixByteLength)+']').slice(1);
+for(const role of [['entrypoint'],['asset'],['data']])test(`native None public proof rejects non-string role ${JSON.stringify(role)}`,()=>{
+ const rows=structuredClone(original);rows.find(x=>x.id==='artwork.mp4').role=role;
+ const bytes=Buffer.concat([shell.prefix.bytes,Buffer.from(rows.map(x=>','+JSON.stringify(x).replaceAll('<','\\u003c')).join('')),shell.suffix.bytes]);
+ assert.throws(()=>{const proof=createKeelRegisteredNativeGzipProof({binding,documentBytes:bytes});assertKeelRegisteredNativeGzipProof(proof,bytes);},/role|Native None|descriptor/i,'JSON role arrays must not acquire a supported native role by String coercion');
+});

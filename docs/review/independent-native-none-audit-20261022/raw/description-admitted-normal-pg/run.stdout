@@ -1,0 +1,379 @@
+TAP version 13
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42622',
+#   message: 'identifier "resource_upload_plans_artifact_resource_id_artifact_resources_id_fk" will be truncated to "resource_upload_plans_artifact_resource_id_artifact_resources_i"',
+#   file: 'scansup.c',
+#   line: '102',
+#   routine: 'truncate_identifier'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42622',
+#   message: 'identifier "indexed_replication_campaigns_source_event_id_chain_events_id_fk" will be truncated to "indexed_replication_campaigns_source_event_id_chain_events_id_f"',
+#   file: 'scansup.c',
+#   line: '102',
+#   routine: 'truncate_identifier'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42622',
+#   message: 'identifier "indexed_replication_contributors_source_event_id_chain_events_id_fk" will be truncated to "indexed_replication_contributors_source_event_id_chain_events_i"',
+#   file: 'scansup.c',
+#   line: '102',
+#   routine: 'truncate_identifier'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42622',
+#   message: 'identifier "community_replication_sources_upload_plan_id_resource_upload_plans_id_fk" will be truncated to "community_replication_sources_upload_plan_id_resource_upload_pl"',
+#   file: 'scansup.c',
+#   line: '102',
+#   routine: 'truncate_identifier'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42710',
+#   message: 'enum label "unique-set" already exists, skipping',
+#   where: `SQL statement "ALTER TYPE "release_type" ADD VALUE IF NOT EXISTS 'unique-set'"\\n` +
+#     'PL/pgSQL function inline_code_block line 1 at SQL statement',
+#   file: 'pg_enum.c',
+#   line: '344',
+#   routine: 'AddEnumLabel'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42710',
+#   message: 'enum label "interactive-work" already exists, skipping',
+#   where: `SQL statement "ALTER TYPE "release_type" ADD VALUE IF NOT EXISTS 'interactive-work'"\\n` +
+#     'PL/pgSQL function inline_code_block line 1 at SQL statement',
+#   file: 'pg_enum.c',
+#   line: '344',
+#   routine: 'AddEnumLabel'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42710',
+#   message: 'enum label "game-world" already exists, skipping',
+#   where: `SQL statement "ALTER TYPE "release_type" ADD VALUE IF NOT EXISTS 'game-world'"\\n` +
+#     'PL/pgSQL function inline_code_block line 1 at SQL statement',
+#   file: 'pg_enum.c',
+#   line: '344',
+#   routine: 'AddEnumLabel'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42710',
+#   message: 'enum label "asset-library" already exists, skipping',
+#   where: `SQL statement "ALTER TYPE "release_type" ADD VALUE IF NOT EXISTS 'asset-library'"\\n` +
+#     'PL/pgSQL function inline_code_block line 1 at SQL statement',
+#   file: 'pg_enum.c',
+#   line: '344',
+#   routine: 'AddEnumLabel'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42710',
+#   message: 'enum label "custom" already exists, skipping',
+#   where: `SQL statement "ALTER TYPE "release_type" ADD VALUE IF NOT EXISTS 'custom'"\\n` +
+#     'PL/pgSQL function inline_code_block line 1 at SQL statement',
+#   file: 'pg_enum.c',
+#   line: '344',
+#   routine: 'AddEnumLabel'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42710',
+#   message: 'enum label "publishing" already exists, skipping',
+#   where: `SQL statement "ALTER TYPE "release_status" ADD VALUE IF NOT EXISTS 'publishing'"\\n` +
+#     'PL/pgSQL function inline_code_block line 1 at SQL statement',
+#   file: 'pg_enum.c',
+#   line: '344',
+#   routine: 'AddEnumLabel'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42710',
+#   message: 'enum label "awaiting-index" already exists, skipping',
+#   where: `SQL statement "ALTER TYPE "release_status" ADD VALUE IF NOT EXISTS 'awaiting-index'"\\n` +
+#     'PL/pgSQL function inline_code_block line 1 at SQL statement',
+#   file: 'pg_enum.c',
+#   line: '344',
+#   routine: 'AddEnumLabel'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42710',
+#   message: 'enum label "scheduled" already exists, skipping',
+#   where: `SQL statement "ALTER TYPE "release_status" ADD VALUE IF NOT EXISTS 'scheduled'"\\n` +
+#     'PL/pgSQL function inline_code_block line 1 at SQL statement',
+#   file: 'pg_enum.c',
+#   line: '344',
+#   routine: 'AddEnumLabel'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42710',
+#   message: 'enum label "live" already exists, skipping',
+#   where: `SQL statement "ALTER TYPE "release_status" ADD VALUE IF NOT EXISTS 'live'"\\n` +
+#     'PL/pgSQL function inline_code_block line 1 at SQL statement',
+#   file: 'pg_enum.c',
+#   line: '344',
+#   routine: 'AddEnumLabel'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42710',
+#   message: 'enum label "paused" already exists, skipping',
+#   where: `SQL statement "ALTER TYPE "release_status" ADD VALUE IF NOT EXISTS 'paused'"\\n` +
+#     'PL/pgSQL function inline_code_block line 1 at SQL statement',
+#   file: 'pg_enum.c',
+#   line: '344',
+#   routine: 'AddEnumLabel'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42710',
+#   message: 'enum label "ended" already exists, skipping',
+#   where: `SQL statement "ALTER TYPE "release_status" ADD VALUE IF NOT EXISTS 'ended'"\\n` +
+#     'PL/pgSQL function inline_code_block line 1 at SQL statement',
+#   file: 'pg_enum.c',
+#   line: '344',
+#   routine: 'AddEnumLabel'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42710',
+#   message: 'enum label "sold-out" already exists, skipping',
+#   where: `SQL statement "ALTER TYPE "release_status" ADD VALUE IF NOT EXISTS 'sold-out'"\\n` +
+#     'PL/pgSQL function inline_code_block line 1 at SQL statement',
+#   file: 'pg_enum.c',
+#   line: '344',
+#   routine: 'AddEnumLabel'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42710',
+#   message: 'enum label "failed" already exists, skipping',
+#   where: `SQL statement "ALTER TYPE "release_status" ADD VALUE IF NOT EXISTS 'failed'"\\n` +
+#     'PL/pgSQL function inline_code_block line 1 at SQL statement',
+#   file: 'pg_enum.c',
+#   line: '344',
+#   routine: 'AddEnumLabel'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42710',
+#   message: 'enum label "holder" already exists, skipping',
+#   where: `SQL statement "ALTER TYPE "release_access_mode" ADD VALUE IF NOT EXISTS 'holder'"\\n` +
+#     'PL/pgSQL function inline_code_block line 1 at SQL statement',
+#   file: 'pg_enum.c',
+#   line: '344',
+#   routine: 'AddEnumLabel'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42710',
+#   message: 'enum label "claim" already exists, skipping',
+#   where: `SQL statement "ALTER TYPE "release_access_mode" ADD VALUE IF NOT EXISTS 'claim'"\\n` +
+#     'PL/pgSQL function inline_code_block line 1 at SQL statement',
+#   file: 'pg_enum.c',
+#   line: '344',
+#   routine: 'AddEnumLabel'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42710',
+#   message: 'enum label "custom" already exists, skipping',
+#   where: `SQL statement "ALTER TYPE "release_access_mode" ADD VALUE IF NOT EXISTS 'custom'"\\n` +
+#     'PL/pgSQL function inline_code_block line 1 at SQL statement',
+#   file: 'pg_enum.c',
+#   line: '344',
+#   routine: 'AddEnumLabel'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42701',
+#   message: 'column "revision" of relation "launch_releases" already exists, skipping',
+#   file: 'tablecmds.c',
+#   line: '7474',
+#   routine: 'check_for_column_name_collision'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42701',
+#   message: 'column "network_label" of relation "launch_releases" already exists, skipping',
+#   file: 'tablecmds.c',
+#   line: '7474',
+#   routine: 'check_for_column_name_collision'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42701',
+#   message: 'column "payout_address" of relation "launch_releases" already exists, skipping',
+#   file: 'tablecmds.c',
+#   line: '7474',
+#   routine: 'check_for_column_name_collision'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42701',
+#   message: 'column "currency" of relation "launch_releases" already exists, skipping',
+#   file: 'tablecmds.c',
+#   line: '7474',
+#   routine: 'check_for_column_name_collision'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42701',
+#   message: 'column "page_state" of relation "launch_releases" already exists, skipping',
+#   file: 'tablecmds.c',
+#   line: '7474',
+#   routine: 'check_for_column_name_collision'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42701',
+#   message: 'column "testnet_parent_id" of relation "launch_releases" already exists, skipping',
+#   file: 'tablecmds.c',
+#   line: '7474',
+#   routine: 'check_for_column_name_collision'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42701',
+#   message: 'column "last_checked_block" of relation "launch_releases" already exists, skipping',
+#   file: 'tablecmds.c',
+#   line: '7474',
+#   routine: 'check_for_column_name_collision'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42701',
+#   message: 'column "sync_status" of relation "launch_releases" already exists, skipping',
+#   file: 'tablecmds.c',
+#   line: '7474',
+#   routine: 'check_for_column_name_collision'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42622',
+#   message: 'identifier "indexed_attested_anchor_tasks_chain_id_registry_address_anchor_id_task_index_pk" will be truncated to "indexed_attested_anchor_tasks_chain_id_registry_address_anchor_"',
+#   file: 'scansup.c',
+#   line: '102',
+#   routine: 'truncate_identifier'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42622',
+#   message: 'identifier "indexed_attested_anchor_tasks_source_event_id_chain_events_id_fk" will be truncated to "indexed_attested_anchor_tasks_source_event_id_chain_events_id_f"',
+#   file: 'scansup.c',
+#   line: '102',
+#   routine: 'truncate_identifier'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42710',
+#   message: 'extension "pg_trgm" already exists, skipping',
+#   file: 'extension.c',
+#   line: '1924',
+#   routine: 'CreateExtension'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42710',
+#   message: 'extension "pg_trgm" already exists, skipping',
+#   file: 'extension.c',
+#   line: '1924',
+#   routine: 'CreateExtension'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42622',
+#   message: 'identifier "indexed_library_tag_definitions_source_event_id_chain_events_id_fk" will be truncated to "indexed_library_tag_definitions_source_event_id_chain_events_id"',
+#   file: 'scansup.c',
+#   line: '102',
+#   routine: 'truncate_identifier'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42622',
+#   message: 'identifier "indexed_library_canonical_tags_source_event_id_chain_events_id_fk" will be truncated to "indexed_library_canonical_tags_source_event_id_chain_events_id_"',
+#   file: 'scansup.c',
+#   line: '102',
+#   routine: 'truncate_identifier'
+# }
+# {
+#   severity_local: 'NOTICE',
+#   severity: 'NOTICE',
+#   code: '42622',
+#   message: 'identifier "indexed_library_community_tags_source_event_id_chain_events_id_fk" will be truncated to "indexed_library_community_tags_source_event_id_chain_events_id_"',
+#   file: 'scansup.c',
+#   line: '102',
+#   routine: 'truncate_identifier'
+# }
+# (node:67764) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: actual normal temporal intake, read-only capture, durable adoption and response-loss recovery
+not ok 1 - actual normal temporal intake, read-only capture, durable adoption and response-loss recovery
+  ---
+  duration_ms: 8771.921166
+  type: 'test'
+  location: '/private/tmp/keel-independent-codec-normal-20261022-02/keel-site/apps/studio/tests/integration/temporal-media-normal-continuation.test.ts:1:4547'
+  failureType: 'testCodeFailure'
+  error: 'The fresh codec forecast requires the exact unissued physical plans.'
+  code: 'conflict'
+  name: 'ReleaseServiceError'
+  stack: |-
+    <anonymous> (/private/tmp/keel-independent-codec-normal-20261022-02/keel-site/apps/studio/src/server/services/release-service.ts:1207:81)
+    async scope (file:///Users/ravonus/dev/keel-site/node_modules/.pnpm/postgres@3.4.9/node_modules/postgres/src/index.js:260:18)
+    async Function.begin (file:///Users/ravonus/dev/keel-site/node_modules/.pnpm/postgres@3.4.9/node_modules/postgres/src/index.js:243:14)
+    async captureNormalRegisteredInlineCodecs (/private/tmp/keel-independent-codec-normal-20261022-02/keel-site/apps/studio/src/server/services/release-service.ts:1192:5)
+    async Module.captureNormalTemporalMediaContext (/private/tmp/keel-independent-codec-normal-20261022-02/keel-site/apps/studio/src/server/services/release-service.ts:1158:5)
+    async TestContext.<anonymous> (/private/tmp/keel-independent-codec-normal-20261022-02/keel-site/apps/studio/tests/integration/temporal-media-normal-continuation.test.ts:79:50)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 9273.989167

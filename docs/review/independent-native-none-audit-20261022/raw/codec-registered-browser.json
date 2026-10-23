@@ -1,0 +1,11 @@
+{
+  "command": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "--test",
+    "tests/registered-native-none.browser.test.mjs"
+  ],
+  "cwd": "/private/tmp/keel-independent-codec-normal-20261022-02/keel-sdk",
+  "gitCommit": "0dc7e6f342b228515b1eecf783c9fd3629802eef",
+  "exit": 0,
+  "elapsed": 0.5108189582824707
+}

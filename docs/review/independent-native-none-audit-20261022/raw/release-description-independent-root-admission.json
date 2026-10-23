@@ -1,0 +1,15 @@
+{
+  "status": "ADMITTED_TEST_SETUP_ONLY",
+  "reviewer": "root; independent of test proposal author",
+  "reviewedAt": "2026-10-23T01:04:23.620716+00:00",
+  "patchSHA256": "2e13812ef311a3f437e460499b4c0e89c37578129ce4f9d8da8564e8e296b414",
+  "originalSHA256": "90a28021b7e838e8a44ba06ee43ae79a240a599a9e74b4ca7cec929cb292fced",
+  "proposedSHA256": "8c7e76a133bb78541f04ba339e2fbb2f4f857162f72a9eddbe7e681c7955bca9",
+  "reason": "The release fixture omitted its required description. Copy the existing exact artifact description to the release draft. Default is empty and studio-release-plan requires description. All assertions, API calls, assets, generators, references, case count, and production source are byte unchanged; anchored inverse byte comparison verified.",
+  "sourceEvidence": [
+    "apps/studio/src/lib/release-schema.ts:194",
+    "apps/studio/src/lib/studio-release-plan.ts:47",
+    "apps/studio/tests/integration/temporal-media-normal-continuation.test.ts:70"
+  ],
+  "permission": "Apply this exact one-property setup correction and run all unchanged remaining assertions; retain original failure. This is not source or release approval."
+}

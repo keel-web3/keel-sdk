@@ -1,0 +1,13 @@
+{
+  "command": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "node_modules/typescript/bin/tsc",
+    "--noEmit",
+    "--incremental",
+    "false"
+  ],
+  "cwd": "/private/tmp/keel-independent-codec-normal-20261022-02/keel-site/apps/studio",
+  "gitCommit": "230c8cff0e2075042cc0784c03beece7ddf14900",
+  "exit": 0,
+  "elapsed": 28.94931387901306
+}

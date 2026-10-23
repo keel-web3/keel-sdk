@@ -1,0 +1,13 @@
+{
+  "verdict": "ADMIT TEST_SETUP_ONLY exact two-line actual service import/binding",
+  "patchSHA256": "f20f57449dd6bfb3d253da39296e455e1291581475034f4345bbd89b0c1147d2",
+  "beforeSHA256": "7ac794848118cda958181068c968e043ece65a94c8159afd0070a7c3c3a2cc1a",
+  "proposedSHA256": "c5a65e57807f3d9c2206eac42aeb710d0f7c4436e7219e58985141a65839d699",
+  "inverseWholeTextExact": true,
+  "assertionsReferencesSourceFixUnchanged": true,
+  "actualImplementation": "apps/studio/src/server/services/media-source-transition.ts:26 hasPrivateMediaHistory, bounded pure source ancestry inspection",
+  "reason": "Current saved-source service imports this real helper; VM adapter had no namespace binding and therefore failed before actual assertions. Importing the exact module supplies production semantics rather than a fake predicate.",
+  "sourceGuardApproval": false,
+  "freshUnitRunClaim": false,
+  "originalRedRetained": "Parent baseline100F5P raw baseline.log; fresh valid fixture baseline must follow before guard fix"
+}

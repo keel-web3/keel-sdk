@@ -1,0 +1,14 @@
+../../packages/site-domain/src/acceptance-ports/publish-preview.ts(2,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../../packages/site-domain/src/acceptance-ports/publish-preview.ts(24,6): error TS7006: Parameter 'value' implicitly has an 'any' type.
+../../packages/site-domain/src/acceptance-ports/publish-preview.ts(272,4): error TS7006: Parameter 'value' implicitly has an 'any' type.
+../../packages/site-domain/src/activity/activity-event.schema.ts(1,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../../packages/site-domain/src/chains/chain-account.ts(1,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../../packages/site-domain/src/chains/protocol-network.ts(1,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../../packages/site-domain/src/collections/collection-batch.ts(1,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../../packages/site-domain/src/collections/collection-batch.ts(5,4): error TS7006: Parameter 'value' implicitly has an 'any' type.
+../../packages/site-domain/src/identity/siwe.ts(1,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../../packages/site-domain/src/notifications/notification-preferences.ts(1,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../../packages/site-domain/src/notifications/notification-preferences.ts(104,15): error TS7006: Parameter 'value' implicitly has an 'any' type.
+../../packages/site-domain/src/notifications/notification-preferences.ts(134,54): error TS7006: Parameter 'eventType' implicitly has an 'any' type.
+../../packages/site-domain/src/notifications/notification-preferences.ts(146,30): error TS7006: Parameter 'event' implicitly has an 'any' type.
+../../packages/site-domain/src/presence/presence-protocol.ts(1,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.

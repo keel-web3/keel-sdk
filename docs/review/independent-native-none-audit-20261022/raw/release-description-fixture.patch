@@ -1,0 +1,11 @@
+--- a/apps/studio/tests/integration/temporal-media-normal-continuation.test.ts
++++ b/apps/studio/tests/integration/temporal-media-normal-continuation.test.ts
+@@ -71,7 +71,7 @@
+     const fields: Record<string, string> = {}; for (const [k, v] of form) if (k !== "files") { assert.equal(typeof v, "string"); fields[k] = v as string; }
+     const body = { fields, files: await Promise.all((form.getAll("files") as File[]).map(async f => ({ fileName: f.name, mediaType: f.type, bytesBase64: Buffer.from(await f.arrayBuffer()).toString("base64") }))) };
+     const made = await createStudioProjectJson(owner, body, AbortSignal.timeout(90_000)), again = await createStudioProjectJson(owner, body); assert.equal(again.id, made.id); assert.equal(again.jobId, made.jobId);
+-    const d = defaultReleaseDraft(), release = await api.createReleaseDraft(owner, { ...d, artifactId: made.id, chainId, title: `Temporal ${mode}`, releaseType: "one-of-one", supply: "1", page: { ...d.page, studio: { ...d.page.studio, presentationMode: "inline" } } });
++    const d = defaultReleaseDraft(), release = await api.createReleaseDraft(owner, { ...d, artifactId: made.id, chainId, title: `Temporal ${mode}`, description: "Owned synthetic real-PG continuation", releaseType: "one-of-one", supply: "1", page: { ...d.page, studio: { ...d.page.studio, presentationMode: "inline" } } });
+     let p = await planning.readReleasePlanning(owner, release.id); assert.equal(p.resolved.status, "ready-for-review", json(p.resolved.issues)); if (!p.resolved.reviewed) p = await planning.changeReleasePlanning(owner, release.id, { operation: "review", commandId: randomUUID(), expectedRevision: p.revision, configurationKey: p.resolved.configurationKey }); return { project: made.id, release: release.id, revision: p.revision };
+   };
+   try {
