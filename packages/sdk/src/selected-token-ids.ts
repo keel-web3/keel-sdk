@@ -33,3 +33,22 @@ export function buildKeelSelectedTokenIdsSetupCall(collection: Address, policy: 
     authority: "owner-or-lifecycle-manager" as const, capability: "requires-selected-chain-readback" as const,
     signing: "not-performed" as const, submission: "not-performed" as const });
 }
+
+/** Optional bounded ERC721 accounting for newly qualified implementations.
+ * This creates no NFTs. It moves owner-entry creation to setup and derives
+ * holder balances from at most 256 selected IDs. Read costs grow with supply. */
+export const keelPreparedOwnershipAbi = parseAbi([
+  "function preparedOwnership() view returns (bool)",
+  "function enablePreparedOwnership()",
+  "event PreparedOwnershipEnabled(uint256 maxSupply)",
+  "error OwnershipPreparationLocked()",
+]);
+
+/** Call only after enabling selected IDs and before creating reservations or
+ * supply. Old clones do not gain this capability through an SDK update. */
+export function buildKeelPreparedOwnershipSetupCall(collection: Address) {
+  return Object.freeze({ to: getAddress(collection),
+    data: encodeFunctionData({ abi: keelPreparedOwnershipAbi, functionName: "enablePreparedOwnership" }), value: "0" as const,
+    authority: "owner-or-lifecycle-manager" as const, capability: "requires-selected-chain-readback" as const,
+    signing: "not-performed" as const, submission: "not-performed" as const });
+}
