@@ -34,7 +34,7 @@ test('exact history receipt preserves nonce, quantity, buyer and digest',()=>{
 });
 test('checked contract ABI and SDK selectors/topics agree',()=>{
  const compiled=JSON.parse(fs.readFileSync(new URL('../../keel-contracts/modules/keel-mint-access/abi/KeelMintGate.json',import.meta.url)));
- for(const name of ['mint','mintExact','authorizationDigest','exactAuthorizationDigest','EXACT_MINT_AUTHORIZATION_TYPEHASH','fundNativeCredit','withdrawPartial'])assert.equal(toFunctionSelector(abi.find(x=>x.type==='function'&&x.name===name)),toFunctionSelector(compiled.find(x=>x.type==='function'&&x.name===name)));
+ for(const name of ['mint','mintExact','authorizationDigest','exactAuthorizationDigest','EXACT_MINT_AUTHORIZATION_TYPEHASH','fundNativeCredit','withdrawPartial','enableAccountPreparation','prepareAccountStorage','accountPreparationEnabled'])assert.equal(toFunctionSelector(abi.find(x=>x.type==='function'&&x.name===name)),toFunctionSelector(compiled.find(x=>x.type==='function'&&x.name===name)));
  assert.deepEqual(abi.find(x=>x.type==='event'&&x.name==='ExactAuthorizationConsumed').inputs.map(({name,type,indexed})=>({name,type,indexed:!!indexed})),compiled.find(x=>x.type==='event'&&x.name==='ExactAuthorizationConsumed').inputs.map(({name,type,indexed})=>({name,type,indexed:!!indexed})));
 });
 
@@ -45,4 +45,15 @@ test('funded credit and partial withdrawal ABI preserve account, asset and amoun
  const topics=encodeEventTopics({abi,eventName:'NativeCreditFunded',args:{account:auth.account,funder:auth.signer}});
  const decoded=decodeEventLog({abi,topics,data:encodeAbiParameters([{type:'uint256'}],[1n])});
  assert.deepEqual(normalize(decoded.args),normalize({amount:1n,account:auth.account,funder:auth.signer}));
+});
+
+test('sponsored preparation calls retain the signed nonce-zero message and account identities',()=>{
+ const before=hashTypedData(createExactMintAuthorizationTypedData(11155111,gate,auth));
+ for(const [functionName,args] of [['enableAccountPreparation',[auth.campaignId]],['prepareAccountStorage',[auth.campaignId,[auth.account]]],['accountPreparationEnabled',[auth.campaignId]]]){
+  const data=encodeFunctionData({abi,functionName,args});const decoded=decodeFunctionData({abi,data});assert.equal(decoded.functionName,functionName);assert.deepEqual(normalize(decoded.args),normalize(args));
+ }
+ const topics=encodeEventTopics({abi,eventName:'AccountStoragePrepared',args:{campaignId:auth.campaignId,account:auth.account,sponsor:auth.signer}});
+ const decoded=decodeEventLog({abi,topics,data:'0x'});
+ assert.deepEqual(normalize(decoded.args),normalize({campaignId:auth.campaignId,account:auth.account,sponsor:auth.signer}));
+ assert.equal(hashTypedData(createExactMintAuthorizationTypedData(11155111,gate,auth)),before);
 });
