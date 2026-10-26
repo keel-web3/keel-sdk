@@ -42,12 +42,17 @@ MCP defaults to Ethereum Sepolia and the `creator-inline-20261005` store:
 Call `keel-creator-inline-prepare` with these arguments. It first reads the
 selected instance's registered shell and reader profile from the chain:
 
-- A legacy-carriage (Base90) shell stops the tool with
-  `KEEL_REGISTERED_CARRIAGE_MISMATCH`, and nothing is written. On Sepolia
-  today, `creator-inline-20261005` is that case, and no URI81 creator instance
-  is registered yet. Report it; do not fall back to a web3://, IPFS or Hybrid
-  pointer for a work under 2,000,000 bytes. The fix is to register a URI81
-  shell for a creator instance.
+- Preparation uses the registry's latest shell revision unless
+  `shellRevision` pins one. On Sepolia, `creator-inline-20261005` revision 1
+  is the original Base90 shell, which existing tokens keep. Revision 2 (tx
+  0x855c3258bdbaa8dd4e4882cf43def4bf3a594b6854a0ed58cf8a09aee391749b) is URI81
+  with the legacy-strict reader grammar, and it is the default for fresh work.
+- A legacy-carriage (Base90) revision stops the tool with
+  `KEEL_REGISTERED_CARRIAGE_MISMATCH`, and nothing is written. Report it; do
+  not fall back to a web3://, IPFS or Hybrid pointer for a work under
+  2,000,000 bytes. The fix is to append a URI81 shell revision: upload the
+  suffix and reader profile, validate the suffix, then have the manager's
+  governor append the revision through `executeGovernance`.
 - Without a history-capable RPC (`rpc.setup-required`), the plan is written
   with `shellAuthentication: "unavailable"`, and its first gate is to
   authenticate (`pnpm rpc:configure`) and prepare again before any upload.

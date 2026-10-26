@@ -23,6 +23,7 @@ const ABI = parseAbi([
   "function RAW_INLINE_PROTECTION_SHELL_ID() view returns(bytes32)",
   "function creatorManagedShell(bytes32) view returns(bool)",
   "function shellRevision(bytes32,uint64) view returns(bytes32 prefix,bytes32 suffix,uint8 mode,bool exists,bytes32 metadataObjectId)",
+  "function shellLatestRevision(bytes32) view returns(uint64)",
   "function builder() view returns(address)",
   "function verifiedDigest(bytes32) view returns(bytes32)",
   "function requireRegistration(bytes32) view",
@@ -88,7 +89,9 @@ export async function prepareKeelAuthenticatedCreatorInline(input: {
   if (typeof shellId !== "string" || !/^0x[0-9a-f]{64}$/iu.test(shellId)
     || shellId !== keccak256(stringToHex("keel.shell.inline-raw-percent-protection@1"))
     || await read(registry, "creatorManagedShell", [shellId]) !== false) throw new TypeError("Prepared creator shell is not registered.");
-  const revision = publication.shellRevision ?? 1n;
+  // Fresh work uses the newest registered revision unless the caller pins one. Older revisions stay
+  // immutable for the tokens bound to them; a legacy-carriage revision still stops below.
+  const revision = publication.shellRevision ?? await read(registry, "shellLatestRevision", [shellId]) as bigint;
   const shell = await read(registry, "shellRevision", [shellId, revision]) as readonly unknown[];
   if (!Array.isArray(shell) || shell[2] !== 3 || shell[3] !== true) throw new TypeError("Prepared creator shell revision is unavailable or incompatible.");
   // The registry authority commits the profile; index receipts and runtime reads
@@ -141,7 +144,7 @@ export async function prepareKeelAuthenticatedCreatorInline(input: {
   };
   const [prefix, suffix] = await Promise.all([registered(shell[0], "registered-shell-prefix"), registered(shell[1], "registered-shell-suffix")]);
   const decode = (bytes: Uint8Array) => new TextDecoder("utf-8", { fatal: true }).decode(decodeKeelPreparedDenseCopyFragment(bytes));
-  const plan = await prepareKeelCreatorInline({ ...publication, chainId: target.chainId, store: target.store, readerGrammar });
+  const plan = await prepareKeelCreatorInline({ ...publication, chainId: target.chainId, store: target.store, readerGrammar, shellRevision: revision });
   const html = decode(prefix.bytes) + decode(plan.preparedBodyBytes) + decode(suffix.bytes);
   // Authenticate the registered decoder before quoting or publishing new payloads.
   const registeredShell = inspectKeelPreparedDenseCopyDocument(html);
