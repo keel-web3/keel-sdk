@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "build": "MCP TypeScript compilation and normal SDK/viewer asset packaging passed",
+  "mcp": {
+    "status": "ok",
+    "toolCount": 67,
+    "trailerTools": [
+      "trailer-snapshot",
+      "trailer-clip",
+      "trailer-inspect",
+      "trailer-plan",
+      "trailer-capture",
+      "trailer-beats",
+      "trailer-render",
+      "trailer-verify",
+      "trailer-stills"
+    ]
+  },
+  "reference": "examples/crucible/validation.json",
+  "offload": {
+    "host": "yuna-mbp",
+    "offloaded": true,
+    "privateTransfer": true,
+    "ffmpeg": "ffmpeg version 8.0.3 Copyright (c) 2000-2026 the FFmpeg developers",
+    "remoteVerificationPassed": true,
+    "independentLocalVerificationPassed": true,
+    "remoteJobScratchRemoved": true,
+    "runtimeBuildScratchRemoved": true,
+    "retainedRuntime": "~/.local/share/keel-trailer-runtime",
+    "scope": "4 second 160x90 production render, not a full CRUCIBLE render on yuna"
+  },
+  "release": {
+    "privatePackage": true,
+    "pushed": false,
+    "published": false,
+    "sharedMcpLauncherChanged": false
+  },
+  "tests": {
+    "tests": 14,
+    "pass": 14,
+    "fail": 0,
+    "skipped": 0,
+    "evidence": "artifacts/tests.tap",
+    "scopes": [
+      "schema and semantic validation",
+      "exact timing and nonuniform grids",
+      "beat detection, declared short audio and silence",
+      "actual Playwright paused-clock capture and rects",
+      "real ROM input and symbols",
+      "two-ROM serial exchange",
+      "existing MCP schemas and dispatch",
+      "tiny all-target render with repeated MP4/RGB hashes",
+      "exact still replay",
+      "pixel materials and rectangle mapping",
+      "verification failures and path confinement"
+    ]
+  },
+  "inspection": {
+    "schema": "schemas/inspection.json",
+    "example": "examples/inspection/README.md",
+    "canonicalMesh": {
+      "vertices": 128,
+      "triangles": 180
+    },
+    "localTests": {
+      "tests": 14,
+      "pass": 14,
+      "fail": 0,
+      "skipped": 0
+    },
+    "finalYunaChecks": {
+      "tests": 10,
+      "pass": 10,
+      "fail": 0,
+      "skipped": 0,
+      "scope": "schema/timing, beat/render/still tests and inspection/clip/pixel/PCM/browser tests; MCP and real-ROM/web-capture tests verified locally before Mac load rose"
+    },
+    "offloadTools": [
+      "trailer-snapshot",
+      "trailer-clip",
+      "trailer-inspect"
+    ],
+    "notes": [
+      "Frames/crops and JSON values retain source hashes.",
+      "Code view exports selected observable state; hidden GPU state and functions are not reconstructed from video.",
+      "Diagnostic mesh projections preserve source arrays; they are not canonical material renders."
+    ]
+  }
+}

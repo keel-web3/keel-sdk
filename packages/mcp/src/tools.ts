@@ -1,3 +1,4 @@
+import { TRAILER_TOOL_DEFINITIONS } from './trailer-tools.js';
 import { AUTHORED_PROJECT_TOOL_DEFINITIONS, loadAuthoredProject } from "./authored-project-tools.js";
 import { executeKeelStudioAgentDraftOperation } from "@keel/sdk/studio-agent-drafts";
 import { STUDIO_PRIVATE_TOOL_DEFINITIONS } from "./studio-private-tools.js";
@@ -1830,6 +1831,7 @@ async function tezosPublicationPrepareTool(context: ToolContext, value: unknown)
 }
 
 export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
+  ...TRAILER_TOOL_DEFINITIONS,
   ...MEDIA_EDIT_TOOL_DEFINITIONS,
   ...STUDIO_PRIVATE_TOOL_DEFINITIONS,
   ...SIGNATURE_PRIVACY_TOOL_DEFINITIONS,
