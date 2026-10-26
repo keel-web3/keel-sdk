@@ -66,6 +66,7 @@ export const KEEL_LINK_GATE_EXEMPT_TOOLS: Readonly<Record<string, string>> = Obj
   "keel-editor-project-list": LOCAL, "keel-editor-project-read": LOCAL, "keel-editor-project-update": LOCAL, "keel-editor-project-open": LOCAL,
   "keel-layered-check": READS, "keel-layered-select": PLANS, "keel-layered-sample": LOCAL, "keel-layered-math": PLANS, "keel-layered-curation": PLANS,
   "keel-svg-create": LOCAL, "keel-svg-inspect": READS,
+  "keel-material-guide": READS, "keel-material-distill": LOCAL,
   analyze: READS, "media-optimize": LOCAL, "media-optimize-apply": LOCAL, build: LOCAL, verify: READS, cost: PLANS,
   "module-resolve": READS, "module-lock": LOCAL, "fray-auction-intake": PLANS, "keel-chain-guide": READS, "keel-library-search": READS,
   "keel-endpoint-config": READS, "keel-studio-capabilities": READS, "keel-studio-project-intake": PLANS, "keel-studio-connect": "account connection; no bytes",

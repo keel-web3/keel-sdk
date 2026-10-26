@@ -12,6 +12,7 @@ import { MATRIX_TOOL_DEFINITIONS } from './matrix-tools.js';
 import { METADATA_TOOL_DEFINITIONS } from './metadata-tools.js';
 import { PREREVEAL_TOOL_DEFINITIONS } from './prereveal-tools.js';
 import { ARENA_TOOL_DEFINITIONS } from './arena-tools.js';
+import { MATERIAL_TOOL_DEFINITIONS } from './material-tools.js';
 import { LAYERED_TOOL_DEFINITIONS } from './layered-tools.js';
 import { SVG_TOOL_DEFINITIONS } from './svg-tools.js';
 import { TEZOS_COLLECTION_TOOL_DEFINITIONS } from './tezos-collection-tools.js';
@@ -1872,6 +1873,7 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = withKeelLinkGate([
   ...METADATA_TOOL_DEFINITIONS,
   ...PREREVEAL_TOOL_DEFINITIONS,
   ...ARENA_TOOL_DEFINITIONS,
+  ...MATERIAL_TOOL_DEFINITIONS,
   tool("analyze", "Analyze a workspace media file and report integrity and wrapper support.", TOOL_SCHEMAS.analyze, analyzeTool),
   tool("media-optimize", "Dry-run a reversible media optimization. It reports only repository-supported adapters and never writes, changes storage mode, uploads, or touches a chain.", TOOL_SCHEMAS.mediaOptimize, mediaOptimizeTool),
   tool("media-optimize-apply", "Write one new optimized file only when its recomputed digest and byte length exactly match a reviewed media-optimize result. The source and selected storage mode are preserved; no upload, wallet, or chain action occurs.", TOOL_SCHEMAS.mediaOptimizeApply, mediaOptimizeApplyTool),
