@@ -39,8 +39,20 @@ MCP defaults to Ethereum Sepolia and the `creator-inline-20261005` store:
 }
 ```
 
-Call `keel-creator-inline-prepare` with these arguments. It writes an unsigned
-plan with exact source hashes, one stored prepared representation per payload,
+Call `keel-creator-inline-prepare` with these arguments. It first reads the
+selected instance's registered shell and reader profile from the chain:
+
+- A legacy-carriage (Base90) shell stops the tool with
+  `KEEL_REGISTERED_CARRIAGE_MISMATCH`, and nothing is written. On Sepolia
+  today, `creator-inline-20261005` is that case, and no URI81 creator instance
+  is registered yet. Report it; do not fall back to a web3://, IPFS or Hybrid
+  pointer for a work under 2,000,000 bytes. The fix is to register a URI81
+  shell for a creator instance.
+- Without a history-capable RPC (`rpc.setup-required`), the plan is written
+  with `shellAuthentication: "unavailable"`, and its first gate is to
+  authenticate (`pnpm rpc:configure`) and prepare again before any upload.
+
+Otherwise it writes an unsigned plan with exact source hashes, one stored prepared representation per payload,
 upload operations, container-table commitments, image carriage and immutable
 renderer binding arguments. Standard collector poster images use their native
 `data:image/...;base64,...` form, prepared once. The shell prefix and suffix are

@@ -126,6 +126,8 @@ test('MCP discovery and creator preparation share the index-selected target and 
     const prepared = (await call(2, 'keel-creator-inline-prepare', { resources: [{ id: 'game', path: 'game.html', mediaType: 'text/html', role: 'entrypoint' }], posterPath: 'poster.svg', posterMediaType: 'image/svg+xml', out: 'plan.json' })).result;
     assert.equal(prepared.isError, undefined, JSON.stringify(prepared));
     assert.equal(prepared.structuredContent.deployment.instance, 'configured-creator');
+    // The fixture index serves no chain, so the registered shell is unauthenticated and the plan says so.
+    assert.equal(prepared.structuredContent.shellAuthentication, 'unavailable');
     globalThis.fetch = async () => new Response('offline', { status: 503 });
     const failed = (await call(3,'keel-network-discover')).result;
     assert.equal(failed.structuredContent.code, 'network.index-unavailable'); assert.equal(failed.isError, true);

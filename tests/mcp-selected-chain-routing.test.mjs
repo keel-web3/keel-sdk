@@ -21,6 +21,8 @@ test('MCP explicit chain shares discovery, preparation and bounded RPC fallback 
       if (String(url) === 'https://routing-index.example/network') return Response.json(index);
       const body = JSON.parse(request.body); calls.push({ url: String(url), method: body.method });
       assert.ok(!/send|sign/u.test(body.method));
+      // A fixture provider without block history: shell authentication reports setup-required.
+      if (body.method === 'eth_getBlockByNumber') return Response.json({ jsonrpc: '2.0', id: body.id, error: { code: -32601, message: 'the method eth_getBlockByNumber does not exist/is not available' } });
       const result = body.method === 'eth_chainId' ? String(url).includes('wrong.') ? '0x1' : '0x14a34' : body.method === 'eth_blockNumber' ? '0x123' : '0x'+'0'.repeat(63)+'7';
       return Response.json({ jsonrpc: '2.0', id: body.id, result });
     };
@@ -35,7 +37,7 @@ test('MCP explicit chain shares discovery, preparation and bounded RPC fallback 
     assert.equal(data.chainId, chainId); assert.equal(data.values.supply, 7);
     await writeFile(root+'/work.html', '<p>Fixture artwork</p>'); await writeFile(root+'/poster.svg', '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"/>');
     const prepared = await call('keel-creator-inline-prepare', { chainId, resources: [{ id: 'work', path: 'work.html', mediaType: 'text/html', role: 'entrypoint' }], posterPath: 'poster.svg', posterMediaType: 'image/svg+xml', out: 'plan.json' });
-    assert.equal(prepared.chainId, chainId); assert.equal(prepared.deployment.instance, 'fixture-creator'); assert.equal(prepared.status, 'review-only'); assert.equal(prepared.completeTokenURIBytes, null);
+    assert.equal(prepared.chainId, chainId); assert.equal(prepared.deployment.instance, 'fixture-creator'); assert.equal(prepared.status, 'review-only'); assert.equal(prepared.completeTokenURIBytes, null); assert.equal(prepared.shellAuthentication, 'unavailable'); assert.match(prepared.requiredGates[0], /Authenticate the registered shell/u);
     assert.ok(prepared.requiredGates.length > 0); assert.ok(calls.every(c => !c.url.includes('old-sepolia')));
     assert.deepEqual(calls.filter(c => c.url.includes('wrong.')).map(c => c.method), ['eth_chainId']);
   } finally { globalThis.fetch = previous; await rm(root, { recursive: true, force: true }); }

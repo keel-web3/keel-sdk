@@ -1,4 +1,5 @@
-import { prepareKeelCreatorInline } from "@keel/sdk";
+import { prepareKeelAuthenticatedCreatorInline, prepareKeelCreatorInline } from "@keel/sdk";
+import { mcpRpc } from "./rpc-tools.js";
 import { discoverKeelNodeNetworks } from '@keel/sdk/network-node';
 import { resolveKeelCreatorTarget } from '@keel/sdk/network-index';
 import type { Address } from "viem";
@@ -42,11 +43,28 @@ export const CREATOR_INLINE_TOOL_DEFINITIONS: readonly ToolDefinition[] = [{
       resources.push({ id: r.id, mediaType: r.mediaType, role: r.role, ...(r.aliases ? { aliases: r.aliases } : {}), ...(r.compression === undefined ? {} : { compression: r.compression }), bytes: file.bytes });
     }
     const poster = await context.workspace.readFile(v.posterPath, 2_000_000);
-    const plan = await prepareKeelCreatorInline({ chainId, store: store as Address, resources, poster: { bytes: poster.bytes, mediaType: v.posterMediaType }, ...(v.description ? { description: v.description } : {}), ...(v.compression === undefined ? {} : { compression: v.compression }), ...(v.brotliQuality === undefined ? {} : { brotliQuality: v.brotliQuality }) });
+    // Prepare only against the shell the selected chain actually registered: its reader grammar and
+    // carriage come from the chain, never a local default. A legacy (Base90) shell, or no URI81
+    // creator instance at all, stops here with the reason instead of writing a plan no reader accepts.
+    const { pool } = await mcpRpc(context, { chainId });
+    const publication = { resources, poster: { bytes: poster.bytes, mediaType: v.posterMediaType }, ...(v.description ? { description: v.description } : {}), ...(v.compression === undefined ? {} : { compression: v.compression }), ...(v.brotliQuality === undefined ? {} : { brotliQuality: v.brotliQuality }) };
+    // Without a history-capable RPC the shell cannot be authenticated. The plan is then written for review
+    // only, and says so: its first gate is the authentication, because no upload may follow an unread shell.
+    let shellAuthentication: "authenticated" | "unavailable" = "authenticated";
+    const plan = await prepareKeelAuthenticatedCreatorInline({ pool, index: discovered.index, selection: discovered.selection, publication }).catch(async (error: unknown) => {
+      const code = (error as { code?: unknown } | null)?.code;
+      if (code === "rpc.setup-required") {
+        shellAuthentication = "unavailable";
+        const local = await prepareKeelCreatorInline({ chainId, store: store as Address, ...publication });
+        return { ...local, requiredGates: [`Authenticate the registered shell of ${target.instance} on chain ${chainId} with a history-capable RPC (pnpm rpc:configure), then prepare again. A legacy-carriage (Base90) shell cannot read this plan; do not upload until preparation is authenticated, and never fall back to a web3://, IPFS or Hybrid pointer under 2,000,000 bytes.`, ...local.requiredGates] };
+      }
+      if (code !== "KEEL_REGISTERED_CARRIAGE_MISMATCH") throw error;
+      throw Object.assign(new TypeError(`No fresh Inline route on chain ${chainId}: creator instance ${target.instance} registers a legacy-carriage shell, and fresh preparation requires an authenticated URI81 shell. Nothing was planned or written. Stop and tell the user; do not fall back to a web3://, IPFS or Hybrid pointer (Inline is the default under 2,000,000 bytes). The fix is infrastructure: register a URI81 reader profile and shell for a creator instance on this chain, then select it in .keel/config.json.`), { code: "KEEL_REGISTERED_CARRIAGE_MISMATCH" });
+    });
     const object = (o: typeof plan.objects[number]) => ({ id: o.id, objectId: o.objectId, digest: o.digest, byteLength: o.byteLength, mediaType: o.mediaType, sourceHex: "0x" + Buffer.from(o.bytes).toString("hex"), chunks: o.chunks.map(c => ({ id: c.id, sourceHex: "0x" + Buffer.from(c.bytes).toString("hex") })), operations: o.operations, newBytes: o.newBytes, reusedBytes: o.reusedBytes });
     const unsigned = { protocol: plan.protocol, status: plan.status, chainId, store, deployment: target, resources: plan.resources.map(r => ({ id: r.id, sourceIntegrity: r.sourceIntegrity, compression: r.compression, encoding: r.encoding, encryption: r.encryption })), objects: plan.objects.map(object), shell: { revision: plan.shell.revision, prefix: object(plan.shell.prefix), suffix: object(plan.shell.suffix), requiredRegistration: plan.shell.requiredRegistration, bootEncoding: plan.shell.bootEncoding, bootCompression: plan.shell.bootCompression }, request: plan.request, sourceBytes: plan.sourceBytes, newStoredBytes: plan.newStoredBytes, completeTokenURIBytes: null, requiredGates: plan.requiredGates };
     const reviewed = { ...unsigned, payloadStorage: plan.payloadStorage, viewer: plan.viewer, provisionalTokenURIBudget: plan.provisionalTokenURIBudget };
     const file = await context.workspace.writeJson(v.out, JSON.parse(JSON.stringify(reviewed, (_, x) => typeof x === "bigint" ? x.toString() : x)));
-    return { protocol: plan.protocol, status: "review-only", chainId, store, deployment: target, plan: file, sourceBytes: plan.sourceBytes, newStoredBytes: plan.newStoredBytes, completeTokenURIBytes: null, resources: unsigned.resources, requiredGates: plan.requiredGates, signing: "not-performed", submission: "not-performed" };
+    return { protocol: plan.protocol, status: "review-only", chainId, store, deployment: target, plan: file, sourceBytes: plan.sourceBytes, newStoredBytes: plan.newStoredBytes, completeTokenURIBytes: null, shellAuthentication, resources: unsigned.resources, requiredGates: plan.requiredGates, signing: "not-performed", submission: "not-performed" };
   },
 }];
