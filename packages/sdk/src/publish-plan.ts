@@ -1,5 +1,6 @@
 import { snapshotKeelExplicitExternalPreview, type KeelExplicitExternalPreview } from "./external-preview.js";
 import { assertKeelFreshPayloadAudit } from "./inline-transport-audit.js";
+import { enforceKeelLinkGate } from "./link-gate.js";
 import { assertKeelPreparedCopyRead, keelPreparedCopyBuilder, type KeelPreparedCopyReadCheck, type KeelPreparedCopyPublishEvidence } from "./prepared-copy-publication.js";
 import { canonicalJson, createIntegrity, utf8ToBytes, type Hex, type Integrity, resolveKeelTokenURIReadBounds, assertKeelNonstandardTokenURIIdentity, type KeelExplicitNonstandardReadPolicy } from "@keel/protocol";
 
@@ -372,6 +373,14 @@ export async function createKeelPublishReviewPlan(value: unknown, options?: { re
   const viewer = boundSource.mediaType.startsWith("application/vnd.keel.token-uri-");
   if (viewer && options?.preparedCopy === undefined) throw new TypeError("Prepared viewer publish plans require canonical preparedCopy full-return evidence before wallet review.");
   if (!viewer && options?.preparedCopy !== undefined) throw new TypeError("COPY evidence cannot authorize an unrelated source upload.");
+  if (viewer) {
+    // The prepared graph and its full return are the bytes this plan publishes.
+    const evidence = options!.preparedCopy!, text = (value: unknown) => typeof value === "string" ? new TextEncoder().encode(value) : value instanceof Uint8Array ? value : undefined;
+    const external = evidence.externalPreview === undefined ? undefined : snapshotKeelExplicitExternalPreview(evidence.externalPreview);
+    await enforceKeelLinkGate({ route: "publish-plan", chainId: boundTarget.chainId, ...(external === undefined ? {} : { externalPreviews: [external] }),
+      resources: ([["graph", evidence.graphBytes], ["expected tokenURI", evidence.expectedTokenURI], ["returned tokenURI", evidence.returnedTokenURI]] as const)
+        .flatMap(([id, value]) => { const bytes = text(value); return bytes === undefined ? [] : [{ id, bytes }]; }) });
+  }
   const preparedCopy = viewer ? await assertKeelPreparedCopyRead({ ...options!.preparedCopy!,
     chainId: boundTarget.chainId, store: boundTarget.address, mediaType: boundSource.mediaType, graphIntegrity: boundSource.integrity }) : undefined;
   const plan = normalize(snapshot, preparedCopy);

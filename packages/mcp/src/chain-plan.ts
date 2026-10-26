@@ -1,5 +1,6 @@
 import { verifyIntegrity, type Hex, type Integrity } from "@keel/protocol";
 import { decompressBytes } from "@keel/builder";
+import { enforceKeelLinkGate } from "@keel/sdk/link-gate";
 import path from "node:path";
 import { deliverResult } from "./large-output.js";
 import { KEEL_CAST_MAX_SLUGS, KEEL_CAST_TARGET_GAS, KEEL_EIP7825_TX_GAS_CAP, keelCastGasEstimate, keelGasLimit, keelMinimumTransactions, keelWeldCompositeGasEstimate, keelWeldObjectGasEstimate } from "@keel/sdk";
@@ -262,6 +263,7 @@ async function validatePlan(workspace: Workspace, planDirectory: string, value: 
     const selectedCompression = compression(plan.compression, "upload plan.compression");
     const decoded = await decodeChunks(chunks, selectedCompression, "upload plan");
     await assertCommittedBytes(decoded, committed, originalByteLength, "upload plan");
+    await enforceKeelLinkGate({ route: "chain-plan", workspaceRoot: workspace.root, resources: [{ id: String(plan.objectName), bytes: decoded, mediaType: String(plan.mediaType) }] });
     return { schema, objectName: objectName(plan.objectName, "upload plan.objectName"), mediaType: mediaType(plan.mediaType, "upload plan.mediaType"), originalByteLength, storedByteLength, compression: selectedCompression, integrity: committed, maxChildren: 128, chunks };
   }
   if (schema !== "keel-recursive-upload-plan@2") throw new TypeError("Unsupported upload plan schema.");
@@ -292,6 +294,7 @@ async function validatePlan(workspace: Workspace, planDirectory: string, value: 
       if (committed.byteLength !== byteLength) throw new TypeError(`recursive leaf ${index}.integrity.byteLength does not match byteLength.`);
       const decoded = await decodeChunks(chunks, selectedCompression, `recursive leaf ${index}`);
       await assertCommittedBytes(decoded, committed, byteLength, `recursive leaf ${index}`);
+      await enforceKeelLinkGate({ route: "chain-plan", workspaceRoot: workspace.root, resources: [{ id: `${String(plan.objectName)} leaf ${index}`, bytes: decoded, mediaType: String(input.mediaType) }] });
       reserveDecoded(decoded.byteLength, `recursive leaf ${index}`);
       const leaf: Leaf = { id: text(input.id, `recursive leaf ${index}.id`), kind: "leaf", level: 0, byteOffset: nonNegative(input.byteOffset, `recursive leaf ${index}.byteOffset`), byteLength, storedByteLength, mediaType: mediaType(input.mediaType, `recursive leaf ${index}.mediaType`), compression: selectedCompression, integrity: committed, chunks, decoded };
       if (ids.has(leaf.id)) throw new TypeError(`Duplicate recursive object ${leaf.id}.`);

@@ -10,6 +10,7 @@ import {
   type KeelDirectoryManifest,
   type KeelStorageGraph,
 } from "@keel/protocol";
+import { enforceKeelLinkGate } from "@keel/builder";
 import { normalizeProjectPath } from "./media.js";
 import { buildKeelTezosRecursiveObject, type KeelTezosNode } from "./tezos-recursive.js";
 import type { PreparedStudioArtifact, PreparedStudioResource } from "./types.js";
@@ -97,6 +98,8 @@ export async function buildKeelStorageGraph(
   prepared: PreparedStudioArtifact,
   options: BuildKeelStorageGraphOptions = {},
 ): Promise<BuiltKeelStorageGraph> {
+  // A storage graph is the Hold upload: every resource passes the link gate before objects are built.
+  await enforceKeelLinkGate({ route: "keel-hold-storage-graph", resources: prepared.resources.map((resource) => ({ id: normalizeProjectPath(resource.fileName), bytes: resource.decodedBytes, mediaType: resource.resource.mediaType })) });
   const built = await Promise.all(prepared.resources.map(async (resource) => ({
     resource,
     object: await buildKeelTezosRecursiveObject(

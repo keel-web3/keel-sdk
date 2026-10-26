@@ -6,6 +6,7 @@
  */
 import { createKeelManagedCompositePlan, createKeelManagedObjectPlan, estimateKeelHoldCallGas, keelManagedCastOperations } from "@keel/sdk/native-managed";
 import { KEEL_INLINE_COMPACT_MEDIA_TYPE, KEEL_CAST_MAX_SLUGS, keelGasLimit, keelMinimumTransactions, keelTransactionGasCap } from "@keel/sdk";
+import { enforceKeelLinkGate } from "@keel/sdk/link-gate";
 import { deliverResult, sha256Hex } from "./large-output.js";
 import type { ToolContext, Workspace } from "./types.js";
 
@@ -164,6 +165,8 @@ export async function graphWeldPrepareTool(context: ToolContext, value: unknown)
     });
   }
   const content = typeof input.contentPath === "string" ? await readPart(context.workspace, input.contentPath) : undefined;
+  await enforceKeelLinkGate({ route: "keel-graph-weld-prepare", workspaceRoot: context.workspace.root, ...(typeof input.chainId === "number" ? { chainId: input.chainId } : {}),
+    resources: [...parts.flatMap((part, index) => part.bytes === undefined ? [] : [{ id: part.path ?? `parts[${index}]`, bytes: part.bytes }]), ...(content === undefined ? [] : [{ id: String(input.contentPath), bytes: content }])] });
   const plan = await planGraphWeld({ hold: input.hold, mediaType, parts, ...(content === undefined ? {} : { content }), ...(typeof input.chainId === "number" ? { chainId: input.chainId } : {}) });
   const result = { ...plan, ...(typeof input.chainId === "number" ? { chainId: input.chainId } : {}) };
   return deliverResult(context.workspace, result, {

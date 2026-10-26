@@ -1,5 +1,6 @@
 import { canonicalJson, createIntegrity, utf8ToBytes, type Integrity } from "@keel/protocol";
 import { getAddress } from "viem";
+import { enforceKeelLinkGate, keelLinkGateWalletRequestResources } from "./link-gate.js";
 
 export const KEEL_WALLET_REQUEST_PROTOCOL = "keel-wallet-request@1" as const;
 export const KEEL_WALLET_QR_SCHEME = "keel-wallet-request:" as const;
@@ -213,6 +214,8 @@ export function parseKeelWalletRequest(value: unknown): KeelWalletRequest {
 
 export async function createKeelWalletRequest(value: unknown): Promise<KeelWalletRequestEnvelope> {
   const request = normalizeRequest(value);
+  // Every wallet request is an onchain push: its calldata or parameters pass the link gate first.
+  await enforceKeelLinkGate({ route: "wallet-request", resources: keelLinkGateWalletRequestResources(request), ...(request.family === "ethereum" ? { chainId: request.chainId } : {}) });
   return { request, integrity: await requestIntegrity(request) };
 }
 
@@ -253,6 +256,7 @@ export async function encodeKeelWalletRequestQr(envelope: KeelWalletRequestEnvel
   const integrity = parseIntegrity(value.integrity);
   const actual = await requestIntegrity(request);
   if (!sameIntegrity(actual, integrity)) throw new TypeError("Wallet request envelope integrity does not match its request.");
+  await enforceKeelLinkGate({ route: "wallet-request-qr", resources: keelLinkGateWalletRequestResources(request), ...(request.family === "ethereum" ? { chainId: request.chainId } : {}) });
   const bytes = utf8ToBytes(canonicalJson({ request, integrity }));
   if (bytes.byteLength > MAX_QR_BYTES) throw new RangeError(`Wallet QR payload cannot exceed ${MAX_QR_BYTES} bytes.`);
   return KEEL_WALLET_QR_SCHEME + base64UrlEncode(bytes);

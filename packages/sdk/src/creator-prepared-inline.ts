@@ -4,6 +4,7 @@ import { buildKeelOnchainContainerBinding } from "./verification-shell.js";
 import { buildKeelPreparedDenseCopyShell, prepareKeelDensePayload, prepareKeelGzipDensePayload } from "./prepared-dense-copy.js";
 import { prepareKeelDenseCopyFragment, serializeKeelDenseTransportJSON } from "./dense-transport.js";
 import { assertKeelInlineImageBytes } from "./collector-policy.js";
+import { enforceKeelLinkGate } from "./link-gate.js";
 import { normalizedAddress, uint } from "./validation.js";
 import { resolveKeelPayloadStorage, resolveKeelShell, type KeelPayloadStorageMode, resolveKeelPreparationReadBounds, type KeelTokenURIPreparationBudget, type KeelExplicitNonstandardReadPolicy } from "@keel/protocol";
 
@@ -100,6 +101,11 @@ export async function prepareKeelCreatorInline(input: {
   if (/^0x0{40}$/u.test(store)) throw new TypeError("A deployed store is required.");
   if (!Number.isSafeInteger(input.chainId) || input.chainId <= 0) throw new TypeError("Invalid creator chain.");
   const chainId = input.chainId;
+  // Refuse link-bearing creator bytes before any carrier is planned, not late at the viewer slot.
+  await enforceKeelLinkGate({ route: "keel-creator-inline-prepare", chainId, resources: [
+    ...input.resources.map((resource) => ({ id: resource.id, bytes: resource.bytes, mediaType: resource.mediaType })),
+    { id: "poster", bytes: input.poster.bytes, mediaType: input.poster.mediaType },
+  ] });
   const compression = input.compression ?? "auto";
   const brotliQuality = input.brotliQuality;
   const readerGrammar = input.readerGrammar ?? "uri81";

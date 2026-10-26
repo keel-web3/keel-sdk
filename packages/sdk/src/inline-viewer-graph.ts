@@ -29,6 +29,7 @@ import {
 import { promisify } from "node:util";
 import { createHash } from "node:crypto";
 import { decodeLzmaCommittedSync } from "./decoders/node.js";
+import { KEEL_EXTERNAL_RESOURCE_LITERAL, KEEL_LINK_GATE_ALLOWED_URLS } from "./link-gate.js";
 import { gzipSync, gunzip, gunzipSync, inflate, inflateSync, brotliDecompress, brotliDecompressSync } from "node:zlib";
 import { encodeAbiParameters, getAddress, keccak256, stringToHex } from "viem";
 
@@ -533,9 +534,8 @@ const gunzipAsync = promisify(gunzip);
 const inflateAsync = promisify(inflate);
 const brotliDecompressAsync = promisify(brotliDecompress);
 const SAFE_INLINE_MODULE_ID = /^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$/u;
-// Arweave locators carry an authority or a 32-byte base64url transaction ID.
-// A minified JS ternary such as `ready ? ar : 1` is not a content locator.
-const EXTERNAL_RESOURCE_LITERAL = /\b(?:(?:https?|ipfs|web3|keel-onchain):[^\s"'<>\\]+|ar:(?:\/\/[^\s"'<>\\]+|[A-Za-z0-9_-]{43}(?![A-Za-z0-9_-])(?:\/[^\s"'<>\\]*)?))/giu;
+// One locator rule for Inline preparation and the push gate (link-gate.ts).
+const EXTERNAL_RESOURCE_LITERAL = KEEL_EXTERNAL_RESOURCE_LITERAL;
 
 /** Shared library bytes are not creator resources. Match the full pinned artifact. */
 async function assertInlineModuleDependencies(bytes: Uint8Array, moduleId: string): Promise<void> {
@@ -598,7 +598,7 @@ export function assertKeelInlineNoExternalDependencies(
     if (/keel\.invalid/iu.test(text)) found.add("keel.invalid");
     for (const match of text.matchAll(EXTERNAL_RESOURCE_LITERAL)) {
       const value = match[0].replace(/[),.;]+$/u, "");
-      if (value !== "http://www.w3.org/2000/svg") found.add(value);
+      if (!KEEL_LINK_GATE_ALLOWED_URLS.includes(value)) found.add(value);
     }
     if (depth >= 4) return;
     const expanded = (value: Uint8Array): void => {

@@ -50,6 +50,7 @@ import {
   prepareKeelTezosEntrypointCapability,
   KEEL_TEZOS_ENTRYPOINT_CAPABILITY_ERRORS,
 } from "@keel/sdk/tezos-entrypoint-capability";
+import { enforceKeelLinkGate } from "@keel/sdk/link-gate";
 import type { JsonSchema, ToolContext, ToolDefinition } from "./types.js";
 
 /**
@@ -211,6 +212,7 @@ export const TEZOS_COLLECTION_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
       for (const [index, resource] of (args.resources as Record<string, any>[]).entries()) {
         resources.push({ name: resource.name, mediaType: resource.mediaType, bytes: await resourceBytes(context, resource, index), ...(resource.compression === undefined ? {} : { compression: resource.compression }), ...(resource.decoded === undefined ? {} : { decoded: resource.decoded }) });
       }
+      await enforceKeelLinkGate({ route: "keel-tezos-hold-resources-prepare", workspaceRoot: context.workspace.root, resources: resources.map((resource) => ({ id: resource.name, bytes: resource.bytes, mediaType: resource.mediaType })) });
       return prepareKeelTezosHoldResources({ network: args.network, creator: args.creator, hold: args.hold, resources, ...(args.chunkBytes === undefined ? {} : { chunkBytes: args.chunkBytes }), ...(args.directory === undefined ? {} : { directory: args.directory }) });
     },
   ),

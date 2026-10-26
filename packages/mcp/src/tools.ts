@@ -18,6 +18,7 @@ import { TEZOS_COLLECTION_TOOL_DEFINITIONS } from './tezos-collection-tools.js';
 import { TEZOS_LIVE_STATE_TOOL_DEFINITIONS } from './tezos-live-state-tools.js';
 import { FIELD_PERMISSION_TOOL_DEFINITIONS } from './field-permission-tools.js';
 import { CREATOR_INLINE_TOOL_DEFINITIONS } from './creator-inline-tools.js';
+import { LINK_GATE_TOOL_DEFINITIONS, withKeelLinkGate } from './link-gate-tools.js';
 import { resolveKeelInlineCarriage } from "@keel/sdk/presentation";
 import {
   prepareKeelTezosShell,
@@ -57,6 +58,9 @@ import {
   buildKeelInlineImageURI,
   KEEL_INLINE_MAX_TOKEN_URI_BYTES,
   createKeelWalletRequest,
+  enforceKeelLinkGate,
+  keelLinkGateWalletRequestResources,
+  type KeelLinkGateResource,
   prepareContractDeployment,
   prepareContractCall,
   keelGasLimit,
@@ -551,6 +555,7 @@ async function walletDeployPrepare(context: ToolContext, input: Record<string, u
     ...(deploy.bytecode === undefined ? {} : { bytecode: requiredString(deploy, "bytecode") }),
     ...(deploy.valueWei === undefined ? {} : { valueWei: requiredString(deploy, "valueWei") }),
   });
+  await enforceKeelLinkGate({ route: "wallet-request-prepare", chainId: deployment.chainId, resources: keelLinkGateWalletRequestResources({ family: "ethereum", data: deployment.data }) });
   const gas = await resolveGasLimit("wallet-request-prepare", input.gas, { chainId: deployment.chainId, data: deployment.data, valueWei: deployment.valueWei });
   const request = {
     protocol: "keel-wallet-deploy-request@1",
@@ -1455,6 +1460,7 @@ async function inlinePrepareTool(context: ToolContext, value: unknown): Promise<
   }
 
   const shell = viewer === "none" ? undefined : await buildKeelInlineShellFragments(repositoryRoot === undefined ? {} : { repositoryRoot });
+  const linkGateResources: KeelLinkGateResource[] = [{ id: requiredString(input, "entry"), bytes: entryBytes, mediaType: entryMediaType }];
 
   const declared = input.modules === undefined ? [] : input.modules;
   if (!Array.isArray(declared)) throw new TypeError("modules must be a list.");
@@ -1487,7 +1493,11 @@ async function inlinePrepareTool(context: ToolContext, value: unknown): Promise<
       version: requiredString(module, "version"),
       mediaType,
       aliases: [requiredString(module, "moduleId")],
-      decodedBytes: (await context.workspace.readFile(requiredString(module, "path"), MAX_MEDIA_BYTES)).bytes,
+      decodedBytes: await (async () => {
+        const bytes = (await context.workspace.readFile(requiredString(module, "path"), MAX_MEDIA_BYTES)).bytes;
+        linkGateResources.push({ id: requiredString(module, "path"), bytes, mediaType });
+        return bytes;
+      })(),
       payloadStorage,
       execution,
       phase: (optionalString(module, "phase") ?? "runtime") as "data" | "runtime",
@@ -1502,6 +1512,7 @@ async function inlinePrepareTool(context: ToolContext, value: unknown): Promise<
   for (const entry of declaredAssets) {
     const asset = record(entry, ["assetId", "path", "mediaType", "compression"], "Inline asset");
     const source = (await context.workspace.readFile(requiredString(asset, "path"), MAX_MEDIA_BYTES)).bytes;
+    linkGateResources.push({ id: requiredString(asset, "path"), bytes: source, mediaType: requiredString(asset, "mediaType") });
     const compression = optionalString(asset, "compression") as "none" | "gzip" | "deflate" | undefined;
     if (compression !== undefined && compression !== "none" && compression !== "gzip" && compression !== "deflate") {
       throw new TypeError("Inline asset compression must be none, gzip, or deflate.");
@@ -1533,6 +1544,8 @@ async function inlinePrepareTool(context: ToolContext, value: unknown): Promise<
   }
   if (viewer === "none" && presentationPolicy !== "raw-artifact") throw new TypeError("A creator-owned shell uses raw-artifact presentationPolicy and does not claim canonical verification.");
   const graph = custom?.graph ?? await buildKeelInlineTokenURIGraph(document, { carriage: resolvedCarriage });
+  // The push gate runs after the Inline checks (whose messages stay as they were) and before any plan is written.
+  await enforceKeelLinkGate({ route: "keel-inline-prepare", resources: linkGateResources, workspaceRoot: context.workspace.root, ...(typeof input.chainId === "number" ? { chainId: input.chainId } : {}) });
 
   const shared = document.parts.filter((part) => part.kind === "existing");
   const creator = document.parts.filter((part) => part.kind === "creator");
@@ -1830,7 +1843,8 @@ async function tezosPublicationPrepareTool(context: ToolContext, value: unknown)
   };
 }
 
-export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
+// Every push route passes the KEEL link gate; see link-gate-tools.ts for the route classification.
+export const TOOL_DEFINITIONS: readonly ToolDefinition[] = withKeelLinkGate([
   ...MEDIA_EDIT_TOOL_DEFINITIONS,
   ...STUDIO_PRIVATE_TOOL_DEFINITIONS,
   ...SIGNATURE_PRIVACY_TOOL_DEFINITIONS,
@@ -1890,7 +1904,8 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   tool("keel-shell-search", "Search the read-back-verified shell catalogue by creator, name, version, or tags. Returns top/bottom object pointers and metadata only; it never fetches carrier bytes, signs, or submits.", TOOL_SCHEMAS.shellSearch, shellSearchTool),
   tool("keel-inline-prepare", "Current raw-percent source and authenticated raw-percent object reuse only; historical carriage is not a publication option. Plan a new INLINE Keel graph. The registered verification shell is the default; explicit viewer=none preserves self-contained creator-owned HTML without canonical protection. Shell choice is independent of Compact/Raw payload storage. Reusable modules and separate assets require a compatible reader. Omitted carriage and presentationPolicy use the automatic compact raw-percent saver plus collector-inline: exact supplied data:image/* bytes and complete data:text/html;charset=utf-8 HTML, with no IPFS/HTTP/web3 resolver or legacy complete-HTML Base64. For new source prepare one exact ASCII image carriage at build time; the final image field only copies its prepared header, payload and footer. Never add a runtime media encoder or publish raw and encoded copies. GIF is direct data:image/gif and never an SVG wrapper or placeholder. The result reports source, stored graph, and complete tokenURI bytes and rejects a result above the public-read ceiling. Explicit current external-preview and raw-artifact policies retain raw-percent metadata/HTML and all publication checks. Review-only: it never signs or submits.", TOOL_SCHEMAS.inlinePrepare, inlinePrepareTool),
   tool("keel-shell-prepare", "Create canonical creator/tag shell metadata or prepare creator registration, update, or irreversible freeze calls. One stable shell ID can publish revisions until its creator freezes it. The recommended viewer follows the current revision; pinning one revision is explicit. A shell is one reusable top and bottom around the work graph; this tool never signs, submits, or invents a replacement default shell.", TOOL_SCHEMAS.shellPrepare, shellPrepareTool),
-];
+  ...LINK_GATE_TOOL_DEFINITIONS,
+]);
 
 export function toolByName(name: string): ToolDefinition | undefined {
   return TOOL_DEFINITIONS.find((entry) => entry.descriptor.name === name);

@@ -125,6 +125,7 @@
     "network:discover": "node scripts/network.mjs discover",
     "network:check": "node scripts/network.mjs check",
     "network:index": "node scripts/network.mjs export",
+    "link-gate": "node packages/sdk/dist/link-gate-cli.js",
     "studio:connect": "node packages/mcp/dist/cli.js --connect",
     "studio:connection-status": "node packages/mcp/dist/cli.js --connection-status"
   },
