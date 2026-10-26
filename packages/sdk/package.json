@@ -438,6 +438,10 @@
       "types": "./dist/release-wallet-batch.d.ts",
       "import": "./dist/release-wallet-batch.js"
     },
+    "./send-window": {
+      "types": "./dist/send-window.d.ts",
+      "import": "./dist/send-window.js"
+    },
     "./transaction-gas-policy": {
       "types": "./dist/transaction-gas-policy.d.ts",
       "import": "./dist/transaction-gas-policy.js"

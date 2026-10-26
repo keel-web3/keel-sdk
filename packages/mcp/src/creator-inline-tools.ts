@@ -1,14 +1,17 @@
+import { KEEL_TOKEN_URI_ROUTE_RULE_SHORT } from "@keel/sdk";
 import { prepareKeelAuthenticatedCreatorInline, prepareKeelCreatorInline } from "@keel/sdk";
 import { mcpRpc } from "./rpc-tools.js";
 import { discoverKeelNodeNetworks } from '@keel/sdk/network-node';
 import { resolveKeelCreatorTarget } from '@keel/sdk/network-index';
+import { planKeelSendWindow } from "@keel/sdk/send-window";
+import { resolveKeelTransactionGasPolicy } from "@keel/sdk/transaction-gas-policy";
 import type { Address } from "viem";
 import type { ToolDefinition } from "./types.js";
 
 export const CREATOR_INLINE_TOOL_DEFINITIONS: readonly ToolDefinition[] = [{
   descriptor: {
     name: "keel-creator-inline-prepare",
-    description: "Prepare modular files for the modern creator factory/renderer route. Automatically selects Brotli when smaller, URI81 carriage for both compressed and uncompressed payloads, COPY-compatible escaping and the gzip/Base64 verification shell. Produces only one upload representation per payload, container commitments, poster carriage and immutable renderer binding arguments. No codec decision is required. Default chain, active creator instance and store come from the public deployment index and workspace configuration. Reuse the exact registered shell: its prefix/suffix are references to verify, never creator-upload substitutes. Writes an unsigned byte plan; chain registration, exact selected-chain readback, full URI/MCP check, call gas, offline browser, wallet approval and mint receipt remain required.",
+    description: `Prepare modular files for the modern creator factory/renderer route. Automatically selects Brotli when smaller, URI81 carriage for both compressed and uncompressed payloads, COPY-compatible escaping and the gzip/Base64 verification shell. Produces only one upload representation per payload, container commitments, poster carriage and immutable renderer binding arguments. No codec decision is required. Default chain, active creator instance and store come from the public deployment index and workspace configuration. Reuse the exact registered shell: its prefix/suffix are references to verify, never creator-upload substitutes. Writes an unsigned byte plan; chain registration, exact selected-chain readback, full URI/MCP check, call gas, offline browser, wallet approval and mint receipt remain required. ${KEEL_TOKEN_URI_ROUTE_RULE_SHORT}`,
     inputSchema: { type: "object", additionalProperties: false, properties: {
       chainId: { type: "integer", minimum: 1 }, instance: { type: "string", minLength: 1, maxLength: 256 }, store: { type: "string", pattern: "^0x[0-9a-fA-F]{40}$" },
       compression: { type: "string", enum: ["auto", "brotli", "none"], default: "auto" }, brotliQuality: { type: "integer", minimum: 0, maximum: 11 },
@@ -66,5 +69,32 @@ export const CREATOR_INLINE_TOOL_DEFINITIONS: readonly ToolDefinition[] = [{
     const reviewed = { ...unsigned, payloadStorage: plan.payloadStorage, viewer: plan.viewer, provisionalTokenURIBudget: plan.provisionalTokenURIBudget };
     const file = await context.workspace.writeJson(v.out, JSON.parse(JSON.stringify(reviewed, (_, x) => typeof x === "bigint" ? x.toString() : x)));
     return { protocol: plan.protocol, status: "review-only", chainId, store, deployment: target, plan: file, sourceBytes: plan.sourceBytes, newStoredBytes: plan.newStoredBytes, completeTokenURIBytes: null, shellAuthentication, resources: unsigned.resources, requiredGates: plan.requiredGates, signing: "not-performed", submission: "not-performed" };
+  },
+}, {
+  descriptor: {
+    name: "keel-send-window-plan",
+    description: "Plan the next window of a long publication (uploads, validations, collection, bind, mint) so its calls are broadcast together instead of one receipt at a time. Simulates the next calls in order with eth_simulateV1 on the selected chain and returns each call's nonce and gas (simulated use × margin, state gas included). Send them in nonce order without waiting, read every receipt, stop on the first failure, then call again with startIndex = nextIndex. Never estimate gas for one call at a time or wait for each receipt in a multi-call publication. Never signs or submits.",
+    inputSchema: { type: "object", additionalProperties: false, properties: {
+      chainId: { type: "integer", minimum: 1 }, from: { type: "string", pattern: "^0x[0-9a-fA-F]{40}$" },
+      callsPath: { type: "string", maxLength: 2048, description: "Workspace JSON: the ordered planned calls, each {to, data, value?}, e.g. a compiled publication's steps." },
+      startIndex: { type: "integer", minimum: 0, default: 0 }, maximumCalls: { type: "integer", minimum: 1, maximum: 255, default: 16 },
+      marginBps: { type: "integer", minimum: 10000, maximum: 30000, default: 13000 }, out: { type: "string", maxLength: 2048 },
+    }, required: ["chainId", "from", "callsPath"] },
+  },
+  async run(context, value) {
+    const v = value as { chainId: number; from: Address; callsPath: string; startIndex?: number; maximumCalls?: number; marginBps?: number; out?: string };
+    const file = await context.workspace.readFile(v.callsPath, 64 * 1024 * 1024);
+    const parsed: unknown = JSON.parse(new TextDecoder().decode(file.bytes));
+    const list = Array.isArray(parsed) ? parsed : (parsed as { steps?: unknown })?.steps;
+    if (!Array.isArray(list)) throw new TypeError("callsPath must hold an array of planned calls or an object with steps.");
+    // Compiled journals nest each call; plain plans list {to, data, value}.
+    const calls = list.map(entry => { const call = (entry as { call?: unknown }).call ?? entry; const c = call as { to: Address; data: `0x${string}`; value?: `0x${string}` }; return { to: c.to, data: c.data, ...(c.value ? { value: c.value } : {}) }; });
+    const { pool } = await mcpRpc(context, { chainId: v.chainId });
+    const block = await pool.request({ method: "eth_getBlockByNumber", params: ["latest", false] }) as { timestamp: string; gasLimit: string };
+    const policy = resolveKeelTransactionGasPolicy({ chainId: v.chainId, blockTimestamp: BigInt(block.timestamp), blockGasLimit: BigInt(block.gasLimit) });
+    const window = await planKeelSendWindow({ transport: pool, chainId: v.chainId, from: v.from, calls, maximumTransactionGas: policy.maximumTotalGas,
+      ...(v.startIndex === undefined ? {} : { startIndex: v.startIndex }), ...(v.maximumCalls === undefined ? {} : { maximumCalls: v.maximumCalls }), ...(v.marginBps === undefined ? {} : { marginBps: v.marginBps }) });
+    const written = v.out ? await context.workspace.writeJson(v.out, window) : undefined;
+    return { ...window, gasPolicy: policy.profile, ...(written ? { file: written } : {}), remaining: calls.length - window.nextIndex };
   },
 }];
