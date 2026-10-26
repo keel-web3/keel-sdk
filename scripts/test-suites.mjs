@@ -130,6 +130,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/sdk-shell-installation-parity.test.mjs",
   "tests/proof-executor-transport.test.mjs",
   "tests/proof-runner-client.test.mjs",
+  "tests/proof-timeout-progress.test.mjs",
   "tests/proof-runtime-package.test.mjs",
   "tests/proof-state-reader.test.mjs",
   "tests/proof-state-reader-cache.test.mjs",

@@ -1831,10 +1831,10 @@ async function tezosPublicationPrepareTool(context: ToolContext, value: unknown)
 }
 
 export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
-  ...TRAILER_TOOL_DEFINITIONS,
   ...MEDIA_EDIT_TOOL_DEFINITIONS,
   ...STUDIO_PRIVATE_TOOL_DEFINITIONS,
   ...SIGNATURE_PRIVACY_TOOL_DEFINITIONS,
+  ...TRAILER_TOOL_DEFINITIONS,
   tool("keel-tezos-shell-prepare", "Prepare native Tezos shell registration, update, or permanent freeze parameters with explicit network and sender. Requires standards.preflightReceipt. Read-only preparation: no RPC, signing, submission, or default-shell replacement. Receipt-backed selected-chain object and registry checks are still required.", tezosShellPrepareSchema, async (context, value) => {
     if (value === null || typeof value !== "object" || Array.isArray(value)) throw new TypeError("Tezos shell arguments must be an object.");
     const { standards, ...input } = value as Record<string, unknown>;
