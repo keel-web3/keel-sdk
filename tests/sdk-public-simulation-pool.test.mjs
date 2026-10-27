@@ -1486,3 +1486,18 @@ test('authenticated local capacity: verified whole-request cap rejects impossibl
     assert.equal(local.clients.length,1);assert.deepEqual(local.programs[0],input.params[0]);}
   finally{await transport.close();await f.transport.close();}
 });
+
+test('a publication over 256 calls reaches the pool as shared blocks, and the public probe uses the same layout',async()=>{
+  const f=fixture([{}]);
+  const preparationCalls=Array.from({length:300},(_,i)=>({...call(i),gas:'0x989680'}));
+  try {
+    const proof=await simulateKeelPublicationBeforeFunding({...fullPlan(),preparationCalls,assertions:[]},f.transport);
+    assert.equal(proof.validatedTransactionCalls,300);
+    const projects=f.privateRequests().map(r=>r.body.params[0].blockStateCalls);
+    assert.ok(projects.length>=3 && projects.every(blocks=>blocks.length<=256 && blocks.some(b=>b.calls.length>1)));
+    assert.deepEqual(projects[0].flatMap(b=>b.calls).map(c=>c.nonce),preparationCalls.map(c=>c.nonce));
+    const probes=f.requests.filter(r=>r.body.method==='eth_simulateV1'&&r.body.params[0].blockStateCalls[0].calls[0].data==='0x'&&r.body.params[0].blockStateCalls.length>1)
+      .map(r=>r.body.params[0].blockStateCalls.map(b=>b.calls.length));
+    assert.ok(projects.every(blocks=>probes.some(layout=>JSON.stringify(layout)===JSON.stringify(blocks.map(b=>b.calls.length)))));
+  } finally {await f.transport.close();}
+});

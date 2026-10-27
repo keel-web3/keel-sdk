@@ -193,6 +193,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/local-test-chain-gas-profile.test.mjs",
   "tests/solidity-compiler.test.mjs",
   "tests/sdk-publication-preflight.test.mjs",
+  "tests/sdk-publication-preflight-packed.test.mjs",
   "tests/sdk-send-window.test.mjs",
   "tests/mcp-send-window.test.mjs",
   "tests/sdk-verified-module-syntax.test.mjs",

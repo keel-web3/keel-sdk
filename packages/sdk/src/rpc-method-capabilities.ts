@@ -447,7 +447,7 @@ function validateSimulation(params: readonly unknown[]): void {
     || !Array.isArray(payload.blockStateCalls) || payload.blockStateCalls.length < 1 || payload.blockStateCalls.length > 256
     || payload.blockStateCalls.some(block => !block || typeof block !== "object" || Array.isArray(block)
       || Object.keys(block).some(key => key !== "calls") || !Array.isArray((block as { calls?: unknown }).calls)
-      || (block as { calls: unknown[] }).calls.length !== 1)
+      || (block as { calls: unknown[] }).calls.length < 1)
     || typeof params[1] !== "string" || !/^(?:latest|0x[0-9a-f]+)$/iu.test(params[1])) throw new TypeError("Publication simulation requires bounded exact call blocks without state, balance or code overrides.");
 }
 function boundedTrace(method: string, params: readonly unknown[]): readonly unknown[] {

@@ -105,6 +105,17 @@ const plan = await prepareKeelCreatorInline({
    enable creator-admin minting, then use `buildKeelCreatorAdminMintCall` to mint
    quantity one. Verify the receipt, `ownerOf(1)` and the minted public tokenURI.
 
+### Prove programs longer than 256 calls
+
+`eth_simulateV1` accepts 256 blocks per request. The pre-funding proof keeps
+one call per block up to 256 calls; a longer publication shares blocks between
+consecutive calls, in their order, so the whole program and its final
+tokenURI are still proven in one request. Each block's requested envelopes
+stay inside the actual block gas limit. On Amsterdam the proven envelope is
+the whole `maximumTransactionGas`, so set it near the measured need (a slug
+upload is about 36M total gas), not near the block limit: 190M envelopes in a
+200M block leave one call per block, and that plan stops before any payment.
+
 ### Send in windows, not one receipt at a time
 
 A modular work is hundreds of calls; the grove was 313. Their only ordering is
