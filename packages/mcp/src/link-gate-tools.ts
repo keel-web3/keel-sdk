@@ -54,6 +54,7 @@ const AUDITS = "audits bytes already published or prepared; refuses links itself
 
 export const KEEL_LINK_GATE_EXEMPT_TOOLS: Readonly<Record<string, string>> = Object.freeze({
   "keel-link-gate": "the gate itself",
+  "keel-send-window-plan": "schedules nonces and gas for calls whose bytes the preparing tool already gated; it adds no bytes",
   "keel-media-capabilities": READS, "keel-media-candidate": LOCAL, "keel-media-compare": LOCAL, "keel-studio-media": LOCAL,
   "keel-signature-privacy-readiness": READS,
   "trailer-snapshot": LOCAL, "trailer-clip": LOCAL, "trailer-inspect": READS, "trailer-plan": PLANS, "trailer-capture": LOCAL,

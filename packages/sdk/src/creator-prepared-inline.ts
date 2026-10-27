@@ -10,6 +10,23 @@ import { resolveKeelPayloadStorage, resolveKeelShell, type KeelPayloadStorageMod
 
 const MEDIA = "application/vnd.keel.token-uri-raw-percent-fragment";
 
+/** The registered shell's loader rewrites import/export statements with these exact patterns, then refuses any
+ * import or export left over. It runs in the collector's browser, after publication, so a module it cannot
+ * rewrite is a minted token that shows "Verification failed". Run the same rewrite here, before any planning.
+ * The common miss is bundler output that starts an import right after a closing brace: `}import{...}from"..."`. */
+export function assertKeelVerifiedModuleSyntax(source: string, id: string): void {
+  const rest = source
+    .replace(/(^|[;\n])\s*import\s*([^;\n]+?)\s*from\s*(["'])([^"']+)\3\s*;?/gu, "$1")
+    .replace(/(^|[;\n])\s*import\s*(["'])([^"']+)\2\s*;?/gu, "$1")
+    .replace(/(^|[;\n}])\s*export\s*\{([^}]*)\}\s*from\s*(["'])([^"']+)\3\s*;?/gu, "$1")
+    .replace(/(^|[;\n}])\s*export\s+((?:async\s+)?(?:function|class|const|let|var))\s+([A-Za-z_$][A-Za-z0-9_$]*)/gu, "$1$2 $3")
+    .replace(/(^|[;\n}])\s*export\s*\{([^}]*)\}\s*;?/gu, "$1");
+  const left = /(^|[;\n}])\s*(?:import|export)\b/u.exec(rest);
+  if (left === null) return;
+  const at = rest.slice(left.index, left.index + 60).replace(/\s+/gu, " ");
+  throw Object.assign(new TypeError(`Verified module ${id} has an import or export the registered loader cannot run (near "${at}"). Start every import and export statement after ";" or a newline; bundlers can emit "}import{". Nothing was prepared.`), { code: "KEEL_VERIFIED_MODULE_SYNTAX", id });
+}
+
 /** The registered inline loader consumes completed module exports in descriptor
  * order. Resolve its supported static imports before producing fresh fragments;
  * source inventory and physical payload order remain independent of playback. */
@@ -36,6 +53,7 @@ function creatorModulePlaybackOrder(resources: readonly {
       /(^|[;\n])\s*import\s*(["'])([^"']+)\2\s*;?/gu,
       /(^|[;\n}])\s*export\s*\{[^}]*\}\s*from\s*(["'])([^"']+)\2\s*;?/gu,
     ]) for (const match of source.matchAll(pattern)) imports.add(reference(match[3]!));
+    assertKeelVerifiedModuleSyntax(source, resource.id);
     dependencies.set(resource.id, imports);
   }
   const active = new Set<string>(), completed = new Set<string>(), ordered: string[] = [];
