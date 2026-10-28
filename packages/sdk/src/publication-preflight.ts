@@ -384,10 +384,14 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
     await emit({ kind: "phase-complete", stage, validation, completedCalls: parsed.length, totalCalls: calls.length });
     return parsed;
   };
-  // Atomic transactions and Amsterdam state-gas discovery need their exact
-  // fee envelope. Legacy independent discovery stays fee-free before strict replay.
-  // No state/balance override or transaction submission is introduced.
-  const discoveryBase = atomicContext || transactionPolicy.separateStateGas ? preparationCalls : preparationCalls.map(({ gasPrice: _legacy, maxFeePerGas: _cap, maxPriorityFeePerGas: _tip, ...call }) => call);
+  // Independent discovery measures gas, not payment: charging an unmeasured
+  // ceiling would reserve funds the measured transaction does not need. Omitted
+  // fees are zero only in this non-strict phase; values and all program fields
+  // stay exact, with no balance/state overrides. Strict replay below restores
+  // the prepared fees and proves actual affordability at the reduced limits.
+  // Fee-sensitive behavior must still fit that replay and return the same bytes.
+  // Atomic wallet discovery retains its existing strict fee/nonce validation.
+  const discoveryBase = atomicContext ? preparationCalls : preparationCalls.map(({ gasPrice: _legacy, maxFeePerGas: _cap, maxPriorityFeePerGas: _tip, ...call }) => call);
   let discoveryCeiling = BigInt(identity.maximumTransactionGas);
   let discoveryCalls = discoveryBase;
   let sharedDiscoveryBudget: bigint | undefined;
@@ -519,14 +523,12 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
   const boundedCalls = preparationCalls.map((call, index) => {
     const maximumUsedGas = gasDiscovery[index]!.maximumUsedGas;
     if (maximumUsedGas === undefined || maximumUsedGas <= 0n) return failure("unsupported-simulation", "This provider does not report pre-refund call gas. A compatible simulator is required before funding.");
-    // Amsterdam meters execution and fresh state separately. maxUsedGas is
-    // execution consumption, so it cannot replace a total transaction budget.
-    // Preserve the exact total allowance that passed whole-program discovery,
-    // including any explicitly measured provider-capacity allocation. Do not
-    // replace a total allowance with execution-only maxUsedGas. Atomic programs
-    // never receive discovery reallocation; strict fee/gas validation still runs.
-    const desired = transactionPolicy.separateStateGas ? BigInt(discoveryCalls[index]!.gas)
-      : atomicContext ? (maximumUsedGas * 120n + 99n) / 100n
+    // Geth v1.17.7 state_transition.go settleGas returns total pre-refund
+    // consumption (execution + state, including the calldata floor) as
+    // maxUsedGas. It is not the execution-only block dimension. Apply the
+    // measured margin on every fork; discovery allowances are never funding
+    // estimates. The exact reduced envelopes must still pass strict replay.
+    const desired = atomicContext ? (maximumUsedGas * 120n + 99n) / 100n
       : keelExecutorGasLimit(maximumUsedGas, BigInt(call.gas));
     const capacity = sharedDiscoveryBudget ?? discoveryCeiling;
     if (discoveryCapacityAttempts.length > 0 && desired > capacity)
@@ -535,7 +537,7 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
     return { ...call, gas: `0x${(desired > BigInt(call.gas) ? BigInt(call.gas) : desired).toString(16)}` as Hex };
   });
   await emit({ kind: "measured-gas", stage: "gas-arithmetic", perCall: gasDiscovery.map((value, callIndex) => ({ callIndex, gasUsed: value.gasUsed, maximumUsedGas: value.maximumUsedGas, validatedGasLimit: BigInt(boundedCalls[callIndex]!.gas) })),
-    provenance: { measurement: "provider pre-refund maxUsedGas", margin: atomicContext ? "ceil(maxUsedGas * 120 / 100)" : "keelExecutorGasLimit(maxUsedGas, original maximum)", aggregate: "sum validated individual envelopes, independent transactions" },
+    provenance: { measurement: "provider pre-refund maxUsedGas", discoveryFees: atomicContext ? "prepared-transaction-fees" : "unpriced-discovery", margin: atomicContext ? "ceil(maxUsedGas * 120 / 100)" : "keelExecutorGasLimit(maxUsedGas, original maximum)", aggregate: "sum validated individual envelopes, independent transactions" },
     aggregateValidatedGas: boundedCalls.reduce((sum, call) => sum + BigInt(call.gas), 0n), capacityAttempts: discoveryCapacityAttempts, allocationAttempts: discoveryAllocationAttempts, capacityScopeEvidence: "algorithm observations; a later envelope remainder is not an authenticated whole-request capacity" });
   stage = "transaction-validation";
   const transactions = await simulate(boundedCalls, true);
@@ -584,7 +586,7 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
   const canonical = record(await request("eth_getBlockByNumber", [block.number, false]));
   if (canonical?.hash !== block.hash) return failure("chain-reorganized", "The chain changed during the preflight. Recheck the same prepared plan before payment.");
   const transactionForkHeaders = transactions.flatMap(result => result.forkHeader ? [result.forkHeader] : []);
-  const discoveryGas = { policy: identity.discoveryGasPolicy, initialGasLimits: preparationCalls.map(call => BigInt(call.gas).toString()),
+  const discoveryGas = { policy: identity.discoveryGasPolicy, feePolicy: atomicContext ? "prepared-transaction-fees" as const : "unpriced-discovery" as const, initialGasLimits: preparationCalls.map(call => BigInt(call.gas).toString()),
     effectiveGasLimits: discoveryCalls.map(call => BigInt(call.gas).toString()), capacityAttempts: discoveryCapacityAttempts,
     ...(discoveryAllocationAttempts.length > 0 ? { allocationAttempts: discoveryAllocationAttempts } : {}) };
   const simulationFingerprint = (await createIntegrity(new TextEncoder().encode(canonicalJson({ ...identity, transactionGasPolicy, transactionForkHeaders, discoveryGas, validatedTransactionCalls: boundedCalls, effectiveReadGas: effectiveReadGas.toString(), readBoundaryAttempts })))).digest;

@@ -371,22 +371,63 @@ test("Amsterdam discovery success cannot bypass strict execution-dimension rejec
  assert.ok(f.requests.some(r=>r.method==="eth_simulateV1"&&r.params[0].validation));
 });
 
-test("Amsterdam retains the total transaction budget when execution consumption omits fresh state", async () => {
+test("Amsterdam uses total pre-refund execution plus state gas and validates its measured margin", async () => {
+ // Geth v1.17.7 settleGas reports the total pre-refund scalar, not just
+ // execution gas: here 25000 execution + 100000 fresh-state gas before refund.
  const f=fixture({timestamp:"0x6ac51fe0",gas:"0x186a0",maximumGas:"0x1e848"});
  const transport={request:async request=>{
   const result=await f.transport.request(request);
-  if(request.method==="eth_simulateV1"&&request.params[0].validation&&BigInt(request.params[0].blockStateCalls[0].calls[0].gas)<200000n){
+  if(request.method==="eth_simulateV1"&&request.params[0].validation&&BigInt(request.params[0].blockStateCalls[0].calls[0].gas)<125000n){
    result[0].calls[0].status="0x0";result[0].calls[0].error={code:3,message:"execution reverted",data:"0x"};
   }
   return result;
  }};
  const proof=await simulateKeelPublicationBeforeFunding(input(),transport);
- assert.equal(BigInt(proof.transactionGasLimits[0]),BigInt(call.gas));
- assert.ok(BigInt(proof.transactionGasLimits[0])<=BigInt(call.gas));
+ assert.equal(proof.transactionGasLimits[0],"131250");
  assert.ok(f.requests.filter(r=>r.method==="eth_simulateV1").every(r=>r.params[0].blockStateCalls.every(b=>BigInt(b.calls[0].gas)<=1000000n)));
  const limited=fixture({timestamp:"0x6ac51fe0",gas:"0x186a0",maximumGas:"0x1e848"});
  const capped=await simulateKeelPublicationBeforeFunding({...input(),preparationCalls:[{...call,gas:"0x1fbd0"}]},limited.transport);
  assert.equal(capped.transactionGasLimits[0],"130000");
+});
+
+test("seven Amsterdam executor operations never promote 200M discovery ceilings into funding", async () => {
+ const measured = [156633n, 35191530n, 197230n, 391234n, 381112n, 383000n, 38000n];
+ const plan = { ...input(), discoveryGasPolicy: "provider-capacity", maximumTransactionGas: 200000000n,
+   preparationCalls: measured.map((_, index) => ({ ...call, data: `0x${index.toString(16).padStart(8,"0")}`, gas: "0xbebc200" })) };
+ const f = fixture({ timestamp: "0x6ac51fe0", blockGas: "0xbebc200" });
+ const transport = { request: async request => {
+   const result = await f.transport.request(request);
+   if (request.method === "eth_simulateV1") result.forEach((block, index) => {
+     if (index < measured.length) { block.calls[0].gasUsed = `0x${(measured[index] * 4n / 5n).toString(16)}`; block.calls[0].maxUsedGas = `0x${measured[index].toString(16)}`; }
+   });
+   return result;
+ } };
+ const proof = await simulateKeelPublicationBeforeFunding(plan, transport);
+ const expectedLimits = measured.map(gas => gas + (gas + 19n) / 20n);
+ assert.deepEqual(proof.transactionGasLimits, expectedLimits.map(String));
+ assert.equal(proof.transactionGasLimits[0], "164465");
+ assert.ok(BigInt(proof.transactionGasLimits[1]) > 16777216n, "fresh-state gas must survive the execution-only cap");
+ assert.deepEqual(proof.discoveryGas.effectiveGasLimits, measured.map(() => "200000000"));
+ assert.ok(expectedLimits.reduce((a,b) => a+b,0n) < 40000000n);
+ const simulations = f.requests.filter(r => r.method === "eth_simulateV1");
+ assert.ok(simulations[0].params[0].blockStateCalls.every(b => BigInt(b.calls[0].gas) === 200000000n));
+ assert.deepEqual(simulations[1].params[0].blockStateCalls.map(b => BigInt(b.calls[0].gas)), expectedLimits);
+ assert.equal(simulations[1].params[0].validation, true);
+ assert.deepEqual(simulations[1].params[0].blockStateCalls.map(b => b.calls[0].data), plan.preparationCalls.map(c => c.data));
+});
+
+test("a state-gas requirement omitted by a provider fails strict replay without restoring the discovery ceiling", async () => {
+ const f = fixture({ timestamp: "0x6ac51fe0", gas: "0x186a0", maximumGas: "0x1e848" });
+ const transport = { request: async request => {
+   const result = await f.transport.request(request);
+   if(request.method === "eth_simulateV1" && request.params[0].validation) {
+     assert.equal(BigInt(request.params[0].blockStateCalls[0].calls[0].gas), 131250n);
+     result[0].calls[0].status = "0x0";
+   }
+   return result;
+ } };
+ await assert.rejects(simulateKeelPublicationBeforeFunding(input(),transport), e => e.kind === "execution-reverted");
+ assert.equal(f.requests.filter(r => r.method === "eth_simulateV1").length, 2);
 });
 test("missing selected-block timestamp fails before any simulation", async () => {
  const f=fixture({omitTimestamp:true});
@@ -450,9 +491,9 @@ for (const fork of [
   for (const [index, replay] of phaseCalls.entries()) {
     for (const field of ["from", "to", "data", "value", "nonce"]) assert.equal(replay[field], exact[field]);
     for (const field of ["gasPrice", "maxFeePerGas", "maxPriorityFeePerGas"]) {
-      // Legacy independent discovery is fee-free; strict/review replay always
-      // preserves the exact fees. Amsterdam discovery needs those same fees.
-      assert.equal(replay[field], index === 0 && !atomic && !fork.separateStateGas ? undefined : exact[field]);
+      // Independent discovery is unpriced on every fork. Strict/review
+      // replay always preserves the exact prepared fees.
+      assert.equal(replay[field], index === 0 && !atomic ? undefined : exact[field]);
     }
   }
   assert.equal(phaseCalls[0].gas, exact.gas);
@@ -529,7 +570,7 @@ for (const chainId of [1, 11155111]) test(`selected EVM chain ${chainId} discove
   const proof = await simulateKeelPublicationBeforeFunding(original, f.transport);
   assert.deepEqual(original, before);
   assert.equal(proof.transactionGasPolicy.maximumTotalGas, '16777216');
-  assert.deepEqual(proof.discoveryGas, { policy: 'provider-capacity', initialGasLimits: ['16000000', '16000000'], effectiveGasLimits: ['150000', '150000'], capacityAttempts: [{ requestedGas: '16000000', providerGasCap: '150000' }] });
+  assert.deepEqual(proof.discoveryGas, { policy: 'provider-capacity', feePolicy: 'unpriced-discovery', initialGasLimits: ['16000000', '16000000'], effectiveGasLimits: ['150000', '150000'], capacityAttempts: [{ requestedGas: '16000000', providerGasCap: '150000' }] });
   assert.deepEqual(proof.transactionGasLimits, ['105000', '105000']);
   const runs = f.requests.filter(r => r.method === 'eth_simulateV1');
   const program = r => r.params[0].blockStateCalls.map(b => b.calls[0]);
@@ -799,7 +840,7 @@ test('later envelope remainder never becomes a whole-request budget or a repeate
     assert.equal(attempt.params[0].validation, false);
     const calls = attempt.params[0].blockStateCalls.map(block => block.calls[0]);
     assert.equal(calls.length, before.preparationCalls.length);
-    assert.deepEqual(calls.map(({ gas, ...call }) => call), before.preparationCalls.map(({ gas, ...call }) => call));
+    assert.deepEqual(calls.map(({ gas, ...call }) => call), before.preparationCalls.map(({ gas, gasPrice: _legacy, maxFeePerGas: _cap, maxPriorityFeePerGas: _tip, ...call }) => call));
   }
 });
 
@@ -843,4 +884,76 @@ test('local chain funding simulation requires and fingerprints its explicit veri
  assert.equal(proof.transactionGasPolicy.profile,'local-anvil-osaka');assert.equal(proof.transactionGasPolicy.maximumTotalGas,'16777216');
  await assert.rejects(simulateKeelPublicationBeforeFunding({...localInput,maximumTransactionGas:16777217n},fixture(selected).transport),error=>error.kind==='configuration-invalid'&&/envelope/.test(error.message));
  const objectId=`0x${'ee'.repeat(32)}`; const storage=await simulateKeelStorageBeforeFunding({...localInput,expectedObjectId:objectId,metadataCall:{...call,data:encodeFunctionData({abi:parseAbi(['function objectExists(bytes32) view returns(bool)']),functionName:'objectExists',args:[objectId]})}},fixture({...selected,storage:true}).transport);assert.equal(storage.transactionGasPolicy.profile,'local-anvil-osaka');
+});
+
+test("Amsterdam discovery ceilings never reserve real fees before measured strict validation", async () => {
+ for (const fees of [{ gasPrice: "0x1000000" }, { maxFeePerGas: "0x1000000", maxPriorityFeePerGas: "0xf4240" }]) {
+  const f=fixture({timestamp:"0x6ac51fe0",blockGas:"0xbebc200",gas:"0x186a0",maximumGas:"0x1e848"});
+  const {maxFeePerGas:_cap,maxPriorityFeePerGas:_tip,...base}=call;
+  const planned={...input(),metadataCall:{...base,gas:"0xf4240"},maximumTransactionGas:200000000n,preparationCalls:[{...base,...fees,gas:"0xbebc200",nonce:"0x0"}]};
+  const balance=200000n*16777216n;
+  const transport={request:async request=>{
+   if(request.method==="eth_simulateV1") for(const block of request.params[0].blockStateCalls){
+    const c=block.calls[0],rate=BigInt(c.maxFeePerGas??c.gasPrice??"0x0");
+    if(BigInt(c.gas)*rate+BigInt(c.value)>balance)throw {code:-38014,message:"insufficient funds for gas * price + value"};
+   }
+   return f.transport.request(request);
+  }};
+  const before=structuredClone(planned),proof=await simulateKeelPublicationBeforeFunding(planned,transport);
+  const phases=f.requests.filter(r=>r.method==="eth_simulateV1");
+  assert.equal(proof.discoveryGas.feePolicy,"unpriced-discovery");
+  assert.deepEqual(proof.transactionGasLimits,["131250"]);
+  for(const field of ["gasPrice","maxFeePerGas","maxPriorityFeePerGas"]){
+   assert.equal(phases[0].params[0].blockStateCalls[0].calls[0][field],undefined);
+   assert.equal(phases[1].params[0].blockStateCalls[0].calls[0][field],planned.preparationCalls[0][field]);
+   assert.equal(phases[2].params[0].blockStateCalls[0].calls[0][field],planned.preparationCalls[0][field]);
+  }
+  assert.deepEqual(planned,before);
+ }
+});
+
+test("unpriced discovery cannot authorize a genuinely unaffordable measured transaction", async () => {
+ for(const fees of [{gasPrice:"0x1000000"},{maxFeePerGas:"0x1000000",maxPriorityFeePerGas:"0xf4240"}]){
+  const f=fixture({timestamp:"0x6ac51fe0",blockGas:"0xbebc200",gas:"0x186a0",maximumGas:"0x1e848"});
+  const {maxFeePerGas:_cap,maxPriorityFeePerGas:_tip,...base}=call;
+  const planned={...input(),maximumTransactionGas:200000000n,preparationCalls:[{...base,...fees,gas:"0xbebc200"}]};
+  const attempts=[];
+  const transport={request:async request=>{
+   if(request.method==="eth_simulateV1"){
+    attempts.push(request.params[0].validation);
+    for(const block of request.params[0].blockStateCalls){const c=block.calls[0],rate=BigInt(c.maxFeePerGas??c.gasPrice??"0x0");
+     if(BigInt(c.gas)*rate>100000n*16777216n)throw {code:-38014,message:"insufficient funds for gas * price + value"};
+    }
+   }
+   return f.transport.request(request);
+  }};
+  await assert.rejects(simulateKeelPublicationBeforeFunding(planned,transport),e=>e.kind==="insufficient-balance");
+  assert.deepEqual(attempts,[false,true]);
+ }
+});
+
+test("fee-sensitive return changes cannot pass the strict paid replay", async()=>{
+ const f=fixture({timestamp:"0x6ac51fe0"});
+ const transport={request:async request=>{
+  const result=await f.transport.request(request);
+  if(request.method==="eth_simulateV1")result[0].calls[0].returnData=encodeAbiParameters([{type:"uint256"}],[BigInt(request.params[0].blockStateCalls[0].calls[0].maxFeePerGas??"0x0")]);
+  return result;
+ }};
+ await assert.rejects(simulateKeelPublicationBeforeFunding(input(),transport),e=>e.kind==="metadata-mismatch");
+ assert.deepEqual(f.requests.filter(r=>r.method==="eth_simulateV1").map(r=>r.params[0].validation),[false,true]);
+});
+
+test("fee-sensitive work exceeding the measured margin fails strict replay without a ceiling fallback", async()=>{
+ const f=fixture({timestamp:"0x6ac51fe0"});
+ const transport={request:async request=>{
+  const result=await f.transport.request(request);
+  if(request.method==="eth_simulateV1")for(const [i,b]of request.params[0].blockStateCalls.entries()){
+   const c=b.calls[0],required=BigInt(c.maxFeePerGas??"0x0")>0n?300000n:100000n,gas=BigInt(c.gas);
+   const used=gas<required?gas:required;result[i].calls[0].gasUsed=`0x${used.toString(16)}`;result[i].calls[0].maxUsedGas=`0x${used.toString(16)}`;
+   if(gas<required)result[i].calls[0].status="0x0";
+  }
+  return result;
+ }};
+ await assert.rejects(simulateKeelPublicationBeforeFunding(input(),transport),e=>e.kind==="execution-reverted");
+ assert.deepEqual(f.requests.filter(r=>r.method==="eth_simulateV1").map(r=>r.params[0].validation),[false,true]);
 });

@@ -159,9 +159,10 @@ function assertNativePoolProof(fixture, proof, expected = plan) {
   assert.equal(proof.completeTokenUriBytes, Buffer.byteLength(expected.expectedTokenURI));
   assert.equal(proof.validatedTransactionCalls, expected.preparationCalls.length);
   assert.deepEqual(projects.map(request => request.params[0].validation), [false, true, false]);
-  // Amsterdam discovery preserves the original fee-bound calls. Only the
-  // measured gas envelopes may change for strict validation and reader replay.
-  assert.deepEqual(projects[0].params[0].blockStateCalls.map(block => block.calls[0]), expected.preparationCalls);
+  // Independent discovery is unpriced so its exploratory ceiling cannot
+  // reserve transaction funding. Strict execution retains the original fees.
+  assert.deepEqual(projects[0].params[0].blockStateCalls.map(block => block.calls[0]),
+    expected.preparationCalls.map(({ gasPrice: _legacy, maxFeePerGas: _cap, maxPriorityFeePerGas: _tip, ...call }) => call));
   assert.deepEqual(projects[1].params[0].blockStateCalls.map(({ calls: [call] }) => { const { gas, ...rest } = call; return rest; }),
     expected.preparationCalls.map(({ gas, ...call }) => call));
   assert.deepEqual(projects[1].params[0].blockStateCalls, projects[2].params[0].blockStateCalls.slice(0, expected.preparationCalls.length));
