@@ -8,6 +8,8 @@ export type KeelCreativeRuntimeAvailability = "local-source" | "external-source-
 export interface KeelCreativeRuntimeResource {
   readonly id: string;
   readonly version: string;
+  /** Supported binding IDs for these exact versioned bytes, never URL aliases. */
+  readonly moduleIdAliases?: readonly string[];
   readonly mediaType: "text/javascript" | "application/wasm";
   readonly format: "classic-script" | "es-module" | "wasm-module";
   readonly role: "module" | "runtime";
@@ -56,6 +58,7 @@ function resource(value: KeelCreativeRuntimeResource): KeelCreativeRuntimeResour
   return Object.freeze({
     ...value,
     dependencies: Object.freeze([...value.dependencies]),
+    ...(value.moduleIdAliases === undefined ? {} : { moduleIdAliases: Object.freeze([...value.moduleIdAliases]) }),
     ...(value.localTransform === undefined ? {} : { localTransform: Object.freeze({ ...value.localTransform }) }),
     integrity: value.integrity === null ? null : Object.freeze({ ...value.integrity }),
   });
@@ -85,6 +88,7 @@ export const KEEL_CREATIVE_RUNTIME_CATALOG: readonly KeelCreativeRuntimeCatalogE
       {
         id: "p5-1-11-3",
         version: "1.11.3",
+        moduleIdAliases: ["p5.js"],
         mediaType: "text/javascript",
         format: "classic-script",
         role: "runtime",

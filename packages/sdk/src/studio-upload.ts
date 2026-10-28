@@ -5,6 +5,7 @@ import {
   defaultKeelStudioPublicationIntent,
   type KeelStudioPublicationIntent,
 } from "./studio-publication.js";
+import { enforceKeelLinkGate } from "./link-gate.js";
 
 export const KEEL_STUDIO_ARTIFACT_UPLOAD_PROTOCOL = "keel-studio-artifact-upload@1" as const;
 
@@ -294,6 +295,12 @@ export async function stageKeelStudioProject(
   if (title.length < 2 || title.length > 160) throw new RangeError("Staged project title must contain from 2 through 160 characters.");
   if (input.agentToken.length < 32) throw new TypeError("KEEL Studio agent token must contain at least 32 characters.");
   if (files.length < 1 || files.length > 256) throw new RangeError("Stage from 1 through 256 project files.");
+  if (input.storageStrategy === "onchain") {
+    // Onchain staging is the Studio publication path: link-bearing bytes stop here, before any upload.
+    await enforceKeelLinkGate({ route: "keel-studio-stage-project", ...(input.releaseIntent === undefined ? {} : { chainId: input.releaseIntent.chainId }),
+      resources: await Promise.all(files.map(async (file) => ({ id: file.path, mediaType: file.mediaType,
+        bytes: file.bytes instanceof Uint8Array ? file.bytes : new Uint8Array(await file.bytes.arrayBuffer()) }))) });
+  }
   const projectProfile = input.projectProfile === undefined ? undefined : parseKeelSelectedProjectProfile(input.projectProfile);
   const payloadStorage = resolveKeelPayloadStorage(input.payloadStorage ?? projectProfile?.snapshot.configuration.payloadStorage);
   const mediaSlots=input.mediaSlots===undefined?undefined:parseKeelStudioMediaSlots(input.mediaSlots);

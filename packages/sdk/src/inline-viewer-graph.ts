@@ -29,6 +29,7 @@ import {
 import { promisify } from "node:util";
 import { createHash } from "node:crypto";
 import { decodeLzmaCommittedSync } from "./decoders/node.js";
+import { KEEL_EXTERNAL_RESOURCE_LITERAL, KEEL_LINK_GATE_ALLOWED_URLS } from "./link-gate.js";
 import { gzipSync, gunzip, gunzipSync, inflate, inflateSync, brotliDecompress, brotliDecompressSync } from "node:zlib";
 import { encodeAbiParameters, getAddress, keccak256, stringToHex } from "viem";
 
@@ -533,12 +534,11 @@ const gunzipAsync = promisify(gunzip);
 const inflateAsync = promisify(inflate);
 const brotliDecompressAsync = promisify(brotliDecompress);
 const SAFE_INLINE_MODULE_ID = /^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$/u;
-// Arweave locators carry an authority or a 32-byte base64url transaction ID.
-// A minified JS ternary such as `ready ? ar : 1` is not a content locator.
-const EXTERNAL_RESOURCE_LITERAL = /\b(?:(?:https?|ipfs|web3|keel-onchain):[^\s"'<>\\]+|ar:(?:\/\/[^\s"'<>\\]+|[A-Za-z0-9_-]{43}(?![A-Za-z0-9_-])(?:\/[^\s"'<>\\]*)?))/giu;
+// One locator rule for Inline preparation and the push gate (link-gate.ts).
+const EXTERNAL_RESOURCE_LITERAL = KEEL_EXTERNAL_RESOURCE_LITERAL;
 
 /** Shared library bytes are not creator resources. Match the full pinned artifact. */
-async function assertInlineModuleDependencies(bytes: Uint8Array, moduleId: string): Promise<void> {
+async function assertInlineModuleDependencies(bytes: Uint8Array, moduleId: string, version?: string): Promise<void> {
   const model = KEEL_MODEL_VENDOR_MODULES.find(module => module.moduleId === moduleId)
     ?? (moduleId === KEEL_MODEL_DISPLAY_MODULE_ID ? KEEL_MODEL_DISPLAY_REVISION : undefined);
   if (model !== undefined) {
@@ -546,14 +546,20 @@ async function assertInlineModuleDependencies(bytes: Uint8Array, moduleId: strin
     if (actual.digest !== model.digest || actual.byteLength !== model.byteLength) throw new TypeError(`Inline model runtime ${moduleId} differs from its pinned artifact.`);
     return;
   }
-  const candidates: Array<{ id: string; integrity: Integrity | null }> = KEEL_CREATIVE_RUNTIME_CATALOG.flatMap(runtime => runtime.resources.filter(resource => resource.referenceStatus === 'active'));
+  const candidates: Array<{ id: string; integrity: Integrity | null; version?: string; moduleIdAliases?: readonly string[] }> = KEEL_CREATIVE_RUNTIME_CATALOG.flatMap(runtime => runtime.resources.filter(resource => resource.referenceStatus === 'active'));
   if (moduleId === 'keel-layered-runtime-v4') {
     const generated = './layered-runtime-info.js';
     const { LAYERED_RUNTIME } = await import(generated);
     candidates.push(LAYERED_RUNTIME);
   }
-  const candidate = candidates.find(resource => resource.id === moduleId && resource.integrity !== null);
+  const candidate = candidates.find(resource => (resource.id === moduleId || resource.moduleIdAliases?.includes(moduleId)) && resource.integrity !== null);
   if (candidate?.integrity) {
+    // Binding aliases require an exact version. Retained canonical-ID callers
+    // may omit it, but an explicitly supplied version must still match.
+    if (candidate.version !== undefined && ((version !== undefined && version !== candidate.version)
+      || (candidate.id !== moduleId && version === undefined))) {
+      throw new TypeError(`Inline shared runtime ${moduleId} requires its exact pinned version ${candidate.version}.`);
+    }
     const actual = await createIntegrity(bytes);
     if (actual.digest === candidate.integrity.digest && actual.byteLength === candidate.integrity.byteLength) return;
     throw new TypeError(`Inline shared runtime ${moduleId} differs from its pinned artifact.`);
@@ -598,7 +604,7 @@ export function assertKeelInlineNoExternalDependencies(
     if (/keel\.invalid/iu.test(text)) found.add("keel.invalid");
     for (const match of text.matchAll(EXTERNAL_RESOURCE_LITERAL)) {
       const value = match[0].replace(/[),.;]+$/u, "");
-      if (value !== "http://www.w3.org/2000/svg") found.add(value);
+      if (!KEEL_LINK_GATE_ALLOWED_URLS.includes(value)) found.add(value);
     }
     if (depth >= 4) return;
     const expanded = (value: Uint8Array): void => {
@@ -850,6 +856,8 @@ function exactStringArray(value: unknown, expected: readonly string[]): boolean 
 export async function verifyKeelPublishedInlineModuleFragment(input: {
   readonly fragment: KeelPublishedInlineFragment;
   readonly moduleId: string;
+  /** Required for a versioned binding alias; canonical-ID callers remain compatible. */
+  readonly version?: string;
   readonly mediaType: string;
   readonly aliases: readonly string[];
   readonly decodedBytes: Uint8Array;
@@ -899,7 +907,7 @@ export async function verifyKeelPublishedInlineModuleFragment(input: {
         : item.embedded.compression === "lzma"
           ? await (await import("./decoders/index.js")).decodeLzma(stored, { decodedByteLength: input.decodedBytes.byteLength })
           : stored;
-  await assertInlineModuleDependencies(decoded, input.moduleId);
+  await assertInlineModuleDependencies(decoded, input.moduleId, input.version);
   const [decodedIntegrity, storedIntegrity] = await Promise.all([
     createIntegrity(decoded),
     createIntegrity(stored),
@@ -1139,7 +1147,7 @@ export async function buildKeelInlineModuleFragment(input: {
   if (phase === "data" && execution !== "classic") {
     throw new TypeError("Inline data modules must use classic execution so they run before renderer code.");
   }
-  await assertInlineModuleDependencies(input.decodedBytes, input.moduleId);
+  await assertInlineModuleDependencies(input.decodedBytes, input.moduleId, input.version);
   const weight = input.weight ?? 0;
   orderKeelModules([{ moduleId: input.moduleId, phase, weight }]);
   const slot = await buildEmbeddedKeelViewerSlot({

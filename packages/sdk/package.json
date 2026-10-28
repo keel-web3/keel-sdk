@@ -4,6 +4,9 @@
   "description": "Typed campaign builders, EIP-712 payloads, ABIs, and signer-policy helpers for Keel contracts.",
   "type": "module",
   "main": "./dist/index.js",
+  "bin": {
+    "keel-link-gate": "./dist/link-gate-cli.js"
+  },
   "types": "./dist/index.d.ts",
   "exports": {
     "./module-runtime": {
@@ -46,6 +49,10 @@
     "./wallet-request": {
       "types": "./dist/wallet-request.d.ts",
       "import": "./dist/wallet-request.js"
+    },
+    "./link-gate": {
+      "types": "./dist/link-gate.d.ts",
+      "import": "./dist/link-gate.js"
     },
     "./module": {
       "types": "./dist/module/index.d.ts",
@@ -430,6 +437,10 @@
     "./release-wallet-batch": {
       "types": "./dist/release-wallet-batch.d.ts",
       "import": "./dist/release-wallet-batch.js"
+    },
+    "./send-window": {
+      "types": "./dist/send-window.d.ts",
+      "import": "./dist/send-window.js"
     },
     "./transaction-gas-policy": {
       "types": "./dist/transaction-gas-policy.d.ts",

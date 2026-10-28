@@ -93,7 +93,7 @@ async function loadPlan(workspace: Workspace, planPath: string): Promise<{ reado
 
 export async function ethereumEncodeTool(workspace: Workspace, value: unknown): Promise<unknown> {
   const input = record(value, "ethereum-encode arguments");
-  exact(input, ["plan", "family", "chainId", "target", "qr", "out"], "ethereum-encode arguments");
+  exact(input, ["plan", "family", "chainId", "target", "qr", "out", "externalPreviews"], "ethereum-encode arguments");
   const planPath = requiredString(input, "plan");
   const family = requiredString(input, "family");
   if (family !== "ethereum") throw new TypeError("ethereum-encode currently supports family ethereum only.");

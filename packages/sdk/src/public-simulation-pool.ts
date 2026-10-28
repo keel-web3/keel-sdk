@@ -285,7 +285,7 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
     } }), { chainId, maximumConnectionAttempts: 1 });
     return { index, transport };
   };
-  const qualifySequence = async (candidate: Candidate, snapshot: Record<string, unknown>, gasLimits: readonly bigint[]) => {
+  const qualifySequence = async (candidate: Candidate, snapshot: Record<string, unknown>, gasLimits: readonly bigint[], layout: readonly number[]) => {
     const zero = `0x${"0".repeat(40)}`, hex = (n: bigint) => `0x${n.toString(16)}`;
     const publicRead = (method: string, params: readonly unknown[]) => candidate.transport.request({ method, params });
     const nonce = quantity(await publicRead("eth_getTransactionCount", [zero, blockTag]));
@@ -307,20 +307,29 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
     // response must preserve its exact original transaction envelopes.
     const publicSequenceGasLimits = gasLimits.map(() => BigInt(policy.transactionBaseGas));
     if (balance! < publicSequenceGasLimits.reduce((sum, gas) => sum + gas, 0n) * gasPrice) unsupported();
-    const blockStateCalls = publicSequenceGasLimits.map((gas, i) => ({ calls: [{ from: zero, to: zero, data: "0x", value: "0x0", gas: hex(gas), nonce: hex(nonce! + BigInt(i)), gasPrice: hex(gasPrice) }] }));
+    // The probe shares blocks exactly as the project program does.
+    let next = 0;
+    const blockStateCalls = layout.map(count => ({ calls: Array.from({ length: count }, () => {
+      const i = next++;
+      return { from: zero, to: zero, data: "0x", value: "0x0", gas: hex(publicSequenceGasLimits[i]!), nonce: hex(nonce! + BigInt(i)), gasPrice: hex(gasPrice) };
+    }) }));
     for (const validation of [false, true]) {
       const result = await candidate.transport.request({ method: "eth_simulateV1", params: [{ blockStateCalls, validation, traceTransfers: false, returnFullTransactions: true }, blockTag] });
-      if (!Array.isArray(result) || result.length !== gasLimits.length) unsupported();
-      let parent = snapshot;
-      for (const [i, value] of (result as unknown[]).entries()) {
+      if (!Array.isArray(result) || result.length !== layout.length) unsupported();
+      let parent = snapshot, i = 0;
+      for (const [b, value] of (result as unknown[]).entries()) {
         const header = object(value), calls = header?.calls, transactions = header?.transactions;
-        const call = Array.isArray(calls) && calls.length === 1 ? object(calls[0]) : undefined;
-        const tx = Array.isArray(transactions) && transactions.length === 1 ? object(transactions[0]) : undefined;
-        const used = quantity(call?.gasUsed), maximum = quantity(call?.maxUsedGas), slot = quantity(parent.slotNumber);
+        const slot = quantity(parent.slotNumber);
         try { assertKeelAmsterdamSimulationHeader(policy, value, { hash: String(parent.hash), number: quantity(parent.number) ?? -1n,
           timestamp: quantity(parent.timestamp) ?? -1n, ...(slot === undefined ? {} : { slotNumber: slot }) }); } catch { unsupported(); }
-        if (!header || call?.status !== "0x1" || call.error !== undefined || call.returnData !== "0x" || used === undefined || used <= 0n
-          || maximum === undefined || maximum < used || maximum > publicSequenceGasLimits[i]! || quantity(tx?.nonce) !== nonce! + BigInt(i) || quantity(tx?.gasPrice) !== gasPrice) unsupported();
+        if (!header || !Array.isArray(calls) || !Array.isArray(transactions) || calls.length !== layout[b] || transactions.length !== layout[b]) unsupported();
+        for (const [j, item] of (calls as unknown[]).entries()) {
+          const call = object(item), tx = object((transactions as unknown[])[j]);
+          const used = quantity(call?.gasUsed), maximum = quantity(call?.maxUsedGas);
+          if (call?.status !== "0x1" || call.error !== undefined || call.returnData !== "0x" || used === undefined || used <= 0n
+            || maximum === undefined || maximum < used || maximum > publicSequenceGasLimits[i]! || quantity(tx?.nonce) !== nonce! + BigInt(i) || quantity(tx?.gasPrice) !== gasPrice) unsupported();
+          i++;
+        }
         parent = header!;
       }
     }
@@ -378,14 +387,20 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
       || Object.keys(program).some(key => !["blockStateCalls", "validation", "traceTransfers", "returnFullTransactions"].includes(key))
       || typeof program.validation !== "boolean" || program.traceTransfers !== false || program.returnFullTransactions !== true)
       throw new KeelPublicationSimulationError("configuration-invalid", "Keep the complete override-free simulation at its selected numbered block.");
-    let requiredGas = 0n; const gasLimits: bigint[] = [];
+    let requiredGas = 0n; const gasLimits: bigint[] = [], layout: number[] = [];
     for (const item of blocks) {
-      const state = object(item), calls = state?.calls, call = Array.isArray(calls) && calls.length === 1 ? object(calls[0]) : undefined, gas = quantity(call?.gas);
-      if (!state || Object.keys(state).some(key => key !== "calls") || !call || gas === undefined || gas <= 0n || gas > 18_446_744_073_709_551_615n
-        || Object.keys(call).some(key => !["from", "to", "data", "value", "gas", "nonce", "gasPrice", "maxFeePerGas", "maxPriorityFeePerGas"].includes(key)))
+      const state = object(item), calls = state?.calls;
+      if (!state || Object.keys(state).some(key => key !== "calls") || !Array.isArray(calls) || !calls.length)
         throw new KeelPublicationSimulationError("configuration-invalid", "Keep every exact bounded call in its original simulation block.");
-      if (gas > requiredGas) requiredGas = gas;
-      gasLimits.push(gas);
+      for (const value of calls) {
+        const call = object(value), gas = quantity(call?.gas);
+        if (!call || gas === undefined || gas <= 0n || gas > 18_446_744_073_709_551_615n
+          || Object.keys(call).some(key => !["from", "to", "data", "value", "gas", "nonce", "gasPrice", "maxFeePerGas", "maxPriorityFeePerGas"].includes(key)))
+          throw new KeelPublicationSimulationError("configuration-invalid", "Keep every exact bounded call in its original simulation block.");
+        if (gas > requiredGas) requiredGas = gas;
+        gasLimits.push(gas);
+      }
+      layout.push(calls.length);
     }
     const measurement = measureKeelSimulationProgram(exact);
     // Only fresh, explicitly measured WHOLE-request caps can use this lower
@@ -466,7 +481,7 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
         // Recheck the complete ordered public sequence for every phase. Its small
         // control envelopes cannot prove project capacity; the unchanged project
         // request below must independently preserve every original gas envelope.
-        await duringPublicQualification(() => qualifySequence(candidate, snapshot, gasLimits));
+        await duringPublicQualification(() => qualifySequence(candidate, snapshot, gasLimits, layout));
         if (!approved.has(urls[index]!)) { awaitingApproval = true; await candidate.transport.close(); continue; }
         projectRequest = true;
         const result = await candidate.transport.request(exact);

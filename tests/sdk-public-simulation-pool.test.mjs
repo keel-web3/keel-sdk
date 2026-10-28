@@ -20,7 +20,7 @@ const fullPlan = () => ({chainId:11155111,blockNumber:18n,reader,readerRuntimeCo
   requiredReaderCalls:[{call:{...call(),nonce:undefined,data:'0xdddd',gas:'0xf4240'},expectedReturn:encodeAbiParameters([{type:'uint256'}],[500n]),gasMargin:10000n}],
   metadataCall:{...call(),nonce:undefined,data:'0xeeee',gas:'0xf4240'},expectedTokenURI:tokenURI,maximumTokenUriBytes:2000000,maximumReadGas:1000000n,collectionOverheadGas:10000n,maximumTransactionGas:200000000n});
 function fixture(faults=[{},{}], approved=urls.slice(0,faults.length)) {
-  const requests=[]; const privateRequests=()=>requests.filter(r=>r.body.method==='eth_simulateV1'&&r.body.params[0].blockStateCalls[0].calls[0].data!=='0x');
+  const responses=[]; const requests=[]; const privateRequests=()=>requests.filter(r=>r.body.method==='eth_simulateV1'&&r.body.params[0].blockStateCalls[0].calls[0].data!=='0x');
   const fetchImpl=async(url,init)=>{
     const index=urls.indexOf(url), fault=faults[index], body=JSON.parse(init.body);
     requests.push({index,body,wire:init.body});
@@ -44,17 +44,21 @@ function fixture(faults=[{},{}], approved=urls.slice(0,faults.length)) {
     if(privateCall&&fault.httpResponse) return fault.httpResponse(body,init);
     if(privateCall&&fault.http) return fault.httpCode === undefined ? new Response('',{status:fault.http}) : Response.json({jsonrpc:'2.0',id:body.id,error:{code:fault.httpCode,message:'SECRET private payload'}},{status:fault.http});
     if(privateCall&&fault.wait) { fault.started?.(); await new Promise((resolve,reject)=>init.signal.addEventListener('abort',()=>reject(new Error('cancelled')),{once:true})); }
+    // Synthetic contract values follow the original operation ordinal, never
+    // the simulated block grouping chosen for discovery versus strict replay.
+    const offsets=[];let ordinal=0;
+    for(const block of blocks){offsets.push(ordinal);ordinal+=block.calls.length;}
     const result=blocks.map((b,i)=>({number:`0x${(19+i).toString(16)}`,timestamp:`0x${(BigInt(snapshot.timestamp)+12n*BigInt(i+1)).toString(16)}`,hash:hash(i+1),parentHash:i?hash(i):snapshot.hash,
       blockAccessListHash:hash(i+10),slotNumber:`0x${(11+i).toString(16)}`,
       transactions:b.calls.map(c=>({...c,gas:fault.cap&&BigInt(c.gas)>(fault.capacityGas??50000000n)?`0x${(fault.capacityGas??50000000n).toString(16)}`:!privateCall&&fault.sequenceCap&&blocks.length>=5&&i===4?'0x1':privateCall&&fault.aggregate&&i===4?'0x1':c.gas})),
-      calls:b.calls.map(c=>({status:privateCall&&fault.revert?'0x0':'0x1',gasUsed:fault.baseGas??(!privateCall?'0x2ee0':'0x5208'),...(!privateCall&&fault.noPreRefund?{}:{maxUsedGas:fault.baseGas??(!privateCall?'0x2ee0':'0x5208')}),returnData:!privateCall?'0x':c.data==='0xeeee'?encodeAbiParameters([{type:'string'}],[fault.metadata??tokenURI]):encodeAbiParameters([{type:'uint256'}],[c.data==='0xdddd'?500n:BigInt((i+1)*100)])}))}));
+      calls:b.calls.map((c,j)=>({status:privateCall&&fault.revert?'0x0':'0x1',gasUsed:fault.baseGas??(!privateCall?'0x2ee0':'0x5208'),...(!privateCall&&fault.noPreRefund?{}:{maxUsedGas:fault.baseGas??(!privateCall?'0x2ee0':'0x5208')}),returnData:!privateCall?'0x':c.data==='0xeeee'?encodeAbiParameters([{type:'string'}],[fault.metadata??tokenURI]):encodeAbiParameters([{type:'uint256'}],[c.data==='0xdddd'?500n:BigInt((offsets[i]+j+1)*100)])}))}));
     if(fault.sharedBudget!==undefined) {
       // Geth's gasBudget is shared across blocks, and consumes used gas after
       // each call. These are synthetic responses, not captured project bytes.
       let remaining=privateCall&&body.params[0].validation&&fault.strictBudget!==undefined?fault.strictBudget:fault.sharedBudget;
       for(const [i,b] of blocks.entries()) for(const [j,c] of b.calls.entries()) {
         const requested=BigInt(c.gas),allowed=requested<remaining?requested:remaining;
-        const demand=privateCall?(fault.projectGasByCall?.[i]??fault.projectGas??21000n):12000n,used=demand<allowed?demand:allowed;
+        const demand=privateCall?(fault.projectGasByCall?.[offsets[i]+j]??fault.projectGas??21000n):12000n,used=demand<allowed?demand:allowed;
         result[i].transactions[j].gas=`0x${allowed.toString(16)}`;
         Object.assign(result[i].calls[j],{gasUsed:`0x${used.toString(16)}`,maxUsedGas:`0x${used.toString(16)}`});
         if(demand>allowed) Object.assign(result[i].calls[j],{status:'0x0',returnData:'0x',error:{code:-32000,message:'synthetic out of gas'}});
@@ -70,6 +74,7 @@ function fixture(faults=[{},{}], approved=urls.slice(0,faults.length)) {
       if(fault.longGas) result[39].transactions[0].gas='0x5209';
       if(fault.longPreRefund) delete result[39].calls[0].maxUsedGas;
     }
+    if(privateCall) responses.push(structuredClone(result));
     return respond(result);
   };
   const readTransport={request:async r=>r.method==='eth_chainId'?'0xaa36a7':r.method==='eth_getBlockByNumber'?snapshot:'0x6000'};
@@ -80,7 +85,7 @@ function fixture(faults=[{},{}], approved=urls.slice(0,faults.length)) {
   }]);
   const options={rpcUrls:urls.slice(0,faults.length),approvedProjectRpcUrls:approved,readTransport,block:{number:18n,hash:snapshot.hash},fetchImpl,minIntervalMs:0,
     ...(providerCapabilities.length?{providerCapabilities}:{}),};
-  return {requests,privateRequests,options,transport:createKeelPublicSepoliaSimulationPool(options)};
+  return {requests,responses,privateRequests,options,transport:createKeelPublicSepoliaSimulationPool(options)};
 }
 
 function singleRecipientTransient({ fault, repeat = false, requestTimeoutMs, onAttempt, beforeResponse } = {}) {
@@ -526,15 +531,15 @@ test('a lower explicit envelope requalifies after a larger cap rejection without
 });
 
 test('the complete metadata read adapts its rejected ceiling while preserving exact transactions', async () => {
-  const f = fixture([{cap:true}]);
+  const f = fixture([{cap:true,capacityGas:40000000n}]);
   try {
     const input = fullPlan();
     for (const call of input.preparationCalls) call.gas = '0x989680';
-    input.maximumReadGas = 60000000n; input.metadataCall.gas = '0x3938700';
+    input.maximumReadGas = 50000000n; input.metadataCall.gas = '0x2faf080';
     const proof = await simulateKeelPublicationBeforeFunding(input, f.transport);
-    assert.equal(proof.requestedReadGasLimit, '60000000');
-    assert.equal(proof.effectiveReadGasLimit, '50000000');
-    assert.deepEqual(proof.readBoundaryAttempts, [{requestedGas:'60000000', providerGasCap:'50000000'}]);
+    assert.equal(proof.requestedReadGasLimit, '50000000');
+    assert.equal(proof.effectiveReadGasLimit, '40000000');
+    assert.deepEqual(proof.readBoundaryAttempts, [{requestedGas:'50000000', providerGasCap:'40000000'}]);
     const requests = f.privateRequests();
     assert.deepEqual(requests.map(request => request.body.params[0].blockStateCalls.length), [5,5,7]);
     const validated = requests[1].body.params[0].blockStateCalls;
@@ -795,13 +800,13 @@ test('shared discovery never reduces a measured margin, accepts a strict clamp o
     }finally{await f.transport.close();}
   }
 });
-test('shared discovery and a rejected 60M public-read ceiling preserve the strictly measured transactions',async()=>{
+test('shared discovery and a rejected 50M public-read ceiling preserve the strictly measured transactions',async()=>{
   const f=fixture([{sharedBudget:50000000n,measuredRequestGasCap:50000000n}],[urls[0]]),source=sharedBudgetPlan();
-  source.maximumReadGas=60000000n;source.metadataCall={...source.metadataCall,gas:'0x3938700'};
+  source.maximumReadGas=50000000n;source.metadataCall={...source.metadataCall,gas:'0x2faf080'};
   const before=structuredClone(source);
   try {
     const proof=await simulateKeelPublicationBeforeFunding(source,f.transport);
-    assert.deepEqual(source,before);assert.equal(proof.readBoundaryAttempts.length,2); // No extra adjustment for an oversized empty public control.
+    assert.deepEqual(source,before);assert.equal(proof.readBoundaryAttempts.length,1); // No extra adjustment for an oversized empty public control.
     assert.equal(proof.effectiveReadGasLimit,'49685000');
     const sent=f.privateRequests(),strict=sent.find(r=>r.body.params[0].validation).body.params[0].blockStateCalls;
     const replay=sent.filter(r=>r.body.params[0].blockStateCalls.length===16);
@@ -1485,4 +1490,24 @@ test('authenticated local capacity: verified whole-request cap rejects impossibl
   try{const result=await transport.request(input);assert.equal(result.length,45);assert.equal(f.requests.length,0,'No expensive public or project sequence can fit this authenticated lower bound');
     assert.equal(local.clients.length,1);assert.deepEqual(local.programs[0],input.params[0]);}
   finally{await transport.close();await f.transport.close();}
+});
+
+test('a publication over 256 calls reaches the pool as shared blocks, and the public probe uses the same layout',async()=>{
+  const f=fixture([{}]);
+  const preparationCalls=Array.from({length:300},(_,i)=>({...call(i),gas:'0x989680'}));
+  try {
+    const proof=await simulateKeelPublicationBeforeFunding({...fullPlan(),preparationCalls,assertions:[]},f.transport);
+    // The layout changes as measured envelopes shrink. Synthetic execution
+    // still returns the exact same ordered contract results on every replay.
+    assert.equal(f.responses[0].length,15);
+    assert.equal(f.responses[1].length,1);
+    assert.deepEqual(f.responses[0].flatMap(b=>b.calls).map(c=>c.returnData),f.responses[1].flatMap(b=>b.calls).map(c=>c.returnData));
+    assert.equal(proof.validatedTransactionCalls,300);
+    const projects=f.privateRequests().map(r=>r.body.params[0].blockStateCalls);
+    assert.ok(projects.length>=3 && projects.every(blocks=>blocks.length<=256 && blocks.some(b=>b.calls.length>1)));
+    assert.deepEqual(projects[0].flatMap(b=>b.calls).map(c=>c.nonce),preparationCalls.map(c=>c.nonce));
+    const probes=f.requests.filter(r=>r.body.method==='eth_simulateV1'&&r.body.params[0].blockStateCalls[0].calls[0].data==='0x'&&r.body.params[0].blockStateCalls.flatMap(b=>b.calls).length>1)
+      .map(r=>r.body.params[0].blockStateCalls.map(b=>b.calls.length));
+    assert.ok(projects.every(blocks=>probes.some(layout=>JSON.stringify(layout)===JSON.stringify(blocks.map(b=>b.calls.length)))));
+  } finally {await f.transport.close();}
 });

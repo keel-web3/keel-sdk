@@ -9,6 +9,8 @@ import {
   type KeelPayloadStorageMode,
   type Compression,
 } from "@keel/protocol";
+import { enforceKeelLinkGate } from "@keel/sdk/link-gate";
+import type { KeelExplicitExternalPreview } from "@keel/sdk/link-gate";
 import { chooseSmallestCompression, compressBytes } from "./compress.js";
 import type { ObjectUploadPlan } from "./types.js";
 
@@ -16,6 +18,7 @@ export interface CreateUploadPlanOptions {
   readonly objectName: string;
   readonly mediaType: string;
   readonly outputDirectory: string;
+  readonly externalPreviews?: readonly KeelExplicitExternalPreview[];
   readonly compression?: Compression | "auto";
   readonly payloadStorage?: KeelPayloadStorageMode;
   readonly maxChunkBytes?: number;
@@ -31,6 +34,7 @@ export async function createUploadPlan(
   options: CreateUploadPlanOptions,
 ): Promise<ObjectUploadPlan> {
   if (sourceBytes.byteLength === 0) throw new RangeError("Object source cannot be empty.");
+  await enforceKeelLinkGate({ route: "upload-plan", ...(options.externalPreviews === undefined ? {} : { externalPreviews: options.externalPreviews }), resources: [{ id: options.objectName, bytes: sourceBytes, mediaType: options.mediaType }] });
   const compression = resolveKeelPayloadCompression(options.payloadStorage, options.compression);
   const maxChunkBytes = positiveSafeInteger(options.maxChunkBytes ?? 23_000, "maxChunkBytes");
   if (maxChunkBytes > 23_000) throw new RangeError("maxChunkBytes cannot exceed the KeelHold limit of 23000.");

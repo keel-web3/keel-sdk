@@ -68,7 +68,9 @@ export async function compileKeelCreatorPreparedPublication(input: KeelCreatorPr
   const steps:KeelCreatorPublicationStep[]=[], assertions:{callIndex:number;returnData:Hex}[]=[];
   const call=(to:Hex,data:Hex,value=0n):KeelSimulationCall=>({from:owner,to,data,value:toHex(value),gas:toHex(maximumTransactionGas),...fees});
   const add=(phase:KeelCreatorPublicationStep["phase"],to:Hex,data:Hex,value=0n,expected?:Hex)=>{
-    if(steps.length>=255)throw new RangeError("Fresh publication exceeds the simulation call bound.");
+    // The pre-funding simulation packs consecutive calls into shared blocks, so this bound is the
+    // exact program's uint16 call index, not eth_simulateV1's 256-block limit.
+    if(steps.length>=65_535)throw new RangeError("Fresh publication exceeds the simulation call bound.");
     if(expected!==undefined)assertions.push({callIndex:steps.length,returnData:expected});
     steps.push({id:`${phase}:${steps.length}`,phase,call:call(to,data,value)});
   };

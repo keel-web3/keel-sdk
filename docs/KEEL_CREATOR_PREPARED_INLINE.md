@@ -39,8 +39,25 @@ MCP defaults to Ethereum Sepolia and the `creator-inline-20261005` store:
 }
 ```
 
-Call `keel-creator-inline-prepare` with these arguments. It writes an unsigned
-plan with exact source hashes, one stored prepared representation per payload,
+Call `keel-creator-inline-prepare` with these arguments. It first reads the
+selected instance's registered shell and reader profile from the chain:
+
+- Preparation uses the registry's latest shell revision unless
+  `shellRevision` pins one. On Sepolia, `creator-inline-20261005` revision 1
+  is the original Base90 shell, which existing tokens keep. Revision 2 (tx
+  0x855c3258bdbaa8dd4e4882cf43def4bf3a594b6854a0ed58cf8a09aee391749b) is URI81
+  with the legacy-strict reader grammar, and it is the default for fresh work.
+- A legacy-carriage (Base90) revision stops the tool with
+  `KEEL_REGISTERED_CARRIAGE_MISMATCH`, and nothing is written. Report it; do
+  not fall back to a web3://, IPFS or Hybrid pointer for a work under
+  2,000,000 bytes. The fix is to append a URI81 shell revision: upload the
+  suffix and reader profile, validate the suffix, then have the manager's
+  governor append the revision through `executeGovernance`.
+- Without a history-capable RPC (`rpc.setup-required`), the plan is written
+  with `shellAuthentication: "unavailable"`, and its first gate is to
+  authenticate (`pnpm rpc:configure`) and prepare again before any upload.
+
+Otherwise it writes an unsigned plan with exact source hashes, one stored prepared representation per payload,
 upload operations, container-table commitments, image carriage and immutable
 renderer binding arguments. Standard collector poster images use their native
 `data:image/...;base64,...` form, prepared once. The shell prefix and suffix are
@@ -87,6 +104,36 @@ const plan = await prepareKeelCreatorInline({
 6. Register the collection's mint route from its owner's wallet, explicitly
    enable creator-admin minting, then use `buildKeelCreatorAdminMintCall` to mint
    quantity one. Verify the receipt, `ownerOf(1)` and the minted public tokenURI.
+
+### Prove programs longer than 256 calls
+
+`eth_simulateV1` accepts 256 blocks per request. The pre-funding proof keeps
+one call per block up to 256 calls; a longer publication shares blocks between
+consecutive calls, in their order, so the whole program and its final
+tokenURI are still proven in one request. Each block's requested envelopes
+stay inside the actual block gas limit. On Amsterdam the proven envelope is
+the whole `maximumTransactionGas`, so set it near the measured need (a slug
+upload is about 36M total gas), not near the block limit: 190M envelopes in a
+200M block leave one call per block, and that plan stops before any payment.
+
+### Send in windows, not one receipt at a time
+
+A modular work is hundreds of calls; the grove was 313. Their only ordering is
+their order, and consecutive nonces already enforce it. So send them in windows:
+
+1. Call `planKeelSendWindow` (`@keel/sdk/send-window`) or MCP
+   `keel-send-window-plan` with the ordered calls and the first unmined index.
+2. It simulates the next calls in order with `eth_simulateV1`, one block each,
+   and returns every call's nonce and gas. Gas is the simulated use × 1.3, and
+   on Sepolia Amsterdam it includes state gas.
+3. Broadcast the whole window in nonce order without waiting.
+4. Read every receipt, and stop on the first that is not successful.
+5. Plan again from `nextIndex`.
+
+Don't estimate each call alone: a live estimate can't see the calls ahead of it
+that aren't mined yet. Don't use a fixed 16,777,216 gas limit either: on
+Amsterdam that covers execution only, so a slug upload of about 36M total gas
+reverts. On Sepolia, a 0.002 gwei tip is enough for inclusion.
 
 The unsigned plan does not sign or submit. Use the normal SDK/wallet publication
 workflow; preparation never bypasses source, URI, browser or wallet gates.

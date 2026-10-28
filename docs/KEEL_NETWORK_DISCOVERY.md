@@ -45,6 +45,11 @@ factory/renderer and COPY/storage bindings. A new artwork still requires its
 registered shell/reader, exact bytes, complete tokenURI, gas check, offline
 browser, creator approval and mint receipt/read-back.
 
+Before any of those pushes, every route runs the KEEL link gate: bytes that
+carry a web locator are refused, and embedded libraries are matched to the
+registered modules (with their selected-chain availability) to reuse instead.
+See [KEEL_LINK_GATE.md](KEEL_LINK_GATE.md) and the `keel-link-gate` tool.
+
 Public discovery starts at `https://studio.onkeel.io/.well-known/keel.json`.
 Its `networks.index` points to
 `https://studio.onkeel.io/deployments/networks.json`, schema

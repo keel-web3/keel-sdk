@@ -7,6 +7,9 @@ import {
   type KeelWalletTransport,
 } from "./wallet-request.js";
 
+import { snapshotKeelLinkGatePreviews } from "./link-gate.js";
+import type { KeelExplicitExternalPreview } from "./external-preview.js";
+
 export const KEEL_WALLET_INTENT_PROTOCOL = "keel-wallet-intent@1" as const;
 export const KEEL_WALLET_INTENT_QR_LIMIT = 24_576 as const;
 
@@ -252,7 +255,8 @@ function unsignedBody(plan: Omit<KeelWalletIntentPlan, "integrity" | "qr">, qr: 
 
 export async function createKeelWalletIntentPlan(inputValue: unknown): Promise<KeelWalletIntentResult> {
   const input = object(inputValue, "wallet intent input");
-  exact(input, ["family", "ready", "requestId", "label", "transport", "qr", "validateCalldata", "validateAdapterOperation"], "wallet intent input");
+  exact(input, ["family", "ready", "requestId", "label", "transport", "qr", "validateCalldata", "validateAdapterOperation", "externalPreviews"], "wallet intent input");
+  const externalPreviews = snapshotKeelLinkGatePreviews(input.externalPreviews as readonly KeelExplicitExternalPreview[] | undefined);
   const family = input.family;
   if (family !== "ethereum" && family !== "tezos") throw new TypeError("wallet intent family must be ethereum or tezos.");
   const requestId = text(input.requestId, "wallet intent.requestId", 128);
@@ -277,7 +281,7 @@ export async function createKeelWalletIntentPlan(inputValue: unknown): Promise<K
       to: item.to,
       data: item.data,
       valueWei: item.valueWei,
-    }));
+    }, { externalPreviews }));
   }
   const base = {
     protocol: KEEL_WALLET_INTENT_PROTOCOL,

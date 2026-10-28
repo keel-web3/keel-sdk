@@ -129,6 +129,7 @@ export async function launchCspBrowser(binary,{fixtureMode='csp-audio'}={}) {
   const fixtureArgs={
     'csp-audio':['--mute-audio','--autoplay-policy=document-user-activation-required'],
     'dom-dump':[],
+    'byte-policy':['--no-sandbox','--disable-gpu','--disable-background-networking','--no-first-run','--disable-crash-reporter','--disable-breakpad'],
     'link-dom-dump':['--ignore-certificate-errors','--disable-features=BlockInsecurePrivateNetworkRequests,LocalNetworkAccessChecks'],
   }[fixtureMode];
   if(fixtureArgs===undefined)throw new TypeError('Unknown browser fixture mode');

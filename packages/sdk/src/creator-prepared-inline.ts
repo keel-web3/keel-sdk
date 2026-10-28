@@ -4,10 +4,28 @@ import { buildKeelOnchainContainerBinding } from "./verification-shell.js";
 import { buildKeelPreparedDenseCopyShell, prepareKeelDensePayload, prepareKeelGzipDensePayload } from "./prepared-dense-copy.js";
 import { prepareKeelDenseCopyFragment, serializeKeelDenseTransportJSON } from "./dense-transport.js";
 import { assertKeelInlineImageBytes } from "./collector-policy.js";
+import { enforceKeelLinkGate } from "./link-gate.js";
 import { normalizedAddress, uint } from "./validation.js";
 import { resolveKeelPayloadStorage, resolveKeelShell, type KeelPayloadStorageMode, resolveKeelPreparationReadBounds, type KeelTokenURIPreparationBudget, type KeelExplicitNonstandardReadPolicy } from "@keel/protocol";
 
 const MEDIA = "application/vnd.keel.token-uri-raw-percent-fragment";
+
+/** The registered shell's loader rewrites import/export statements with these exact patterns, then refuses any
+ * import or export left over. It runs in the collector's browser, after publication, so a module it cannot
+ * rewrite is a minted token that shows "Verification failed". Run the same rewrite here, before any planning.
+ * The common miss is bundler output that starts an import right after a closing brace: `}import{...}from"..."`. */
+export function assertKeelVerifiedModuleSyntax(source: string, id: string): void {
+  const rest = source
+    .replace(/(^|[;\n])\s*import\s*([^;\n]+?)\s*from\s*(["'])([^"']+)\3\s*;?/gu, "$1")
+    .replace(/(^|[;\n])\s*import\s*(["'])([^"']+)\2\s*;?/gu, "$1")
+    .replace(/(^|[;\n}])\s*export\s*\{([^}]*)\}\s*from\s*(["'])([^"']+)\3\s*;?/gu, "$1")
+    .replace(/(^|[;\n}])\s*export\s+((?:async\s+)?(?:function|class|const|let|var))\s+([A-Za-z_$][A-Za-z0-9_$]*)/gu, "$1$2 $3")
+    .replace(/(^|[;\n}])\s*export\s*\{([^}]*)\}\s*;?/gu, "$1");
+  const left = /(^|[;\n}])\s*(?:import|export)\b/u.exec(rest);
+  if (left === null) return;
+  const at = rest.slice(left.index, left.index + 60).replace(/\s+/gu, " ");
+  throw Object.assign(new TypeError(`Verified module ${id} has an import or export the registered loader cannot run (near "${at}"). Start every import and export statement after ";" or a newline; bundlers can emit "}import{". Nothing was prepared.`), { code: "KEEL_VERIFIED_MODULE_SYNTAX", id });
+}
 
 /** The registered inline loader consumes completed module exports in descriptor
  * order. Resolve its supported static imports before producing fresh fragments;
@@ -35,6 +53,7 @@ function creatorModulePlaybackOrder(resources: readonly {
       /(^|[;\n])\s*import\s*(["'])([^"']+)\2\s*;?/gu,
       /(^|[;\n}])\s*export\s*\{[^}]*\}\s*from\s*(["'])([^"']+)\2\s*;?/gu,
     ]) for (const match of source.matchAll(pattern)) imports.add(reference(match[3]!));
+    assertKeelVerifiedModuleSyntax(source, resource.id);
     dependencies.set(resource.id, imports);
   }
   const active = new Set<string>(), completed = new Set<string>(), ordered: string[] = [];
@@ -100,6 +119,11 @@ export async function prepareKeelCreatorInline(input: {
   if (/^0x0{40}$/u.test(store)) throw new TypeError("A deployed store is required.");
   if (!Number.isSafeInteger(input.chainId) || input.chainId <= 0) throw new TypeError("Invalid creator chain.");
   const chainId = input.chainId;
+  // Refuse link-bearing creator bytes before any carrier is planned, not late at the viewer slot.
+  await enforceKeelLinkGate({ route: "keel-creator-inline-prepare", chainId, resources: [
+    ...input.resources.map((resource) => ({ id: resource.id, bytes: resource.bytes, mediaType: resource.mediaType })),
+    { id: "poster", bytes: input.poster.bytes, mediaType: input.poster.mediaType },
+  ] });
   const compression = input.compression ?? "auto";
   const brotliQuality = input.brotliQuality;
   const readerGrammar = input.readerGrammar ?? "uri81";

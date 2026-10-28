@@ -18,6 +18,7 @@ export * from "./keel-document.js";
 export * from "./fray-upload.js";
 export * from "./collection-verification.js";
 export * from "./prepared-envelope-capability.js";
+export * from "./link-gate.js";
 export * from "./wallet-request.js";
 export * from "./wallet-intent.js";
 export * from "./wallet-link.js";

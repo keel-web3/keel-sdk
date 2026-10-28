@@ -18,19 +18,21 @@ export function measureKeelPublicationSimulationRequest(request: { readonly meth
     || !program || Object.keys(program).some(key => !["blockStateCalls", "validation", "traceTransfers", "returnFullTransactions"].includes(key))
     || typeof program.validation !== "boolean" || program.traceTransfers !== false || program.returnFullTransactions !== true
     || !Array.isArray(blocks) || blocks.length < 1 || blocks.length > 256) invalid("Owned simulation requires the complete, numbered-block program without overrides.");
-  let conservativeGasBudget = 0n, maximumCallGas = 0n;
+  let conservativeGasBudget = 0n, maximumCallGas = 0n, callCount = 0;
   for (const item of blocks as unknown[]) {
     const block = object(item), calls = block?.calls;
-    if (!block || Object.keys(block).length !== 1 || !Array.isArray(calls) || calls.length !== 1) invalid("Each simulation block must contain one exact planned call and no overrides.");
-    const call = object((calls as unknown[])[0]);
-    const gas = quantity(call?.gas);
-    if (!call || Object.keys(call).some(key => !["from", "to", "data", "value", "gas", "nonce", "gasPrice", "maxFeePerGas", "maxPriorityFeePerGas"].includes(key))
-      || gas === undefined || gas <= 0n || gas > MAX_UINT64) invalid("Owned simulation requires explicit bounded call gas and no call overrides.");
-    conservativeGasBudget += gas!;
-    if (gas! > maximumCallGas) maximumCallGas = gas!;
+    if (!block || Object.keys(block).length !== 1 || !Array.isArray(calls) || !calls.length) invalid("Each simulation block must contain exact planned calls and no overrides.");
+    for (const value of calls as unknown[]) {
+      const call = object(value);
+      const gas = quantity(call?.gas);
+      if (!call || Object.keys(call).some(key => !["from", "to", "data", "value", "gas", "nonce", "gasPrice", "maxFeePerGas", "maxPriorityFeePerGas"].includes(key))
+        || gas === undefined || gas <= 0n || gas > MAX_UINT64) invalid("Owned simulation requires explicit bounded call gas and no call overrides.");
+      conservativeGasBudget += gas!; callCount++;
+      if (gas! > maximumCallGas) maximumCallGas = gas!;
+    }
   }
   if (conservativeGasBudget > MAX_UINT64) invalid("The complete simulation request exceeds the supported RPC budget range.");
-  return Object.freeze({ blockCount: (blocks as unknown[]).length, callCount: (blocks as unknown[]).length,
+  return Object.freeze({ blockCount: (blocks as unknown[]).length, callCount,
     requestBytes: new TextEncoder().encode(encode(request)).byteLength, conservativeGasBudget, maximumCallGas });
 }
 

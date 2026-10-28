@@ -1,6 +1,8 @@
 export * from "./types.js";
 export * from "./compress.js";
 export * from "./plan.js";
+export type { KeelExplicitExternalPreview } from "@keel/sdk/link-gate";
+export { assertKeelLinkGate, enforceKeelLinkGate, scanKeelLinkGate, KeelLinkGateRefusal } from "@keel/sdk/link-gate";
 export * from "./wrap.js";
 export * from "./recursive-plan.js";
 export * from "./pipeline.js";

@@ -376,7 +376,7 @@ test("historical compressed assets remain exact locally while fresh Inline rejec
 test("canonical Inline publication has one shell top, ordered middle, and one shell bottom", async () => {
   const shell = await buildKeelInlineShellFragments({ repositoryRoot });
   const p5 = await buildKeelInlineModuleFragment({
-    moduleId: "p5.js",
+    moduleId: "test.synthetic-p5",
     version: "1.11.3",
     mediaType: "text/javascript",
     decodedBytes: utf8("globalThis.p5=class{}"),
@@ -537,7 +537,7 @@ test("published canonical fragments survive platform-specific module recompressi
   const moduleBytes = utf8(`globalThis.p5=${JSON.stringify("flow".repeat(20_000))}`);
   const aliases = ["p5.min.js", "./p5.min.js", "p5.js"];
   const canonicalModule = await buildKeelInlineModuleFragment({
-    moduleId: "p5.js",
+    moduleId: "test.synthetic-p5",
     version: "1.11.3",
     mediaType: "text/javascript",
     aliases,
@@ -566,7 +566,7 @@ test("published canonical fragments survive platform-specific module recompressi
   }));
   await verifyKeelPublishedInlineModuleFragment({
     fragment: published[1],
-    moduleId: "p5.js",
+    moduleId: "test.synthetic-p5",
     mediaType: "text/javascript",
     aliases,
     decodedBytes: moduleBytes,
@@ -575,7 +575,7 @@ test("published canonical fragments survive platform-specific module recompressi
   // Deflate stands in for another runtime's byte-different compression. The
   // creator graph must consume the already-published canonical gzip slot.
   const recompressedModule = await buildKeelInlineModuleFragment({
-    moduleId: "p5.js",
+    moduleId: "test.synthetic-p5",
     version: "1.11.3",
     mediaType: "text/javascript",
     aliases,
@@ -600,7 +600,7 @@ test("published canonical fragments survive platform-specific module recompressi
   await assert.rejects(
     verifyKeelPublishedInlineModuleFragment({
       fragment: published[1],
-      moduleId: "p5.js",
+      moduleId: "test.synthetic-p5",
       mediaType: "text/javascript",
       aliases,
       decodedBytes: utf8("tampered"),

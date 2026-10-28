@@ -470,6 +470,11 @@ const endpointConfig: JsonSchema = object({
   indexerUrl: string("Optional credential-free HTTPS indexer origin.", 512),
 });
 
+const externalPreviewCommitments: JsonSchema = { type: "array", maxItems: 16, description: "Exact existing image-preview source commitments; no availability or signing permission is granted.", items: object({
+      schema: { type: "string", enum: ["keel-explicit-external-preview@1"] }, uri: string(undefined, 2048), mediaType: { type: "string", enum: ["image/png", "image/jpeg", "image/gif", "image/webp", "image/avif", "image/svg+xml"] },
+      sourceIntegrity: object({ algorithm: { type: "string", enum: ["sha256"] }, digest: string(), byteLength: integer(undefined, 1) }, ["algorithm", "digest", "byteLength"]),
+    }, ["schema", "uri", "mediaType", "sourceIntegrity"]) };
+
 export const TOOL_SCHEMAS = {
   analyze: object({ input: string("Workspace-relative media path."), mediaType: string() }, ["input"]),
   mediaOptimize: object({
@@ -500,6 +505,7 @@ export const TOOL_SCHEMAS = {
     maxChunkBytes: integer(), leafDecodedBytes: integer(), maxPartsPerComposite: integer(), maxTreeDepth: integer(),
   }, ["input"]),
   uploadPlan: object({
+    externalPreviews: externalPreviewCommitments,
     payloadStorage: { type: "string", enum: [...KEEL_PAYLOAD_STORAGE_MODES], default: KEEL_DEFAULT_PAYLOAD_STORAGE, description: "Compact uses native payload bytes with lossless compression when beneficial. Raw keeps supplied bytes unchanged; separate from shell and delivery." },
     input: string("Workspace-relative source file."), objectName: string(undefined, 128), mediaType: string(undefined, 128),
     strategy: { type: "string", enum: ["flat", "recursive"] },
@@ -507,12 +513,14 @@ export const TOOL_SCHEMAS = {
     maxChunkBytes: integer(undefined, 1, 23000), leafDecodedBytes: integer(undefined, 4096), maxPartsPerComposite: integer(undefined, 2, 128),
   }, ["input", "objectName", "mediaType"]),
   chainPlan: object({
+    externalPreviews: externalPreviewCommitments,
     plan: string("Workspace-relative materialized upload-plan JSON."),
     family: { type: "string", enum: ["ethereum"] },
     chainId: integer(undefined, 1), target: string(),
     out: string("Optional workspace-relative .json path. Large descriptor plans are written in full to a file and returned as path + sha256; pass that path to publish-plan as chainPlanPath."),
   }, ["plan", "family", "chainId", "target"]),
   ethereumEncode: object({
+    externalPreviews: externalPreviewCommitments,
     plan: string("Workspace-relative materialized upload-plan JSON."),
     family: { type: "string", enum: ["ethereum"] },
     chainId: integer(undefined, 1), target: string(), qr: boolean(),
@@ -549,6 +557,7 @@ export const TOOL_SCHEMAS = {
   moduleResolve: object({ snapshot: string(), selector: moduleSelector }, ["snapshot", "selector"]),
   moduleLock: object({ snapshot: string(), out: string(), selector: moduleSelector }, ["snapshot", "out", "selector"]),
   walletRequestPrepare: object({
+    externalPreviews: externalPreviewCommitments,
     request: walletRequest,
     deploy: object({
       artifactPath: string("Workspace compiler artifact JSON (Foundry out/*.json or Hardhat) with abi and creation bytecode."),

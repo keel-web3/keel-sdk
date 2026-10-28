@@ -76,6 +76,13 @@ this order; it is not advice:
    `module-review-prepare`, `keel-tezos-shell-prepare`,
    `keel-tezos-publication-prepare`.
 
+Every build and request tool also runs the KEEL link gate on the bytes it
+would push: any `http(s)://`, `ipfs://`, `ar://`, `web3://` or `keel-onchain://`
+locator (only the SVG namespace is allowed), including inside compressed and
+encoded layers, refuses with `code: "external-link-found"`, the resource, byte
+offset, URL and context, plus the registered KEEL modules to reuse. Run
+`keel-link-gate` to check bytes first. See `docs/KEEL_LINK_GATE.md`.
+
 Every step-8 tool takes `standards: { preflightReceipt, auditDigest?, workKind? }`.
 Without valid evidence it refuses: the result has `isError: true` and
 `structuredContent` `{ code, nextTool, next }`, for example
