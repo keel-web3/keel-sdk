@@ -37,9 +37,25 @@ test('historical sixteen-call transcript retains its fee-free discovery and raw 
   assert.equal(strict.response.result, undefined);
 });
 
-test('current Amsterdam total allowances and fees preserve calldata and fixture strict -38013 stays terminal', async () => {
+test('historical unsigned 60M input is rejected by fresh 50M policy before RPC', async () => {
+  const input = structuredClone(recorded.input), before = structuredClone(recorded);
+  for (const key of ['blockNumber', 'maximumReadGas', 'maximumTransactionGas']) input[key] = BigInt(input[key]);
+  assert.equal(input.maximumReadGas, 60_000_000n);
+  let requests = 0;
+  await assert.rejects(simulateKeelStorageBeforeFunding(input, { request: async () => {
+    requests++; throw new Error('Fresh out-of-policy input must not reach RPC.');
+  } }), error => error.kind === 'configuration-invalid' && /selected reader\/provider bounds/u.test(error.message));
+  assert.equal(requests, 0);
+  assert.deepEqual(recorded, before);
+});
+
+test('fresh 50M read uses measured Amsterdam total gas and exact fees; strict -38013 stays terminal', async () => {
   const input = structuredClone(recorded.input);
   for (const key of ['blockNumber', 'maximumReadGas', 'maximumTransactionGas']) input[key] = BigInt(input[key]);
+  // This is a new unsigned fixture, not a retained paid journal. Keep the
+  // historical 60M record immutable and use today's default for its read only.
+  input.maximumReadGas = 50_000_000n;
+  input.metadataCall.gas = `0x${input.maximumReadGas.toString(16)}`;
   const before = structuredClone(recorded.requests);
   let cursor = 0;
   await assert.rejects(simulateKeelStorageBeforeFunding(input, { request: async request => {
@@ -48,12 +64,21 @@ test('current Amsterdam total allowances and fees preserve calldata and fixture 
     const expected = structuredClone({ method: actual.method, params: actual.params });
     if (expected.method === 'eth_simulateV1') {
       for (const [index, block] of expected.params[0].blockStateCalls.entries()) {
-        // Amsterdam separates state gas from execution maxUsedGas. Current
-        // strict replay keeps the input's complete bounded total allowance;
-        // the archived execution-only margin is historical fixture evidence.
-        block.calls[0].gas = input.preparationCalls[index].gas;
-        for (const key of ['gasPrice', 'maxFeePerGas', 'maxPriorityFeePerGas']) {
-          if (input.preparationCalls[index][key] !== undefined) block.calls[0][key] = input.preparationCalls[index][key];
+        if (expected.params[0].validation) {
+          // The recorded provider maxUsedGas is total pre-refund consumption.
+          // Strict replay uses that measurement plus rounded 5%, never the
+          // unmeasured 200M discovery ceiling. Preserve the original fee style.
+          const measured = BigInt(recorded.requests.at(-2).response.result[index].calls[0].maxUsedGas);
+          const padded = measured + (measured + 19n) / 20n;
+          const maximum = BigInt(input.preparationCalls[index].gas);
+          assert.equal(BigInt(block.calls[0].gas), padded < maximum ? padded : maximum);
+          assert.ok(BigInt(block.calls[0].gas) < maximum);
+          for (const key of ['gasPrice', 'maxFeePerGas', 'maxPriorityFeePerGas']) {
+            if (input.preparationCalls[index][key] !== undefined) block.calls[0][key] = input.preparationCalls[index][key];
+          }
+        } else {
+          block.calls[0].gas = input.preparationCalls[index].gas;
+          for (const key of ['gasPrice', 'maxFeePerGas', 'maxPriorityFeePerGas']) delete block.calls[0][key];
         }
       }
     }
@@ -64,7 +89,7 @@ test('current Amsterdam total allowances and fees preserve calldata and fixture 
     return structuredClone(actual.response.result);
   } }), error => {
     assert.equal(error.kind, 'configuration-invalid');
-    assert.equal(error.diagnostic.rpcCode, -38013);
+    assert.equal(error.diagnostic?.rpcCode, -38013);
     assert.equal(error.diagnostic.transactionValidation, 'intrinsic-gas');
     assert.doesNotMatch(error.message, /Retry the same prepared plan|Correct the saved plan/);
     return true;

@@ -364,7 +364,21 @@ test('public qualification uses observed nonzero nonce and records the exact sel
     const prep={from:owner,to:owner,data:encodeKeelAtomicWalletBatch([{to:target,data:'0x1234',value:'0x0'}]),value:'0x0',nonce:'0x6',gas,maxFeePerGas:'0x1000000',maxPriorityFeePerGas:'0xf4240'};
     const job={transactionContext:'atomic-wallet',planFingerprint:'0x'+'aa'.repeat(32),chainId:11155111,blockNumber:18n,reader,readerRuntimeCodeHash:keccak256('0x6000'),preparationCalls:[prep],metadataCall:{from:owner,to:reader,data:'0x1234',value:'0x0',gas:'0xf4240'},expectedTokenURI:expected,maximumTokenUriBytes:2_000_000,maximumReadGas:1_000_000n,collectionOverheadGas:10_000n,maximumTransactionGas:200_000_000n};
     if(failure)await assert.rejects(simulateKeelPublicationBeforeFunding(job,t),e=>e.kind===({metadata:'metadata-mismatch',revert:'execution-reverted',nonce:'unsupported-simulation',maximum:'unsupported-simulation'})[failure]);
-    else {const proof=await simulateKeelPublicationBeforeFunding(job,t);assert.equal(proof.completeTokenUriBytes,Buffer.byteLength(expected));assert.equal(proof.transactionGasPolicy.profile,'sepolia-amsterdam');assert.equal(proof.transactionGasLimits[0],BigInt(prep.gas).toString(),'Amsterdam retains the exact atomic total-gas envelope rather than an execution-only margin');assert.equal(proof.validatedTransactionCalls,1);assert.equal(proof.signing,'not-performed');assert.equal(proof.submission,'not-performed');}
+    else {
+      const proof=await simulateKeelPublicationBeforeFunding(job,t);
+      const measured=BigInt(incident.successfulPreRefundGasUsed),padded=(measured*120n+99n)/100n;
+      const expectedGas=padded<BigInt(prep.gas)?padded:BigInt(prep.gas);
+      assert.equal(proof.completeTokenUriBytes,Buffer.byteLength(expected));
+      assert.equal(proof.transactionGasPolicy.profile,'sepolia-amsterdam');
+      assert.equal(proof.transactionGasLimits[0],expectedGas.toString(),'Use total pre-refund measurement plus rounded 20% for the atomic wallet');
+      assert.ok(expectedGas<BigInt(prep.gas),'Do not promote the discovery ceiling into the validated transaction');
+      const strict=nodes.flatMap(simulationRequests).filter(r=>r.params[0].validation)
+        .flatMap(r=>r.params[0].blockStateCalls).flatMap(b=>b.calls)
+        .filter(c=>c.data===prep.data&&BigInt(c.gas)===expectedGas);
+      assert.ok(strict.length>0,'The exact reduced total-gas envelope must actually pass strict replay');
+      for(const call of strict)assert.deepEqual(call,{...prep,gas:`0x${expectedGas.toString(16)}`});
+      assert.equal(proof.validatedTransactionCalls,1);assert.equal(proof.signing,'not-performed');assert.equal(proof.submission,'not-performed');
+    }
     assert.equal(nodes.length,2);assert.ok(nodes.every(n=>n.requests.every(r=>['eth_chainId','eth_getBlockByNumber','eth_getTransactionCount','eth_getBalance','eth_getCode','eth_simulateV1'].includes(r.method))));
     await t.close();assert.ok(nodes.every(n=>n.closed===1));
   }

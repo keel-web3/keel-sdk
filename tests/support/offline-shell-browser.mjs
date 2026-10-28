@@ -41,6 +41,36 @@ export function pageRequestsFromNetLog(log,origin) {
     .map(params=>params.url);
 }
 
+/** Keep startup failures actionable without retaining unbounded browser logs.
+ * This observes the existing launch; it never changes flags or permits traffic. */
+export function waitForOfflineBrowserEndpoint(child,binary,timeout) {
+  assert.ok(Number.isSafeInteger(timeout)&&timeout>0&&timeout<=60000);
+  const started=Date.now();
+  return new Promise((resolve,reject)=>{
+    let stderr=Buffer.alloc(0),settled=false;
+    const details=()=>`binary=${binary}; elapsedMs=${Date.now()-started}; exitCode=${child.exitCode}; signal=${child.signalCode}; stderr=${JSON.stringify(stderr.toString())}`;
+    const finish=(error,endpoint)=>{
+      if(settled)return;settled=true;clearTimeout(timer);
+      child.removeListener('error',onError);child.removeListener('exit',onExit);child.stderr.removeListener('data',onData);
+      // Continue draining the pipe after discovery so later warnings cannot
+      // block the browser or accumulate in this helper's retained diagnostics.
+      child.stderr.resume();
+      if(error)reject(error);else resolve(endpoint);
+    };
+    const onError=error=>finish(new Error(`Chromium failed to start: ${error.message} (${details()})`));
+    const onExit=(code,signal)=>finish(new Error(`Chromium exited before qualification: ${code}; signal=${signal} (${details()})`));
+    const onData=chunk=>{
+      const combined=Buffer.concat([stderr,Buffer.from(chunk)]);
+      const match=/DevTools listening on (ws:\/\/127\.0\.0\.1:\d+\/\S+)\r?\n/u.exec(combined.toString());
+      stderr=combined.subarray(-16384);
+      if(match)finish(undefined,match[1]);
+    };
+    const timer=setTimeout(()=>finish(new Error(`Chromium debugging endpoint timed out (${details()})`)),timeout);
+    child.once('error',onError);child.once('exit',onExit);child.stderr.on('data',onData);
+    if(child.exitCode!==null||child.signalCode!==null)onExit(child.exitCode,child.signalCode);
+  });
+}
+
 /** Isolated browser, loopback fixture only. External page requests are blocked
  * before transmission and recorded, so a negative control tests the observer. */
 export async function observeOfflineShell(html, terminalState='verified', expectedSignal, options={}) {
@@ -72,12 +102,7 @@ export async function observeOfflineShell(html, terminalState='verified', expect
   const child=spawn(binary,['--headless','--no-sandbox','--disable-dev-shm-usage','--disable-background-networking','--disable-client-side-phishing-detection','--disable-features=OptimizationHints,MediaRouter,AutofillServerCommunication,PreconnectToSearch,SearchEnginePreconnect','--safebrowsing-disable-auto-update','--disable-component-update','--disable-domain-reliability','--disable-sync','--disable-default-apps','--disable-extensions','--no-first-run','--no-default-browser-check','--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE 127.0.0.1, EXCLUDE localhost',`--proxy-server=http://127.0.0.1:${browserProxy.address().port}`,'--remote-debugging-port=0',`--log-net-log=${netlogPath}`,`--user-data-dir=${profile}`,'about:blank'],{stdio:['ignore','ignore','pipe']});
   let socket,sequence=0;const pending=new Map(),attempts=[];
   try {
-    const endpoint=await new Promise((resolve,reject)=>{
-      let stderr='';const timer=setTimeout(()=>reject(new Error('Chromium debugging endpoint timed out')),startupTimeout);
-      child.on('error',error=>{clearTimeout(timer);reject(error);});
-      child.stderr.on('data',chunk=>{stderr+=chunk.toString();const match=/DevTools listening on (ws:\/\/127\.0\.0\.1:\d+\/\S+)/u.exec(stderr);if(match){clearTimeout(timer);resolve(match[1]);}});
-      child.on('exit',code=>{clearTimeout(timer);reject(new Error(`Chromium exited before qualification: ${code}`));});
-    });
+    const endpoint=await waitForOfflineBrowserEndpoint(child,binary,startupTimeout);
     socket=new WebSocket(endpoint);await new Promise((resolve,reject)=>{socket.addEventListener('open',resolve,{once:true});socket.addEventListener('error',reject,{once:true});});
     const command=(method,params={},sessionId)=>new Promise((resolve,reject)=>{
       const id=++sequence;const timer=setTimeout(()=>{pending.delete(id);reject(new Error(`CDP ${method} timed out`));},10000);
