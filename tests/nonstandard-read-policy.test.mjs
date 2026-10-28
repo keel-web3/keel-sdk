@@ -22,8 +22,8 @@ export function policyFor(tokenURI=uri) {
   const limits={maximumTokenUriBytes:Buffer.byteLength(tokenURI),maximumRpcResponseBytes:keelTokenURIRpcResponseBytes(Buffer.byteLength(tokenURI)),maximumReadGas:'60000000'};
   return createKeelExplicitNonstandardReadPolicy({identity,limits,acknowledgementKey:keelNonstandardReadAcknowledgementKey({identity,limits})});
 }
-test('standard read bounds stay exactly 2M and 60M; ABI/padding/hex/JSON are counted independently',()=>{
-  assert.deepEqual(resolveKeelTokenURIReadBounds(),{maximumTokenUriBytes:2_000_000,maximumRpcResponseBytes:4_004_224,maximumReadGas:60_000_000n});
+test('standard read bounds stay exactly 2M and 50M; ABI/padding/hex/JSON are counted independently',()=>{
+  assert.deepEqual(resolveKeelTokenURIReadBounds(),{maximumTokenUriBytes:2_000_000,maximumRpcResponseBytes:4_004_224,maximumReadGas:50_000_000n});
   assert.equal(keelTokenURIRpcResponseBytes(2_000_001),4_004_288);
   assert.throws(()=>keelTokenURIRpcResponseBytes(Number.MAX_SAFE_INTEGER),/safe/);
 });

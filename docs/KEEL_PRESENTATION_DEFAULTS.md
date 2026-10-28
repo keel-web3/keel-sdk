@@ -1,0 +1,9 @@
+# Presentation defaults
+
+Fresh art recommends the registered KEEL verification shell. An explicit creator-owned/no-shell selection is preserved and makes no canonical protection claim.
+
+For original image-category inputs strictly larger than 900,000 decimal bytes, Automatic recommends a pinned IPFS preview URI in `image` and the verification shell in `animation_url`. This is an original-input threshold, not a thumbnail upload cap or proof of complete returned size. The original remains in the onchain inventory once; the external preview is not another full inline metadata image. Studio does not invent a CID or pinning receipt. Supply and verify the exact preview URI; if pinning or the selected-chain adapter is unavailable, the recommendation stays blocked. Explicit Inline image, Hybrid and no-shell alternatives remain reviewable. Hosted HTTPS previews are explicit alternatives with host availability risk.
+
+The standard complete single `tokenURI` read budget defaults to 50,000,000 gas. At or above that measured cost, recommend a qualified Hybrid reader to reduce the single-call work. The complete UTF-8 return, image/animation contributions under actual outer encoding, ABI/JSON response size, reader and provider gas limits remain separate mandatory checks. Source/compressed size alone cannot prove compatibility. An unrelated revert is not evidence of oversized metadata.
+
+An explicit nonstandard KEEL read binds the exact measured URI digest/length, source, project/revision, defaults, chain, plan and physical read bounds to an acknowledgement. It is not a provider capability or publication proof; exact simulation, receipts/readback and browser decoding still apply. Other marketplaces may not support it. A missing qualified route remains blocked. Existing paid plans and retained choices are never rebuilt by these defaults.

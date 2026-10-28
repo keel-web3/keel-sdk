@@ -1,9 +1,12 @@
 import { decodeBase64, encodeBase64 } from "./bytes.js";
+import { KEEL_STANDARD_TOKEN_URI_READ_GAS } from "./nonstandard-read-policy.js";
 import { canonicalJson } from "./canonical.js";
 import { sha256Hex } from "./integrity.js";
 
 /** Decimal byte counts. Asset size, encoded image size and complete metadata are independent gates. */
 export const KEEL_SMART_INLINE_ASSET_MAX_BYTES = 500_000;
+/** Original image-category input, decimal bytes; not a preview upload cap. */
+export const KEEL_SMART_IPFS_IMAGE_THRESHOLD_BYTES = 900_000;
 export const KEEL_SMART_SPLIT_ASSET_THRESHOLD_BYTES = 2_000_000;
 export const KEEL_SMART_INLINE_IMAGE_URI_MAX_BYTES = 1_750_000;
 export const KEEL_SMART_TOKEN_URI_MAX_BYTES = 2_000_000;
@@ -269,7 +272,8 @@ export function planKeelSmartAssetPresentation(input: KeelSmartAssetPresentation
   const sourceMotion = input.sourceMotion ?? "unknown";
   if (!["still", "animated", "unknown"].includes(sourceMotion)) throw new TypeError("Actual source motion classification is required.");
   const assetPresentation = parseKeelAssetPresentationPreference(input.assetPresentation ?? "automatic");
-  const fallbackDelivery = input.fallbackDelivery === undefined ? undefined : parseKeelPresentationFallbackDelivery(input.fallbackDelivery);
+  const largeImage = original.mediaType.startsWith("image/") && (original.byteLength ?? 0) > KEEL_SMART_IPFS_IMAGE_THRESHOLD_BYTES;
+  const fallbackDelivery = input.fallbackDelivery === undefined ? largeImage ? "ipfs" : undefined : parseKeelPresentationFallbackDelivery(input.fallbackDelivery);
   const externalPreviewUri = input.externalPreviewUri === undefined ? undefined : parseKeelExternalPreviewUri(input.externalPreviewUri);
   let externalPresentation: KeelExternalPresentation | undefined;
   if (input.externalPresentation !== undefined) {
@@ -332,6 +336,7 @@ export function planKeelSmartAssetPresentation(input: KeelSmartAssetPresentation
     if (over("prefixBytes", "maxEnvelopeBytes") || over("suffixBytes", "maxEnvelopeBytes")) hardBlockers.push("deployed-envelope-limit");
     if (Number(measured.literalMediaPrefixBytes ?? 0) > 0) hardBlockers.push("native-media-duplicated-in-literal-prefix");
     for (const [actual, maximum, reason] of [["executionGas", "maxExecutionGas", "transaction-execution-limit"], ["stateGas", "maxStateGas", "transaction-state-limit"], ["readGas", "maxReadGas", "public-read-limit"], ["completeTokenUriBytes", "maximumTokenUriBytes", "actual-reader-output-limit"]]) if (over(actual!, maximum!)) hardBlockers.push(reason!);
+    if (measured.readGas !== undefined && BigInt(measured.readGas) >= KEEL_STANDARD_TOKEN_URI_READ_GAS) compatibilityWarnings.push("complete-read-at-or-above-standard-gas-target");
     if (Number(measured.completeTokenUriBytes ?? 0) > KEEL_SMART_TOKEN_URI_MAX_BYTES) compatibilityWarnings.push("complete-metadata-above-standard-target");
     if (layout.image === "inline" && (Number(measured.imageUriBytes ?? 0) > KEEL_SMART_INLINE_IMAGE_URI_MAX_BYTES || Number(measured.encodedImageSlotBytes ?? 0) > KEEL_SMART_INLINE_IMAGE_URI_MAX_BYTES)) compatibilityWarnings.push("inline-image-above-compatibility-target");
     if (measured.completeTokenUriBytes === undefined) remainingChecks.push("actual-complete-render-measurement");
@@ -347,28 +352,35 @@ export function planKeelSmartAssetPresentation(input: KeelSmartAssetPresentation
     const route = id === "direct-onchain-asset" ? "direct-onchain-asset" : id === "image-only-inline" ? "image-only" : id === "media-only-inline" ? "inline-media" : external ? "external-presentation" : hybrid ? "canonical-shell-hybrid" : "canonical-shell-inline";
     return { id, selection: layout, route, image, animation, viewer: shell ? "keel-verification-shell" as const : "none" as const,
       mode: external ? "external" as const : hybrid ? "hybrid" as const : shell ? "inline" as const : "direct" as const,
-      measurements: measured, measurementBasis: "provisional-local-measurements" as const, standardsCompatible: measured.completeTokenUriBytes === undefined ? null : Number(measured.completeTokenUriBytes) <= KEEL_SMART_TOKEN_URI_MAX_BYTES && !compatibilityWarnings.includes("inline-image-above-compatibility-target"),
+      measurements: measured, measurementBasis: "provisional-local-measurements" as const, standardsCompatible: measured.completeTokenUriBytes === undefined ? null : Number(measured.completeTokenUriBytes) <= KEEL_SMART_TOKEN_URI_MAX_BYTES && !compatibilityWarnings.includes("inline-image-above-compatibility-target") && !compatibilityWarnings.includes("complete-read-at-or-above-standard-gas-target"),
       measurementComplete: measured.completeTokenUriBytes !== undefined, hardBlockers, compatibilityWarnings, remainingChecks, requiredCapability,
       status: hardBlockers.length ? "blocked" as const : "requires-validation" as const, publicationReady: false as const };
   });
   const large = (original.byteLength ?? 0) > KEEL_SMART_SPLIT_ASSET_THRESHOLD_BYTES;
-  const intermediate = (original.byteLength ?? 0) > KEEL_SMART_INLINE_ASSET_MAX_BYTES && !large;
-  const sameImage = preview === undefined || original.digest !== undefined && preview.digest === original.digest
-    && preview.byteLength === original.byteLength && preview.mediaType === original.mediaType;
-  const stillShortcut = intermediate && execution === "static" && sourceMotion === "still" && sameImage
-    && ["image/png", "image/jpeg", "image/webp", "image/avif", "image/bmp", "image/tiff", "image/heic", "image/heif"].includes(original.mediaType);
-  const preferred: KeelAssetPresentationCandidateId[] = assetPresentation === "external-preview" ? large ? ["external-preview-hybrid", "external-preview-inline"] : ["external-preview-inline", "external-preview-hybrid"]
-    : assetPresentation === "inline-image-hybrid-verifier" ? ["canonical-hybrid"]
-    : large ? ["canonical-hybrid", "external-preview-hybrid", "canonical-inline"]
-    : stillShortcut ? ["image-only-inline", "canonical-inline", "canonical-hybrid", "external-preview-hybrid"]
-    : ["canonical-inline", "canonical-hybrid", "external-preview-hybrid"];
+  const gasHeavy = initialMeasurements.readGas !== undefined && BigInt(initialMeasurements.readGas) >= KEEL_STANDARD_TOKEN_URI_READ_GAS
+    || input.candidateMeasurements?.["canonical-inline"]?.readGas !== undefined && BigInt(input.candidateMeasurements["canonical-inline"].readGas!) >= KEEL_STANDARD_TOKEN_URI_READ_GAS;
+  const qualifiedHybrid = candidates.find(candidate => candidate.id === "canonical-hybrid")!.hardBlockers.length === 0;
+  const qualifiedExternalHybrid = candidates.find(candidate => candidate.id === "external-preview-hybrid")!.hardBlockers.length === 0;
+  // Image defaults remain visible when their adapter/URL is unavailable.
+  // An explicit selection always wins; unavailable defaults never invent a URL.
+  const preferred: KeelAssetPresentationCandidateId[] = assetPresentation === "external-preview" || assetPresentation === "automatic" && largeImage
+    ? large || gasHeavy && qualifiedExternalHybrid ? ["external-preview-hybrid", "external-preview-inline"] : ["external-preview-inline", "external-preview-hybrid"]
+    : assetPresentation === "inline-image-hybrid-verifier" || large || gasHeavy && qualifiedHybrid ? ["canonical-hybrid", "canonical-inline"]
+    : ["canonical-inline", "canonical-hybrid"];
   const usable = (id: KeelAssetPresentationCandidateId) => candidates.find(c => c.id === id)!;
   const qualified = preferred.map(usable).filter(c => c.hardBlockers.length === 0);
-  const recommended = qualified.find(c => c.measurementComplete && c.standardsCompatible) ?? qualified.find(c => c.standardsCompatible !== false) ?? qualified[0] ?? usable(preferred[0]!);
+  const recommended = (largeImage || gasHeavy) && assetPresentation === "automatic" ? usable(preferred[0]!) : qualified.find(c => c.measurementComplete && c.standardsCompatible) ?? qualified.find(c => c.standardsCompatible !== false) ?? qualified[0] ?? usable(preferred[0]!);
   const selected = explicit ? candidates.find(c => c.selection.image === explicit.image && c.selection.animation === explicit.animation) : assetPresentation === "automatic" ? recommended : usable(preferred[0]!);
   if (!selected) throw new TypeError("This slot combination has no maintained presentation adapter.");
   const selectionSource = explicit ? "explicit" as const : assetPresentation === "automatic" ? "recommended" as const : "preset" as const;
   const suggestions: { candidateId?: KeelAssetPresentationCandidateId; code: string }[] = [];
+  if (largeImage) suggestions.push({ candidateId: "external-preview-inline", code: "image-over-900kb-use-ipfs-preview-with-verifier" });
+  if (gasHeavy || selected.measurements.readGas !== undefined && BigInt(selected.measurements.readGas) >= KEEL_STANDARD_TOKEN_URI_READ_GAS) {
+    const hybridId = largeImage ? "external-preview-hybrid" : "canonical-hybrid";
+    if (candidates.find(candidate => candidate.id === hybridId)!.hardBlockers.length === 0) suggestions.push({ candidateId: hybridId, code: "complete-read-at-or-above-50m-review-qualified-hybrid" });
+    else suggestions.push({ code: "hybrid-unavailable-review-explicit-bounded-keel-read" });
+    suggestions.push({ code: "explicit-nonstandard-keel-read-requires-exact-acknowledgement-and-provider-proof" });
+  }
   if (Number(selected.measurements.completeTokenUriBytes ?? 0) > KEEL_SMART_TOKEN_URI_MAX_BYTES && selected.selection.animation === "hybrid-shell") {
     const compact = compactNativeAlternative(execution, original.mediaType, candidates);
     if (compact) suggestions.push({ candidateId: compact, code: compact === "image-only-inline" ? "review-image-only-to-save-space" : "review-inline-media-to-save-space" });
@@ -386,8 +398,8 @@ export function planKeelSmartAssetPresentation(input: KeelSmartAssetPresentation
     ...(capabilities === undefined ? {} : { capabilities }),
     ...selected, selectedCandidateId: selected.id, recommendedCandidateId: recommended.id, selectionSource,
     candidates, suggestions, acknowledgementKey, nonstandardCompatibilityAcknowledged: input.nonstandardCompatibilityAcknowledged === true, omittedGridImageAcknowledged: input.omittedGridImageAcknowledged === true,
-    thresholds: { assetInlineBytes: KEEL_SMART_INLINE_ASSET_MAX_BYTES, assetSplitReadBytes: KEEL_SMART_SPLIT_ASSET_THRESHOLD_BYTES, encodedImageUriBytes: KEEL_SMART_INLINE_IMAGE_URI_MAX_BYTES, completeTokenUriBytes: KEEL_SMART_TOKEN_URI_MAX_BYTES },
-    reasons: [large ? "split-read-recommended-for-source-size" : stillShortcut ? "direct-still-image-recommended-for-duplicate-source-size" : "registered-verifier-default", ...selected.hardBlockers], blockers: selected.hardBlockers,
+    thresholds: { assetInlineBytes: KEEL_SMART_INLINE_ASSET_MAX_BYTES, ipfsImageOriginalBytes: KEEL_SMART_IPFS_IMAGE_THRESHOLD_BYTES, standardReadGas: KEEL_STANDARD_TOKEN_URI_READ_GAS.toString(), assetSplitReadBytes: KEEL_SMART_SPLIT_ASSET_THRESHOLD_BYTES, encodedImageUriBytes: KEEL_SMART_INLINE_IMAGE_URI_MAX_BYTES, completeTokenUriBytes: KEEL_SMART_TOKEN_URI_MAX_BYTES },
+    reasons: [largeImage ? "ipfs-image-preview-with-registered-verifier-default" : gasHeavy ? "hybrid-recommended-for-complete-read-gas" : large ? "split-read-recommended-for-source-size" : "registered-verifier-default", ...selected.hardBlockers], blockers: selected.hardBlockers,
     status: selected.hardBlockers.length ? "blocked" as const : compatibilityReviewRequired ? "compatibility-review-required" as const : "requires-validation" as const,
     publicationReady: false as const, requiresExactFullSimulation: true as const, requiredNativeStorageCopies: 1 as const };
   return freeze({ ...policy, planKey: canonicalJson(policy) });
@@ -528,7 +540,15 @@ export async function measureKeelSmartAssetPresentation(plan: KeelSmartAssetPres
     recommendations.push({ candidateId: "hybrid-verifier-only", code: "review-verifier-without-inline-grid-image" });
     if ((encodedAnimationSlotBytes ?? embeddedAnimationUriBytes ?? 0) > KEEL_SMART_TOKEN_URI_MAX_BYTES) recommendations.push({ candidateId: plan.fallbackDelivery === "hosted" ? "hosted-presentation" : "ipfs-presentation", code: "embedded-verifier-alone-above-standard-target" });
   }
-  const standardsCompatible = completeTokenUriBytes <= KEEL_SMART_TOKEN_URI_MAX_BYTES && (plan.image?.delivery !== "inline" || (imageUriBytes ?? 0) <= KEEL_SMART_INLINE_IMAGE_URI_MAX_BYTES && (encodedImageSlotBytes ?? 0) <= KEEL_SMART_INLINE_IMAGE_URI_MAX_BYTES);
+  if (plan.measurements.readGas !== undefined && BigInt(plan.measurements.readGas) >= KEEL_STANDARD_TOKEN_URI_READ_GAS) {
+    compatibilityWarnings.push("complete-read-at-or-above-standard-gas-target");
+    const hybridId = plan.image?.delivery === "external" ? "external-preview-hybrid" : "canonical-hybrid";
+    if (plan.candidates.find(candidate => candidate.id === hybridId)!.hardBlockers.length === 0) recommendations.push({ candidateId: hybridId, code: "complete-read-at-or-above-50m-review-qualified-hybrid" });
+    else recommendations.push({ code: "hybrid-unavailable-review-explicit-bounded-keel-read" });
+    recommendations.push({ code: "explicit-nonstandard-keel-read-requires-exact-acknowledgement-and-provider-proof" });
+  }
+  const gasCompatible = plan.measurements.readGas === undefined || BigInt(plan.measurements.readGas) < KEEL_STANDARD_TOKEN_URI_READ_GAS;
+  const standardsCompatible = gasCompatible && completeTokenUriBytes <= KEEL_SMART_TOKEN_URI_MAX_BYTES && (plan.image?.delivery !== "inline" || (imageUriBytes ?? 0) <= KEEL_SMART_INLINE_IMAGE_URI_MAX_BYTES && (encodedImageSlotBytes ?? 0) <= KEEL_SMART_INLINE_IMAGE_URI_MAX_BYTES);
   const compatibilityReviewRequired = !standardsCompatible && !plan.nonstandardCompatibilityAcknowledged || plan.image === null && !plan.omittedGridImageAcknowledged;
   const result = { schema: "keel-smart-presentation-return-measurement@1" as const, planKey: plan.planKey, acknowledgementKey: plan.acknowledgementKey,
     tokenURI, completeTokenUriBytes, imageUriBytes, encodedImageSlotBytes, encodedImageValueBytes, encodedAnimationSlotBytes, encodedAnimationValueBytes, inlineMediaIntegrity, embeddedAnimationIntegrity, embeddedAnimationUriBytes, standardsCompatible, measurementBasis: "actual-rendered-complete-return" as const,

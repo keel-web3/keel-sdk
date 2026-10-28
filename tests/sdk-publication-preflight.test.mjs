@@ -196,7 +196,7 @@ test("explicit storage-only simulation verifies its predicted object without cla
 
 test("public metadata read gas is independent of the transaction cap while every planned transaction stays validated", async () => {
   const f = fixture({ blockGas: "0x3938700", readGas: "0x1a6dc1c" });
-  const proof = await simulateKeelPublicationBeforeFunding({ ...input(), maximumReadGas: 60_000_000n, metadataCall: { ...call, gas: "0x3938700" } }, f.transport);
+  const proof = await simulateKeelPublicationBeforeFunding({ ...input(), maximumReadGas: 50_000_000n, metadataCall: { ...call, gas: "0x2faf080" } }, f.transport);
   assert.equal(proof.assemblyReadGas, "27712540");
   assert.equal(proof.validatedTransactionCalls, 1);
   assert.equal(f.requests.filter(request => request.method === "eth_simulateV1")[1].params[0].validation, true);

@@ -2,7 +2,7 @@ import { canonicalJson } from "./canonical.js";
 
 /** A compatibility target, not an ERC-721 limit or a provider capability. */
 export const KEEL_STANDARD_TOKEN_URI_TARGET_BYTES = 2_000_000;
-export const KEEL_STANDARD_TOKEN_URI_READ_GAS = 60_000_000n;
+export const KEEL_STANDARD_TOKEN_URI_READ_GAS = 50_000_000n;
 
 export interface KeelNonstandardReadIdentity {
   readonly chainId: number;
@@ -73,7 +73,8 @@ function fields(value: PolicyInput): PolicyInput {
   const identity = exact(value.identity, ["chainId", "projectId", "revision", "defaultsRevision", "planDigest", "measurementDigest", "sourceDigest", "tokenUriDigest", "completeTokenUriBytes"]);
   const limits = exact(value.limits, ["maximumTokenUriBytes", "maximumRpcResponseBytes", "maximumReadGas"]);
   if (!count(identity.chainId) || !count(identity.completeTokenUriBytes)
-    || Number(identity.completeTokenUriBytes) <= KEEL_STANDARD_TOKEN_URI_TARGET_BYTES) throw new RangeError("Explicit nonstandard reads require an exact above-target complete URI measurement and chain.");
+    || Number(identity.completeTokenUriBytes) <= KEEL_STANDARD_TOKEN_URI_TARGET_BYTES
+      && !(typeof limits.maximumReadGas === "string" && /^[1-9][0-9]{0,77}$/u.test(limits.maximumReadGas) && BigInt(limits.maximumReadGas) >= KEEL_STANDARD_TOKEN_URI_READ_GAS)) throw new RangeError("Explicit nonstandard reads require an exact complete URI measurement, chain and above-target bytes or read-gas budget.");
   for (const key of ["projectId", "revision", "defaultsRevision"]) if (typeof identity[key] !== "string" || !(identity[key] as string).length || (identity[key] as string).length > 256) throw new TypeError("Nonstandard reads require the exact project, revision and defaults identity.");
   for (const key of ["planDigest", "measurementDigest", "sourceDigest", "tokenUriDigest"]) if (!digest(identity[key])) throw new TypeError("Nonstandard reads require exact lowercase SHA-256 commitments.");
   if (!count(limits.maximumTokenUriBytes) || Number(limits.maximumTokenUriBytes) < Number(identity.completeTokenUriBytes)

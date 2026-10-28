@@ -5,12 +5,12 @@ const a=n=>'0x'+n.toString(16).padStart(40,'0'),h=n=>'0x'+n.toString(16).padStar
 const owner=a(1),collection=a(2),renderer=a(3),factory=a(4),store=a(5),mint=a(6),code='0x6000',expected='data:application/json,{"name":"verified exact"}';
 const block={number:'0x12',hash:h(42),timestamp:'0x68f00000',gasLimit:'0x1000000'};
 const call=(to,data='0x1234')=>({from:owner,to,data,value:'0x0',gas:'0xf4240',maxFeePerGas:'0x1000000',maxPriorityFeePerGas:'0xf4240'});
-async function setup(){
+async function setup(maximumReadGas=1_000_000n){
  const prepared=await prepareKeelCreatorInline({chainId:11155111,store,resources:[{id:'index.html',role:'entrypoint',mediaType:'text/html',bytes:Buffer.from('<p>exact</p>'.repeat(100))}],poster:{mediaType:'image/png',bytes:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jR1sAAAAASUVORK5CYII=','base64')}});
  prepared.prepaymentSimulation='required';prepared.route={renderer,factory,builder:a(7),registry:a(8),validation:a(9),instance:'test',shellId:h(1),shellRevision:1n,authenticatedBlockNumber:'18',authenticatedBlockHash:block.hash};prepared.infrastructure={contracts:[{address:renderer,runtimeCodeHash:keccak256(code)},{address:factory,runtimeCodeHash:keccak256(code)}]};
  const binding=buildKeelCreatorPreparedCopyBindingCall({renderer,collection,tokenId:1n,plan:prepared});
  const steps=[{id:'upload',phase:'upload',call:call(store)},{id:'validate',phase:'validate',call:call(a(9))},{id:'create',phase:'create-collection',call:call(factory)},{id:'bind',phase:'bind',call:call(renderer,binding.data)},{id:'route',phase:'mint-route',call:call(mint)},{id:'mint',phase:'mint',call:call(mint)}];
- const journal=createKeelCreatorPublicationJournal({id:'fresh-1',actorId:'actor',owner,sourceRevision:'sha256:source',settingsRevision:'defaults:1',prepared,collection,tokenId:1n,steps,simulation:{metadataCall:call(collection,encodeFunctionData({abi:parseAbi(['function tokenURI(uint256) view returns(string)']),functionName:'tokenURI',args:[1n]})),expectedTokenURI:expected,maximumTokenUriBytes:2_000_000,maximumReadGas:1_000_000n,collectionOverheadGas:10_000n,maximumTransactionGas:16_000_000n}});
+ const journal=createKeelCreatorPublicationJournal({id:'fresh-1',actorId:'actor',owner,sourceRevision:'sha256:source',settingsRevision:'defaults:1',prepared,collection,tokenId:1n,steps,simulation:{metadataCall:call(collection,encodeFunctionData({abi:parseAbi(['function tokenURI(uint256) view returns(string)']),functionName:'tokenURI',args:[1n]})),expectedTokenURI:expected,maximumTokenUriBytes:2_000_000,maximumReadGas,collectionOverheadGas:10_000n,maximumTransactionGas:16_000_000n}});
  return {journal,steps};
 }
 const actor={actorId:'actor',owner,sourceRevision:'sha256:source',settingsRevision:'defaults:1'};
@@ -52,4 +52,40 @@ test('a persisted unknown wallet outcome blocks duplicate requests until rejecti
  assert.equal(rejected.walletAttempt,undefined);assert.equal(rejected.receipts.length,0);
  const confirmed=await recordKeelCreatorPublicationReceipt(pending,h(100),transport(pending));
  assert.equal(confirmed.walletAttempt,undefined);assert.equal(confirmed.receipts.length,1);
+});
+
+test('historical partially paid 60M journal resumes exact remaining calls without changing its fingerprint or receipts',async()=>{
+ const {journal}=await setup(60_000_000n);
+ await assert.rejects(prepareKeelCreatorPublicationWalletStep(journal,actor,transport(journal)),/reader.provider bounds/);
+ const paid=await recordKeelCreatorPublicationReceipt(journal,h(100),transport(journal));
+ const before=serializeKeelCreatorPublicationJournal(paid);
+ const rpc=transport(paid);const next=await prepareKeelCreatorPublicationWalletStep(paid,actor,rpc);
+ assert.equal(next.status,'approval-required');assert.equal(next.stepId,paid.steps[1].id);
+ assert.equal(serializeKeelCreatorPublicationJournal(paid),before);
+ assert.equal(paid.fingerprint,journal.fingerprint);
+ const sent=rpc.requests.filter(x=>x.method==='eth_simulateV1')[0].params[0].blockStateCalls;
+ assert.equal(sent.length,paid.steps.length-1);assert.equal(sent[0].calls[0].to,paid.steps[1].call.to);
+ await assert.rejects(prepareKeelCreatorPublicationWalletStep(paid,actor,transport(paid,{changedReceipt:true})),/exact reviewed publication step/);
+});
+
+test('historical allowance rejects a paid journal attached to another remaining plan before simulation',async()=>{
+ const {simulateKeelRetainedPublicationAfterReceipts}=await import('../packages/sdk/dist/publication-preflight.js');
+ const {journal}=await setup(60_000_000n);const paid=await recordKeelCreatorPublicationReceipt(journal,h(100),transport(journal));
+ const rpc=transport(paid);
+ const simulation={...paid.simulation,assertions:[],blockNumber:18n,planFingerprint:paid.fingerprint,preparationCalls:paid.steps.slice(1).map(step=>step.call)};
+ await assert.rejects(simulateKeelRetainedPublicationAfterReceipts({...simulation,planFingerprint:h(999)},paid,rpc),/exact saved journal/);
+ await assert.rejects(simulateKeelRetainedPublicationAfterReceipts({...simulation,reader:a(99)},paid,rpc),/exact saved journal/);
+ await assert.rejects(simulateKeelRetainedPublicationAfterReceipts({...simulation,preparationCalls:[paid.steps[0].call]},paid,rpc),/exact saved journal/);
+ assert.equal(rpc.requests.length,0);
+});
+
+test('historical replay snapshots authority before awaits and accepts an optional diagnostics observer',async()=>{
+ const {simulateKeelRetainedPublicationAfterReceipts}=await import('../packages/sdk/dist/publication-preflight.js');
+ const {journal}=await setup(60_000_000n);const paid=await recordKeelCreatorPublicationReceipt(journal,h(100),transport(journal));
+ const simulation={...paid.simulation,assertions:[],blockNumber:18n,planFingerprint:paid.fingerprint,preparationCalls:paid.steps.slice(1).map(step=>({...step.call})),diagnostics:()=>{}};
+ const rpc=transport(paid);let first=true;
+ const proof=await simulateKeelRetainedPublicationAfterReceipts(simulation,paid,{request:async req=>{if(first){first=false;simulation.maximumReadGas=70_000_000n;simulation.preparationCalls[0].data='0xffff';}return rpc.request(req);}});
+ assert.equal(proof.validatedTransactionCalls,paid.steps.length-1);
+ const discovery=rpc.requests.find(x=>x.method==='eth_simulateV1').params[0].blockStateCalls;
+ assert.equal(discovery[0].calls[0].data,paid.steps[1].call.data);
 });

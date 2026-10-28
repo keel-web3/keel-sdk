@@ -1,4 +1,4 @@
-import { resolveKeelShell, type KeelShellChoice } from "@keel/protocol";
+import { KEEL_STANDARD_TOKEN_URI_READ_GAS, resolveKeelShell, type KeelShellChoice } from "@keel/protocol";
 export { KEEL_STANDARD_TOKEN_URI_TARGET_BYTES, KEEL_STANDARD_TOKEN_URI_READ_GAS, resolveKeelTokenURIPreparationBounds, resolveKeelPreparationReadBounds, keelNonstandardReadAcknowledgementKey, createKeelExplicitNonstandardReadPolicy, resolveKeelTokenURIReadBounds, keelTokenURIRpcResponseBytes, assertKeelNonstandardTokenURIIdentity, type KeelTokenURIPreparationBudget, type KeelNonstandardReadIdentity, type KeelExplicitNonstandardReadPolicy } from "@keel/protocol";
 export { KEEL_DEFAULT_PAYLOAD_STORAGE, KEEL_PAYLOAD_STORAGE_MODES, KEEL_PAYLOAD_STORAGE_POLICY, resolveKeelPayloadStorage, keelPayloadCompressionPolicy, resolveKeelPayloadCompression, KEEL_SHELL_CHOICES, KEEL_DEFAULT_SHELL, resolveKeelShell, type KeelShellChoice, type KeelPayloadStorageMode } from "@keel/protocol";
 
@@ -25,6 +25,8 @@ export function planKeelAssetPresentation(input: {
   readonly graphByteLength?: number;
   readonly readGas?: bigint;
   readonly blockGasLimit?: bigint;
+  /** Selected-chain adapter evidence; a gas measurement alone cannot qualify Hybrid. */
+  readonly hybridQualified?: boolean;
 }) {
   for (const [key, value] of Object.entries(input)) {
     if (["originalByteLength", "compressedByteLength", "tokenUriByteLength", "graphByteLength"].includes(key) && value !== undefined && (!Number.isSafeInteger(value) || Number(value) < 0)) throw new TypeError(`${key} must be a nonnegative safe byte count.`);
@@ -38,14 +40,16 @@ export function planKeelAssetPresentation(input: {
   const viewer = resolveKeelShell(input.viewer);
   const selectionByteLength = input.tokenUriByteLength ?? input.compressedByteLength;
   const selectionBasis = input.tokenUriByteLength === undefined ? "compressed-estimate" : "complete-token-uri";
-  const automaticMode = selectionByteLength <= KEEL_INLINE_MAX_TOKEN_URI_BYTES ? "inline" : "hybrid";
+  if (input.hybridQualified !== undefined && typeof input.hybridQualified !== "boolean") throw new TypeError("Hybrid qualification must be an explicit capability result.");
+  const gasSplit = input.hybridQualified === true && input.readGas !== undefined && input.readGas >= KEEL_STANDARD_TOKEN_URI_READ_GAS;
+  const automaticMode = selectionByteLength <= KEEL_INLINE_MAX_TOKEN_URI_BYTES && !gasSplit ? "inline" : "hybrid";
   const mode = !input.mode || input.mode === "auto" ? automaticMode : input.mode;
   const warnings: { code: string; message: string; remedy: string }[] = [];
   if (mode === "hybrid") warnings.push({ code: "rpc-presentation", message: "The HTML viewer reconstructs the work through read-only RPC calls. All published resource bytes can still remain onchain.", remedy: "Use declared RPC providers, verify every resource digest, and expose direct contract retrieval alongside the viewer. Some collectors block network access inside animation_url." });
   if (selectionByteLength > KEEL_INLINE_MAX_TOKEN_URI_BYTES && mode === "inline") warnings.push({ code: "above-inline-default", message: "Inline is explicitly selected above the 2 MB automatic boundary. Your choice is preserved.", remedy: "Measure the complete tokenURI and public read cost; choose RPC reconstruction if the selected reader cannot return it." });
   if (input.tokenUriByteLength !== undefined && input.tokenUriByteLength > KEEL_INLINE_MAX_TOKEN_URI_BYTES) warnings.push({ code: "token-uri-size", message: "The complete tokenURI exceeds KEEL's 2 MB public-reader compatibility limit. This is a reader limit, not a file-import limit or an ERC-721 file-size rule.", remedy: "Reuse registered modules, reduce metadata/preview overhead, or explicitly choose RPC reconstruction. Keep original onchain bytes directly retrievable." });
   const gasLimit = input.blockGasLimit === undefined ? KEEL_INLINE_SAFE_RPC_GAS : keelInlineReadGasLimit(input.blockGasLimit);
-  if (input.readGas !== undefined && input.readGas > gasLimit) warnings.push({ code: "read-gas", message: "The measured complete read exceeds the selected RPC gas boundary.", remedy: "Use paged readSlug calls and reconstruct locally, or choose a reader that can execute the full read. Publication gas is a separate measurement." });
+  if (input.readGas !== undefined && (input.readGas >= KEEL_STANDARD_TOKEN_URI_READ_GAS || input.readGas > gasLimit)) warnings.push({ code: "read-gas", message: "The measured complete read reaches the 50M compatibility target or exceeds the selected physical read bound.", remedy: "Recommend Hybrid only when the selected-chain adapter is qualified. Otherwise review an explicit bounded KEEL read with exact acknowledgement and provider proof; other sites may not support it. Publication gas is separate." });
   return {
     schema: "keel-asset-presentation-plan@1" as const,
     mode, automaticMode, selectionBasis, selectionByteLength, cutoffBytes: KEEL_INLINE_MAX_TOKEN_URI_BYTES,
@@ -283,4 +287,4 @@ export function resolveKeelInlineCarriage(carriage: string = "compact"): Exclude
   return carriage === "compact" ? "raw-percent" : carriage as Exclude<KeelInlineCarriage, "compact">;
 }
 
-export { KEEL_SMART_INLINE_ASSET_MAX_BYTES, KEEL_SMART_SPLIT_ASSET_THRESHOLD_BYTES, KEEL_SMART_INLINE_IMAGE_URI_MAX_BYTES, KEEL_SMART_TOKEN_URI_MAX_BYTES, KEEL_ASSET_PRESENTATION_PREFERENCES, KEEL_PRESENTATION_FALLBACK_DELIVERIES, parseKeelPresentationFallbackDelivery, type KeelPresentationFallbackDelivery, type KeelExternalPresentation, parseKeelAssetPresentationPreference, parseKeelExternalPreviewUri, classifyKeelAssetExecution, classifyKeelAssetMotion, planKeelSmartAssetPresentation, resolveKeelAssetPresentationSelection, hashKeelSmartAssetPresentationPlan, measureKeelSmartAssetPresentation, measureKeelSmartPresentationMatrix, KEEL_ASSET_PRESENTATION_FALLBACK_DELIVERIES, KEEL_ASSET_IMAGE_DELIVERIES, KEEL_ASSET_ANIMATION_DELIVERIES, KEEL_ASSET_PRESENTATION_CANDIDATE_IDS, type KeelAssetPresentationSelection, type KeelAssetPresentationCandidateId, type KeelAssetPresentationPreference, type KeelAssetExecution, type KeelAssetMotion, type KeelPresentationSource, type KeelSmartPresentationMeasurements, type KeelSmartPresentationCapabilities, type KeelSmartAssetPresentationInput, type KeelSmartAssetPresentationPlan } from "@keel/protocol";
+export { KEEL_SMART_IPFS_IMAGE_THRESHOLD_BYTES, KEEL_SMART_INLINE_ASSET_MAX_BYTES, KEEL_SMART_SPLIT_ASSET_THRESHOLD_BYTES, KEEL_SMART_INLINE_IMAGE_URI_MAX_BYTES, KEEL_SMART_TOKEN_URI_MAX_BYTES, KEEL_ASSET_PRESENTATION_PREFERENCES, KEEL_PRESENTATION_FALLBACK_DELIVERIES, parseKeelPresentationFallbackDelivery, type KeelPresentationFallbackDelivery, type KeelExternalPresentation, parseKeelAssetPresentationPreference, parseKeelExternalPreviewUri, classifyKeelAssetExecution, classifyKeelAssetMotion, planKeelSmartAssetPresentation, resolveKeelAssetPresentationSelection, hashKeelSmartAssetPresentationPlan, measureKeelSmartAssetPresentation, measureKeelSmartPresentationMatrix, KEEL_ASSET_PRESENTATION_FALLBACK_DELIVERIES, KEEL_ASSET_IMAGE_DELIVERIES, KEEL_ASSET_ANIMATION_DELIVERIES, KEEL_ASSET_PRESENTATION_CANDIDATE_IDS, type KeelAssetPresentationSelection, type KeelAssetPresentationCandidateId, type KeelAssetPresentationPreference, type KeelAssetExecution, type KeelAssetMotion, type KeelPresentationSource, type KeelSmartPresentationMeasurements, type KeelSmartPresentationCapabilities, type KeelSmartAssetPresentationInput, type KeelSmartAssetPresentationPlan } from "@keel/protocol";

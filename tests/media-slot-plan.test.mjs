@@ -1,13 +1,13 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {planKeelMediaSlots,assertKeelMediaSlotReadFit} from '../packages/builder/dist/media-slot-plan.js';
 const input={sourceResourceId:'source',mediaType:'image/gif',sourceByteLength:1_000_001};
-test('known still rasters use only image while GIF retains verification',()=>{for(const mediaType of ['image/png','image/jpeg']){const p=planKeelMediaSlots({...input,mediaType,sourceMotion:'still'});assert.equal(p.image.resourceId,'source');assert.equal(p.animation_url,null);assert.equal(p.viewer,'none');}const gif=planKeelMediaSlots(input);assert.equal(gif.viewer,'keel-verification-shell');assert.equal(gif.animation_url.resourceId,'source');});
+test('still rasters and GIF retain verification by default',()=>{for(const mediaType of ['image/png','image/jpeg']){const p=planKeelMediaSlots({...input,mediaType,sourceMotion:'still'});assert.equal(p.image,null);assert.equal(p.animation_url.resourceId,'source');assert.equal(p.viewer,'keel-verification-shell');}const gif=planKeelMediaSlots(input);assert.equal(gif.viewer,'keel-verification-shell');assert.equal(gif.animation_url.resourceId,'source');});
 test('small WebP and AVIF default to shell animation with no duplicate full-size image',()=>{for(const mediaType of ['image/webp','image/avif']){const p=planKeelMediaSlots({...input,mediaType,sourceByteLength:500_000});assert.equal(p.image,null);assert.equal(p.animation_url.presentation,'keel-shell');assert.equal(p.viewer,'keel-verification-shell');}});
 test('explicit candidate changes animation resource only and thumbnail is separately configured',()=>{const p=planKeelMediaSlots({...input,selectedCandidateResourceId:'edited',thumbnailResourceId:'thumb'});assert.equal(p.image.resourceId,'thumb');assert.equal(p.animation_url.resourceId,'edited');assert.throws(()=>planKeelMediaSlots({...input,thumbnailResourceId:'source'}),/separately/);});
 test('defaults filter asset and collection; independent explicit delivery choices win',()=>{const p=planKeelMediaSlots({...input,mediaType:'image/webp',sourceByteLength:10,collectionType:'erc1155',thumbnailResourceId:'thumb',defaults:[{imageDelivery:'hosted',animationDelivery:'hosted'},{mediaType:'image/webp',imageDelivery:'ipfs',animationDelivery:'ipfs'},{mediaType:'image/gif',animationDelivery:'onchain'},{mediaType:'image/webp',sourceByteLength:10,collectionType:'erc1155',animationDelivery:'onchain'}],explicit:{image:{resourceId:'custom',presentation:'direct',delivery:'hosted'}}});assert.equal(p.image.delivery,'hosted');assert.equal(p.animation_url.delivery,'onchain');});
 test('both slots require explicit selection and exact complete read proof',()=>{const p=planKeelMediaSlots({...input,mediaType:'image/webp',sourceByteLength:10,explicit:{image:{resourceId:'source',presentation:'direct',delivery:'onchain'}}});assert.equal(p.duplicateSourceInBothSlots,true);assert.throws(()=>assertKeelMediaSlotReadFit(p,{planKey:p.planKey,completeTokenUriBytes:2000001,maxTokenUriBytes:2000000,selectedChainReadPassed:true}),/complete metadata/);assert.throws(()=>assertKeelMediaSlotReadFit(p,{planKey:'old',completeTokenUriBytes:10,maxTokenUriBytes:2000000,selectedChainReadPassed:true}),/complete metadata/);assertKeelMediaSlotReadFit(p,{planKey:p.planKey,completeTokenUriBytes:100,maxTokenUriBytes:2000000,selectedChainReadPassed:true});});
 
-test('decimal 500KB and 2MB recommendations require known still raster motion while GIF retains verification',()=>{
+test('verification remains enabled across original raster size boundaries',()=>{
  for(const mediaType of ['image/png','image/jpeg','image/webp','image/avif']){
   for(const sourceByteLength of [undefined,1,499999,500000]){
    const p=planKeelMediaSlots({sourceResourceId:'source',mediaType,sourceByteLength});
@@ -15,7 +15,7 @@ test('decimal 500KB and 2MB recommendations require known still raster motion wh
   }
   for(const sourceByteLength of [500001,999999,1000000,1000001,2000000]) {
    const direct=planKeelMediaSlots({sourceResourceId:'source',mediaType,sourceByteLength,sourceMotion:'still'});
-   assert.equal(direct.viewer,'none');assert.equal(direct.image.resourceId,'source');assert.equal(direct.animation_url,null);
+   assert.equal(direct.viewer,'keel-verification-shell');assert.equal(direct.image,null);assert.equal(direct.animation_url.resourceId,'source');
   }
   const split=planKeelMediaSlots({sourceResourceId:'source',mediaType,sourceByteLength:2000001});
   assert.equal(split.viewer,'keel-verification-shell');assert.equal(split.animation_url.resourceId,'source');

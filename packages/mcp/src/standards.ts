@@ -11,7 +11,7 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { gunzipSync, inflateRawSync, inflateSync } from "node:zlib";
-import { buildCompactInlineKeelShell, KEEL_INLINE_SAFE_RPC_GAS } from "@keel/sdk";
+import { buildCompactInlineKeelShell, KEEL_STANDARD_TOKEN_URI_READ_GAS } from "@keel/sdk";
 import { createIntegrity } from "@keel/protocol";
 import type { ToolContext, Workspace } from "./types.js";
 
@@ -19,8 +19,8 @@ export const EVIDENCE_DIRECTORY = ".keel-mcp";
 export const PREFLIGHT_RECEIPT_SCHEMA = "keel-contract-workflow-receipt@1" as const;
 export const TOKEN_STANDARD_AUDIT_SCHEMA = "keel-token-standard-audit@1" as const;
 export const STANDARDS_CLEARANCE_SCHEMA = "keel-standards-clearance@1" as const;
-/** Public-read ceiling for tokenURI (the SDK's documented 60M public-RPC safety cap, one constant everywhere). */
-export const TOKEN_URI_READ_GAS_LIMIT = Number(KEEL_INLINE_SAFE_RPC_GAS);
+/** Standard single-call tokenURI budget; the historical physical read ceiling is separate. */
+export const TOKEN_URI_READ_GAS_LIMIT = Number(KEEL_STANDARD_TOKEN_URI_READ_GAS);
 export const TOKEN_URI_MAX_BYTES = 2_000_000;
 export const EVIDENCE_TTL_MS = 24 * 60 * 60 * 1000;
 /** The single protocol literal allowed anywhere: the SVG namespace is syntax, not a fetch. */
@@ -742,33 +742,34 @@ export interface LiveRead {
   /** debug_traceCall gasUsed when available, else the smallest gas limit returning the full-gas bytes. */
   readonly measuredGas?: number;
   readonly measurement?: { readonly method: "debug_traceCall" | "eth_call-binary-search-equal-bytes"; readonly tracedGasUsed?: number; readonly searchedGasLimit?: number; readonly precision: number; readonly calls: number; readonly lowGasDivergentResults: number; readonly note?: string; readonly stopped?: string };
+  readonly readOptions?: { readonly recommended: "review-qualified-readers"; readonly standardSingleCallGas: number; readonly nonstandard: string };
   readonly failure?: { readonly code: "read-failed" | "read-gas-exceeds-limit"; readonly detail: string };
 }
 
 /**
- * Read tokenURI exactly the way a marketplace must be able to: one eth_call capped at 60M gas at a pinned block.
+ * Read tokenURI exactly the way a marketplace must be able to: one eth_call capped at 50M gas at a pinned block.
  * eth_estimateGas is reported but never trusted as the gate -- some nodes truncate or under-report large returns.
  */
 export async function readTokenUri(rpcUrl: string, contract: string, tokenId: bigint): Promise<LiveRead> {
   const chainId = Number(BigInt(String(await rpc(rpcUrl, "eth_chainId", []))));
   const block = String(await rpc(rpcUrl, "eth_blockNumber", []));
   const call = { to: contract, data: tokenUriCalldata(tokenId) };
-  const estimateNote = "eth_estimateGas is advisory: nodes can silently truncate or undercount large string returns. The gate is the eth_call capped at 60,000,000 gas.";
+  const estimateNote = "eth_estimateGas is advisory: nodes can silently truncate or undercount large string returns. The gate is the eth_call capped at 50,000,000 gas.";
   let estimatedGas: number | undefined;
   try {
     estimatedGas = Number(BigInt(String(await rpc(rpcUrl, "eth_estimateGas", [call, block]))));
   } catch {
     estimatedGas = undefined;
   }
-  const base = { chainId, block, gasLimit: TOKEN_URI_READ_GAS_LIMIT, ...(estimatedGas === undefined ? {} : { estimatedGas }), estimateNote };
+  const base = { chainId, block, readOptions: { recommended: "review-qualified-readers" as const, standardSingleCallGas: TOKEN_URI_READ_GAS_LIMIT, nonstandard: "At or above 50M measured complete-read gas, recommend Hybrid only after its selected-chain capability is qualified; otherwise report that unavailable route. An explicit nonstandard KEEL read requires exact acknowledgement and verified reader/provider limits; other sites may not load it. This diagnostic grants no capability." }, gasLimit: TOKEN_URI_READ_GAS_LIMIT, ...(estimatedGas === undefined ? {} : { estimatedGas }), estimateNote };
   let result: unknown;
   try {
     result = await rpc(rpcUrl, "eth_call", [{ ...call, gas: `0x${TOKEN_URI_READ_GAS_LIMIT.toString(16)}` }, block]);
   } catch (capped) {
-    // Distinguish "needs more than 60M" from "reverts": retry at the node's own (higher) cap.
+    // Distinguish "needs more than 50M" from "reverts": retry at the node's own (higher) cap.
     try {
       await rpc(rpcUrl, "eth_call", [call, block]);
-      return { ...base, failure: { code: "read-gas-exceeds-limit", detail: `tokenURI(${tokenId}) fails within ${TOKEN_URI_READ_GAS_LIMIT} gas but succeeds with the node's higher cap.` } };
+      return { ...base, failure: { code: "read-gas-exceeds-limit", detail: `tokenURI(${tokenId}) fails within ${TOKEN_URI_READ_GAS_LIMIT} gas but succeeds with the node's higher cap. Review Hybrid to reduce the single tokenURI call only if its selected-chain capability is qualified; an explicit nonstandard KEEL read needs exact acknowledgement and verified reader/provider support, and other sites may not load it.` } };
     } catch {
       return { ...base, failure: { code: "read-failed", detail: `tokenURI(${tokenId}) eth_call failed: ${capped instanceof Error ? capped.message : String(capped)}` } };
     }

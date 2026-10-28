@@ -1,3 +1,4 @@
+import type { KeelCreatorPublicationJournal } from "./creator-publication-journal.js";
 import { emitKeelPublicationDiagnostic, type KeelPublicationDiagnosticObserver } from "./publication-diagnostics.js";
 import { keelExecutorGasLimit } from "./managed-publication.js";
 import { resolveKeelTransactionGasPolicy, assertKeelAmsterdamSimulationHeader, type KeelLocalTestChainGasProfile } from "./transaction-gas-policy.js";
@@ -229,8 +230,53 @@ export async function simulateKeelStorageBeforeFunding(input: Omit<KeelPublicati
   return performPublicationSimulation({ ...input, expectedTokenURI: "", maximumTokenUriBytes: 1, collectionOverheadGas: 0n }, transport, { kind: "storage-only", objectId: input.expectedObjectId });
 }
 
+/** Historical explicit 60M read allowance, only after canonical receipts prove
+ * an already-paid exact call prefix. No new budget, policy, call or journal is
+ * fabricated. Fresh funding keeps the 50M default and exact acknowledgement. */
+export async function simulateKeelRetainedPublicationAfterReceipts(input: KeelPublicationSimulationInput,
+  journal: KeelCreatorPublicationJournal, transport: KeelPreflightTransport) {
+  // Snapshot both inputs before any RPC. The immutable full journal fingerprint
+  // binds paid prefix, exact remaining suffix, source, chain and complete read.
+  const { diagnostics, ...data } = input;
+  input = { ...structuredClone(data), ...(diagnostics === undefined ? {} : { diagnostics }), ...(input.localTestChainProfile === undefined ? {} : { localTestChainProfile: input.localTestChainProfile }) };
+  const originalProfile = journal.simulation.localTestChainProfile;
+  const saved = { ...structuredClone(journal), simulation: { ...structuredClone(journal.simulation), ...(originalProfile === undefined ? {} : { localTestChainProfile: originalProfile }) } };
+  const { fingerprint, receipts, walletAttempt: _attempt, ...authority } = saved;
+  const commitment = await createIntegrity(new TextEncoder().encode(JSON.stringify(authority, (_key, value: unknown) => typeof value === "bigint" ? value.toString() : value)));
+  if (saved.schema !== "keel.creator-prepared-publication-journal@1" || commitment.digest !== fingerprint
+    || saved.steps.some(step => step.call.from.toLowerCase() !== saved.owner.toLowerCase())
+    || receipts.some((receipt, i) => receipt.stepId !== saved.steps[i]?.id))
+    return failure("configuration-invalid", "Historical publication journal identity or paid prefix changed.");
+  if (saved.walletAttempt || saved.receipts.length === 0 || saved.receipts.length >= saved.steps.length)
+    return failure("configuration-invalid", "Historical resume requires an existing paid journal with an unissued remaining suffix.");
+  const expected = { ...saved.simulation, ...(originalProfile === undefined ? {} : { localTestChainProfile: originalProfile }),
+    assertions: (saved.simulation.assertions ?? []).filter(a => a.callIndex >= saved.receipts.length).map(a => ({ ...a, callIndex: a.callIndex - saved.receipts.length })),
+    ...(input.blockNumber === undefined ? {} : { blockNumber: input.blockNumber }), planFingerprint: saved.fingerprint,
+    preparationCalls: saved.steps.slice(saved.receipts.length).map(step => step.call) };
+  const normalized = (value: unknown) => canonicalJson(JSON.parse(JSON.stringify(value, (key, item: unknown) => key === "diagnostics" ? undefined : typeof item === "bigint" ? item.toString() : item)));
+  if (normalized(input) !== normalized(expected)) return failure("configuration-invalid", "Historical simulation differs from its exact saved journal, paid prefix or remaining program.");
+  const paid = saved.receipts.map((receipt, i) => ({ call: saved.steps[i]!.call, transactionHash: receipt.transactionHash }));
+  if (!paid.length || paid.length > 255 || input.preparationReadBudget !== undefined || input.nonstandardReadPolicy !== undefined
+    || input.maximumReadGas <= 50_000_000n || input.maximumReadGas > 60_000_000n || input.maximumTokenUriBytes > 2_000_000)
+    return failure("configuration-invalid", "Historical read compatibility requires an exact paid prefix and its original bounded 60M read.");
+  if (BigInt(String(await transport.request({ method: "eth_chainId", params: [] }))) !== BigInt(input.chainId)) return failure("configuration-invalid", "Wrong retained publication chain.");
+  for (const { call, transactionHash } of paid) {
+    if (!/^0x[0-9a-f]{64}$/iu.test(transactionHash)) return failure("configuration-invalid", "Invalid retained receipt hash.");
+    const tx = await transport.request({ method: "eth_getTransactionByHash", params: [transactionHash] }) as Record<string, unknown> | null;
+    const receipt = await transport.request({ method: "eth_getTransactionReceipt", params: [transactionHash] }) as Record<string, unknown> | null;
+    const equal = (a: unknown, b: string) => typeof a === "string" && a.toLowerCase() === b.toLowerCase();
+    if (!tx || !receipt || receipt.status !== "0x1" || !equal(tx.hash, transactionHash) || !equal(receipt.transactionHash, transactionHash)
+      || !equal(tx.from, call.from) || !equal(tx.to, call.to) || !equal(tx.input, call.data) || typeof tx.value !== "string" || BigInt(tx.value) !== BigInt(call.value)
+      || typeof receipt.blockNumber !== "string" || !/^0x[0-9a-f]+$/iu.test(receipt.blockNumber) || typeof receipt.blockHash !== "string")
+      return failure("configuration-invalid", "The retained receipt does not prove the exact already-paid call.");
+    const block = await transport.request({ method: "eth_getBlockByNumber", params: [receipt.blockNumber, false] }) as Record<string, unknown> | null;
+    if (!block || !equal(block.hash, receipt.blockHash)) return failure("configuration-invalid", "The retained paid receipt is no longer canonical.");
+  }
+  return performPublicationSimulation(input, transport, { kind: "collector-metadata", legacyPaidReadGas: "60000000" });
+}
+
 async function performPublicationSimulation(input: KeelPublicationSimulationInput, transport: KeelPreflightTransport,
-  expectation: { readonly kind: "collector-metadata" } | { readonly kind: "storage-only"; readonly objectId: Hex }) {
+  expectation: ({ readonly kind: "collector-metadata" } | { readonly kind: "storage-only"; readonly objectId: Hex }) & { readonly legacyPaidReadGas?: string }) {
   if (!Number.isSafeInteger(input.chainId) || input.chainId < 1 || !/^(?:0x|sha256:)[0-9a-f]{64}$/iu.test(input.planFingerprint)
     || !/^0x[0-9a-f]{64}$/iu.test(input.readerRuntimeCodeHash) || !Number.isSafeInteger(input.maximumTokenUriBytes) || input.maximumTokenUriBytes < 1
     || (input.blockNumber !== undefined && (typeof input.blockNumber !== "bigint" || input.blockNumber < 0n))
@@ -238,6 +284,7 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
     || !Array.isArray(input.preparationCalls) || input.preparationCalls.length > 255 || (input.observationCalls !== undefined && !Array.isArray(input.observationCalls)) || typeof input.expectedTokenURI !== "string") return failure("configuration-invalid", "The exact publication fingerprint, network, reader, and measured-read limits are required.");
   let readBounds: ReturnType<typeof resolveKeelTokenURIReadBounds>;
   try { readBounds = resolveKeelTokenURIReadBounds(input.nonstandardReadPolicy); } catch { return failure("configuration-invalid", "The exact nonstandard compatibility acknowledgement is missing, invalid or stale."); }
+  if (expectation.legacyPaidReadGas !== undefined) readBounds = { ...readBounds, maximumReadGas: BigInt(expectation.legacyPaidReadGas) };
   if (input.maximumReadGas > readBounds.maximumReadGas || input.maximumTokenUriBytes > readBounds.maximumTokenUriBytes) return failure("configuration-invalid", "Inline simulation cannot exceed its exact selected reader/provider bounds.");
   let preparationBounds: ReturnType<typeof resolveKeelPreparationReadBounds>;
   try { preparationBounds = resolveKeelPreparationReadBounds(input); } catch { return failure("configuration-invalid", "The unsigned preparation identity or bounds changed before exact read review."); }

@@ -15,12 +15,13 @@ const imageURI='data:image/png;base64,'+png.toString('base64');
 const htmlURI=html=>'data:text/html;charset=utf-8,'+encodeURIComponent(html);
 const render = (extra={}) => jsonURI({name:'Exact 🌊',image:imageURI,animation_url:htmlURI('<!doctype html><p>exact verifier program</p>'),...extra});
 
-test('known still same-source raster uses decimal thresholds separate from metadata boundaries',()=>{
+test('original-image IPFS boundary keeps the verifier separate from metadata boundaries',()=>{
  const still=n=>({...input(n),source:{...input(n).source,mediaType:'image/png'},preview:undefined,sourceMotion:'still'});
  assert.equal(p.KEEL_SMART_INLINE_ASSET_MAX_BYTES,500000);assert.equal(p.KEEL_SMART_SPLIT_ASSET_THRESHOLD_BYTES,2000000);
  for(const n of [499999,500000])assert.equal(p.planKeelSmartAssetPresentation(still(n)).selectedCandidateId,'canonical-inline');
- for(const n of [500001,1999999,2000000])assert.equal(p.planKeelSmartAssetPresentation(still(n)).selectedCandidateId,'image-only-inline');
- assert.equal(p.planKeelSmartAssetPresentation(still(2000001)).selectedCandidateId,'canonical-hybrid');
+ for(const n of [500001,900000])assert.equal(p.planKeelSmartAssetPresentation(still(n)).selectedCandidateId,'canonical-inline');
+ for(const n of [900001,1999999,2000000])assert.equal(p.planKeelSmartAssetPresentation(still(n)).selectedCandidateId,'external-preview-inline');
+ assert.equal(p.planKeelSmartAssetPresentation(still(2000001)).selectedCandidateId,'external-preview-hybrid');
 });
 test('matrix exposes maintained alternatives and never calls a local numeric estimate chain-ready',()=>{
  const plan=p.planKeelSmartAssetPresentation(input());assert.equal(plan.candidates.length,10);assert.equal(plan.publicationReady,false);
@@ -35,7 +36,7 @@ test('real prefix/cap arithmetic rejects old duplication and chooses another qua
  assert.equal(direct.source.byteLength,130296);assert.deepEqual(direct.preview,image);
 });
 test('explicit layout remains selected even when a different layout is recommended',()=>{
- const plan=choose(input(1000000),hybrid);assert.equal(plan.selectedCandidateId,'canonical-hybrid');assert.equal(plan.selectionSource,'explicit');assert.equal(plan.recommendedCandidateId,'canonical-inline');
+ const plan=choose(input(1000000),hybrid);assert.equal(plan.selectedCandidateId,'canonical-hybrid');assert.equal(plan.selectionSource,'explicit');assert.equal(plan.recommendedCandidateId,'external-preview-inline');
 });
 test('scripts always require a registered verifier and script MIME overrides a static caller label',()=>{
  const x={...input(1000000),source:{...input().source,mediaType:'text/javascript'},execution:'static'};
@@ -237,7 +238,7 @@ test('native references are never automatically selected when safe inline layout
   const plan=p.planKeelSmartAssetPresentation({...input(n),capabilities:{...capabilities,directAsset,shellInline:'unknown',shellHybrid:'unsupported',inlineImageTypes:undefined,inlineMediaTypes:undefined}});
   assert.notEqual(plan.selectedCandidateId,'direct-onchain-asset');assert.equal(plan.status,'blocked');
  }
- const other=p.planKeelSmartAssetPresentation({...input(2000001),capabilities:{...capabilities,shellHybrid:'unsupported'}});assert.equal(other.selectedCandidateId,'canonical-inline');
+ const other=p.planKeelSmartAssetPresentation({...input(2000001),capabilities:{...capabilities,shellHybrid:'unsupported'}});assert.equal(other.selectedCandidateId,'external-preview-hybrid');assert.equal(other.status,'blocked');
  const explicit=choose(input(2000001),{image:'onchain-reference',animation:'omitted'});assert.equal(explicit.selectedCandidateId,'direct-onchain-asset');assert.equal(explicit.selectionSource,'explicit');
 });
 

@@ -172,7 +172,7 @@ test("audit decodes every layer: nested data URIs, gzip slots, base64 JSON, and 
   }
 });
 
-test("audit reads tokenURI live with a 60M gas cap and never trusts estimateGas", async () => {
+test("audit reads tokenURI live with a 50M gas cap and never trusts estimateGas", async () => {
   const { directory, call } = await workspace();
   const good = await mockRpc({ tokenUri: rawPercent({ name: "live", image: IMAGE }) });
   const heavy = await mockRpc({ tokenUri: rawPercent({ name: "heavy", image: IMAGE }), needsGas: true, estimate: 21_000 });
@@ -181,7 +181,7 @@ test("audit reads tokenURI live with a 60M gas cap and never trusts estimateGas"
     assert.equal(live.verdict, "pass");
     assert.deepEqual(live.subject, { kind: "contract", chainId: 11155111, contract: CAR, tokenId: "1", block: "0x10" });
     const capped = good.calls.find((entry) => entry.method === "eth_call");
-    assert.equal(capped.params[0].gas, "0x3938700");
+    assert.equal(capped.params[0].gas, "0x2faf080");
     assert.equal(capped.params[0].data, `0xc87b56dd${"1".padStart(64, "0")}`);
     assert.equal(capped.params[1], "0x10");
 

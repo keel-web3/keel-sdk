@@ -3,7 +3,7 @@ import { resolveKeelPreparationReadBounds, assertKeelNonstandardTokenURIIdentity
 import { decodeEventLog, encodeFunctionData, getAddress, keccak256, parseAbi, type Hex } from "viem";
 import { buildKeelCreatorPreparedCopyBindingCall } from "./creator-prepared-inline.js";
 import type { prepareKeelAuthenticatedCreatorInline } from "./creator-prepared-route.js";
-import { simulateKeelPublicationBeforeFunding, type KeelPublicationSimulationInput, type KeelPreflightTransport, type KeelSimulationCall } from "./publication-preflight.js";
+import { simulateKeelRetainedPublicationAfterReceipts, simulateKeelPublicationBeforeFunding, type KeelPublicationSimulationInput, type KeelPreflightTransport, type KeelSimulationCall } from "./publication-preflight.js";
 
 type Prepared = Awaited<ReturnType<typeof prepareKeelAuthenticatedCreatorInline>>;
 type Phase = "upload" | "validate" | "create-collection" | "bind" | "mint-route" | "mint";
@@ -146,7 +146,11 @@ export async function prepareKeelCreatorPublicationWalletStep(journal:KeelCreato
     const code=await transport.request({method:"eth_getCode",params:[contract.address,block.number]});
     if(typeof code!=="string"||!/^0x(?:[0-9a-f]{2})+$/iu.test(code)||keccak256(code as Hex)!==contract.codeHash)throw new TypeError("Prepared publication runtime changed.");
   }
-  const proof=await simulateKeelPublicationBeforeFunding({...journal.simulation,assertions:(journal.simulation.assertions ?? []).filter(a=>a.callIndex>=journal.receipts.length).map(a=>({...a,callIndex:a.callIndex-journal.receipts.length})),blockNumber:BigInt(block.number),planFingerprint:journal.fingerprint,preparationCalls:pending.map(step=>step.call)},transport);
+  const simulation={...journal.simulation,assertions:(journal.simulation.assertions ?? []).filter(a=>a.callIndex>=journal.receipts.length).map(a=>({...a,callIndex:a.callIndex-journal.receipts.length})),blockNumber:BigInt(block.number),planFingerprint:journal.fingerprint,preparationCalls:pending.map(step=>step.call)};
+  const legacyPaid = journal.receipts.length > 0 && journal.simulation.preparationReadBudget === undefined && journal.simulation.nonstandardReadPolicy === undefined
+    && journal.simulation.maximumReadGas > 50_000_000n && journal.simulation.maximumReadGas <= 60_000_000n;
+  const proof=legacyPaid ? await simulateKeelRetainedPublicationAfterReceipts(simulation,journal,transport)
+    : await simulateKeelPublicationBeforeFunding(simulation,transport);
   const gas=proof.transactionGasLimits[0];if(!gas)throw new TypeError("Missing exact next-step gas envelope.");
   const step=pending[0]!;
   return {status:"approval-required" as const,stepId:step.id,phase:step.phase,approval:{...step.call,gas:`0x${BigInt(gas).toString(16)}` as Hex},proof,sourceRevision:journal.sourceRevision,settingsRevision:journal.settingsRevision,signing:"not-performed" as const,submission:"not-performed" as const};

@@ -293,8 +293,9 @@ export function resolveKeelRetainedBuildReadPolicy(profile: KeelStudioDefaultPro
   const current = parseKeelStudioDefaultProfile(profile);
   const retained = input.retained === undefined ? null : retainedBuildSnapshot(input.retained);
   const readKeys = ["rpcMaxConcurrentReads", "maxReadGas", "maxOutputBytes"] as const;
-  const values: Record<string, number> = { rpcMaxConcurrentReads: KEEL_DEFAULT_RPC_READ_CONCURRENCY };
-  const sources: Record<string, KeelEffectiveBuildDefaults["sources"][string]> = { rpcMaxConcurrentReads: "system" };
+  const values: Record<string, number> = { rpcMaxConcurrentReads: KEEL_DEFAULT_RPC_READ_CONCURRENCY,
+    maxReadGas: retained === null ? 50_000_000 : Number(retained.values.maxReadGas ?? 60_000_000) };
+  const sources: Record<string, KeelEffectiveBuildDefaults["sources"][string]> = { rpcMaxConcurrentReads: "system", maxReadGas: retained?.sources.maxReadGas ?? "system" };
   const fields = new Map(KEEL_BUILD_DEFAULT_FIELDS.map(field => [field.id, field]));
   for (const [source, rawLayer] of [["account", current.global], ["media", current.byMedia[input.mediaType ?? ""]], ["project", input.project], ["build", input.build]] as const) {
     const layer = rawLayer === undefined ? {} : answers(rawLayer);
