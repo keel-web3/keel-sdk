@@ -457,6 +457,106 @@ function resourceOffset(layer: Layer, offset: number): number {
   return at;
 }
 
+interface TrustedSpan { readonly start: number; readonly end: number; readonly module: PinnedModule }
+interface JsonStringView extends MappedBytes { readonly start: number; readonly end: number; readonly value: string }
+
+/** Read JSON tokens in byte coordinates; native JSON and fatal UTF-8 validate
+ * the grammar before token spans can carry any pinned-payload authority. */
+function jsonLayer(bytes: Uint8Array): { readonly declared: unknown; readonly strings: readonly JsonStringView[]; readonly slots: readonly JsonStringView[] } | undefined {
+  const text = byteText(bytes);
+  let prefix = text.startsWith(",") ? 1 : 0, limit = bytes.byteLength;
+  let declared: unknown;
+  const valid = () => { try { declared = JSON.parse(new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(bytes.subarray(prefix, limit))); return true; } catch { return false; } };
+  if (!valid()) {
+    // The maintained prepared-COPY document carries these same JSON items in
+    // one literal array. The marker locates grammar, never grants authority:
+    // every embedded body below still needs its complete catalog SHA/length.
+    const marker = "globalThis.__KEEL_ITEMS__=[null", found = text.indexOf(marker);
+    if (found < 0) return undefined;
+    prefix = found + marker.length - "[null".length;
+    let depth = 0, quoted = false; limit = -1;
+    for (let index = prefix; index < text.length; index++) {
+      const char = text[index];
+      if (quoted) { if (char === "\\") index++; else if (char === '"') quoted = false; }
+      else if (char === '"') quoted = true;
+      else if (char === "[") depth++;
+      else if (char === "]" && --depth === 0) { limit = index + 1; break; }
+    }
+    if (limit < 0 || !valid()) return undefined;
+  }
+  const strings: JsonStringView[] = [], slots: JsonStringView[] = [];
+  let at = prefix, objects = 0;
+  const space = () => { while (/[ \r\n\t]/u.test(text[at] ?? "x")) at++; };
+  const string = (): JsonStringView => {
+    const start = at++, output: number[] = [], map: number[] = [];
+    const emit = (value: readonly number[], source: number) => { for (const byte of value) { output.push(byte); map.push(source); } };
+    while (at < text.length && text[at] !== '"') {
+      const source = at;
+      if (text[at] !== "\\") { emit([bytes[at++]!], source); continue; }
+      const escaped = text[++at]!;
+      if (escaped === "u") {
+        let length = 6;
+        const first = Number.parseInt(text.slice(at + 1, at + 5), 16);
+        if (first >= 0xd800 && first <= 0xdbff && text.slice(source + 6, source + 8) === "\\u") {
+          const second = Number.parseInt(text.slice(source + 8, source + 12), 16);
+          if (second >= 0xdc00 && second <= 0xdfff) length = 12;
+        }
+        const value = JSON.parse('"' + text.slice(source, source + length) + '"') as string;
+        emit([...new TextEncoder().encode(value)], source); at = source + length;
+      } else {
+        const escapes: Readonly<Record<string, number>> = { '"': 34, "\\": 92, "/": 47, b: 8, f: 12, n: 10, r: 13, t: 9 };
+        emit([escapes[escaped]!], source); at++;
+      }
+    }
+    const end = ++at;
+    const value = JSON.parse(new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(bytes.subarray(start, end))) as string;
+    const decoded = Uint8Array.from(output);
+    if (new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(decoded) !== value) throw new TypeError("JSON string cannot preserve its UTF-8 bytes");
+    map.push(end - 1);
+    return { start, end, value, bytes: decoded, map: Uint32Array.from(map) };
+  };
+  const value = (depth: number, field?: string): JsonStringView | undefined => {
+    if (depth > 128 || ++objects > 16_384) throw new RangeError("JSON token inspection bound");
+    space();
+    if (text[at] === '"') { const result = string(); strings.push(result); return result; }
+    if (text[at] === "{") {
+      at++; space(); let stored: JsonStringView | undefined, compression: string | undefined;
+      while (text[at] !== "}") {
+        space(); const key = string().value; space(); at++;
+        const child = value(depth + 1, key);
+        if (key === "storedText") stored = child;
+        if (key === "compression") compression = child?.value;
+        space(); if (text[at] !== ",") break; at++;
+      }
+      at++;
+      if (field === "embedded" && compression === "none" && stored !== undefined) slots.push(stored);
+    } else if (text[at] === "[") {
+      at++; space(); while (text[at] !== "]") { value(depth + 1); space(); if (text[at] !== ",") break; at++; } at++;
+    } else { while (at < text.length && !/[ \r\n\t,}\]]/u.test(text[at]!)) at++; }
+    return undefined;
+  };
+  value(0); return { declared, strings, slots };
+}
+
+function containsSpan(spans: readonly TrustedSpan[], start: number, end: number): boolean {
+  return spans.some(span => start >= span.start && end <= span.end);
+}
+
+/** A payload pin is scoped to this exact string body and exact mapped views.
+ * Compressed-container diagnostic anchors are never authorization maps. */
+function trustSpan(state: ScanState, layer: Layer, start: number, end: number, module: PinnedModule): void {
+  let current = layer, from = start, to = end;
+  for (;;) {
+    if (from < 0 || to <= from || to > current.bytes.byteLength) return;
+    const spans = state.trustedSpans.get(current) ?? [];
+    spans.push({ start: from, end: to, module }); state.trustedSpans.set(current, spans);
+    if (!current.view || !current.parent || !current.toParent) return;
+    const parentFrom = current.toParent(from), parentTo = current.toParent(to);
+    if (!Number.isSafeInteger(parentFrom) || !Number.isSafeInteger(parentTo) || parentFrom < 0 || parentTo <= parentFrom || parentTo > current.parent.bytes.byteLength) return;
+    current = current.parent; from = parentFrom; to = parentTo;
+  }
+}
+
 interface ScanState {
   readonly hits: KeelLinkGateHit[];
   readonly hitKeys: Set<string>;
@@ -469,6 +569,7 @@ interface ScanState {
   hitCount: number;
   exemptLayer: (bytes: Uint8Array) => PinnedModule | undefined;
   readonly previews: ReadonlySet<string>;
+  readonly trustedSpans: Map<Layer, TrustedSpan[]>;
 }
 
 function snippet(text: string, start: number, end: number): string {
@@ -482,7 +583,12 @@ function snippet(text: string, start: number, end: number): string {
 function viewExemption<T>(layer: Layer, start: number, end: number, match: (text: string, start: number, end: number) => T | undefined): T | undefined {
   let current: Layer = layer, from = start, to = end;
   while (current.view === true && current.parent !== undefined && current.toParent !== undefined) {
-    from = current.toParent(from); to = current.toParent(Math.max(from, to - 1)) + 1;
+    // Map both half-open boundaries from the same child coordinate system.
+    // Mixing the mapped start with the child end can authorize another span.
+    if (!Number.isSafeInteger(from) || !Number.isSafeInteger(to) || from < 0 || to <= from || to > current.bytes.byteLength) return undefined;
+    const parentFrom = current.toParent(from), parentTo = current.toParent(to);
+    if (!Number.isSafeInteger(parentFrom) || !Number.isSafeInteger(parentTo) || parentFrom < 0 || parentTo <= parentFrom || parentTo > current.parent.bytes.byteLength) return undefined;
+    from = parentFrom; to = parentTo;
     current = current.parent;
     const found = match(byteText(current.bytes), from, to);
     if (found) return found;
@@ -509,7 +615,7 @@ interface MappedBytes { readonly bytes: Uint8Array; readonly map: Uint32Array }
 
 function decodePercent(text: string): MappedBytes | undefined {
   if (!/%[0-9A-Fa-f]{2}/u.test(text)) return undefined;
-  const bytes = new Uint8Array(text.length), map = new Uint32Array(text.length);
+  const bytes = new Uint8Array(text.length), map = new Uint32Array(text.length + 1);
   let length = 0;
   for (let index = 0; index < text.length; index += 1) {
     map[length] = index;
@@ -518,7 +624,8 @@ function decodePercent(text: string): MappedBytes | undefined {
       index += 2;
     } else bytes[length++] = text.charCodeAt(index) & 0xff;
   }
-  return { bytes: bytes.slice(0, length), map: map.slice(0, length) };
+  map[length] = text.length;
+  return { bytes: bytes.slice(0, length), map: map.slice(0, length + 1) };
 }
 
 /** JavaScript/JSON string escapes (\/, \uXXXX, \xXX) that hide a locator from a literal scan. */
@@ -538,6 +645,7 @@ function unescapeScript(text: string): MappedBytes | undefined {
     else if (rest.startsWith("\\/")) { emit(47, index); index += 1; }
     else emit(text.charCodeAt(index) & 0xff, index);
   }
+  map.push(text.length);
   return { bytes: Uint8Array.from(bytes), map: Uint32Array.from(map) };
 }
 
@@ -641,25 +749,57 @@ function inspect(state: ScanState, layer: Layer): void {
     state.hitCount += 1;
     if (state.hits.length < MAX_REPORTED_HITS) state.hits.push({ resource: layer.resource, offset, layerOffset: start, layers: layer.path, url, scheme, context });
   };
-  for (const match of text.matchAll(GATE_LOCATOR)) {
-    const url = match[0].replace(/[),.;]+$/u, "");
-    record(match.index, match.index + url.length, url, url.slice(0, url.indexOf(":")).toLowerCase(), match[0]);
-  }
-  for (const match of text.matchAll(SENTINEL)) record(match.index, match.index + match[0].length, match[0], "keel.invalid");
-
   const child = (bytes: Uint8Array | undefined, codec: string, at: number, map?: Uint32Array) => {
     if (bytes === undefined || bytes.byteLength === 0) return;
     if (layer.depth >= MAX_DEPTH) { state.uninspected.add(`${codec}: exceeds the ${MAX_DEPTH}-layer nesting bound`); return; }
     if (state.expandedBytes + bytes.byteLength > MAX_EXPANDED_BYTES) { state.uninspected.add(`${codec}: exceeds the ${MAX_EXPANDED_BYTES}-byte scan bound`); return; }
     state.expandedBytes += bytes.byteLength;
-    const toParent = map === undefined ? () => at : (offset: number) => map[offset] ?? at;
-    inspect(state, { resource: layer.resource, bytes, path: [...layer.path, `${codec}@${at}`], depth: layer.depth + 1, parent: layer, toParent, ...(map === undefined ? {} : { view: true }), ...(pinned === undefined ? {} : { pinned }) });
+    const toParent = map === undefined ? () => at : (offset: number) => map[offset] ?? Number.NaN;
+    const next: Layer = { resource: layer.resource, bytes, path: [...layer.path, `${codec}@${at}`], depth: layer.depth + 1, parent: layer, toParent, ...(map === undefined ? {} : { view: true }), ...(pinned === undefined ? {} : { pinned }) };
+    if (map !== undefined && map.length === bytes.byteLength + 1) {
+      // A sibling escape can require a whole-layer view. Carry only child
+      // intervals whose complete mapped byte span stays inside a proven body.
+      const boundary = (value: number, inclusive: boolean) => {
+        let low = 0, high = map.length;
+        while (low < high) { const mid = (low + high) >>> 1; if (map[mid]! < value || inclusive && map[mid] === value) low = mid + 1; else high = mid; }
+        return low;
+      };
+      for (const span of state.trustedSpans.get(layer) ?? []) {
+        const start = boundary(span.start, false), end = boundary(span.end, true) - 1;
+        if (start < end && end <= bytes.byteLength && map[start]! >= span.start && map[end]! <= span.end) {
+          const inherited = state.trustedSpans.get(next) ?? [];
+          inherited.push({start, end, module: span.module}); state.trustedSpans.set(next, inherited);
+        }
+      }
+    }
+    inspect(state, next);
   };
+
+  const spans = () => state.trustedSpans.get(layer) ?? [];
+  const outside = (start: number, end: number) => !containsSpan(spans(), start, end);
+  let json: ReturnType<typeof jsonLayer>;
+  try { json = jsonLayer(layer.bytes); }
+  catch { state.uninspected.add("JSON token inspection could not finish within its bounds"); }
+  if (json !== undefined) {
+    for (const slot of json.slots) {
+      const module = state.exemptLayer(slot.bytes);
+      if (module !== undefined) {
+        trustSpan(state, layer, slot.start + 1, slot.end - 1, module);
+        if (state.exemptions.length < MAX_REPORTED_HITS) state.exemptions.push({resource: layer.resource, url: "", reason: "registered-module-bytes", moduleId: module.moduleId, version: module.version});
+      }
+    }
+    for (const string of json.strings) {
+      if (string.bytes.byteLength < 32 || !outside(string.start + 1, string.end - 1)) continue;
+      const original = layer.bytes.subarray(string.start + 1, string.end - 1);
+      if (original.byteLength === string.bytes.byteLength && original.every((byte, index) => byte === string.bytes[index])) continue;
+      if (interesting(string.bytes)) child(string.bytes, "json-string", 0, string.map);
+    }
+  }
 
   // Owned embedded slots declare their codec. Unlike speculative binary
   // guesses, a declared compressed payload must be opened or remain blocked.
-  let declared: unknown;
-  try { declared = JSON.parse(text.startsWith(",") ? text.slice(1).trimEnd() : text); } catch { /* Not a JSON slot. */ }
+  let declared: unknown = json?.declared;
+  if (declared === undefined) try { declared = JSON.parse(text.startsWith(",") ? text.slice(1).trimEnd() : text); } catch { /* Not a JSON slot. */ }
   const pending: unknown[] = declared === undefined ? [] : [declared];
   let inspectedObjects = 0;
   while (pending.length > 0) {
@@ -702,16 +842,30 @@ function inspect(state: ScanState, layer: Layer): void {
     child(decompress(state, "gzip", layer.bytes.subarray(at)), "gzip", at);
   }
   if (text8) {
-    const percent = decodePercent(text), escaped = unescapeScript(text);
-    if (percent) child(percent.bytes, "percent", 0, percent.map);
-    if (escaped) child(escaped.bytes, "escape", 0, escaped.map);
+    if ([...text.matchAll(/%[0-9A-Fa-f]{2}/gu)].some(match => outside(match.index, match.index + match[0].length))) {
+      const percent = decodePercent(text); if (percent) child(percent.bytes, "percent", 0, percent.map);
+    }
+    if ([...text.matchAll(/\\(?:\/|u[0-9A-Fa-f]{4}|x[0-9A-Fa-f]{2})/gu)].some(match => outside(match.index, match.index + match[0].length))) {
+      const escaped = unescapeScript(text); if (escaped) child(escaped.bytes, "escape", 0, escaped.map);
+    }
   }
   // data: URIs, then any remaining Base64 runs (storedBase64 slots, inline blobs, JSON payloads).
   const covered: [number, number][] = [];
-  for (const match of text.matchAll(/data:([a-z0-9.+\/-]*)((?:;[a-z0-9.+=-]+)*?)(;base64)?,([^\s"'<>\\]{8,})/giu)) {
+  const dataUris = /data:([a-z0-9.+\/-]*)((?:;[a-z0-9.+=-]+)*?)(;base64)?,([^\s"'<>\\]{8,})/giu;
+  let match: RegExpExecArray | null;
+  while ((match = dataUris.exec(text)) !== null) {
     const at = match.index + match[0].length - match[4]!.length;
     const payload = match[3] ? /^[A-Za-z0-9+\/=_%-]*/u.exec(match[4]!)![0] : match[4]!;
+    const owner = spans().find(span => match!.index >= span.start && match!.index + 5 <= span.end && at < span.end);
+    if (owner !== undefined) {
+      // A feature-probe data: literal cannot cross its proven JSON string
+      // boundary. Do not consume or mark the untrusted suffix as covered.
+      covered.push([at, Math.min(at + payload.length, owner.end)]);
+      dataUris.lastIndex = owner.end;
+      continue;
+    }
     covered.push([at, at + payload.length]);
+    if (!outside(at, at + payload.length)) continue;
     const bytes = match[3] ? base64Bytes(decodeURIComponentSafe(payload)) : decodePercent(payload)?.bytes;
     child(bytes, `data-uri${match[1] ? `(${match[1]})` : ""}${match[3] ? "-base64" : ""}`, at);
   }
@@ -719,11 +873,20 @@ function inspect(state: ScanState, layer: Layer): void {
   for (const match of text.matchAll(/[A-Za-z0-9+\/_-]{32,}={0,2}/gu)) {
     if (runs >= MAX_BASE64_RUNS_PER_LAYER) { state.uninspected.add(`more than ${MAX_BASE64_RUNS_PER_LAYER} Base64 runs in one layer`); break; }
     const at = match.index;
-    if (covered.some(([start, end]) => at >= start && at < end)) continue;
+    if (covered.some(([start, end]) => at >= start && at < end) || !outside(at, at + match[0].length)) continue;
     runs += 1;
     const bytes = base64Bytes(match[0]);
     if (bytes !== undefined && interesting(bytes)) child(bytes, "base64", at);
   }
+  let visible = text;
+  for (const span of [...spans()].sort((a,b) => b.start - a.start)) visible = visible.slice(0, span.start) + " ".repeat(span.end - span.start) + visible.slice(span.end);
+  for (const match of visible.matchAll(GATE_LOCATOR)) {
+    const url = match[0].replace(/[),.;]+$/u, "");
+    record(match.index, match.index + url.length, url, url.slice(0, url.indexOf(":")).toLowerCase(), match[0]);
+  }
+  for (const match of visible.matchAll(SENTINEL)) record(match.index, match.index + match[0].length, match[0], "keel.invalid");
+
+
 }
 
 function decodeURIComponentSafe(value: string): string {
@@ -843,8 +1006,8 @@ export function scanKeelLinkGate(input: KeelLinkGateInput): KeelLinkGateReport {
   const byDigest = new Map(pinnedModules().map((module) => [module.digest, module] as const));
   const state: ScanState = {
     hits: [], hitKeys: new Set(), exemptions: [], layers: [], visited: new Set(), uninspected: new Set(), digestOf: new Map(), expandedBytes: 0, hitCount: 0,
-    exemptLayer: (bytes) => byDigest.get(digestOf(state, bytes)),
-    previews: new Set(snapshotKeelLinkGatePreviews(input.externalPreviews).map(preview => preview.uri)),
+    exemptLayer: (bytes) => { const module = byDigest.get(digestOf(state, bytes)); return module?.byteLength === bytes.byteLength ? module : undefined; },
+    previews: new Set(snapshotKeelLinkGatePreviews(input.externalPreviews).map(preview => preview.uri)), trustedSpans: new Map(),
   };
   const resources: KeelLinkGateReport["resources"][number][] = [];
   for (const resource of input.resources) {
@@ -965,7 +1128,7 @@ let infrastructureLoad: Promise<readonly KeelLinkGateInfrastructure[]> | undefin
 function layerTexts(id: string, bytes: Uint8Array): string[] {
   const state: ScanState = {
     hits: [], hitKeys: new Set(), exemptions: [], layers: [], visited: new Set(), uninspected: new Set(), digestOf: new Map(), expandedBytes: 0, hitCount: 0,
-    exemptLayer: () => undefined, previews: new Set(),
+    exemptLayer: () => undefined, previews: new Set(), trustedSpans: new Map(),
   };
   inspect(state, { resource: id, bytes, path: [], depth: 0 });
   return state.layers.map((layer) => byteText(layer.bytes));
