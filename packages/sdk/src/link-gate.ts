@@ -1142,22 +1142,21 @@ export function loadKeelLinkGateInfrastructure(): Promise<readonly KeelLinkGateI
       const bytes = typeof value === "string" ? new TextEncoder().encode(value) : value;
       entries.push({ id, digest: sha256Hex(bytes), texts: layerTexts(id, bytes) });
     };
-    const fs = builtin<NodeFs>("node:fs"), path = builtin<NodePath>("node:path"), root = repositoryRoot();
-    if (fs && path && root) {
+    const fs = builtin<NodeFs>("node:fs"), path = builtin<NodePath>("node:path"), url = builtin<typeof import("node:url")>("node:url");
+    if (fs && path && url && import.meta.url.startsWith("file:")) {
+      const directory = path.dirname(url.fileURLToPath(import.meta.url));
       for (const [id, file] of [
-        ["keel.published-view-reader", "packages/sdk/dist/assets/keel-published-view-reader-v1.js"],
-        ["keel.verification-chrome", "packages/viewer/src/keel-verification-chrome.js"],
-        ["keel.managed-shell-runtime", "packages/sdk/dist/managed-shell-runtime.js"],
+        ["keel.published-view-reader", "assets/keel-published-view-reader-v1.js"],
+        ["keel.verification-chrome", "assets/keel-verification-chrome.js"],
+        ["keel.managed-shell-runtime", "managed-shell-runtime.js"],
       ] as const) {
-        try { add(id, new Uint8Array(fs.readFileSync(path.join(root, file)))); } catch { /* Not part of this checkout or bundle. */ }
+        try { add(id, new Uint8Array(fs.readFileSync(path.join(directory, file)))); } catch { /* Not part of this package or bundle. */ }
       }
       try {
         // Not statically analysable: browser bundles of wallet-request must not pull in the shell builder.
-        const url = builtin<typeof import("node:url")>("node:url");
-        if (!url) throw new Error("Node URL resolution is unavailable.");
-        const specifier = url.pathToFileURL(path.join(path.dirname(url.fileURLToPath(import.meta.url)), "inline-viewer-graph.js")).href;
+        const specifier = url.pathToFileURL(path.join(directory, "inline-viewer-graph.js")).href;
         const graph = await import(/* webpackIgnore: true */ /* @vite-ignore */ specifier) as typeof import("./inline-viewer-graph.js");
-        const shell = await graph.buildKeelInlineShellFragments({ repositoryRoot: root });
+        const shell = await graph.buildKeelInlineShellFragments();
         add("keel.verification-shell.prefix", shell.prefix.bytes);
         add("keel.verification-shell.suffix", shell.suffix.bytes);
       } catch { /* The shell sources are not available here; only the static assets are exempt. */ }

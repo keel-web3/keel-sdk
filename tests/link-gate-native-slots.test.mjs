@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFile} from 'node:fs/promises';
+import {readFile,cp,mkdtemp,symlink,rm,copyFile} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import path from 'node:path';
+import {fileURLToPath,pathToFileURL} from 'node:url';
 import {createHash} from 'node:crypto';
 import {gzipSync,brotliCompressSync,deflateRawSync} from 'node:zlib';
 import {scanKeelLinkGate,enforceKeelLinkGate} from '../packages/sdk/dist/link-gate.js';
@@ -76,4 +79,22 @@ test('owned HTML arrays retain mandatory declared-codec inspection',()=>{
  for(const embedded of [{compression:'brotli',storedBase64:'invalid*'},{compression:'unavailable-codec',storedBase64:Buffer.from(source).toString('base64')}]){
   const report=scan(utf8('<script>globalThis.__KEEL_ITEMS__='+JSON.stringify([null,{embedded}])+';</script>'));assert.equal(report.status,'blocked');assert.ok(report.coverage.uninspected.length);
  }
+});
+
+
+test('installed SDK layout loads canonical gate assets without a checkout',async()=>{
+ const directory=await mkdtemp(path.join(tmpdir(),'keel-installed-gate-'));
+ try{
+  await cp(new URL('../packages/sdk/dist/',import.meta.url),path.join(directory,'dist'),{recursive:true});
+  await copyFile(new URL('../packages/sdk/package.json',import.meta.url),path.join(directory,'package.json'));
+  // Reuse dependency installation only; no examples or repository tree is copied.
+  await symlink(fileURLToPath(new URL('../packages/sdk/node_modules',import.meta.url)),path.join(directory,'node_modules'),'dir');
+  const installed=await import(pathToFileURL(path.join(directory,'dist/link-gate.js')).href);
+  const infrastructure=await installed.loadKeelLinkGateInfrastructure();
+  for(const id of ['keel.published-view-reader','keel.verification-chrome','keel.verification-shell.prefix','keel.verification-shell.suffix'])assert.ok(infrastructure.some(r=>r.id===id),id);
+  const shell=await buildKeelInlineShellFragments({codecProfile:'native'});
+  const report=await installed.enforceKeelLinkGate({route:'installed-layout',resources:[{id:'registered-suffix',bytes:shell.suffix.bytes}]});assert.equal(report.status,'clear');
+  const evil='https://evil.invalid/installed-tail';
+  await assert.rejects(installed.enforceKeelLinkGate({route:'installed-layout',resources:[{id:'creator',bytes:utf8('<a href="'+evil+'">x</a>')}]}),e=>e.report.hits.some(h=>h.url===evil));
+ }finally{await rm(directory,{recursive:true,force:true});}
 });
