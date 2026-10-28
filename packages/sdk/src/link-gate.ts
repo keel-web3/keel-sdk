@@ -339,8 +339,9 @@ function pinnedModules(): readonly PinnedModule[] {
 
 function repositoryRoot(): string | undefined {
   try {
-    const url = new URL("../../../", import.meta.url);
-    return url.protocol === "file:" ? decodeURIComponent(url.pathname) : undefined;
+    const path = builtin<NodePath>("node:path"), url = builtin<typeof import("node:url")>("node:url");
+    if (!path || !url || !import.meta.url.startsWith("file:")) return undefined;
+    return path.resolve(path.dirname(url.fileURLToPath(import.meta.url)), "../../..");
   } catch { return undefined; }
 }
 
@@ -989,7 +990,9 @@ export function loadKeelLinkGateInfrastructure(): Promise<readonly KeelLinkGateI
       }
       try {
         // Not statically analysable: browser bundles of wallet-request must not pull in the shell builder.
-        const specifier = new URL("./inline-viewer-graph.js", import.meta.url).href;
+        const url = builtin<typeof import("node:url")>("node:url");
+        if (!url) throw new Error("Node URL resolution is unavailable.");
+        const specifier = url.pathToFileURL(path.join(path.dirname(url.fileURLToPath(import.meta.url)), "inline-viewer-graph.js")).href;
         const graph = await import(/* webpackIgnore: true */ /* @vite-ignore */ specifier) as typeof import("./inline-viewer-graph.js");
         const shell = await graph.buildKeelInlineShellFragments({ repositoryRoot: root });
         add("keel.verification-shell.prefix", shell.prefix.bytes);
