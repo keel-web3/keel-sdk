@@ -469,7 +469,7 @@ function projectStack(
     const configured = asset.stack;
     return {
       id: asset.id,
-      label: configured?.label.trim() || asset.fileName,
+      label: configured?.label.trim() || [...asset.fileName].reduce((label, character) => label.length + character.length <= 96 ? label + character : label, ""),
       role: configured?.role ?? inferredStackRole(asset),
       order,
       resource: asset.id,
