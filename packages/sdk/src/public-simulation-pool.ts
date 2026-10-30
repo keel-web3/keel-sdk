@@ -520,7 +520,7 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
         // -38026 is Geth's client limit, also used for non-gas limits. Only
         // separately authenticated request-capacity evidence permits fallback.
         const clientCapacityRejection = code === -38026 && requestCapacityEvidence;
-        const rateRejection = failure.diagnostic?.transportFailure === "rate-limited" && (code === undefined || code === 429 || code === -32005);
+        const rateRejection = failure.diagnostic?.transportFailure === "rate-limited" && (code === undefined || code === 429 || code === -32005 || code === -32029 && failure.diagnostic?.httpStatus === 429);
         const accessRejection = failure.diagnostic?.failureReason === "access-denied" && (code === undefined || code === 401 || code === 403);
         const retryableRpcRejection = code === undefined || code === -32601 || rateRejection || accessRejection
           || failure.kind === "provider-limit" && (failure.diagnostic?.providerGasCap !== undefined || failure.diagnostic?.httpStatus === 413 || failure.diagnostic?.gasCapacityScope === "request-bytes"

@@ -178,8 +178,13 @@ function rejectRpcError(method: string, error: { code?: unknown; message?: unkno
     throw new KeelRpcResponseError(code, undefined, undefined, status);
   if ([401, 403].includes(code)) throw new ProviderFailure("access-denied", 0, { transportFailure: "rpc-error", httpStatus: status, rpcCode: code });
   if (/execution reverted/iu.test(message)) throw new KeelRpcResponseError(3, typeof error.data === "string" && /^0x[0-9a-f]*$/iu.test(error.data) ? error.data : undefined, undefined, status);
-  if (/api.?key|unauthorized|authentication|access denied/iu.test(message)) throw new ProviderFailure("access-denied", 0, { transportFailure: "rpc-error", httpStatus: status, rpcCode: code });
-  if (code === 429 || code === -32005 || /rate.?limit|too many requests|quota|compute units|usage.?limit/iu.test(message)) throw new ProviderFailure("rate-limited", delay, { transportFailure: "rate-limited", httpStatus: status, rpcCode: code });
+  // An explicit authentication denial remains terminal even when a provider
+  // returns an inconsistent 429. Mere mention of a key is not a denial: many
+  // quota messages say "API key rate limit". Keep those transient.
+  if (/unauthorized|unauthorised|not authori[sz]ed|forbidden|authentication|access denied|(?:invalid|missing|expired|revoked|unauthori[sz]ed)\s+(?:api[ -]?)?key|(?:api[ -]?)?key\s+(?:is\s+)?(?:invalid|missing|expired|revoked|unauthori[sz]ed)/iu.test(message))
+    throw new ProviderFailure("access-denied", 0, { transportFailure: "rpc-error", httpStatus: status, rpcCode: code });
+  if (code === 429 || code === -32005 || code === -32029 && status === 429 || /rate.?limit|too many requests|quota|compute units|usage.?limit/iu.test(message)) throw new ProviderFailure("rate-limited", delay, { transportFailure: "rate-limited", httpStatus: status, rpcCode: code });
+  if (/api.?key/iu.test(message)) throw new ProviderFailure("access-denied", 0, { transportFailure: "rpc-error", httpStatus: status, rpcCode: code });
   if (/missing trie|historical|pruned|state.*unavailable|header not found/iu.test(message)) throw new ProviderFailure("history-unavailable", 0, { transportFailure: "rpc-error", httpStatus: status, rpcCode: code });
   if (method === "eth_simulateV1") {
     // Preserve typed failure evidence while never exposing a provider URL,
@@ -237,6 +242,10 @@ export interface KeelRpcPoolOptions {
   /** Complete publication simulations can take longer than ordinary reads. */
   readonly simulationTimeoutMs?: number;
   readonly minIntervalMs?: number;
+  /** Maximum pending requests per provider, excluding its active request. */
+  readonly maximumQueuedRequests?: number;
+  /** Maximum time a read may wait for a provider slot. */
+  readonly maximumQueueWaitMs?: number;
   readonly maxResponseBytes?: number;
   readonly allowLoopback?: boolean;
   readonly fetchImpl?: typeof fetch;
@@ -267,17 +276,27 @@ function pause(ms: number, signal?: AbortSignal): Promise<void> {
     signal?.addEventListener("abort", onAbort, { once: true });
   });
 }
+/** Local admission exhaustion does not imply that the provider failed. */
+export class KeelRpcQueueFullError extends Error {
+  constructor() { super("The provider read queue is full. Retry after active requests finish."); this.name = "KeelRpcQueueFullError"; }
+}
+export class KeelRpcQueueTimeoutError extends Error {
+  constructor() { super("The provider read queue exceeded its wait budget. Retry the saved read."); this.name = "KeelRpcQueueTimeoutError"; }
+}
 export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
   if (!Array.isArray(options.rpcUrls) || options.rpcUrls.length < 1 || options.rpcUrls.length > 6) throw new TypeError("RPC pool requires one to six endpoints.");
   if (options.chainId !== undefined && (!Number.isSafeInteger(options.chainId) || options.chainId < 1)) throw new TypeError("RPC pool requires a positive expected chain ID.");
   const timeoutMs = bound(options.timeoutMs, 8000, 100, 30000);
   const simulationTimeoutMs = bound(options.simulationTimeoutMs, timeoutMs, 100, 90000);
   const minIntervalMs = bound(options.minIntervalMs, 250, 0, 10000);
+  const maximumQueuedRequests = bound(options.maximumQueuedRequests, 64, 1, 256);
+  const maximumQueueWaitMs = bound(options.maximumQueueWaitMs, 30_000, 1, 60_000);
   const maxBytes = bound(options.maxResponseBytes, 16 * 1024 * 1024, 1024, 64 * 1024 * 1024);
   const states = [...new Set(options.rpcUrls.map(url => normalizeKeelRpcUrl(url, options.allowLoopback)))].map(url => ({
     url, disabled: false, cooldown: 0, nextAt: 0, failures: 0, chainId: undefined as number | undefined,
     checkedAt: 0, checking: undefined as Promise<void> | undefined, reason: undefined as FailureReason | undefined,
-    diagnostic: undefined as KeelRpcFailureDiagnostic | undefined, tail: Promise.resolve(),
+    diagnostic: undefined as KeelRpcFailureDiagnostic | undefined, active: false,
+    queue: [] as { admit: () => void; cancel: () => void }[],
   }));
   const fetcher = options.fetchImpl ?? fetch;
   let expectedChain = options.chainId, cursor = 0, id = 0;
@@ -285,10 +304,25 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
     ...(s.chainId === undefined ? {} : { checkedChainId: s.chainId }), ...(s.reason === undefined ? {} : { reason: s.reason }),
     ...(s.diagnostic === undefined ? {} : { diagnostic: s.diagnostic }),
     retryAfterMs: Math.max(0, s.cooldown - Date.now()), disabled: s.disabled }));
+  function acquire(state: typeof states[number], signal?: AbortSignal): Promise<() => void> {
+    signal?.throwIfAborted();
+    const release = () => {
+      const next = state.queue.shift();
+      if (next) next.admit(); else state.active = false;
+    };
+    if (!state.active) { state.active = true; return Promise.resolve(release); }
+    if (state.queue.length >= maximumQueuedRequests) throw new KeelRpcQueueFullError();
+    return new Promise((resolve, reject) => {
+      const remove = () => { const i = state.queue.indexOf(waiter); if (i >= 0) state.queue.splice(i, 1); clearTimeout(timer); signal?.removeEventListener("abort", waiter.cancel); };
+      const waiter = { admit() { clearTimeout(timer); signal?.removeEventListener("abort", waiter.cancel); resolve(release); },
+        cancel() { remove(); reject(signal?.reason); } };
+      const timer = setTimeout(() => { remove(); reject(new KeelRpcQueueTimeoutError()); }, maximumQueueWaitMs);
+      state.queue.push(waiter); signal?.addEventListener("abort", waiter.cancel, { once: true });
+      if (signal?.aborted) waiter.cancel();
+    });
+  }
   async function send(state: typeof states[number], method: string, params: readonly unknown[], signal?: AbortSignal): Promise<unknown> {
-    const prior = state.tail; let release!: () => void;
-    state.tail = new Promise<void>(r => { release = r; });
-    await prior;
+    const release = await acquire(state, signal);
     let timer: ReturnType<typeof setTimeout> | undefined;
     let timedOut = false;
     let requestWireBytes: number | undefined;
@@ -475,7 +509,7 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
         return value;
       } catch (error) {
         input.signal?.throwIfAborted();
-        if (error instanceof KeelRpcResponseError || error instanceof KeelRpcHttpRequestError) throw error;
+        if (error instanceof KeelRpcResponseError || error instanceof KeelRpcHttpRequestError || error instanceof KeelRpcQueueFullError || error instanceof KeelRpcQueueTimeoutError) throw error;
         // A queued chain check may inherit another caller's cancellation. It
         // must not replace a denial already observed by that shared source.
         const failure = state.disabled && state.reason === "access-denied" ? new ProviderFailure("access-denied", 0, state.diagnostic)

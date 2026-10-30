@@ -20,10 +20,10 @@ function retryableStateSource(error) {
   // Only observed retry classes may disclose address/key reads to an alternative.
   // Malformed envelopes, unknown RPC/transport errors and missing pinned state
   // are ambiguous safety failures, not authority to shop another recipient.
-  return error.reason==='rate-limited'||d?.transportFailure==='timeout'
+  return error.reason==='rate-limited'||d?.transportFailure==='timeout'||d?.transportFailure==='connection-reset'
     ||d?.rpcCode===-32601||d?.rpcCode===4200||d?.httpStatus===413||d?.responseFailure==='response-too-large';
 }
-export function createApprovedProofStateReader({rpcUrls,approvedStateRpcUrls,block,fetchImpl,minIntervalMs=250,onAttempt}) {
+export function createApprovedProofStateReader({rpcUrls,approvedStateRpcUrls,block,fetchImpl,minIntervalMs=250,onAttempt,random=Math.random}) {
   const configured=[...new Set(rpcUrls.map(url=>normalizeKeelRpcUrl(url)))];
   const approved=new Set(approvedStateRpcUrls.map(url=>normalizeKeelRpcUrl(url)));
   if([...approved].some(url=>!configured.includes(url))||typeof block.number!=='bigint'||block.number<0n||!hash.test(block.hash))throw fail('State reads require explicit configured recipients and a pinned block.');
@@ -37,7 +37,7 @@ export function createApprovedProofStateReader({rpcUrls,approvedStateRpcUrls,blo
   const abort=new AbortController(),blockHash=block.hash.toLowerCase(),tag=`0x${block.number.toString(16)}`,qualified=new Set();
   // Immutable EIP-1898 responses belong only to this approved reader instance.
   // Native execution still verifies every reused proof/code against its base root.
-  const reads=new Map();let cachedBytes=0,cacheEpoch=0,terminalFailure;
+  const reads=new Map(),inflightBySignal=new WeakMap();let cachedBytes=0,cacheEpoch=0,terminalFailure;
   let selected=0,closed=false;
   const invalidate=()=>{reads.clear();cachedBytes=0;cacheEpoch++;};
   const available=(signal,index)=>{
@@ -66,14 +66,13 @@ export function createApprovedProofStateReader({rpcUrls,approvedStateRpcUrls,blo
     }
     throw fail('The proof source refuses execution, submission, unpinned or unbounded reads.');
   }
-  return {
-    async request({method,params=[],signal}){
+  async function requestOnce({method,params=[],signal}){
       if(closed)throw fail('The proof source was closed.');
       const p=structuredClone(params);validate(method,p);
       const combined=signal?AbortSignal.any([signal,abort.signal]):abort.signal;available(combined);
       const cacheKey=['eth_getProof','eth_getCode'].includes(method)?JSON.stringify([method,p[0].toLowerCase(),method==='eth_getProof'?p[1].map(value=>value.toLowerCase()):[],blockHash]):undefined;
       const epoch=cacheEpoch;
-      let last;
+      let last,retriedRateLimit=false;
       for(let offset=0;offset<eligible.length;offset++){
         const index=(selected+offset)%eligible.length,pinned=pool.pin(index);
         try{
@@ -105,9 +104,41 @@ export function createApprovedProofStateReader({rpcUrls,approvedStateRpcUrls,blo
           if(!retryableStateSource(error)){terminalFailure??=keelSimulationTransportFailure(error);throw terminalFailure;}
           last=keelSimulationTransportFailure(error);qualified.delete(index);
           try{onAttempt?.({candidateIndex:index,...last.diagnostic});}catch{/* Observers cannot alter a read. */}
+          // Only an observed 429 on the sole approved recipient may be retried
+          // here, once, and only within a short bounded cooldown. When another
+          // approved source exists, preserve the existing immediate fallback.
+          const wait=pool.status()[index]?.retryAfterMs??0;
+          if(eligible.length===1&&!retriedRateLimit&&error instanceof KeelRpcSetupError&&error.reason==='rate-limited'&&wait>0&&wait<=1500){
+            retriedRateLimit=true;
+            const sample=Number(random()),jitter=Number.isFinite(sample)?Math.floor(Math.max(0,Math.min(1,sample))*Math.min(250,wait/4)):0;
+            await new Promise((resolve,reject)=>{
+              const cancelled=()=>{clearTimeout(timer);combined.removeEventListener('abort',cancelled);reject(combined.reason);};
+              const timer=setTimeout(()=>{combined.removeEventListener('abort',cancelled);resolve();},wait+jitter+10);
+              combined.addEventListener('abort',cancelled,{once:true});if(combined.aborted)cancelled();
+            });
+            offset--;continue;
+          }
         }
       }
       throw last??fail('Approved state sources are unavailable.');
+  }
+  return {
+    async request(input){
+      const {method,params=[],signal}=input;
+      // Only identical pinned immutable reads with the same cancellation owner
+      // coalesce. Different callers' abort signals never cancel each other.
+      if(!['eth_getProof','eth_getCode'].includes(method))return requestOnce(input);
+      let key;try{key=JSON.stringify([method,params]);}catch{return requestOnce(input);}
+      if(!key||key.length>2048)return requestOnce(input);
+      const owner=signal??abort.signal,entries=inflightBySignal.get(owner)??new Map();
+      inflightBySignal.set(owner,entries);
+      let task=entries.get(key);
+      if(!task){task=requestOnce(input);entries.set(key,task);}
+      try{
+        const value=await task;
+        available(signal?AbortSignal.any([signal,abort.signal]):abort.signal);
+        return structuredClone(value);
+      }finally{if(entries.get(key)===task)entries.delete(key);}
     },
     status(){return pool.status().map(({checkedChainId,reason,retryAfterMs,disabled},candidateIndex)=>({candidateIndex,checkedChainId,reason,retryAfterMs,disabled}));},
     close(){closed=true;invalidate();abort.abort();},

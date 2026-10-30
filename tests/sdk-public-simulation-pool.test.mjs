@@ -1180,7 +1180,7 @@ test('configured root URLs keep distinct credential identities without exposing 
 // Captured operator categories, synthetic data only. Library evidence
 // libfile_bf7ede842b2081919bc7c130c019a4d6 (2026-10-10 10:29–10:34 UTC).
 test('rate/access diagnostics survive approved whole-program failover without shopping deterministic rejections',async()=>{
-  for(const fault of [{http:429,httpCode:-32005},{http:403},{error:-32005},{error:403}]) {
+  for(const fault of [{http:429,httpCode:-32005},{http:429,httpCode:-32029},{http:403},{error:-32005},{error:403}]) {
     const f=fixture([fault,{}]), attempts=[];
     const transport=createKeelPublicSepoliaSimulationPool({...f.options,onAttempt:d=>attempts.push(d)});
     try {
