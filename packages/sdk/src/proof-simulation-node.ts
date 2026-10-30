@@ -13,6 +13,7 @@ export interface KeelProofSimulationOptions {
   /** Explicit approval for address/key reads; distinct from full-program approval. */
   readonly approvedStateRpcUrls: readonly string[];
   readonly signal?: AbortSignal;
+  readonly providerAdmission?: <T>(provider: string, methods: readonly string[], operation: () => Promise<T>, signal?: AbortSignal) => Promise<T>;
   readonly onAttempt?: (diagnostic: Readonly<Record<string, string | number>>) => void;
   readonly onEvidence?: (evidence: Readonly<Record<string, unknown>>) => void;
   /** Bounded fixed-field native stage/read counters; no calldata or endpoints. */
@@ -24,7 +25,7 @@ export interface KeelProofSimulationOptions {
  */
 export async function createKeelProofSimulationTransport(options: KeelProofSimulationOptions): Promise<KeelPreflightTransport & { close(): Promise<void> }> {
   const block = { ...options.block };
-  const stateReader = createApprovedProofStateReader({ rpcUrls: [...options.rpcUrls], approvedStateRpcUrls: [...options.approvedStateRpcUrls], block, onAttempt: options.onAttempt });
+  const stateReader = createApprovedProofStateReader({ rpcUrls: [...options.rpcUrls], approvedStateRpcUrls: [...options.approvedStateRpcUrls], block, onAttempt: options.onAttempt, ...(options.providerAdmission ? { providerAdmission: options.providerAdmission } : {}) });
   try {
     const transport = await createProofBackedSimulationTransport({
       ...options, block, stateReader,

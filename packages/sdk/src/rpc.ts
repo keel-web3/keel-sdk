@@ -249,6 +249,8 @@ export interface KeelRpcPoolOptions {
   readonly maxResponseBytes?: number;
   readonly allowLoopback?: boolean;
   readonly fetchImpl?: typeof fetch;
+  /** Optional host-owned admission around one complete physical read. */
+  readonly providerAdmission?: <T>(provider: string, methods: readonly string[], operation: () => Promise<T>, signal?: AbortSignal) => Promise<T>;
   /** Owner-private evidence only. No endpoint or headers are supplied. Persisting
    * callers must redact credential echoes in arbitrary provider text. */
   readonly onPrivateResponse?: (event: KeelRpcPrivateObservation) => void | Promise<void>;
@@ -322,7 +324,13 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
     });
   }
   async function send(state: typeof states[number], method: string, params: readonly unknown[], signal?: AbortSignal): Promise<unknown> {
+    // Acquire the process-local provider slot before the shared host lock.
+    // Reversing this order can deadlock a concurrent request holding the slot.
     const release = await acquire(state, signal);
+    try { return await (options.providerAdmission ? options.providerAdmission(state.url, [method], () => sendPhysical(state, method, params, signal), signal) : sendPhysical(state, method, params, signal)); }
+    finally { release(); }
+  }
+  async function sendPhysical(state: typeof states[number], method: string, params: readonly unknown[], signal?: AbortSignal): Promise<unknown> {
     let timer: ReturnType<typeof setTimeout> | undefined;
     let timedOut = false;
     let requestWireBytes: number | undefined;
@@ -457,7 +465,7 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
       }
       if (error instanceof KeelRpcResponseError || error instanceof KeelRpcHttpRequestError || error instanceof ProviderFailure) throw error;
       throw networkFailure(error, timedOut);
-    } finally { if (timer !== undefined) clearTimeout(timer); release(); }
+    } finally { if (timer !== undefined) clearTimeout(timer); }
   }
   async function checkChain(state: typeof states[number], signal?: AbortSignal, force = false): Promise<void> {
     if (!force && state.chainId !== undefined && Date.now() - state.checkedAt < 60000) return;
@@ -512,8 +520,11 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
         if (error instanceof KeelRpcResponseError || error instanceof KeelRpcHttpRequestError || error instanceof KeelRpcQueueFullError || error instanceof KeelRpcQueueTimeoutError) throw error;
         // A queued chain check may inherit another caller's cancellation. It
         // must not replace a denial already observed by that shared source.
+        const admission = error !== null && typeof error === "object" ? error as { name?: unknown; reason?: unknown; retryAfterMs?: unknown } : undefined;
         const failure = state.disabled && state.reason === "access-denied" ? new ProviderFailure("access-denied", 0, state.diagnostic)
-          : error instanceof ProviderFailure ? error : networkFailure(error, false);
+          : error instanceof ProviderFailure ? error
+          : admission?.name === "SharedProviderCooldownError" && admission.reason === "rate-limited" && typeof admission.retryAfterMs === "number" && Number.isSafeInteger(admission.retryAfterMs) && admission.retryAfterMs >= 0
+            ? new ProviderFailure("rate-limited", admission.retryAfterMs, { transportFailure: "rate-limited" }) : networkFailure(error, false);
         last = failure.reason; state.reason = last;
         state.diagnostic = failure.diagnostic; lastDiagnostic = failure.diagnostic;
         if (["wrong-chain", "access-denied"].includes(last)) state.disabled = true;

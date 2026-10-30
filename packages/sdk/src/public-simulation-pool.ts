@@ -28,6 +28,7 @@ export interface KeelPublicSimulationPoolOptions {
   readonly readTransport: KeelPreflightTransport;
   readonly block: { readonly number: bigint; readonly hash: string };
   readonly fetchImpl?: typeof fetch;
+  readonly providerAdmission?: KeelRpcPoolOptions["providerAdmission"];
   readonly minIntervalMs?: number;
   /** Entire qualification + project request deadline; callers may only lower the 120s bound. */
   readonly requestTimeoutMs?: number;
@@ -214,7 +215,7 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
   // Each owner keeps a separate parser/identity cache and private observer. Only
   // admission/cooldown/capability availability is shared, never owner evidence.
   const pool = createKeelRpcPool({ rpcUrls: urls, chainId, timeoutMs: 30_000, simulationTimeoutMs: 90_000, maxResponseBytes: 64 * 1024 * 1024,
-    ...(options.fetchImpl ? { fetchImpl: options.fetchImpl } : {}), ...(options.minIntervalMs === undefined ? {} : { minIntervalMs: options.minIntervalMs }),
+    ...(options.fetchImpl ? { fetchImpl: options.fetchImpl } : {}), ...(options.providerAdmission ? { providerAdmission: options.providerAdmission } : {}), ...(options.minIntervalMs === undefined ? {} : { minIntervalMs: options.minIntervalMs }),
     ...(options.observe ? { onPrivateResponse(event) {
       const active = activeObservations.get(event.providerIndex);
       if (active) notify({ ...active, type: event.error !== undefined || object(event.response)?.error !== undefined || (event.httpStatus ?? 200) >= 400 ? "rpc-error" : "rpc-response",

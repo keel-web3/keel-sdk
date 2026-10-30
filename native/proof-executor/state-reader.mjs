@@ -23,16 +23,19 @@ function retryableStateSource(error) {
   return error.reason==='rate-limited'||d?.transportFailure==='timeout'||d?.transportFailure==='connection-reset'
     ||d?.rpcCode===-32601||d?.rpcCode===4200||d?.httpStatus===413||d?.responseFailure==='response-too-large';
 }
-export function createApprovedProofStateReader({rpcUrls,approvedStateRpcUrls,block,fetchImpl,minIntervalMs=250,onAttempt,random=Math.random}) {
+export function createApprovedProofStateReader({rpcUrls,approvedStateRpcUrls,block,fetchImpl,providerAdmission,minIntervalMs=250,onAttempt,random=Math.random}) {
   const configured=[...new Set(rpcUrls.map(url=>normalizeKeelRpcUrl(url)))];
   const approved=new Set(approvedStateRpcUrls.map(url=>normalizeKeelRpcUrl(url)));
   if([...approved].some(url=>!configured.includes(url))||typeof block.number!=='bigint'||block.number<0n||!hash.test(block.hash))throw fail('State reads require explicit configured recipients and a pinned block.');
   const eligible=configured.filter(url=>approved.has(url));
   if(!eligible.length)throw fail('No configured recipient is approved for project address and storage-key reads.');
   const key=JSON.stringify([eligible,minIntervalMs]);
-  const cache=fetchImpl?(poolsByFetch.get(fetchImpl)??new Map()):sharedPools;
-  if(fetchImpl)poolsByFetch.set(fetchImpl,cache);
-  const pool=cache.get(key)??createKeelRpcPool({rpcUrls:eligible,chainId:11155111,timeoutMs:15000,maxResponseBytes:2*1024*1024,minIntervalMs,...(fetchImpl?{fetchImpl}:{})});
+  const scope=providerAdmission??fetchImpl;
+  // Distinct injected fetch functions must never share a pool merely because
+  // their host-admission callback happens to be the same.
+  const cache=providerAdmission&&fetchImpl?new Map():scope?(poolsByFetch.get(scope)??new Map()):sharedPools;
+  if(scope&&!(providerAdmission&&fetchImpl))poolsByFetch.set(scope,cache);
+  const pool=cache.get(key)??createKeelRpcPool({rpcUrls:eligible,chainId:11155111,timeoutMs:15000,maxResponseBytes:2*1024*1024,minIntervalMs,...(fetchImpl?{fetchImpl}:{}),...(providerAdmission?{providerAdmission}:{})});
   cache.set(key,pool);if(cache.size>16)cache.delete(cache.keys().next().value);
   const abort=new AbortController(),blockHash=block.hash.toLowerCase(),tag=`0x${block.number.toString(16)}`,qualified=new Set();
   // Immutable EIP-1898 responses belong only to this approved reader instance.
