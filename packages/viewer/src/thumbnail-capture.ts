@@ -4,16 +4,16 @@ export function createThumbnailCaptureScript(): string {
     let explicit=false, pending, generation=0, motion;
     const finish=()=>{if(!motion)return;clearInterval(motion.timer);const result=motion;motion=undefined;send("sequence",{frames:result.frames,width:result.width,height:result.height,frameRate:result.frameRate})};
     const send=(action,extra={})=>parent.postMessage({protocol:"keel-sandbox-poster@1",action,...extra},"*");
-    const capture=()=>{
+    const capture=(deadline=0)=>{
       clearTimeout(pending);
       const ticket=++generation;
       const marked=document.querySelector("[data-keel-thumbnail]");
       const candidates=marked?[marked]:[...document.querySelectorAll("canvas,video,img"),...Array.from(document.querySelectorAll("ruffle-player"),p=>p.shadowRoot?.querySelector("canvas")).filter(Boolean)];
-      if(candidates.length!==1){send("unavailable",{reason:candidates.length?"Choose one preview surface with data-keel-thumbnail.":"No preview surface is ready."});return}
+      if(candidates.length!==1){if(candidates.length===0&&deadline>0&&!explicit&&Date.now()<deadline){pending=setTimeout(()=>capture(deadline),100);return}send("unavailable",{reason:candidates.length?"Choose one preview surface with data-keel-thumbnail.":"No preview surface is ready."});return}
       const source=candidates[0];
       const width=source instanceof HTMLCanvasElement?source.width:source instanceof HTMLImageElement?source.naturalWidth:source instanceof HTMLVideoElement?source.videoWidth:0;
       const height=source instanceof HTMLCanvasElement?source.height:source instanceof HTMLImageElement?source.naturalHeight:source instanceof HTMLVideoElement?source.videoHeight:0;
-      if(!width||!height){send("unavailable",{reason:"The preview surface has no pixels yet."});return}
+      if(!width||!height){if(deadline>0&&!explicit&&Date.now()<deadline){pending=setTimeout(()=>capture(deadline),100);return}send("unavailable",{reason:"The preview surface has no pixels yet."});return}
       const requested=source.getAttribute?.("data-keel-thumbnail-motion");
       if(requested!==null&&requested!==undefined&&!motion){
         const frameRate=requested===""?12:Number(requested);
@@ -41,6 +41,6 @@ export function createThumbnailCaptureScript(): string {
       const init=label=>emit("init",label),ready=label=>emit("capture",label),stop=label=>emit("stop",label);
       Object.defineProperty(globalThis,"__KEEL_THUMBNAIL__",{value:Object.freeze({protocol:"keel-thumbnail-capture@1",init,ready,capture:ready,stop,after:(delay,label)=>{if(!Number.isFinite(delay)||delay<0||delay>30000)throw new RangeError("Invalid capture delay.");explicit=true;clearTimeout(pending);pending=setTimeout(()=>ready(label),delay)}})});
     }
-    addEventListener("load",()=>{if(!explicit)capture()},{once:true});
+    addEventListener("load",()=>{if(!explicit)capture(Date.now()+5000)},{once:true});
   })();</script>`;
 }
