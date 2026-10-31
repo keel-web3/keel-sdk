@@ -407,6 +407,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/sdk.test.mjs",
   "tests/source-verification.test.mjs",
   "tests/studio-core.test.mjs",
+  "tests/studio-media-inference.test.mjs",
   "tests/test-suite-classification.test.mjs",
   "tests/three-r180-sepolia-evidence.test.mjs",
   "tests/viewer-wake.test.mjs",
