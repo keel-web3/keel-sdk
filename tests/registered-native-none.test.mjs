@@ -3,7 +3,7 @@ import test from 'node:test';
 import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {gunzipSync,gzipSync} from 'node:zlib';
-import {buildKeelInlineLocalDocument,buildKeelInlineModuleFragment,decodeKeelInlineGraphFragment,buildKeelInlineRawPercentTokenURIGraph,buildKeelPreparedOneOfOneTokenURI} from '../packages/sdk/dist/inline-viewer-graph.js';
+import {buildKeelInlineNativeAudioDocument,buildKeelInlineLocalDocument,buildKeelInlineAssetDisplayModuleFragment,buildKeelInlineModuleFragment,decodeKeelInlineGraphFragment,buildKeelInlineRawPercentTokenURIGraph,buildKeelPreparedOneOfOneTokenURI} from '../packages/sdk/dist/inline-viewer-graph.js';
 import {createKeelRegisteredNativeGzipProof,assertKeelRegisteredNativeGzipProof,KEEL_REGISTERED_NATIVE_GZIP_FRAME_PROFILE as p} from '../packages/sdk/dist/registered-native-gzip.js';
 import {inspectKeelInlinePayloadCarriage,assertKeelFreshPayloadCarriage,assertKeelFreshPayloadAudit,auditKeelInlineTokenURI} from '../packages/sdk/dist/inline-transport-audit.js';
 import {createKeelPublishReviewPlan,verifyKeelPublishReviewPlan} from '../packages/sdk/dist/publish-plan.js';
@@ -76,11 +76,12 @@ test('native None proof rejects spoofed types, encoded text/scripts, malformed c
  assert.throws(()=>proof(fromEntries(items)),/Native None/);
 });
 
-test('native None cannot bypass immutable frame/binding or the mandatory genuine Gzip member',async()=>{
+test('native None cannot bypass immutable frame/binding or admit an empty native inventory',async()=>{
  const root=await document();
  const wrong=Buffer.from(root.rootBytes);wrong[0]^=1;assert.throws(()=>proof({rootBytes:wrong}),/exact authenticated/);
  assert.throws(()=>createKeelRegisteredNativeGzipProof({binding:{...binding,chainId:1},documentBytes:root.rootBytes}),/maintained selected-chain/);
- assert.throws(()=>proof(fromEntries(entries(root).filter(item=>item.role!=='module'))),/No exact native Gzip member/);
+ const identityOnly=fromEntries(entries(root).filter(item=>item.role!=='module'));assert.doesNotThrow(()=>proof(identityOnly));
+ const plain=fromEntries([{id:'text-only',role:'entrypoint',mediaType:'text/html',integrity:integrity(Buffer.from('text')),embedded:{compression:'none',storedText:'text',storedIntegrity:integrity(Buffer.from('text'))}}]);assert.throws(()=>proof(plain),/No exact native Gzip or None member/);
  const items=entries(root),movie=items.find(item=>item.id==='artwork.mp4');movie.embedded.compression='brotli';assert.throws(()=>proof(fromEntries(items)),/only exact per-resource native Gzip/);
 });
 
@@ -204,4 +205,24 @@ test('QuickTime inference preserves the original but direct playback fails with 
  await assert.rejects(buildKeelInlineLocalDocument({shell,modules:[display],entry:{id:resource.id,mediaType:resource.mediaType,source}}),/Keep the original.*separate MP4 playback derivative/);
  const safe=await document();
  for(const compression of ['none','gzip']){const items=entries(safe),item=items.find(item=>item.id==='artwork.mp4');item.mediaType='video/quicktime';item.integrity=integrity(source);const stored=compression==='gzip'?gzipSync(source):source;item.embedded={compression,storedBase64:stored.toString('base64'),storedIntegrity:integrity(stored)};assert.throws(()=>proof(fromEntries(items)),/Native None/)}
+});
+
+// Complete maintained rev5 frame, with an actual text-carried display module and
+// native originals. None is not changed to Gzip just to manufacture eligibility.
+test('all-None native audio/video keeps exact sources and authenticates fresh COPY without a Gzip sibling',async t=>{
+ const noneDisplay=await buildKeelInlineAssetDisplayModuleFragment();
+ for(const [name,mime,directory]of [['tone.mp3','audio/mpeg','native-media'],['tone.aac','audio/aac','native-media'],['normal-artwork.m4v','video/x-m4v','registered-native-none'],['normal-artwork.mp4','video/mp4','registered-native-none'],['synthetic-video.webm','video/webm','registered-native-none']])await t.test(mime,async()=>{
+  const source=readFileSync(new URL('./fixtures/'+directory+'/'+name,import.meta.url));
+  const request={shell,modules:[noneDisplay],entry:{id:name,mediaType:mime,source,compression:'none'}};
+  const root=mime.startsWith('audio/')?await buildKeelInlineNativeAudioDocument({...request,registeredNativeGzipBinding:binding}):await buildKeelInlineLocalDocument(request);
+  const current=proof(root);assert.deepEqual(current.members,[]);assert.equal(current.nativeNoneMembers.length,1);
+  assert.deepEqual(current.nativeNoneMembers[0].integrity,integrity(source));assert.deepEqual(current.nativeNoneMembers[0].storedIntegrity,integrity(source));
+  assert.deepEqual(Buffer.from(entries(root).find(item=>item.id===name).embedded.storedBase64,'base64'),source);
+  const restored=JSON.parse(JSON.stringify(current));assertKeelRegisteredNativeGzipProof(restored,root.rootBytes);assertKeelFreshPayloadCarriage(root.rootBytes,{registeredNativeGzip:restored});
+  const graph=await buildKeelInlineRawPercentTokenURIGraph(root,{registeredNativeGzip:restored});assert.equal(graph.htmlIntegrity.digest,hash(root.rootBytes));
+  const audit=inspectKeelInlinePayloadCarriage(graph.htmlBytes,{registeredNativeGzip:restored});assertKeelFreshPayloadAudit(JSON.parse(JSON.stringify(audit)));
+  const omitted=structuredClone(restored);delete omitted.nativeNoneMembers;assert.throws(()=>assertKeelRegisteredNativeGzipProof(omitted,root.rootBytes),/No exact native/);
+  const changed=structuredClone(restored);changed.nativeNoneMembers[0].integrity.digest='0x'+'00'.repeat(32);assert.throws(()=>assertKeelRegisteredNativeGzipProof(changed,root.rootBytes));
+  const wrongFrame=Buffer.from(root.rootBytes);wrongFrame[0]^=1;assert.throws(()=>proof({rootBytes:wrongFrame}),/exact authenticated/);
+ });
 });

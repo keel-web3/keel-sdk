@@ -70,8 +70,8 @@ function commitment(value: unknown): asserts value is Commitment {
   if (Object.keys(value).sort().join() !== "algorithm,byteLength,digest" || value.algorithm !== "sha256" || typeof value.digest !== "string" || !HASH.test(value.digest)
     || !Number.isSafeInteger(value.byteLength) || Number(value.byteLength) < 1 || Number(value.byteLength) > 32 * 1024 * 1024) throw new TypeError("Invalid native Gzip commitment.");
 }
-function memberArray(value: unknown): asserts value is readonly unknown[] {
-  if (!Array.isArray(value) || Object.getPrototypeOf(value) !== Array.prototype || !value.length || value.length > 128
+function memberArray(value: unknown, allowEmpty = false): asserts value is readonly unknown[] {
+  if (!Array.isArray(value) || Object.getPrototypeOf(value) !== Array.prototype || (!allowEmpty && !value.length) || value.length > 128
     || Object.keys(value).length !== value.length
     || Reflect.ownKeys(value).some(key => key !== "length" && (typeof key !== "string" || !/^(?:0|[1-9][0-9]*)$/u.test(key) || Number(key) >= value.length))
     || Object.values(Object.getOwnPropertyDescriptors(value)).some(field => field.get || field.set)) throw new TypeError("Invalid native Gzip evidence member array.");
@@ -150,7 +150,11 @@ function inspectDocument(bytes: Uint8Array, binding: KeelRegisteredNativeGzipBin
     members.push({ id: item.id, mediaType: item.mediaType, integrity: { ...item.integrity }, storedIntegrity: { ...embedded.storedIntegrity } });
   }
   assertRegisteredNativeNoneModelGraph(decodedResources, modelNoneIds);
-  if (!members.length) throw new TypeError("No exact native Gzip member was prepared.");
+  // The maintained frame has both Gzip and identity readers. Exact None
+  // originals do not need an unrelated compressed member to gain authority;
+  // their complete container, role and equal stored/decoded commitments were
+  // checked above against these same immutable registered frames.
+  if (!members.length && !nativeNoneMembers.length) throw new TypeError("No exact native Gzip or None member was prepared.");
   void binding;
   return {members, nativeNoneMembers};
 }
@@ -168,7 +172,7 @@ export function assertKeelRegisteredNativeGzipProof(input: KeelRegisteredNativeG
   const expectedKeys = ["binding", "bindingDigest", "documentIntegrity", "members", "schema", ...(Object.hasOwn(input, "nativeNoneMembers") ? ["nativeNoneMembers"] : [])].sort().join();
   if (Object.keys(input).sort().join() !== expectedKeys || input.schema !== "keel-registered-native-gzip-proof@1"
     || input.bindingDigest !== sha(enc.encode(canonicalJson(binding))) || input.documentIntegrity.byteLength > 2_000_000) throw new TypeError("Invalid native Gzip evidence identity.");
-  memberArray(input.members);
+  memberArray(input.members, true);
   const ids = new Set<string>(); let total = 0;
   for (const member of input.members) {
     plain(member); commitment(member.integrity); commitment(member.storedIntegrity);
@@ -189,6 +193,7 @@ export function assertKeelRegisteredNativeGzipProof(input: KeelRegisteredNativeG
       ids.add(value.id); total += value.integrity.byteLength;
     }
   }
+  if (ids.size === 0) throw new TypeError("No exact native Gzip or None evidence member was supplied.");
   if (ids.size > 128 || total > 32 * 1024 * 1024) throw new RangeError("Native Gzip evidence exceeds its bounded member inventory.");
   if (html) {
     const root = html.subarray(0, input.documentIntegrity.byteLength);

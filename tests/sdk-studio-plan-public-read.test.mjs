@@ -27,7 +27,8 @@ test('public byte reader accepts an exactly 2,000,000-byte complete Inline retur
  const f=fixture(uri);const result=await f.read();
  assert.equal(result.audit.completeTokenURIBytes,2_000_000);
  assert.equal(result.audit.htmlBytes,Buffer.byteLength('<!doctype html><p>🔥%#</p>'));
- assert.equal(result.callGasLimit,'60000000');assert.equal(result.browserVerified,false);
+ // Fresh reads use the Oct28 50M policy; retained paid 60M plans are separate.
+ assert.equal(result.callGasLimit,'50000000');assert.equal(result.browserVerified,false);
  assert.equal(result.selectedChainReadAuthenticated,false);assert.equal(result.audit.onchainStorage.status,'not-inspected');
  assert.ok(f.calls.filter(c=>['eth_call','eth_getCode'].includes(c.method)).every(c=>c.params[1]==='0x10'));
  await assert.rejects(fixture(token('a'.repeat(2_000_001-Buffer.byteLength(base)))).read(),/length|oversized|limit/);
