@@ -250,7 +250,7 @@ export interface KeelRpcPoolOptions {
   readonly allowLoopback?: boolean;
   readonly fetchImpl?: typeof fetch;
   /** Optional host-owned admission around one complete physical read. */
-  readonly providerAdmission?: <T>(provider: string, methods: readonly string[], operation: () => Promise<T>, signal?: AbortSignal) => Promise<T>;
+  readonly providerAdmission?: <T>(provider: string, methods: readonly string[], operation: (marker?: { beforeDispatch(): Promise<void>; afterDispatch(): void }) => Promise<T>, signal?: AbortSignal) => Promise<T>;
   /** Owner-private evidence only. No endpoint or headers are supplied. Persisting
    * callers must redact credential echoes in arbitrary provider text. */
   readonly onPrivateResponse?: (event: KeelRpcPrivateObservation) => void | Promise<void>;
@@ -327,10 +327,10 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
     // Acquire the process-local provider slot before the shared host lock.
     // Reversing this order can deadlock a concurrent request holding the slot.
     const release = await acquire(state, signal);
-    try { return await (options.providerAdmission ? options.providerAdmission(state.url, [method], () => sendPhysical(state, method, params, signal), signal) : sendPhysical(state, method, params, signal)); }
+    try { return await (options.providerAdmission ? options.providerAdmission(state.url, [method], marker => sendPhysical(state, method, params, signal, marker), signal) : sendPhysical(state, method, params, signal)); }
     finally { release(); }
   }
-  async function sendPhysical(state: typeof states[number], method: string, params: readonly unknown[], signal?: AbortSignal): Promise<unknown> {
+  async function sendPhysical(state: typeof states[number], method: string, params: readonly unknown[], signal?: AbortSignal, marker?: { beforeDispatch(): Promise<void>; afterDispatch(): void }): Promise<unknown> {
     let timer: ReturnType<typeof setTimeout> | undefined;
     let timedOut = false;
     let requestWireBytes: number | undefined;
@@ -360,9 +360,11 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
       const requestBody = JSON.stringify({ jsonrpc: "2.0", id: requestId, method, params });
       if (options.onPrivateResponse) requestWireBytes = new TextEncoder().encode(requestBody).byteLength;
       let response: Response;
-      try { response = await fetcher(state.url, { method: "POST", headers: { "content-type": "application/json" },
-        body: requestBody,
-        redirect: "error", signal: signal === undefined ? controller.signal : AbortSignal.any([controller.signal, signal]) }); }
+      try { await marker?.beforeDispatch();
+        const pending = fetcher(state.url, { method: "POST", headers: { "content-type": "application/json" },
+          body: requestBody,
+          redirect: "error", signal: signal === undefined ? controller.signal : AbortSignal.any([controller.signal, signal]) });
+        marker?.afterDispatch(); response = await pending; }
       catch (error) { privatelyObserve({ error }); signal?.throwIfAborted(); throw networkFailure(error, timedOut); }
       // The observed status restricts this shared source immediately. Body
       // capture and caller cancellation cannot erase a known access denial.
