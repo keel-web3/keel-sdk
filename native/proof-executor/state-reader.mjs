@@ -23,7 +23,8 @@ function retryableStateSource(error) {
   return error.reason==='rate-limited'||d?.transportFailure==='timeout'||d?.transportFailure==='connection-reset'
     ||d?.rpcCode===-32601||d?.rpcCode===4200||d?.httpStatus===413||d?.responseFailure==='response-too-large';
 }
-export function createApprovedProofStateReader({rpcUrls,approvedStateRpcUrls,block,fetchImpl,providerAdmission,minIntervalMs=250,onAttempt,random=Math.random}) {
+export function createApprovedProofStateReader({rpcUrls,approvedStateRpcUrls,block,fetchImpl,providerAdmission,minIntervalMs=250,onAttempt,random=Math.random,latencyFallback=false,monotonicNow=()=>performance.now()}) {
+  if(typeof latencyFallback!=='boolean'||typeof monotonicNow!=='function')throw fail('Invalid proof latency policy.');
   const configured=[...new Set(rpcUrls.map(url=>normalizeKeelRpcUrl(url)))];
   const approved=new Set(approvedStateRpcUrls.map(url=>normalizeKeelRpcUrl(url)));
   if([...approved].some(url=>!configured.includes(url))||typeof block.number!=='bigint'||block.number<0n||!hash.test(block.hash))throw fail('State reads require explicit configured recipients and a pinned block.');
@@ -42,6 +43,9 @@ export function createApprovedProofStateReader({rpcUrls,approvedStateRpcUrls,blo
   // Native execution still verifies every reused proof/code against its base root.
   const reads=new Map(),inflightBySignal=new WeakMap();let cachedBytes=0,cacheEpoch=0,terminalFailure;
   let selected=0,closed=false;
+  // Only this reader's serial, successful, uncached primary state reads count.
+  // The second recipient is already explicitly approved; no proof authority changes.
+  let latencyPreferred=false,latencySamples=0,latencyTotalMs=0,latencySlowSamples=0,primaryInFlight=0,latencyMeasurementsValid=true;
   const invalidate=()=>{reads.clear();cachedBytes=0;cacheEpoch++;};
   const available=(signal,index)=>{
     signal.throwIfAborted();if(terminalFailure)throw terminalFailure;
@@ -77,7 +81,7 @@ export function createApprovedProofStateReader({rpcUrls,approvedStateRpcUrls,blo
       const epoch=cacheEpoch;
       let last,retriedRateLimit=false;
       for(let offset=0;offset<eligible.length;offset++){
-        const index=(selected+offset)%eligible.length,pinned=pool.pin(index);
+        const index=((latencyPreferred?1:selected)+offset)%eligible.length,pinned=pool.pin(index);
         try{
           available(combined,index);
           const state=pool.status()[index];
@@ -89,14 +93,34 @@ export function createApprovedProofStateReader({rpcUrls,approvedStateRpcUrls,blo
           }
           const retained=cacheKey&&reads.get(cacheKey);
           if(retained?.index===index&&!state?.disabled){available(combined,index);return structuredClone(retained.value);}
-          const result=await pinned.request({method,params:p,signal:combined});available(combined,index);
+          const measured=latencyFallback&&eligible.length>1&&index===0&&!latencyPreferred&&['eth_getProof','eth_getCode'].includes(method)&&latencyMeasurementsValid;
+          let started;
+          if(measured){if(primaryInFlight!==0)latencyMeasurementsValid=false;primaryInFlight++;started=monotonicNow();}
+          let result;
+          try{result=await pinned.request({method,params:p,signal:combined});}
+          finally{if(measured)primaryInFlight--;}
+          available(combined,index);
           // Some EIP-1898 providers return null for an unknown/pruned hash.
           // Missing pinned state is terminal, never an empty value or permission
           // to ask another recipient for a replacement snapshot.
           if(result===null||result===undefined)throw new KeelPublicationSimulationError('rpc-unavailable','The selected state block or proof is unavailable.');
           if(method==='eth_getBlockByNumber'&&(result?.hash?.toLowerCase()!==blockHash||result.number!==tag))throw new KeelPublicationSimulationError('chain-reorganized','The selected state block changed.');
           selected=index;
-          if(cacheKey&&cacheable(method,p,result)){remember(cacheKey,result,index,epoch);return structuredClone(result);}
+          const shapeValid=cacheKey&&cacheable(method,p,result);
+          if(measured&&latencyMeasurementsValid&&shapeValid){
+            const duration=monotonicNow()-started;
+            if(!Number.isFinite(duration)||duration<0)latencyMeasurementsValid=false;
+            else{
+              latencySamples++;latencyTotalMs+=duration;if(duration>=1200)latencySlowSamples++;
+              // At least 32 real primary reads, average >=1.2s and >=37.5% slow;
+              // a single outlier, a cache hit or overlapping reads cannot trigger.
+              if(latencySamples>=32&&latencyTotalMs>=latencySamples*1200&&latencySlowSamples*8>=latencySamples*3){
+                latencyPreferred=true;
+                try{onAttempt?.({candidateIndex:1,latencyFallback:1,primaryReadSamples:latencySamples,primaryReadMs:Math.round(latencyTotalMs)});}catch{/* Observation cannot alter a read. */}
+              }
+            }
+          }
+          if(shapeValid){remember(cacheKey,result,index,epoch);return structuredClone(result);}
           return result;
         }catch(error){
           invalidate();

@@ -15,6 +15,8 @@ export interface KeelProofSimulationOptions {
   readonly signal?: AbortSignal;
   readonly providerAdmission?: <T>(provider: string, methods: readonly string[], operation: (marker?: { beforeDispatch(): Promise<void>; afterDispatch(): void }) => Promise<T>, signal?: AbortSignal) => Promise<T>;
   readonly onAttempt?: (diagnostic: Readonly<Record<string, string | number>>) => void;
+  /** Opt in only when all alternate state recipients are explicitly approved. */
+  readonly latencyFallback?: boolean;
   readonly onEvidence?: (evidence: Readonly<Record<string, unknown>>) => void;
   /** Bounded fixed-field native stage/read counters; no calldata or endpoints. */
   readonly onProgress?: (event: Readonly<Record<string, string | number>>) => void;
@@ -25,7 +27,7 @@ export interface KeelProofSimulationOptions {
  */
 export async function createKeelProofSimulationTransport(options: KeelProofSimulationOptions): Promise<KeelPreflightTransport & { close(): Promise<void> }> {
   const block = { ...options.block };
-  const stateReader = createApprovedProofStateReader({ rpcUrls: [...options.rpcUrls], approvedStateRpcUrls: [...options.approvedStateRpcUrls], block, onAttempt: options.onAttempt, ...(options.providerAdmission ? { providerAdmission: options.providerAdmission } : {}) });
+  const stateReader = createApprovedProofStateReader({ rpcUrls: [...options.rpcUrls], approvedStateRpcUrls: [...options.approvedStateRpcUrls], block, onAttempt: options.onAttempt, ...(options.latencyFallback ? { latencyFallback: true } : {}), ...(options.providerAdmission ? { providerAdmission: options.providerAdmission } : {}) });
   try {
     const transport = await createProofBackedSimulationTransport({
       ...options, block, stateReader,
