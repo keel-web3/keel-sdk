@@ -66,7 +66,10 @@ export function sourceUriForFile(fileName: string): string {
 
 export function inferMediaType(fileName: string, declared?: string): string {
   if (declared !== undefined && declared.trim().length > 0 && declared !== "application/octet-stream") {
-    return declared.toLowerCase();
+    // Browsers identify animated PNG as image/apng; the registered PNG
+    // renderer reads the same container and preserves its animation chunks.
+    const mediaType = declared.toLowerCase();
+    return mediaType === "image/apng" ? "image/png" : mediaType;
   }
   return MEDIA_BY_EXTENSION[extension(fileName)] ?? "application/octet-stream";
 }

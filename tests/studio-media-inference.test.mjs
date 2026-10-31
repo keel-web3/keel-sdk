@@ -28,3 +28,14 @@ test("inference preserves declared types and executable/model identities without
   assert.equal(inferMediaType("art.wav", "audio/custom"), "audio/custom");
   assert.equal(inferMediaType("art.unknown"), "application/octet-stream");
 });
+
+test("declared browser APNG MIME resolves to the registered PNG container without changing unrelated declarations", () => {
+  for (const declared of ["image/apng", "IMAGE/APNG"]) {
+    const mediaType = inferMediaType("animation.apng", declared);
+    assert.equal(mediaType, "image/png");
+    assert.ok(KEEL_ASSET_DISPLAY_MEDIA_TYPES.includes(mediaType));
+    assert.equal(inferRole(mediaType, "animation.apng"), "image");
+  }
+  assert.equal(inferMediaType("animation.apng", "image/custom"), "image/custom");
+  assert.equal(inferMediaType("animation.apng", "text/javascript"), "text/javascript");
+});
