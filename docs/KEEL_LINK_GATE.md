@@ -1,8 +1,8 @@
 # KEEL link gate and module finder
 
-Bytes headed onchain through KEEL must not name the web. The link gate is the
+Bytes headed onchain through KEEL must not depend on external web resources. The link gate is the
 one check every KEEL-driven push runs before it produces an upload plan, a
-wallet request or a Studio stage. It refuses on any concrete locator and tells
+wallet request or a Studio stage. It refuses on concrete locators outside the structurally qualified exceptions below and tells
 the creator which registered KEEL modules to reuse instead of embedding a copy.
 
 Source: `packages/sdk/src/link-gate.ts` (`@keel/sdk/link-gate`), MCP wiring in
@@ -71,6 +71,16 @@ There is no bypass option. These are not hits:
   `"keel_manifest_digest"`, is metadata KEEL writes, not a fetch by the
   artwork. Every other `web3://` locator is refused.
 - **Minified syntax** such as `ready ? ar : 1`.
+
+- **Passive AVC user data in a complete MP4.** A bounded ISO BMFF parser follows
+  actual track/sample tables into `mdat`, validates AVC configuration and NAL/SEI
+  framing, and classifies only H.264 `user_data_unregistered` (type 5) bytes after
+  the 16-byte UUID as passive metadata. These may contain encoder attribution
+  URLs; they cannot request a resource. No domain is allowlisted. The source bytes
+  are unchanged and the report records `passive-avc-user-data`. Real `dref` URL
+  entries, other SEI types, free/unreferenced bytes, unsupported codecs and
+  malformed containers retain the ordinary strict scan. This classification is
+  not codec playback proof. See `tests/mp4-passive-metadata.test.mjs`.
 
 Exemptions are listed in the report so nothing passes silently.
 

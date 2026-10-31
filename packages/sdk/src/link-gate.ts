@@ -1,3 +1,4 @@
+import { mp4PassiveMetadataSpans } from "./mp4-passive-metadata.js";
 import { sha256 as viemSha256 } from "viem";
 
 import { KEEL_CREATIVE_RUNTIME_CATALOG } from "./creative-runtime-catalog.js";
@@ -72,7 +73,7 @@ export interface KeelLinkGateHit {
 export interface KeelLinkGateExemption {
   readonly resource: string;
   readonly url: string;
-  readonly reason: "registered-module-bytes" | "registered-module-context" | "registered-shell-context" | "explicit-external-preview" | "keel-manifest-pointer";
+  readonly reason: "registered-module-bytes" | "registered-module-context" | "registered-shell-context" | "explicit-external-preview" | "keel-manifest-pointer" | "passive-avc-user-data";
   readonly moduleId?: string;
   readonly version?: string;
 }
@@ -708,8 +709,14 @@ function inspect(state: ScanState, layer: Layer): void {
   state.layers.push(layer);
   const pinned = layer.pinned ?? state.exemptLayer(layer.bytes);
   const text = byteText(layer.bytes);
+  let passiveSpans: ReturnType<typeof mp4PassiveMetadataSpans> | undefined;
   const record = (start: number, end: number, url: string, scheme: string, rawURL = url) => {
     if (KEEL_LINK_GATE_ALLOWED_URLS.includes(rawURL)) return;
+    passiveSpans ??= mp4PassiveMetadataSpans(layer.bytes);
+    if (passiveSpans.some(span => start >= span.start && end <= span.end)) {
+      if (state.exemptions.length < MAX_REPORTED_HITS) state.exemptions.push({ resource: layer.resource, url, reason: "passive-avc-user-data" });
+      return;
+    }
     // The committed preview URI, also when a decoded view of it (`%20` → space) cuts the locator short.
     const preview = (value: string, at: number) => [...state.previews].some((uri) => {
       if (!value.startsWith(uri, at)) return false;

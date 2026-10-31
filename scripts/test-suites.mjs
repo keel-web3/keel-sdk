@@ -360,6 +360,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/sdk-inline-viewer-graph.test.mjs",
   "tests/sdk-keel-audio-runtime.test.mjs",
   "tests/sdk-link-gate.test.mjs",
+  "tests/mp4-passive-metadata.test.mjs",
   "tests/sdk-keel721-abi-parity.test.mjs",
   "tests/sdk-managed-publication.test.mjs",
   "tests/managed-publication-recovery.test.mjs",
