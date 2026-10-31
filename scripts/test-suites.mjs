@@ -126,6 +126,8 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/offline-shell-connect-reset.test.mjs",
   "tests/offline-shell-browser-startup.test.mjs",
   "tests/link-gate-native-slots.test.mjs",
+  "tests/link-gate-percent-media.test.mjs",
+  "tests/link-gate-managed-loader.test.mjs",
   "tests/mcp-read-policy.test.mjs",
   "tests/owner-presentation-policy.test.mjs",
   "tests/sdk-browser-fixture-identity.test.mjs",

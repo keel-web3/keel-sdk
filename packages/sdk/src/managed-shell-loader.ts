@@ -47,3 +47,41 @@ export function buildKeelManagedShellLoader(input: {
   const literal = (v: unknown) => JSON.stringify(v).replaceAll("<", "\\u003c");
   return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Loading artwork</title></head><body><p id="keel-loader-status">Loading onchain artwork…</p><script>globalThis.__KEEL_MANAGED_SHELL__=${literal(configuration)};${KEEL_MANAGED_SHELL_RUNTIME.replaceAll("</script", "<\\/script")}</script></body></html>`;
 }
+
+/** Recognize only the complete maintained loader under the bundled host policy.
+ * In-band host lists/revisions are configuration, never governance evidence. */
+export function isKeelGovernedManagedShellLoader(document: string): boolean {
+  const marker = "<script>globalThis.__KEEL_MANAGED_SHELL__=";
+  const start = document.indexOf(marker);
+  const runtime = `;${KEEL_MANAGED_SHELL_RUNTIME.replaceAll("</script", "<\\/script")}</script></body></html>`;
+  if (start < 0 || !document.endsWith(runtime)) return false;
+  try {
+    const value = JSON.parse(document.slice(start + marker.length, -runtime.length));
+    if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+    const baseKeys = ["chainId", "store", "objectId", "digest", "rpcUrls", "rpcHosts", "maxConcurrentReads"];
+    const manifestKeys = ["requestedMaxConcurrentReads", "rpcManifestRevision", "rpcHostListRevision", "rpcHostListEpoch", "rpcHostListCurrentEpoch"];
+    const hasManifest = manifestKeys.some(key => Object.hasOwn(value, key));
+    const keys = hasManifest ? [...baseKeys, ...manifestKeys] : baseKeys;
+    if (Object.keys(value).length !== keys.length || keys.some(key => !Object.hasOwn(value, key))) return false;
+    if (!Array.isArray(value.rpcHosts) || value.rpcHosts.length < 1 || new Set(value.rpcHosts).size !== value.rpcHosts.length
+      || value.rpcHosts.some((host: unknown) => typeof host !== "string" || !KEEL_DEFAULT_RPC_HOSTS.includes(host))) return false;
+    if (!Array.isArray(value.rpcUrls) || value.rpcUrls.some((endpoint: unknown) => {
+      if (typeof endpoint !== "string") return true;
+      assertKeelRpcUrl(endpoint, KEEL_DEFAULT_RPC_HOSTS);
+      return false;
+    })) return false;
+    const plain = buildKeelManagedShellLoader({chainId: value.chainId, store: value.store, objectId: value.objectId, digest: value.digest,
+      rpcUrls: value.rpcUrls, rpcHosts: value.rpcHosts, maxConcurrentReads: value.maxConcurrentReads});
+    let expected = plain;
+    if (hasManifest) {
+      if (manifestKeys.some(key => !Number.isSafeInteger(value[key]) || value[key] < (key === "requestedMaxConcurrentReads" ? 1 : 0))
+        || value.requestedMaxConcurrentReads > 64 || value.maxConcurrentReads > value.requestedMaxConcurrentReads) return false;
+      // Revisions are retained data, not authenticated governance claims. The
+      // endpoints above must independently satisfy the bundled host policy.
+      const base = JSON.parse(plain.slice(plain.indexOf(marker) + marker.length, -runtime.length));
+      for (const key of manifestKeys) base[key] = value[key];
+      expected = plain.slice(0, plain.indexOf(marker) + marker.length) + JSON.stringify(base).replaceAll("<", "\\u003c") + runtime;
+    }
+    return document === expected;
+  } catch { return false; }
+}
