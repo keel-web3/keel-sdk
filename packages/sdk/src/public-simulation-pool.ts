@@ -73,6 +73,12 @@ export function createKeelConfiguredReadRateLimitHandler(options: ConfiguredRead
   const scheduler = configuredReadScheduler(options);
   return (retryAfterMs: number) => scheduler.observeRateLimit(retryAfterMs);
 }
+/** Numeric availability of this exact existing recipient. No URL, request,
+ * response, owner evidence or proof is returned. Whole-read coordinators may
+ * skip a cooldown, but a retained access restriction stays terminal. */
+export function keelConfiguredReadProviderStatus(options: ConfiguredReadRecipient) {
+  return configuredReadScheduler(options).status();
+}
 
 /** Admit the caller's existing configured reader without discovering an endpoint,
  * changing recipients or adding a retry layer. The server must supply the exact

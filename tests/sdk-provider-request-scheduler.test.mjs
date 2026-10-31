@@ -9,6 +9,29 @@ const failure = (status, retryAfterMs = 0) => Object.assign(new Error(`private p
 const gate = () => { let resolve; const promise = new Promise(r => { resolve = r; }); return { promise, resolve }; };
 const tick = () => new Promise(resolve => setImmediate(resolve));
 
+test('numeric status exposes a late denial until its existing capability expiry without retaining private evidence', t => {
+  t.mock.timers.enable({ apis: ['Date'], now: 10_000 });
+  const scheduler = create({ ...settings, capabilityMaximumAgeMs: 100 });
+  scheduler.observeRateLimit(5_000);
+  scheduler.observeAccessDenial(403);
+  assert.equal(scheduler.status().accessDeniedStatus, 403);
+  assert.equal(scheduler.status().retryAfterMs, 5_000);
+  assert.doesNotMatch(JSON.stringify(scheduler.status()), /https:|PRIVATE|requestBody|responseBody/iu);
+  t.mock.timers.tick(100);
+  assert.equal(scheduler.status().accessDeniedStatus, undefined);
+  assert.equal(scheduler.status().retryAfterMs, 4_900);
+});
+for (const original of [Object.assign(new Error('request timed out'), { name: 'TimeoutError' }),
+  Object.assign(new Error('socket reset'), { code: 'ECONNRESET' }),
+  Object.assign(new Error('headers timed out'), { code: 'UND_ERR_HEADERS_TIMEOUT' })]) {
+  test(`typed ${original.name === 'TimeoutError' ? original.name : original.code} records shared cooldown with caller-owned retry`, async () => {
+    const scheduler = create({ ...settings, baseRetryDelayMs: 50 }); let calls = 0;
+    await assert.rejects(scheduler.run({ method: 'eth_getCode', retryMode: 'caller' }, async () => { calls++; throw original; }), error => error === original);
+    assert.equal(calls, 1); assert.ok(scheduler.status().retryAfterMs > 0);
+    assert.equal(scheduler.status().activeRequests, 0);
+  });
+}
+
 test('shared admission is keyed by exact provider, chain and transport configuration', () => {
   const transport = {}, another = {};
   const first = shared('https://already-approved.example/PRIVATE', settings, transport);
