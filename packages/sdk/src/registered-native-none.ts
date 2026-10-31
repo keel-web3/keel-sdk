@@ -7,7 +7,7 @@ const invalid = (): never => { throw new TypeError("Native None requires a compl
 const text = (bytes: Uint8Array, at: number, length: number) => String.fromCharCode(...bytes.subarray(at, at + length));
 interface Box { readonly kind: string; readonly at: number; readonly body: number; readonly end: number }
 const ISO_VIDEO_MEDIA_TYPES = ["video/mp4", "video/x-m4v"] as const;
-function inspectVideoISO(bytes: Uint8Array, mediaType: string): void {
+export function inspectVideoISO(bytes: Uint8Array, mediaType: string, visitSample?: (start: number, end: number, entry: Box) => void): void {
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   let boxCount = 0;
   const boxes = (start = 0, end = bytes.length): Box[] => {
@@ -79,9 +79,18 @@ function inspectVideoISO(bytes: Uint8Array, mediaType: string): void {
       if (map[mapping + 1] && chunk + 1 >= map[mapping + 1]!.first) mapping++;
       const n = map[mapping]!.samples; if (n > count - sample) invalid();
       let length = 0; for (let i = 0; i < n; i++) length += sampleSize || sizes![sample + i]!;
+      const firstSample = sample;
       sample += n;
       const at = table.body + 8 + chunk * width, offset = width === 8 ? view.getBigUint64(at) : BigInt(view.getUint32(at));
       if (!mdat.some(row => offset >= BigInt(row.body) && offset + BigInt(length) <= BigInt(row.end))) invalid();
+      if (isVideo && visitSample) {
+        let start = Number(offset);
+        for (let i = 0; i < n; i++) {
+          const end = start + (sampleSize || sizes![firstSample + i]!);
+          visitSample(start, end, entries[map[mapping]!.description - 1]!);
+          start = end;
+        }
+      }
     }
     if (sample !== count) invalid();
   }

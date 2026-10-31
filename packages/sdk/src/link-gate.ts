@@ -1,3 +1,4 @@
+import { mp4PassiveMetadataSpans } from "./mp4-passive-metadata.js";
 import { sha256 as viemSha256 } from "viem";
 
 import { KEEL_CREATIVE_RUNTIME_CATALOG } from "./creative-runtime-catalog.js";
@@ -72,7 +73,7 @@ export interface KeelLinkGateHit {
 export interface KeelLinkGateExemption {
   readonly resource: string;
   readonly url: string;
-  readonly reason: "registered-module-bytes" | "registered-module-context" | "registered-shell-context" | "explicit-external-preview" | "keel-manifest-pointer";
+  readonly reason: "registered-module-bytes" | "registered-module-context" | "registered-shell-context" | "explicit-external-preview" | "keel-manifest-pointer" | "passive-avc-user-data";
   readonly moduleId?: string;
   readonly version?: string;
 }
@@ -570,6 +571,7 @@ interface ScanState {
   exemptLayer: (bytes: Uint8Array) => PinnedModule | undefined;
   readonly previews: ReadonlySet<string>;
   readonly trustedSpans: Map<Layer, TrustedSpan[]>;
+  readonly inspectedDataUris: Map<string, [number, number][]>;
 }
 
 function snippet(text: string, start: number, end: number): string {
@@ -706,10 +708,29 @@ function inspect(state: ScanState, layer: Layer): void {
   if (state.layers.length >= MAX_LAYERS) { state.uninspected.add(`more than ${MAX_LAYERS} nested layers`); return; }
   state.visited.add(key);
   state.layers.push(layer);
+  const covered: [number, number][] = [];
+  const inspectedDataUris: [number, number][] = [];
+  state.inspectedDataUris.set(key, inspectedDataUris);
   const pinned = layer.pinned ?? state.exemptLayer(layer.bytes);
   const text = byteText(layer.bytes);
+  let passiveSpans: ReturnType<typeof mp4PassiveMetadataSpans> | undefined;
+  // Whole-document matching is deliberately separate from context exemptions:
+  // a copied configuration or a modified/appended program grants no authority.
+  const managedMatches = new Map<string, KeelLinkGateInfrastructure | undefined>();
+  const managedExemption = (candidate: string): KeelLinkGateInfrastructure | undefined => {
+    if (managedMatches.has(candidate)) return managedMatches.get(candidate);
+    let match: KeelLinkGateInfrastructure | undefined;
+    try { if (governedManagedLoader?.(candidate)) match = infrastructureCache?.find(entry => entry.id === "keel.managed-shell-runtime"); } catch { /* Malformed UTF-8 is not an exact maintained loader. */ }
+    managedMatches.set(candidate, match);
+    return match;
+  };
   const record = (start: number, end: number, url: string, scheme: string, rawURL = url) => {
     if (KEEL_LINK_GATE_ALLOWED_URLS.includes(rawURL)) return;
+    passiveSpans ??= mp4PassiveMetadataSpans(layer.bytes);
+    if (passiveSpans.some(span => start >= span.start && end <= span.end)) {
+      if (state.exemptions.length < MAX_REPORTED_HITS) state.exemptions.push({ resource: layer.resource, url, reason: "passive-avc-user-data" });
+      return;
+    }
     // The committed preview URI, also when a decoded view of it (`%20` → space) cuts the locator short.
     const preview = (value: string, at: number) => [...state.previews].some((uri) => {
       if (!value.startsWith(uri, at)) return false;
@@ -727,7 +748,7 @@ function inspect(state: ScanState, layer: Layer): void {
       return;
     }
     const module = pinned ?? contextExemption(text, start, end) ?? viewExemption(layer, start, end, contextExemption);
-    const infrastructure = module ? undefined : infrastructureExemption(text, start, end) ?? viewExemption(layer, start, end, infrastructureExemption);
+    const infrastructure = module ? undefined : managedExemption(text) ?? viewExemption(layer, start, end, managedExemption) ?? infrastructureExemption(text, start, end) ?? viewExemption(layer, start, end, infrastructureExemption);
     if (infrastructure) {
       const key = `${layer.resource}\u0000${url}\u0000exempt`;
       if (state.hitKeys.has(key)) return;
@@ -773,6 +794,18 @@ function inspect(state: ScanState, layer: Layer): void {
       }
     }
     inspect(state, next);
+    if (map !== undefined && map.length === bytes.byteLength + 1) {
+      // Percent/escape views already inspected the complete data-URI payload.
+      // Map only that exact interval back; unrelated encoded runs still consume
+      // the normal budget, and locators remain inspected in both layers.
+      for (const [start, end] of state.inspectedDataUris.get(`${layer.resource}\u0000${digestOf(state, bytes)}`) ?? []) {
+        const first = map[start], last = map[end];
+        if (first !== undefined && last !== undefined && first < last) {
+          covered.push([first, last]); inspectedDataUris.push([first, last]);
+        }
+      }
+    }
+    return true;
   };
 
   const spans = () => state.trustedSpans.get(layer) ?? [];
@@ -850,7 +883,6 @@ function inspect(state: ScanState, layer: Layer): void {
     }
   }
   // data: URIs, then any remaining Base64 runs (storedBase64 slots, inline blobs, JSON payloads).
-  const covered: [number, number][] = [];
   const dataUris = /data:([a-z0-9.+\/-]*)((?:;[a-z0-9.+=-]+)*?)(;base64)?,([^\s"'<>\\]{8,})/giu;
   let match: RegExpExecArray | null;
   while ((match = dataUris.exec(text)) !== null) {
@@ -867,13 +899,16 @@ function inspect(state: ScanState, layer: Layer): void {
     covered.push([at, at + payload.length]);
     if (!outside(at, at + payload.length)) continue;
     const bytes = match[3] ? base64Bytes(decodeURIComponentSafe(payload)) : decodePercent(payload)?.bytes;
-    child(bytes, `data-uri${match[1] ? `(${match[1]})` : ""}${match[3] ? "-base64" : ""}`, at);
+    // Include only the comma delimiter with its payload: after percent
+    // encoding its trailing "2C" otherwise joins the first Base64 run.
+    // Header parameters are not covered and remain independently inspected.
+    if (child(bytes, `data-uri${match[1] ? `(${match[1]})` : ""}${match[3] ? "-base64" : ""}`, at)) inspectedDataUris.push([at - 1, at + payload.length]);
   }
   let runs = 0;
   for (const match of text.matchAll(/[A-Za-z0-9+\/_-]{32,}={0,2}/gu)) {
-    if (runs >= MAX_BASE64_RUNS_PER_LAYER) { state.uninspected.add(`more than ${MAX_BASE64_RUNS_PER_LAYER} Base64 runs in one layer`); break; }
     const at = match.index;
-    if (covered.some(([start, end]) => at >= start && at < end) || !outside(at, at + match[0].length)) continue;
+    if (covered.some(([start, end]) => at >= start && at + match[0].length <= end) || !outside(at, at + match[0].length)) continue;
+    if (runs >= MAX_BASE64_RUNS_PER_LAYER) { state.uninspected.add(`more than ${MAX_BASE64_RUNS_PER_LAYER} Base64 runs in one layer`); break; }
     runs += 1;
     const bytes = base64Bytes(match[0]);
     if (bytes !== undefined && interesting(bytes)) child(bytes, "base64", at);
@@ -1007,7 +1042,7 @@ export function scanKeelLinkGate(input: KeelLinkGateInput): KeelLinkGateReport {
   const state: ScanState = {
     hits: [], hitKeys: new Set(), exemptions: [], layers: [], visited: new Set(), uninspected: new Set(), digestOf: new Map(), expandedBytes: 0, hitCount: 0,
     exemptLayer: (bytes) => { const module = byDigest.get(digestOf(state, bytes)); return module?.byteLength === bytes.byteLength ? module : undefined; },
-    previews: new Set(snapshotKeelLinkGatePreviews(input.externalPreviews).map(preview => preview.uri)), trustedSpans: new Map(),
+    previews: new Set(snapshotKeelLinkGatePreviews(input.externalPreviews).map(preview => preview.uri)), trustedSpans: new Map(), inspectedDataUris: new Map(),
   };
   const resources: KeelLinkGateReport["resources"][number][] = [];
   for (const resource of input.resources) {
@@ -1123,12 +1158,13 @@ export interface KeelLinkGateInfrastructure {
 
 let infrastructureCache: readonly KeelLinkGateInfrastructure[] | undefined;
 let infrastructureLoad: Promise<readonly KeelLinkGateInfrastructure[]> | undefined;
+let governedManagedLoader: ((text: string) => boolean) | undefined;
 
 /** Every decoded layer text of `bytes`, so infrastructure stored compressed or encoded is matched as built. */
 function layerTexts(id: string, bytes: Uint8Array): string[] {
   const state: ScanState = {
     hits: [], hitKeys: new Set(), exemptions: [], layers: [], visited: new Set(), uninspected: new Set(), digestOf: new Map(), expandedBytes: 0, hitCount: 0,
-    exemptLayer: () => undefined, previews: new Set(), trustedSpans: new Map(),
+    exemptLayer: () => undefined, previews: new Set(), trustedSpans: new Map(), inspectedDataUris: new Map(),
   };
   inspect(state, { resource: id, bytes, path: [], depth: 0 });
   return state.layers.map((layer) => byteText(layer.bytes));
@@ -1148,10 +1184,23 @@ export function loadKeelLinkGateInfrastructure(): Promise<readonly KeelLinkGateI
       for (const [id, file] of [
         ["keel.published-view-reader", "assets/keel-published-view-reader-v1.js"],
         ["keel.verification-chrome", "assets/keel-verification-chrome.js"],
-        ["keel.managed-shell-runtime", "managed-shell-runtime.js"],
       ] as const) {
         try { add(id, new Uint8Array(fs.readFileSync(path.join(directory, file)))); } catch { /* Not part of this package or bundle. */ }
       }
+      try {
+        // Read the exported runtime, not the ESM source containing its quoted
+        // string. Keep this Node-only import out of browser wallet bundles.
+        const runtimeSpecifier = url.pathToFileURL(path.join(directory, "managed-shell-runtime.js")).href;
+        const runtime = await import(/* webpackIgnore: true */ /* @vite-ignore */ runtimeSpecifier) as typeof import("./managed-shell-runtime.js");
+        add("keel.managed-shell-runtime", runtime.KEEL_MANAGED_SHELL_RUNTIME);
+        const loaderSpecifier = url.pathToFileURL(path.join(directory, "managed-shell-loader.js")).href;
+        const loader = await import(/* webpackIgnore: true */ /* @vite-ignore */ loaderSpecifier) as typeof import("./managed-shell-loader.js");
+        // byteText uses WHATWG latin1 (windows-1252), so reverse its exact
+        // byte mapping before UTF-8 decoding; charCodeAt would corrupt 0x80-9f.
+        const alphabet = byteText(Uint8Array.from({length: 256}, (_, index) => index));
+        const byteValues = new Map([...alphabet].map((char, index) => [char, index]));
+        governedManagedLoader = text => loader.isKeelGovernedManagedShellLoader(utf8Decoder.decode(Uint8Array.from(text, char => byteValues.get(char)!)));
+      } catch { /* Missing maintained runtime/loader cannot grant an exemption. */ }
       try {
         // Not statically analysable: browser bundles of wallet-request must not pull in the shell builder.
         const specifier = url.pathToFileURL(path.join(directory, "inline-viewer-graph.js")).href;

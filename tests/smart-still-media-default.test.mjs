@@ -29,16 +29,21 @@ function webp(animated = false) {
   const body=Buffer.concat([Buffer.from('WEBP'),riffChunk('VP8X',flags),...(animated?[riffChunk('ANIM',Buffer.alloc(6)),riffChunk('ANMF',Buffer.alloc(16))]:[]),riffChunk('VP8 ',Buffer.from([1,2,3,4]))]);
   const h=Buffer.alloc(8);h.write('RIFF');h.writeUInt32LE(body.length,4);return Buffer.concat([h,body]);
 }
-test('known still same-source raster retains the decimal 500KB shortcut and 2MB split boundary', () => {
-  for (const n of [499999,500000,500001,1999999,2000000,2000001]) {
+// docs/KEEL_PRESENTATION_DEFAULTS.md (Oct28) supersedes the old automatic None shortcut.
+test('known still same-source raster keeps verification and the decimal 900KB preview boundary', () => {
+  for (const n of [499999,500000,500001,899999,900000,900001,1999999,2000000,2000001]) {
     const plan=p.planKeelSmartAssetPresentation(base({ source:{...source,byteLength:n}, sourceMotion:'still' }));
-    assert.equal(plan.selectedCandidateId,n>2000000?'canonical-hybrid':n>500000?'image-only-inline':'canonical-inline');
+    assert.equal(plan.selectedCandidateId,n>2000000?'external-preview-hybrid':n>900000?'external-preview-inline':'canonical-inline');
+    shell(plan);
+    if (n>900000) { assert.equal(plan.image.uri,null); assert.ok(plan.hardBlockers.includes('explicit-external-preview-url-required')); }
     assert.equal(plan.source.digest,source.digest); assert.equal(plan.publicationReady,false);
   }
 });
-test('a distinct grid preview is not the duplicated-still exception', () => {
+test('same-source and distinct grid previews never silently remove verification', () => {
   for (const preview of [{...source,resourceId:'thumbnail',byteLength:100,digest:hash('b')},{...source,resourceId:'thumbnail',mediaType:'image/webp'}]) shell(p.planKeelSmartAssetPresentation(base({sourceMotion:'still',preview})));
-  const same=p.planKeelSmartAssetPresentation(base({sourceMotion:'still',preview:{...source,resourceId:'same-bytes-alias'}}));assert.equal(same.viewer,'none');
+  const same=p.planKeelSmartAssetPresentation(base({sourceMotion:'still',preview:{...source,resourceId:'same-bytes-alias'}}));shell(same);
+  const explicit=p.planKeelSmartAssetPresentation(base({sourceMotion:'still',selection:{image:'inline',animation:'omitted'}}));
+  assert.equal(explicit.viewer,'none');assert.equal(explicit.selectionSource,'explicit');
 });
 test('nonexecutable is not still: animation, scripts and unknown motion keep verification', () => {
   for (const mediaType of ['image/gif','image/apng','video/mp4','audio/mpeg','text/plain','image/svg+xml','model/gltf-binary','application/octet-stream']) {
@@ -57,11 +62,19 @@ test('inline and hybrid explicit verifier choices stay selected for a shortcut-e
 test('complete-return and actual reader limits stay separate from the still-size recommendation', () => {
   for (const size of [1999999,2000000,2000001]) {
     const plan=p.planKeelSmartAssetPresentation(base({sourceMotion:'still',candidateMeasurements:{'image-only-inline':{completeTokenUriBytes:size,maximumTokenUriBytes:2000000}}}));
-    if(size>2000000)shell(plan);else assert.equal(plan.viewer,'none');assert.equal(plan.publicationReady,false);
+    shell(plan);
+    const candidate=plan.candidates.find(candidate=>candidate.id==='image-only-inline');
+    assert.equal(candidate.standardsCompatible,size<=2000000);
+    assert.equal(candidate.hardBlockers.includes('actual-reader-output-limit'),size>2000000);
+    const explicit=p.planKeelSmartAssetPresentation(base({sourceMotion:'still',selection:{image:'inline',animation:'omitted'},candidateMeasurements:{'image-only-inline':{completeTokenUriBytes:size,maximumTokenUriBytes:2000000}}}));
+    assert.equal(explicit.viewer,'none');assert.equal(explicit.hardBlockers.includes('actual-reader-output-limit'),size>2000000);assert.equal(explicit.publicationReady,false);
   }
   for (const key of ['executionGas','stateGas','readGas']) {
     const maximum={executionGas:'maxExecutionGas',stateGas:'maxStateGas',readGas:'maxReadGas'}[key];
     const plan=p.planKeelSmartAssetPresentation(base({sourceMotion:'still',candidateMeasurements:{'image-only-inline':{[key]:'101',[maximum]:'100'}}}));shell(plan);
+    const candidate=plan.candidates.find(candidate=>candidate.id==='image-only-inline');
+    const blocker={executionGas:'transaction-execution-limit',stateGas:'transaction-state-limit',readGas:'public-read-limit'}[key];
+    assert.ok(candidate.hardBlockers.includes(blocker));
   }
 });
 test('PNG/APNG motion uses the actual full chunk sequence, not PNG MIME or first chunk', () => {
@@ -104,7 +117,7 @@ async function stage(bytes, mediaType, explicit = {}) {
     }});return metadata;
 }
 test('real SDK staging keeps canonical intent until server qualification and preserves exact source bytes',async()=>{
-  for(const size of [499999,500000,500001,1999999,2000000,2000001]){
+  for(const size of [499999,500000,500001,899999,900000,900001,1999999,2000000,2000001]){
     const metadata=await stage(png({size}),'image/png');assert.equal(metadata.viewer,'keel-verification-shell');assert.equal(metadata.publicationIntent?.schema,'keel-studio-publication-intent@1');assert.equal(metadata.publicationIntent?.viewer.required,true);
   }
   assert.equal((await stage(png({size:500001,animated:true}),'image/png')).viewer,'keel-verification-shell');
@@ -123,7 +136,7 @@ test('real SDK staging keeps verifier for large GIF and byte-sniffed scripts and
 test('builder intent accepts explicit motion evidence but never assumes GIF or a distinct thumbnail is still duplication',()=>{
   for(const mediaType of ['image/png','image/webp','image/jpeg']){
     assert.equal(defaultKeelImageViewer(mediaType,500001),'keel-verification-shell');
-    assert.equal(defaultKeelImageViewer(mediaType,500001,'still'),'none');
+    assert.equal(defaultKeelImageViewer(mediaType,500001,'still'),'keel-verification-shell');
     const plan=planKeelMediaSlots({sourceResourceId:'original',mediaType,sourceByteLength:500001,sourceMotion:'still',thumbnailResourceId:'separate-thumbnail'});assert.equal(plan.viewer,'keel-verification-shell');assert.equal(plan.image.resourceId,'separate-thumbnail');
   }
   for(const mediaType of ['image/gif','image/apng','video/mp4','audio/mpeg'])assert.equal(defaultKeelImageViewer(mediaType,500001,'still'),'keel-verification-shell');
