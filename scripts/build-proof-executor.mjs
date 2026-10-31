@@ -6,7 +6,10 @@ const gethCommit='a579077007b98217c3e253a66e4b452ca0c32b96';
 const root=process.cwd(),build=resolve(process.env.KEEL_NATIVE_BUILD_DIR??'/tmp/keel-proof-executor-build');
 const source=join(build,'geth'),binary=join(build,'keel-proof-executor');mkdirSync(build,{recursive:true});
 execFileSync('git',['diff','--exit-code','HEAD'],{cwd:root,stdio:'pipe'});
-const run=(cmd,args,cwd=root)=>execFileSync(cmd,args,{cwd,stdio:'inherit',env:process.env});
+// The immutable runner image is FROM scratch. Ambient host CGO settings must
+// never produce binaries requiring a dynamic loader absent from that image.
+const buildEnvironment={...process.env,CGO_ENABLED:'0'};
+const run=(cmd,args,cwd=root)=>execFileSync(cmd,args,{cwd,stdio:'inherit',env:buildEnvironment});
 if(!existsSync(join(source,'.git')))run('git',['clone','--depth','1','--branch','v1.17.8','https://github.com/ethereum/go-ethereum.git',source]);
 execFileSync('git',['diff','--exit-code','HEAD'],{cwd:source,stdio:'pipe'});
 const allowedOverlays=new Set(['cmd/keel-proof-executor/main.go','cmd/keel-proof-executor/public_fixture_test.go','cmd/keel-proof-fixture/main.go','internal/ethapi/keel_sparse.go','internal/keelfork/reader.go','internal/keelfork/reader_public_fixture_test.go']);
@@ -24,4 +27,5 @@ run(process.env.KEEL_GO_BINARY??'go',['build','-buildvcs=false','-trimpath','-o'
 const receipt={schema:'keel-proof-executor-build@1',gethCommit,sdkCommit:execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim(),binarySha256:createHash('sha256').update(readFileSync(binary)).digest('hex'),binaryBytes:readFileSync(binary).length,sourceTree:execFileSync('git',['rev-parse','HEAD^{tree}'],{cwd:root,encoding:'utf8'}).trim(),goVersion:execFileSync(process.env.KEEL_GO_BINARY??'go',['version'],{encoding:'utf8'}).trim()};
 receipt.brokerSha256=createHash('sha256').update(readFileSync(join(build,'keel-proof-runner'))).digest('hex');
 receipt.brokerBytes=readFileSync(join(build,'keel-proof-runner')).length;
+receipt.cgoEnabled=false;
 writeFileSync(join(build,'receipt.json'),JSON.stringify(receipt,null,2)+'\n');console.log(JSON.stringify(receipt));
