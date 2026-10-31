@@ -1,3 +1,9 @@
 packages:
   - "packages/*"
   - "apps/*"
+
+# Video/audio fidelity checks require the package's pinned executable. pnpm 10
+# otherwise skips this installer, leaving advertised conversions unavailable.
+# Runtime media admission still verifies the reviewed binary's exact digest.
+onlyBuiltDependencies:
+  - ffmpeg-static
