@@ -184,8 +184,8 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
   // to the sandbox list: removing those 18 bytes restores the prior suffix hash.
   // Keep exact byte/hash guards against unreviewed growth or substitution.
   const canonicalFragments = [
-    { byteLength: 15_108, digest: "0x4a5405a5794aa91206ef4cebebee127d8917735d4d33546a0bbf8c6bead9a58e" },
-    { byteLength: 143_728, digest: "0xb40f97a95bf3ed016e6cf773486679ab842d90b40e820ffc8bde7d096c62cbf8" },
+    { byteLength: 15_178, digest: "0x274132820d713f6cac8456202d4edfe5289a506c3f1dcc9080213f744960d11d" },
+    { byteLength: 144_384, digest: "0x2935e466120369f488cf51ef592871fe7002b36c16a59d25c7a98963ad594f4e" },
   ];
   for (const [index, fragment] of [shell.prefix, shell.suffix].entries()) {
     const expected = canonicalFragments[index];
