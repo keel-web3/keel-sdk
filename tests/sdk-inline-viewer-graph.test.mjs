@@ -185,7 +185,7 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
   // Keep exact byte/hash guards against unreviewed growth or substitution.
   const canonicalFragments = [
     { byteLength: 15_178, digest: "0x274132820d713f6cac8456202d4edfe5289a506c3f1dcc9080213f744960d11d" },
-    { byteLength: 144_384, digest: "0x2935e466120369f488cf51ef592871fe7002b36c16a59d25c7a98963ad594f4e" },
+    { byteLength: 144788, digest: "0x4563ddef14b137836280a0ea06d76aefe703d2aed51ef3547d4b32f6b81eb50f" },
   ];
   for (const [index, fragment] of [shell.prefix, shell.suffix].entries()) {
     const expected = canonicalFragments[index];

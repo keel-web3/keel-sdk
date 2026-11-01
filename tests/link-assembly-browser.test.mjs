@@ -41,7 +41,7 @@ function verified(result) {
   assert.ok(result.out.includes('data-vault-verification="verified"'), result.out.slice(-5500) + '\n' + result.err);
   assert.match(result.out, /id="verify-title">Files verified/);
   assert.match(result.out, /<iframe/);
-  assert.match(result.out, /sandbox="allow-scripts allow-pointer-lock allow-downloads"/);
+  assert.match(result.out, /sandbox="allow-scripts allow-pointer-lock"/);
 }
 function rejected(result, reason) {
   assert.match(result.out, /data-vault-verification="failed"/);

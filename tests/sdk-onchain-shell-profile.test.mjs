@@ -10,7 +10,7 @@ const full={id:'water',role:'module',mediaType:'text/javascript',bytes,chainId:3
 // Exact maintained master shell build goldens, including its explicit artwork
 // download permission. These are build identities, not onchain registration receipts.
 test('maintained embedded shell build goldens stay exact for native and LZMA',async()=>{
- const expected={native:'0x2935e466120369f488cf51ef592871fe7002b36c16a59d25c7a98963ad594f4e','lzma-js':'0x711cdf52e3359b378ccaaf98a812d9d6f23aebb7b3977ac732e589f40ba7f954'};
+ const expected={native:'0x4563ddef14b137836280a0ea06d76aefe703d2aed51ef3547d4b32f6b81eb50f','lzma-js':'0x39c29bddc34a195c81d15c607a34a5ffa9f45b308a4b538948de4d5caacfc940'};
  for(const codecProfile of ['native','lzma-js']){const a=await buildCompactInlineKeelShell({codecProfile});assert.equal(sha(a.prefix),'0x274132820d713f6cac8456202d4edfe5289a506c3f1dcc9080213f744960d11d');assert.equal(sha(a.suffix),expected[codecProfile]);assert.equal(a.deliveryProfile,'embedded-assembled');}
 });
 test('binary profile uses same protected verifier and bounded reader with governed RPC',async()=>{
