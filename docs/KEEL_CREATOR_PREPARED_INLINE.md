@@ -46,7 +46,11 @@ selected instance's registered shell and reader profile from the chain:
   `shellRevision` pins one. On Sepolia, `creator-inline-20261005` revision 1
   is the original Base90 shell, which existing tokens keep. Revision 2 (tx
   0x855c3258bdbaa8dd4e4882cf43def4bf3a594b6854a0ed58cf8a09aee391749b) is URI81
-  with the legacy-strict reader grammar, and it is the default for fresh work.
+  with the legacy-strict reader grammar. Revision 3 (tx
+  0xd791210f53c48637984ba17e888ed8b7d4d756b53f594207fbb1535e804caedb) keeps
+  that format, moves the seal to the top left, fails a work that navigates
+  its frame, removes WebRTC from the child, and pauses the startup timeout
+  while the tab is hidden. It is the default for fresh work.
 - A legacy-carriage (Base90) revision stops the tool with
   `KEEL_REGISTERED_CARRIAGE_MISMATCH`, and nothing is written. Report it; do
   not fall back to a web3://, IPFS or Hybrid pointer for a work under
