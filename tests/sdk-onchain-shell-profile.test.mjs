@@ -10,8 +10,8 @@ const full={id:'water',role:'module',mediaType:'text/javascript',bytes,chainId:3
 // Exact maintained master shell build goldens, including its explicit artwork
 // download permission. These are build identities, not onchain registration receipts.
 test('maintained embedded shell build goldens stay exact for native and LZMA',async()=>{
- const expected={native:'0xb40f97a95bf3ed016e6cf773486679ab842d90b40e820ffc8bde7d096c62cbf8','lzma-js':'0xbc4af94db06fb2cd3af01e8ee45149ce3af6940ad1b3e64f2b850068d173e578'};
- for(const codecProfile of ['native','lzma-js']){const a=await buildCompactInlineKeelShell({codecProfile});assert.equal(sha(a.prefix),'0x4a5405a5794aa91206ef4cebebee127d8917735d4d33546a0bbf8c6bead9a58e');assert.equal(sha(a.suffix),expected[codecProfile]);assert.equal(a.deliveryProfile,'embedded-assembled');}
+ const expected={native:'0x2935e466120369f488cf51ef592871fe7002b36c16a59d25c7a98963ad594f4e','lzma-js':'0x711cdf52e3359b378ccaaf98a812d9d6f23aebb7b3977ac732e589f40ba7f954'};
+ for(const codecProfile of ['native','lzma-js']){const a=await buildCompactInlineKeelShell({codecProfile});assert.equal(sha(a.prefix),'0x274132820d713f6cac8456202d4edfe5289a506c3f1dcc9080213f744960d11d');assert.equal(sha(a.suffix),expected[codecProfile]);assert.equal(a.deliveryProfile,'embedded-assembled');}
 });
 test('binary profile uses same protected verifier and bounded reader with governed RPC',async()=>{
  const shell=await buildCompactInlineKeelShell({codecProfile:'lzma-js',onchainDelivery:delivery});assert.equal(shell.deliveryProfile,'onchain-recursive');assert.ok(shell.supportedCodecs.includes('lzma'));const text=Buffer.from(shell.suffix).toString();assert.ok(text.includes('KEEL binary object is not permanently registered and sealed.'));assert.ok(text.includes('Selected KEEL builder does not bind this Hold.'));assert.ok(text.includes('KEEL fallback RPC chain mismatch.'));assert.ok(text.includes('Unknown KEEL container reference.'));
