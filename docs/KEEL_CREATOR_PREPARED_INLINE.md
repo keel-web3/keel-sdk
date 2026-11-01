@@ -50,7 +50,17 @@ selected instance's registered shell and reader profile from the chain:
   0xd791210f53c48637984ba17e888ed8b7d4d756b53f594207fbb1535e804caedb) keeps
   that format, moves the seal to the top left, fails a work that navigates
   its frame, removes WebRTC from the child, and pauses the startup timeout
-  while the tab is hidden. It is the default for fresh work.
+  while the tab is hidden. Revision 4 (tx
+  0x90e61944590f8f5589d53f84c0e0103957c7dacc47313df319721eaa727715eb) gives a
+  work `allow-downloads` only when its `keel.loading-manifest` sets
+  `downloads: true`. It is the default for fresh work.
+- A blocked download shows the page nothing, so a work must ask before it
+  offers a save: `__KEEL_SHELL__.capabilities()` resolves `{downloads}`, true
+  when the work declared it and the shell is top level or its host said so.
+  A host says so with `setCapabilities({downloads:true})`, and may do so after
+  load, so ask again later. Its frame must really let saves out: unsandboxed,
+  or in Chrome `sandbox="allow-scripts allow-same-origin allow-downloads"`.
+  `allow-downloads` without `allow-same-origin` still blocks them.
 - A legacy-carriage (Base90) revision stops the tool with
   `KEEL_REGISTERED_CARRIAGE_MISMATCH`, and nothing is written. Report it; do
   not fall back to a web3://, IPFS or Hybrid pointer for a work under
