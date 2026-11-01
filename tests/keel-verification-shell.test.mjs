@@ -141,6 +141,13 @@ test("the existing Vault shell fails closed and refuses unsupported verifier rec
   assert.match(tezosRuntime, /no verifier receipt claimed/u);
 });
 
+test("the standalone verifier locks its child down like the registered shell", async () => {
+  const runtime = await readFile(path.join(repositoryRoot, "examples/demos/keel-creative-lab/keel-verifier-runtime.js"), "utf8");
+  assert.match(runtime, /default-src 'none'; script-src 'unsafe-inline' data: blob:\$\{wasmSource\}.*connect-src 'none'.*frame-src 'none'/u);
+  assert.match(runtime, /"RTCPeerConnection","webkitRTCPeerConnection","RTCDataChannel"\]\)delete globalThis\[name\]/u);
+  assert.match(runtime, /securitypolicyviolation[\s\S]*frame\.remove\(\);\s*refuse\("The work tried to leave its verified document\."\)/u);
+});
+
 test("the standalone verifier wraps headless entrypoints before injection", async () => {
   const runtime = await readFile(path.join(repositoryRoot, "examples/demos/keel-creative-lab/keel-verifier-runtime.js"), "utf8");
   assert.match(runtime, /browserSha256/u);

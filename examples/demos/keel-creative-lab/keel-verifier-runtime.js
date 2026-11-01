@@ -316,7 +316,11 @@ async function verifiedRuntimeContext() {
   };
 }
 
-function instrumentEntrypoint(html, nonce, runtimeContext, contentUrls, childProof) {
+function instrumentEntrypoint(html, nonce, runtimeContext, contentUrls, childProof, wasm) {
+  // The same lockdown the registered shell gives a child. The sandbox keeps the
+  // work away from this document; this keeps it from reaching the network.
+  const wasmSource = wasm ? " 'wasm-unsafe-eval'" : "";
+  const policy = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' data: blob:${wasmSource}; style-src 'unsafe-inline' data:; img-src data: blob:; media-src data: blob:; font-src data:; connect-src 'none'; object-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'none'"><script>for(const name of ["RTCPeerConnection","webkitRTCPeerConnection","RTCDataChannel"])delete globalThis[name]</script>`;
   const context = runtimeContext === undefined
     ? ""
     : `<script>globalThis.__KEEL_CONTEXT__=Object.freeze(${scriptJson(runtimeContext)});globalThis.__KEEL_RUNTIME__=Object.freeze({context:globalThis.__KEEL_CONTEXT__})</script>`;
@@ -332,12 +336,12 @@ function instrumentEntrypoint(html, nonce, runtimeContext, contentUrls, childPro
   const inputBridge = `<script>(()=>{addEventListener("message",event=>{const data=event.data;if(event.source!==parent||data?.protocol!=="keel-child-input@1"||!['keydown','keyup'].includes(data.type)||typeof data.code!=="string"||data.code.length>48||typeof data.key!=="string"||data.key.length>48)return;document.documentElement.dataset.keelLastInput=data.type+':'+data.code;dispatchEvent(new KeyboardEvent(data.type,{code:data.code,key:data.key,repeat:data.repeat===true,altKey:data.altKey===true,ctrlKey:data.ctrlKey===true,metaKey:data.metaKey===true,shiftKey:data.shiftKey===true,bubbles:true,cancelable:true}))})})()</script>`;
   const probe = `<script>(()=>{const n=${JSON.stringify(nonce)},benign=["ResizeObserver loop completed with undelivered notifications.","ResizeObserver loop limit exceeded"],send=(state,detail={})=>parent.postMessage({protocol:"keel-child-runtime@1",nonce:n,state,...detail},"*"),report=detail=>{const message=String(detail);if(benign.includes(message.trim()))return;send("failed",{message})};addEventListener("error",event=>report(event.message||"Entrypoint runtime error."));addEventListener("unhandledrejection",event=>report(event.reason?.message??event.reason??"Unhandled entrypoint rejection."));addEventListener("load",()=>setTimeout(()=>send("ready",{canvasCount:document.querySelectorAll("canvas").length,childCount:document.body?.childElementCount??0,loadError:document.body?.dataset?.loadError??null}),500),{once:true})})()</script>`;
   if (/<head(?:\s[^>]*)?>/iu.test(html)) {
-    return html.replace(/<head(?:\s[^>]*)?>/iu, (match) => `${match}${context}${proof}${content}${shellClient}${inputBridge}${probe}`);
+    return html.replace(/<head(?:\s[^>]*)?>/iu, (match) => `${match}${policy}${context}${proof}${content}${shellClient}${inputBridge}${probe}`);
   }
   // A verified entrypoint may be a fragment (canvas/script) rather than a
   // complete document. Wrap it before injecting Keel globals so the child
   // always executes inside a real top-level document with a <head>.
-  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${context}${proof}${content}${shellClient}${inputBridge}${probe}</head><body>${html}</body></html>`;
+  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${policy}${context}${proof}${content}${shellClient}${inputBridge}${probe}</head><body>${html}</body></html>`;
 }
 
 /*
@@ -387,13 +391,20 @@ async function launch() {
   // handed that result, per-item checks included, as __KEEL_VERIFICATION__.
   const html = instrumentEntrypoint(
     replaceAliases(new TextDecoder().decode(resolved.get(entry.id)), aliases), nonce, runtimeContext, contentUrls,
-    verificationResult("verified"),
+    verificationResult("verified"), envelope.items.some((item) => item.mediaType === "application/wasm"),
   );
   const frame = document.createElement("iframe");
   frame.title = envelope.title;
   frame.tabIndex = 0;
   frame.sandbox = "allow-scripts allow-pointer-lock";
   frame.referrerPolicy = "no-referrer";
+  // This document's frame-src refuses anything but the srcdoc, so a work that
+  // navigates its own frame lands here, and it stops being the verified work.
+  document.addEventListener("securitypolicyviolation", (event) => {
+    if (event.effectiveDirective !== "frame-src") return;
+    frame.remove();
+    refuse("The work tried to leave its verified document.");
+  });
   frame.srcdoc = html;
   // A child that mounts its own Keel proof chrome says so; one seal is enough,
   // and the child's tracks the artwork rather than the viewport. This document
@@ -465,8 +476,8 @@ async function launch() {
   verificationUI.ready();
 }
 
-launch().catch((error) => {
-  const message = error instanceof Error ? error.message : String(error);
+function refuse(message) {
+  if (document.body.dataset.verification === "failed") return;
   document.body.dataset.verification = "failed";
   status.hidden = true;
   // A failed verification is this document's to report, whatever a child
@@ -475,4 +486,6 @@ launch().catch((error) => {
   childOwnsChrome = false;
   verificationUI = mountVerificationUI(verificationResult("failed", message), runtimeData, contextData);
   verificationUI.ready();
-});
+}
+
+launch().catch((error) => refuse(error instanceof Error ? error.message : String(error)));
