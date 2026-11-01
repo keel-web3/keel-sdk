@@ -963,7 +963,7 @@ function compactInlineRuntime(
       extraRows: [...plugins.map((plugin) => Object.freeze({ key: plugin.title, value: plugin.body })),
         ...(liveContent ? [{ key: "Live appearance reads", value: `Enabled manifest and published read intents verified. ${liveContent.state.appearance ? "Wallet choices, backpack items, campaign eligibility and restored slots are live. " : "Wallet choices are live. "}RPC state at block ${liveContent.disclosure.blockNumber}; registered artwork is checked against its stored digest. These reads do not change the original seed or mint catalog. Source: ${liveContent.disclosure.endpoint}` }] : []),
         ...(liveReadError ? [{ key: "Wallet skins unavailable", value: liveReadError + ". Showing base artwork." }] : [])],
-    }) as { fail(label: string, detail: string): void; verification(): unknown; putPanel(input: unknown): unknown; removePanel(id: string): unknown; connectChild(frame: HTMLIFrameElement,loading?:{ready():boolean;progress(payload:unknown):boolean}): void; open(page?: string): void; close(): void; catalog(): unknown;setMarketplaces(input: unknown): unknown };
+    }) as { fail(label: string, detail: string): void; verification(): unknown; putPanel(input: unknown): unknown; removePanel(id: string): unknown; connectChild(frame: HTMLIFrameElement,loading?:{downloads?:boolean;ready():boolean;progress(payload:unknown):boolean}): void; open(page?: string): void; close(): void; catalog(): unknown;setMarketplaces(input: unknown): unknown };
     Object.defineProperty(globals, "__KEEL_SHELL_API__", {
       value: Object.freeze({protocol:"keel-shell-plugin@1",version:2,
         verification:verificationUI.verification,catalog:verificationUI.catalog,resources:()=>resources,plugins:()=>plugins,
@@ -972,7 +972,7 @@ function compactInlineRuntime(
     });
     const frame = document.createElement("iframe");
     frame.title = "Verified KEEL work";
-    frame.sandbox.add("allow-scripts", "allow-pointer-lock", "allow-downloads");
+    frame.sandbox.add("allow-scripts", "allow-pointer-lock");
     frame.referrerPolicy = "no-referrer";
     const directMedia = entry.mediaType.startsWith("image/") || entry.mediaType.startsWith("video/") || entry.mediaType === "model/gltf-binary";
     const assetDisplay = directMedia
@@ -1041,6 +1041,7 @@ function compactInlineRuntime(
       creatorLoader.addEventListener("load",()=>{if(document.body.dataset.verification!=="failed" && status.dataset.stage!=="ready")status.hidden=true;},{once:true});document.body.append(creatorLoader);
     }
     updateLoading("initialize","Starting the work",80);
+    if(loading.downloads)frame.sandbox.add("allow-downloads");
     let resolvePaint:()=>void=()=>{},rejectPaint:(error:Error)=>void=()=>{},manualReady=false,hasPainted=false,childFailed=false,progress=80;
     const ready=new Promise<void>((resolve,reject)=>{resolvePaint=resolve;rejectPaint=reject;});
     const finish=()=>{if(hasPainted&&(loading.readiness!=="manual"||manualReady)&&!childFailed)resolvePaint();};
@@ -1049,7 +1050,7 @@ function compactInlineRuntime(
     const startTimer=()=>{if(timer===undefined&&!document.hidden){timeFrom=performance.now();timer=setTimeout(()=>rejectPaint(new Error("Verified entrypoint initialization timed out")),timeLeft);}};
     const holdTimer=()=>{if(!document.hidden)return startTimer();if(timer===undefined)return;clearTimeout(timer);timer=undefined;timeLeft=Math.max(0,timeLeft-(performance.now()-timeFrom));};
     document.addEventListener("visibilitychange",holdTimer);startTimer();
-    verificationUI.connectChild(frame,{ready(){manualReady=true;finish();return true;},progress(payload){
+    verificationUI.connectChild(frame,{downloads:loading.downloads===true,ready(){manualReady=true;finish();return true;},progress(payload){
       if(!payload||typeof payload!=="object")throw new TypeError("Invalid initialization progress");const data=payload as {percent?:unknown;message?:unknown};
       if(typeof data.percent!=="number"||!Number.isFinite(data.percent)||data.percent<0||data.percent>100||(data.message!==undefined&&(typeof data.message!=="string"||data.message.length>160)))throw new TypeError("Invalid initialization progress");
       progress=Math.max(progress,80+data.percent*.2);updateLoading("initialize",typeof data.message==="string"?data.message:"Starting the work",progress);

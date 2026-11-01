@@ -7,8 +7,8 @@ import test from 'node:test';
 
 const sdk = fileURLToPath(new URL('../packages/sdk/', import.meta.url));
 const golden = {
-  native: '0x2935e466120369f488cf51ef592871fe7002b36c16a59d25c7a98963ad594f4e',
-  'lzma-js': '0x711cdf52e3359b378ccaaf98a812d9d6f23aebb7b3977ac732e589f40ba7f954',
+  native: '0x4563ddef14b137836280a0ea06d76aefe703d2aed51ef3547d4b32f6b81eb50f',
+  'lzma-js': '0x39c29bddc34a195c81d15c607a34a5ffa9f45b308a4b538948de4d5caacfc940',
 };
 
 test('installed SDK retains exact canonical native/LZMA bytes outside the workspace', async () => {

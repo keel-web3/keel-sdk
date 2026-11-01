@@ -396,7 +396,9 @@ async function launch() {
   const frame = document.createElement("iframe");
   frame.title = envelope.title;
   frame.tabIndex = 0;
-  frame.sandbox = "allow-scripts allow-pointer-lock";
+  const loadingItem = envelope.items.find((item) => item.id === "keel.loading-manifest" || item.aliases?.includes("keel.loading-manifest"));
+  const downloads = loadingItem !== undefined && JSON.parse(new TextDecoder().decode(resolved.get(loadingItem.id))).downloads === true;
+  frame.sandbox = `allow-scripts allow-pointer-lock${downloads ? " allow-downloads" : ""}`;
   frame.referrerPolicy = "no-referrer";
   // This document's frame-src refuses anything but the srcdoc, so a work that
   // navigates its own frame lands here, and it stops being the verified work.
@@ -465,7 +467,7 @@ async function launch() {
     frame.addEventListener("error", () => { clearTimeout(timer); removeEventListener("message", receive); reject(new Error("Verified entrypoint failed to load.")); }, { once: true });
   });
   verificationUI = mountVerificationUI(verificationResult("verified"), runtimeData, contextData);
-  verificationUI.connectChild(frame);
+  verificationUI.connectChild(frame, { downloads });
   stage.replaceChildren(frame);
   await loaded;
   document.body.dataset.verification = "verified";

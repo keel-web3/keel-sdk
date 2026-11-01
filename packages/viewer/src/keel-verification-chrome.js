@@ -848,6 +848,8 @@ function mountVerificationUI(result, runtime, runtimeContext, presentationInput)
     const removed=applicationPanels.delete(owner+":"+id);renderApplicationPanels();return removed;
   };
   const recentUpdates = new Map();
+  // No page can see a download being blocked, so an embedded work can only save what its host says it lets through.
+  let hostDownloads = false;
   addEventListener("message", event => {
     if(event.data?.protocol!=="keel-shell-extension@1")return;
     const owner = event.source === connectedChild?.contentWindow ? "artwork" : event.source === parent && parent !== window ? "host" : undefined;
@@ -861,6 +863,8 @@ function mountVerificationUI(result, runtime, runtimeContext, presentationInput)
       else if(action==="art-ready" && owner==="artwork"){if(!childLoading)throw new Error("No loading stage");value=childLoading.ready();}
       else if(action==="art-progress" && owner==="artwork"){if(!childLoading)throw new Error("No loading stage");value=childLoading.progress(payload);}
       else if(action==="put-marketplaces" && owner==="host")value=setMarketplaces(payload);
+      else if(action==="put-capabilities" && owner==="host"){hostDownloads=payload?.downloads===true;value=true;}
+      else if(action==="capabilities")value={downloads:childLoading?.downloads===true&&(parent===window||hostDownloads)};
       else if(action==="snapshot")value=snapshot();
       else if(action==="catalog")value=catalog();
       else if(action==="open") {open(typeof payload==="string" ? payload : undefined);value=true;}

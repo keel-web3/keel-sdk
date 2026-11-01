@@ -45,6 +45,10 @@ export interface KeelShellClient {
   progress(percent: number, message?: string): Promise<unknown>;
   /** Only the embedding host can update the core directory. Artwork can use putPanel instead. */
   setMarketplaces(directory: KeelMarketplaceDirectory): Promise<unknown>;
+  /** Whether a save reaches the viewer: the work declared downloads, and it is top level or its host said so. */
+  capabilities(): Promise<{ readonly downloads: boolean }>;
+  /** Only the embedding host can say what its own frame lets through. */
+  setCapabilities(capabilities: { readonly downloads: boolean }): Promise<unknown>;
   dispose(): void;
 }
 /** The function is self-contained so the same implementation can be injected before artwork executes. */
@@ -81,6 +85,8 @@ export function createKeelShellClient(target: Window = window.parent, timeoutMs 
     ready: () => request("art-ready"), progress: (percent: number, message?: string) => request("art-progress", {percent,message}),
     open: (page?: string) => request("open", page), close: () => request("close"),
     setMarketplaces: (directory: KeelMarketplaceDirectory) => request("put-marketplaces", directory),
+    capabilities: () => request("capabilities") as Promise<{ readonly downloads: boolean }>,
+    setCapabilities: (capabilities: { readonly downloads: boolean }) => request("put-capabilities", capabilities),
     dispose() { disposed = true; removeEventListener("message", onMessage); for (const item of pending.values()) {clearTimeout(item.timer); item.reject(new Error("Shell client disposed"));} pending.clear(); },
   });
 }

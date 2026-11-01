@@ -180,7 +180,7 @@ test("Tone + keel-audio load inside the compact Inline shell CSP and a real clic
   try {
     const page = await openArtwork(browser, artwork.url);
     const { point, after } = await assertGestureOnlyStart(page);
-    assert.equal(point.sandbox, "allow-scripts allow-pointer-lock allow-downloads");
+    assert.equal(point.sandbox, "allow-scripts allow-pointer-lock");
     assert.equal(point.allow, null, "the compact shell delegates no autoplay");
     assert.equal(after.clockSource, "worker", "the compact shell CSP lets Tone's blob-worker clock run");
     assert.deepEqual(page.problems, []);
