@@ -9,6 +9,7 @@ import { createWorkspace } from "./paths.js";
 import { getFrayAuctionReviewPrompt, getKeelAssetReviewPrompt, getKeelDraftRepairPrompt, getKeelProjectPlanPrompt, PROMPT_DEFINITIONS } from "./prompts.js";
 import { getMcpResource, McpResourceNotFoundError, RESOURCE_DEFINITIONS } from "./resources.js";
 import { TOOL_DEFINITIONS } from "./tools.js";
+import { KEEL_TOKEN_URI_ROUTE_RULE } from "@keel/sdk";
 import { loadMcpPlugins, type McpPluginOptions } from "./plugins.js";
 import type { ToolDefinition } from "./types.js";
 import {
@@ -107,6 +108,8 @@ function toolError(error: unknown): ToolCallResult {
 }
 
 const MCP_INSTRUCTIONS = [
+  // First, so a truncating client still shows it: agents copy the relay chains most onchain art uses.
+  KEEL_TOKEN_URI_ROUTE_RULE,
   "Use the execution explanation returned by plan and prepare-review. Studio also works without an agent. Keep requested signer, creator account, contract authority, artwork creator, current owner, fee payer and recipient distinct. Agent grants never authorize signing. Unsupported delegated or agent-owned paths require explicit supported setup; never create credentials, fund wallets or grant permissions from a draft instruction.",
   STUDIO_RELEASE_RECOVERY_GUIDANCE,
   "For a blocked existing Studio release, use keel-studio-draft operation=diagnose before changing any files. Check actual scopes and retry recoverable reads yourself. When the complete metadata read fails, set includeReadCall=true to obtain its exact private calldata, pinned block/runtime hashes, byte commitments and gas attempts; do not infer its cost from stored game size. This evidence never authorizes sending private inputs to a new provider or creating a wallet transaction. Preserve the exact artifact, object IDs and receipts. Do not infer size from an RPC error, assume KEEL staff must fix an owner-controlled operation, or stage the artwork again. Offer Hybrid/IPFS only for a demonstrated Inline capability limit and only when that route is actually configured. New transactions remain explicitly owner-reviewed.",

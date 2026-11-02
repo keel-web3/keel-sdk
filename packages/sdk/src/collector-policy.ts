@@ -194,7 +194,7 @@ export function assertKeelCollectorInlineMetadata(
   const animation = metadata.animation_url;
   if (typeof image !== "string") throw new TypeError("Collector Inline metadata must include image.");
   if (typeof animation !== "string") throw new TypeError("Collector Inline metadata must include animation_url.");
-  if (/^(?:https?|ipfs|ar|web3|keel-onchain):/iu.test(image)) throw new TypeError("Collector Inline image cannot be an external locator.");
+  if (/^(?:https?|ipfs|ar|web3|keel-onchain|oca-onchain|oca):/iu.test(image)) throw new TypeError("Collector Inline image cannot be an external locator.");
   assertDataURI(image, "Collector Inline image", "data:image/");
   assertKeelCollectorInlineAnimation(animation, options);
 }
@@ -203,7 +203,7 @@ export function assertKeelCollectorInlineMetadata(
  * only the image slot; it never relaxes this registered Inline animation. */
 export function assertKeelCollectorInlineAnimation(animation: unknown, options: { readonly requireCanonicalShell?: boolean } = {}): void {
   if (typeof animation !== "string") throw new TypeError("Collector Inline metadata must include animation_url.");
-  if (/^(?:https?|ipfs|ar|web3|keel-onchain):/iu.test(animation)) throw new TypeError("Collector Inline animation_url cannot be an external locator.");
+  if (/^(?:https?|ipfs|ar|web3|keel-onchain|oca-onchain|oca):/iu.test(animation)) throw new TypeError("Collector Inline animation_url cannot be an external locator.");
   if (!animation.startsWith(INLINE_HTML_PREFIX)) {
     throw new TypeError("Collector Inline animation_url must be the raw-percent data:text/html;charset=utf-8 URI.");
   }

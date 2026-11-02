@@ -2,7 +2,27 @@ import { canonicalJson } from "./canonical.js";
 
 /** A compatibility target, not an ERC-721 limit or a provider capability. */
 export const KEEL_STANDARD_TOKEN_URI_TARGET_BYTES = 2_000_000;
+/** Absolute public-RPC eth_call ceiling used to obtain the complete bytes at all. Not the publication standard. */
 export const KEEL_STANDARD_TOKEN_URI_READ_GAS = 60_000_000n;
+/**
+ * The publication standard: a complete tokenURI read THROUGH THE ACTUAL COLLECTION must cost at most 20M gas.
+ * EVM memory is quadratic, so every frame that returns N bytes pays ~3w + w^2/512 (+3 gas/word copy), w = N/32:
+ * ~4.5M gas per frame at 1.5MB. Only two frames may hold the big bytes: the registered KEEL builder and the
+ * collection, which forwards the builder's returndata unchanged (KeelRawStringReturn.forward). A Solidity relay
+ * (`return IRenderer(x).tokenURI(id)`) decodes and re-encodes, ~3-4x the floor per hop: measured 16.1M for the
+ * renderer alone, 63.9M through a companion, 117.1M through the collection, for one 1.55MB token.
+ */
+export const KEEL_STANDARD_COLLECTION_TOKEN_URI_READ_GAS = 20_000_000n;
+/** Frames that may hold the complete tokenURI bytes: builder + collection (precompiles excluded). */
+export const KEEL_TOKEN_URI_MAX_BIG_BYTE_FRAMES = 2;
+/** The one remedy every route finding, lint and refusal repeats. */
+export const KEEL_TOKEN_URI_DIRECT_BUILDER_REMEDY = "Use KeelComposed721: the collection itself assembles the URI from the prepared Hold fragments (KeelPreparedAssembly) and returns it, one frame; live state comes from a small IKeelTokenURIComposer that returns only the envelope and object IDs (KB). Where a collection cannot assemble, it calls the registered KEEL builder directly and forwards its returndata with KeelRawStringReturn.forward. Never relay the URI through companions, renderers, clones or proxies.";
+/** Gas the EVM must charge for one frame to hold and return N bytes: memory expansion plus one word copy. */
+export function keelTokenURIForwardFloorGas(returnBytes: number): number {
+  if (!Number.isSafeInteger(returnBytes) || returnBytes < 0) throw new RangeError("returnBytes must be a nonnegative safe integer.");
+  const words = Math.ceil(returnBytes / 32);
+  return 3 * words + Math.floor(words * words / 512) + 3 * words;
+}
 
 export interface KeelNonstandardReadIdentity {
   readonly chainId: number;

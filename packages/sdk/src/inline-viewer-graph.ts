@@ -24,6 +24,8 @@ import {
   type Hex,
   type Integrity,
   resolveKeelPreparationReadBounds,
+  KeelRetiredLocatorError,
+  isRetiredKeelLocator,
   type KeelTokenURIPreparationBudget, type KeelExplicitNonstandardReadPolicy,
 } from "@keel/protocol";
 import { promisify } from "node:util";
@@ -2272,6 +2274,7 @@ export async function buildKeelPreparedOneOfOneTokenURI(input: {
   if (input.graph.mediaType !== "application/vnd.keel.token-uri-raw-percent-fragment" || input.shellFragments !== undefined) {
     throw new KeelLegacyCarriageError("Prepared tokenURI graph media/shell carriage");
   }
+  if (isRetiredKeelLocator(input.manifestURI)) throw new KeelRetiredLocatorError(input.manifestURI);
   const animationEncoding = "raw-percent" as const;
   const prefixRaw = `${prefixHead},"animation_url":"data:text/html;charset=utf-8,`;
   const suffixRaw = [

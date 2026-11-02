@@ -1,7 +1,7 @@
 # The Keel verification shell (the "stamp")
 
 Every default collector-facing Keel viewer is wrapped in one canonical on-chain
-HTML verification shell: the seal button in the bottom-left corner (green or
+HTML verification shell: the seal button in the top-left corner (green or
 red by verification state) that opens a tabbed proof surface. A creator can
 explicitly select another compatible registered shell or preserve one
 self-contained UTF-8 HTML entrypoint with viewer=none as a creator-owned
@@ -78,7 +78,12 @@ projects may exercise the module but never define or fork the default.
   `character.attestedAnchors` (cross-chain anchor rows in the
   "Keel object trail" panel, read from the attested-anchor registry's
   `objectAnchoredChains`; requires a `keel.attestedAnchorRegistry`
-  address in the manifest extension).
+  address in the manifest extension), and `token.seedHistory`: the token's
+  seed under every harness revision with a KeelSeedRegistry seed set,
+  `[{ revision, at, seed }]` oldest first, `at` being the seed set's
+  `createdAt`. Each update is then a checkpoint: art keeps the seed in force
+  when a span of time began, so what came before an update stays as it was
+  and only what follows it changes (requires `keel.seedRegistry`).
 
 ## On-chain wrapper reconstruction (one call, any chain)
 

@@ -1,10 +1,11 @@
+import { KEEL_TOKEN_URI_ROUTE_RULE_SHORT } from "@keel/sdk";
 import { mcpRpc } from "./rpc-tools.js";
 import { readKeelInlineTokenAudit } from "@keel/sdk";
 import type { ToolDefinition } from "./types.js";
 
 export const TOKEN_AUDIT_TOOL_DEFINITIONS: readonly ToolDefinition[] = [{
   descriptor: {name:"keel-inline-token-audit",
-    description:"Read the actual collection tokenURI at a pinned RPC block and measure complete returned bytes, decoded HTML/image, child packed bytes, Base64/hex carriage inflation and document layers. Detect fresh encoded-body regressions. Bounded read-only calls; never signs, publishes or claims browser/registry verification. MIME type does not override ;base64. Use this for a user's actual token, not compressed-size estimates.",
+    description:`Read the actual collection tokenURI at a pinned RPC block and measure complete returned bytes, decoded HTML/image, child packed bytes, Base64/hex carriage inflation and document layers. Detect fresh encoded-body regressions. Bounded read-only calls; never signs, publishes or claims browser/registry verification. MIME type does not override ;base64. Use this for a user's actual token, not compressed-size estimates. Judge the actual collection read by the standard: keel-token-standard-audit measures its gas (<= 20M) and callTracer route. ${KEEL_TOKEN_URI_ROUTE_RULE_SHORT}`,
     inputSchema:{type:"object",additionalProperties:false,properties:{
       rpcUrl:{type:"string",minLength:1,maxLength:2048},chainId:{type:"integer",minimum:1},
       collection:{type:"string",pattern:"^0x[0-9a-fA-F]{40}$"},tokenId:{type:"string",pattern:"^(0|[1-9][0-9]*)$",maxLength:78},

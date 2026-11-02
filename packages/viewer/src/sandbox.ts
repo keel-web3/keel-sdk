@@ -245,6 +245,11 @@ function validateRuntimeContext(context: RuntimeContext): RuntimeContext {
   if (context.derivedTokenSeed !== undefined && !bytes32.test(context.derivedTokenSeed)) {
     throw new TypeError("Runtime token seed must be canonical bytes32.");
   }
+  if (context.seedHistory !== undefined && (
+    !Array.isArray(context.seedHistory)
+    || context.seedHistory.some((era, index, all) => !Number.isSafeInteger(era.revision) || era.revision < 1
+      || !decimal.test(era.at) || !bytes32.test(era.seed) || (index > 0 && era.revision <= all[index - 1]!.revision))
+  )) throw new TypeError("Runtime seed history must be ascending revisions with decimal times and bytes32 seeds.");
   for (const [name, value] of Object.entries({
     packedAttributes: context.packedAttributes,
     portableRoot: context.portableRoot,

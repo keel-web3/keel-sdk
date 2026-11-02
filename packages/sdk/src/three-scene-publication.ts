@@ -6,7 +6,10 @@ import {
   KEEL_VIEWER_PROTOCOL,
   assertValidManifest,
   canonicalJson,
+  KeelRetiredLocatorError,
   createIntegrity,
+  isRetiredKeelLocator,
+  keelManifestURI,
   manifestIntegrity,
   toDataUrl,
   utf8ToBytes,
@@ -477,6 +480,7 @@ function buildTokenPlan(input: {
     throw new TypeError("token name and symbol must be bounded and non-empty.");
   }
   const manifestURI = token.manifestURI ?? input.manifestURI;
+  if (isRetiredKeelLocator(manifestURI)) throw new KeelRetiredLocatorError(manifestURI);
   if (manifestURI.length === 0 || new TextEncoder().encode(manifestURI).length > 2_048) {
     throw new TypeError("token manifestURI must fit the selected KeelIndex publication limit (2,048 bytes).");
   }
@@ -644,7 +648,7 @@ export async function buildKeelImmutableThreeScenePublicationPlan(
   if (manifestPublication.storageMode !== KEEL_NATIVE_CARRIER_V1 || manifestPublication.operations.length !== 1) {
     throw new Error("The canonical immutable manifest must remain a native publication with one logical weld operation.");
   }
-  const manifestURI = `keel-onchain://${chainId}/${hold}/${manifestObjectId}`;
+  const manifestURI = keelManifestURI({ chainId, store: hold, objectId: manifestObjectId });
   const token = input.token === undefined
     ? undefined
     : buildTokenPlan({ token: input.token, owner, executor, manifestURI, manifestDigest });

@@ -1,3 +1,4 @@
+import { KeelRetiredLocatorError, isRetiredKeelLocator } from "@keel/protocol";
 import { sha256 } from "viem";
 
 import { keelTezosOnchfsObjectId } from "./tezos-collection.js";
@@ -332,6 +333,7 @@ export function buildKeelIndexRegisterCollection(input: { readonly index: string
 }
 
 export function buildKeelIndexPublishCollection(input: { readonly index: string; readonly source: string; readonly collection: string; readonly manifestUri: string; readonly manifestDigest: string; readonly parentRevision?: number; readonly compatibilityMin?: number; readonly compatibilityMax?: number; readonly policy?: number; readonly activationTime?: number }): TezosTransactionOperation {
+  if (isRetiredKeelLocator(input.manifestUri)) throw new KeelRetiredLocatorError(input.manifestUri);
   assertAddress(input.index, "index");
   assertAddress(input.source, "source");
   assertAddress(input.collection, "collection");
@@ -373,6 +375,7 @@ export function buildKeelCollectionSetMinter(input: { readonly collection: strin
 }
 
 export function buildKeelCollectionPresentation(input: { readonly collection: string; readonly source: string; readonly manifestUri: string; readonly manifestDigest: string; readonly previewUri?: string }): TezosTransactionOperation {
+  for (const uri of [input.manifestUri, input.previewUri]) if (uri !== undefined && isRetiredKeelLocator(uri)) throw new KeelRetiredLocatorError(uri);
   assertAddress(input.collection, "collection");
   assertAddress(input.source, "source");
   return { kind: "transaction", amount: "0", destination: input.collection, parameters: { entrypoint: "set_default_presentation", value: pair([hexBytes(utf8Hex(input.manifestUri), "manifest URI"), hexBytes(input.manifestDigest, "manifest digest"), hexBytes(utf8Hex(input.previewUri ?? input.manifestUri), "preview URI")]) } };

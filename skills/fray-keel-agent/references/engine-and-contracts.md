@@ -47,6 +47,17 @@ refreshing a remembered network. An unknown deployment means setup is needed,
 not that the network itself is unsupported. A historical address or observed
 bytecode is not verified shell, ABI or authority evidence.
 
+TokenURI read route: one frame, the collection assembles the URI (KeelComposed721 + IKeelTokenURIComposer); at most the builder forwarded raw beside it. The read
+through the actual collection must cost <= 20M gas. Only the registered builder
+and the collection hold the URI bytes; the collection calls the builder
+directly and returns its returndata with `KeelRawStringReturn.forward`, with
+live envelope inputs from a small module. Never write
+`return IRenderer(x).tokenURI(id)` in a collection, companion or renderer, and
+never put a clone/proxy in front: each extra frame pays the quadratic memory
+floor (~4.5M at 1.5MB) and a decode/re-encode relay ~3-4x that.
+`keel-token-standard-audit` reports each big-byte hop from callTracer and fails
+relay chains, copying relays and proxy frames.
+
 Estimate exact prepared calls against the selected network. Keep publication
 transaction cost separate from tokenURI/read execution gas; reads do not charge
 the user's wallet. Include all transaction and chain-specific fee components

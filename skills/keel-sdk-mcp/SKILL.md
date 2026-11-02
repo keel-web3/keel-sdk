@@ -27,6 +27,25 @@ Read `docs/KEEL_STUDIO_WALLET_REVIEW.md`; agent keys never authorize signing.
 **Shell choice:** Shell choice is independent of payload storage. Default to the registered KEEL verification shell. If a creator explicitly selects viewer=none, preserve their creator-owned HTML shell and direct-artifact presentation through handoff, preview, preparation and publication; do not insert or label it as canonical protection. The same native-byte/no-duplicate storage policy applies to both. Existing explicit creator shell registration/selection APIs remain available for reusable custom shells.
 
 
+**ONE FRAME: THE COLLECTION ASSEMBLES THE URI.** Use `KeelComposed721` with an `IKeelTokenURIComposer` (keel-contracts) for large live metadata: the collection copies the prepared Hold fragments itself and returns them; the composer returns only the envelope and object IDs. A complete tokenURI read
+through the actual collection must cost <= 20,000,000 gas
+(`KEEL_STANDARD_COLLECTION_TOKEN_URI_READ_GAS`; 60M is only the eth_call
+ceiling). EVM memory is quadratic: every frame that returns N bytes pays
+~3w + w^2/512 gas (w = N/32), ~4.5M per frame at 1.5MB, and a Solidity relay
+(`return IRenderer(x).tokenURI(id)`) decodes and re-encodes for ~3-4x that per
+hop. One 1.55MB token measured 16.1M at the renderer, 63.9M through a
+companion, 117.1M through the collection. Only two frames may hold the URI
+bytes: the registered KEEL builder (`preEncodedTokenURIFragmentsWithImage` /
+`preparedTokenURI`) and the collection. The collection calls the builder
+directly and returns `KeelRawStringReturn.forward(builder, abi.encodeCall(...), false)`.
+Per-token live state (name, attributes, context) comes from a small envelope
+module that returns KB, never the URI. No companion/renderer relays and no
+EIP-1167 clone or proxy in front of a large tokenURI. Most existing onchain art
+chains collection -> companion -> renderer; do not copy it. Pass the sources to
+`keel-contract-workflow-preflight` (`soliditySources`/`solidityPaths`) and audit
+the live collection with `keel-token-standard-audit`; both fail closed. Read
+[KEEL_PREPARED_COPY_ASSEMBLY.md](../../docs/KEEL_PREPARED_COPY_ASSEMBLY.md#one-relay-the-collection-forwards-the-builder).
+
 **EXISTING OBJECTS: PREPARED COPY FIRST.** Call `keel-inline-reuse-plan` before
 fresh preparation, an upload plan, or a new encoder. Preserve exact stored
 bytes, ordered object IDs, media, chain/store, digests and the bound registered

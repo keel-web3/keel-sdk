@@ -42,6 +42,8 @@ import type {
 export const KEEL_RUNTIME_EXTENSION_KEY = "keel.runtime" as const;
 export const KEEL_RUNTIME_PROTOCOL = "keel-runtime@1" as const;
 export const KEEL_INJECTION_PROTOCOL = "keel-injection@1" as const;
+/** The most harness revisions whose seed sets one view reads for `token.seedHistory`. */
+export const KEEL_SEED_HISTORY_LIMIT = 256;
 export const KEEL_ANCHOR_TOKEN_ID = "$anchor.tokenId" as const;
 export const KEEL_STAKED_CHARACTER_ID = "$staked.characterId" as const;
 
@@ -66,6 +68,7 @@ export type KeelInjectionField =
   | "block.timestamp"
   | "token.id"
   | "token.seed"
+  | "token.seedHistory"
   | "character.seed"
   | "character.packedAttributes"
   | "character.portableRoot"
@@ -768,6 +771,7 @@ function injectionExtension(value: unknown, label: string): KeelInjectionExtensi
     "block.timestamp",
     "token.id",
     "token.seed",
+    "token.seedHistory",
     "character.seed",
     "character.packedAttributes",
     "character.portableRoot",
@@ -1004,6 +1008,9 @@ export function parseKeelRuntimeExtension(manifest: ArtifactManifest): KeelRunti
   }
   if (result.injection?.fields.includes("token.seed") === true && result.seedRegistry === undefined) {
     throw new TypeError("Keel token.seed injection requires a seed registry.");
+  }
+  if (result.injection?.fields.includes("token.seedHistory") === true && result.seedRegistry === undefined) {
+    throw new TypeError("Keel token.seedHistory injection requires a seed registry.");
   }
   if (result.injection?.fields.includes("character.attestedAnchors") === true && result.attestedAnchorRegistry === undefined) {
     throw new TypeError("Keel character.attestedAnchors injection requires an attested-anchor registry binding.");
@@ -1907,6 +1914,7 @@ export async function bindKeelManifest(
   }
 
   let seed: KeelSeedBinding | undefined;
+  let seedHistory: RuntimeContext["seedHistory"];
   if (extension.seedRegistry !== undefined) {
     const [seedHarnessRegistry, seedKeelIndex, seedSetValue, seedSetIdValue] = await Promise.all([
       read(extension.seedRegistry, "harnessRegistry"),
@@ -1942,6 +1950,33 @@ export async function bindKeelManifest(
     };
     if (manifest.runtime.determinism.mode === "replay" && manifest.runtime.determinism.seed !== derivedTokenSeed) {
       throw new Error("Manifest replay seed does not match the Keel token seed.");
+    }
+    if (extension.injection?.fields.includes("token.seedHistory") === true) {
+      // Every earlier revision's seed set too, each a checkpoint: the seed in force from its creation on.
+      if (effective.harnessRevision > KEEL_SEED_HISTORY_LIMIT) throw new RangeError("Keel seed history exceeds its revision limit.");
+      const history: { revision: number; at: string; seed: Hex }[] = [];
+      for (let revision = 1; revision <= effective.harnessRevision; revision += 1) {
+        const value = revision === effective.harnessRevision
+          ? seedSetValue
+          : await read(extension.seedRegistry, "seedSetForHarnessRevision", [extension.viewerId, BigInt(revision)]);
+        if (!bool(tupleValue(value, "exists", 9), "seedSet.exists")) continue;
+        if (
+          bytes32(tupleValue(value, "harnessId", 0), "seedSet.harnessId") !== extension.viewerId ||
+          safeNumber(tupleValue(value, "harnessRevision", 1), "seedSet.harnessRevision", 1) !== revision ||
+          !sameAddress(contractAddress(tupleValue(value, "collection", 2), "seedSet.collection"), anchor.collection)
+        ) throw new Error("Keel seed history does not match the effective viewer.");
+        const id = revision === effective.harnessRevision
+          ? seedSetId
+          : bytes32(scalar(await read(extension.seedRegistry, "predictSeedSetId", [extension.viewerId, BigInt(revision)])), "seedSetId");
+        history.push({
+          revision,
+          at: BigInt(tupleValue(value, "createdAt", 6) as bigint | number | string).toString(),
+          seed: revision === effective.harnessRevision
+            ? derivedTokenSeed
+            : bytes32(scalar(await read(extension.seedRegistry, "deriveTokenSeed", [id, BigInt(extension.tokenId)])), "derivedTokenSeed"),
+        });
+      }
+      seedHistory = history;
     }
   }
 
@@ -2370,6 +2405,7 @@ export async function bindKeelManifest(
             ...(fields.has("block.timestamp") ? { blockTimestamp: options.blockTimestamp!.toString() } : {}),
             ...(fields.has("token.id") ? { tokenId: extension.tokenId } : {}),
             ...(fields.has("token.seed") ? { derivedTokenSeed: seed!.derivedTokenSeed } : {}),
+            ...(fields.has("token.seedHistory") ? { seedHistory: seedHistory! } : {}),
             ...(fields.has("character.seed") ? { derivedTokenSeed: characterRecipe!.derivedTokenSeed } : {}),
             ...(fields.has("character.packedAttributes") ? { packedAttributes: characterRecipe!.packedAttributes } : {}),
             ...(fields.has("character.portableRoot") ? { portableRoot: characterRecipe!.portableRoot } : {}),

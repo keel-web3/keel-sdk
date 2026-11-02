@@ -158,6 +158,14 @@ test("audit decodes every layer: nested data URIs, gzip slots, base64 JSON, and 
       assert.equal(result.verdict, "fail", locator);
       assert.ok(codes(result).includes("external-locator"), locator);
     }
+    for (const locator of ["oca-onchain://11155111/0x1111111111111111111111111111111111111111/0x22", "oca:object/1"]) {
+      const result = await audit(call, rawPercent({ name: "o", image: IMAGE, description: `see ${locator}` }));
+      assert.equal(result.verdict, "fail", locator);
+      assert.deepEqual(codes(result), ["retired-oca-locator"], locator);
+      const finding = result.findings.find((item) => item.code === "retired-oca-locator");
+      assert.equal(finding.exceptable, false);
+      assert.match(finding.detail, /OCA is gone/u);
+    }
 
     const b64 = await audit(call, `data:application/json;base64,${Buffer.from(JSON.stringify({ name: "b", image: IMAGE })).toString("base64")}`);
     assert.equal(b64.verdict, "pass");

@@ -14,6 +14,7 @@ export * from "./keel-module-index.js";
 export * from "./portable.js";
 export * from "./keel-hold.js";
 export * from "./keel-presentation.js";
+export * from "./keel-manifest-uri.js";
 export * from "./keel-verification-presentation.js";
 export * from "./keel-content-cache.js";
 export * from "./keel-viewer-bridge.js";

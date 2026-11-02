@@ -138,6 +138,7 @@ export * from "./prepared-copy-publication.js";
 export * from "./inline-transport-audit.js";
 export * from "./prepared-inline-sources.js";
 export * from "./inline-token-read.js";
+export * from "./token-uri-read-route.js";
 
 export * from "./dense-transport.js";
 

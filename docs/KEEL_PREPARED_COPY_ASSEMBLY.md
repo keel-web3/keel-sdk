@@ -107,6 +107,74 @@ See [KEEL_PRESENTATION.md](KEEL_PRESENTATION.md) for delivery and revision gates
 and [KEEL_OBJECT_STORAGE_FOR_CHEAP_READS.md](KEEL_OBJECT_STORAGE_FOR_CHEAP_READS.md)
 for the write-once/copy-on-read storage boundary.
 
+## One frame: the collection assembles the URI
+
+Use `KeelComposed721` (keel-contracts `src/modules/keel-die/KeelComposed721.sol`) for large live metadata. Its
+`tokenURI` asks a small `IKeelTokenURIComposer` for the prepared fragment IDs, digests and the per-token raw envelope
+(kilobytes), then `KeelPreparedAssembly` copies the fragments from their Hold slugs into the collection's own memory,
+checks every length and SHA-256, and returns. The bytes are byte-identical to
+`KeelRawTokenURIBuilder.preEncodedTokenURIFragmentsWithImage` and exist in one frame. Measured: a 966 KB token reads
+for 2.65M gas through the collection (the builder alone: 2.66M); the 1.65 MB NOCTURNES Genesis token reads for 10.55M
+on a Sepolia fork, where the companion relay chain cost 117.1M. Test: `test/modules/keel-die/KeelComposed721.t.sol`.
+
+### Fallback: the collection forwards the builder
+
+A tokenURI read through the **actual collection** must cost at most
+**20,000,000 gas** (`KEEL_STANDARD_COLLECTION_TOKEN_URI_READ_GAS`). The 60M
+`KEEL_STANDARD_TOKEN_URI_READ_GAS` is only the eth_call ceiling used to obtain
+the bytes at all; it is not the publication standard.
+
+Why: EVM memory is quadratic. Every call frame that RETURNs N bytes must hold
+them in its own memory and pays at least `3w + w^2/512` gas plus 3 gas/word for
+the copy, with `w = N/32` (`keelTokenURIForwardFloorGas`). That is ~4.5M gas per
+frame at 1.5MB, even when the frame only forwards. A Solidity relay that writes
+`return IRenderer(x).tokenURI(id)` decodes the child's string into memory and
+re-encodes it: ~3-4x the floor per hop. One real 1.55MB token measured 16.1M at
+the renderer alone, 63.9M through a companion and 117.1M through the
+collection. Most existing onchain art is built as collection -> companion ->
+renderer -> builder; do not copy that shape.
+
+The standard route:
+
+1. The collection calls the registered KEEL builder (for example
+   `KeelRawTokenURIBuilder.preEncodedTokenURIFragmentsWithImage` or
+   `preparedTokenURI`) **directly**.
+2. It returns the builder's returndata unchanged:
+   `return KeelRawStringReturn.forward(builder, abi.encodeCall(IBuilder.preparedTokenURI, (...)), false);`
+   (keel-contracts `src/modules/keel-kernel/libraries/KeelRawStringReturn.sol`;
+   `KeelRevisioned721` already does this). One frame copy, no decode/re-encode.
+3. Per-token live state (name, attributes, context, small JSON) is computed by
+   the collection or read from a small envelope module that returns only the
+   envelope inputs (KB), never the big URI.
+4. Big-byte frames: builder + collection only. No companion or renderer relays
+   carrying the big string, and no EIP-1167 clone or proxy in front when size
+   matters: a proxy is one more frame holding the full bytes.
+
+Enforcement (fail closed):
+
+- `keel-token-standard-audit` (live `rpcUrl` + `contract` + `tokenId`) measures
+  the read gas through the collection and fails
+  `collection-read-gas-exceeds-standard` above 20M. With `debug_traceCall`
+  callTracer it reports every frame whose output is >= 90% of the final return
+  (address, gasUsed, self gas, output bytes, forward floor) and fails
+  `token-uri-relay-chain` (more than two big-byte frames),
+  `token-uri-copying-relay` (a forwarding frame spending more than 2x the
+  floor itself) and `token-uri-proxy-frame` (a DELEGATECALL frame carrying the
+  bytes). None of these can be waived. Without a trace, a return of 512 KiB or
+  more fails `token-uri-route-unverified`.
+- `keel-contract-workflow-preflight` with `soliditySources` or `solidityPaths`
+  lints tokenURI/uri functions for `.tokenURI(`, `.uri(`,
+  `.preparedTokenURI(`, `.preEncodedTokenURI...(` calls and
+  `abi.decode(..., (string))` relays. With the default `intent: "publication"`
+  it refuses (`token-uri-relay-source`) and issues no receipt.
+- SDK: `analyzeKeelTokenURIReadRoute(callTracerTree)` and
+  `lintKeelTokenURIRelaySource(sources)`.
+
+Every finding carries the same remedy: Collection must call the registered KEEL
+builder directly and forward its returndata with KeelRawStringReturn.forward;
+live state comes from a small envelope module; do not relay the URI through
+companions/renderers/proxies.
+
 ## Executable publication gate and prototype map
 
 Use the tested implementations, not a new composer or encoding:

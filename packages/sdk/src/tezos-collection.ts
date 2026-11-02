@@ -926,6 +926,9 @@ export function prepareKeelTezosHoldResources(input: KeelTezosHoldResourcesInput
   const network = assertNetwork(input.network);
   const creator = assertAddress(input.creator, "creator");
   const hold = assertContract(input.hold, "hold");
+  // A custom Hold has no default resolver deployment; make its exact chain and
+  // contract explicit so a reader never looks up the official OnchFS contract.
+  const onchfsAuthority = `tezos:${network}:${hold}`;
   const chunkBytes = Number(natural(input.chunkBytes ?? KEEL_TEZOS_DEFAULT_CHUNK_BYTES, "chunkBytes", { positive: true, max: 28_000n }));
   if (!Array.isArray(input.resources) || input.resources.length === 0 || input.resources.length > 256) throw new TypeError("resources must list 1-256 creator resources.");
   const writes: TezosTransactionOperation[] = [];
@@ -964,7 +967,7 @@ export function prepareKeelTezosHoldResources(input: KeelTezosHoldResourcesInput
     welds.push(call("hold", hold, "weld_object", mPair([
       mText(compression), mInt(decodedByteLength), mBytes(decodedSha256), mBytes(fileCid), mBytes(manifestHex), mBytes(manifestSha256), mText(resource.mediaType), mBytes(objectId), mInt(stored.length), mBytes(storedSha256),
     ])));
-    return { name: resource.name, mediaType: resource.mediaType, compression, objectId, manifestSha256, fileCid, onchfsUri: `onchfs://${fileCid}`, storedByteLength: stored.length, storedSha256, decodedByteLength, decodedSha256, chunkCount: pointers.length, chunkPointers: pointers, metadataHex: hexOf(metadata) };
+    return { name: resource.name, mediaType: resource.mediaType, compression, objectId, manifestSha256, fileCid, onchfsUri: `onchfs://${onchfsAuthority}/${fileCid}`, storedByteLength: stored.length, storedSha256, decodedByteLength, decodedSha256, chunkCount: pointers.length, chunkPointers: pointers, metadataHex: hexOf(metadata) };
   });
   const directoryEntries: Record<string, string> = Object.fromEntries(resources.map((resource) => [resource.name, resource.fileCid]));
   const directoryCid = input.directory === true ? keelTezosOnchfsDirectoryCid(directoryEntries) : undefined;
@@ -979,7 +982,7 @@ export function prepareKeelTezosHoldResources(input: KeelTezosHoldResourcesInput
     expectedSender: creator,
     hold,
     resources,
-    ...(directoryCid === undefined ? {} : { directory: { cid: directoryCid, onchfsUri: `onchfs://${directoryCid}`, files: directoryEntries } }),
+    ...(directoryCid === undefined ? {} : { directory: { cid: directoryCid, onchfsUri: `onchfs://${onchfsAuthority}/${directoryCid}`, files: directoryEntries } }),
     storage: { storedBytes: resources.reduce((total, resource) => total + resource.storedByteLength, 0), newChunkCount: writes.length, payloadStorage: "native-bytes-once" },
     operations,
     batches: groupKeelTezosOperations(operations),
@@ -1431,7 +1434,12 @@ export function keelTezosTextDataUri(mediaType: string, text: string): string {
 function carrier(value: unknown, label: string, allowExternal: boolean): string {
   if (typeof value !== "string" || value.length === 0) throw new TypeError(`${label} must be a URI.`);
   if (KEEL_POINTER.test(value)) throw new TypeError(`${label} is a KEEL pointer, not self-contained presentation. Use inline data or an onchfs:// Hold carrier.`);
-  if (!ONCHAIN_CARRIER.test(value) && !allowExternal) throw new TypeError(`${label} must be an onchain carrier (data:, onchfs:// or tezos-storage:). External carriers need allowExternalCarrier=true.`);
+  // Custom Holds require the exact network and contract emitted by the native
+  // resource preparer. Validate both Base58 checksums rather than treating a
+  // qualified onchain URI as an external carrier.
+  const qualified = /^onchfs:\/\/tezos:([^:/]+):([^/]+)\/[0-9a-f]{64}(?:\/[^\s]*)?$/u.exec(value);
+  if (qualified) { assertNetwork(qualified[1]); assertContract(qualified[2], "OnchFS Hold"); }
+  if (!qualified && !ONCHAIN_CARRIER.test(value) && !allowExternal) throw new TypeError(`${label} must be an onchain carrier (data:, onchfs:// or tezos-storage:). External carriers need allowExternalCarrier=true.`);
   return value;
 }
 

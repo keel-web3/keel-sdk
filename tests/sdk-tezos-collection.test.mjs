@@ -117,7 +117,11 @@ test("Hold resources match OnchFS CIDs, dedupe chunks, and fit operation batches
   const html = new TextEncoder().encode("<!doctype html>".repeat(3000));
   const plan = prepareKeelTezosHoldResources({ network, creator, hold, directory: true, resources: [{ name: "index.html", mediaType: "text/html", bytes: html }, { name: "copy.html", mediaType: "text/html", bytes: html }] });
   const [first, second] = plan.resources;
-  assert.equal(first.onchfsUri, `onchfs://${first.fileCid}`);
+  assert.equal(first.onchfsUri, `onchfs://tezos:${network}:${hold}/${first.fileCid}`);
+  assert.equal(plan.directory.onchfsUri, `onchfs://tezos:${network}:${hold}/${plan.directory.cid}`);
+  const other = prepareKeelTezosHoldResources({ network: "NetXsqzbfFenSTS", creator, hold, resources: [{ name: "index.html", mediaType: "text/html", bytes: html }] });
+  assert.equal(other.resources[0].fileCid, first.fileCid);
+  assert.equal(other.resources[0].onchfsUri, `onchfs://tezos:NetXsqzbfFenSTS:${hold}/${first.fileCid}`);
   assert.equal(first.fileCid, second.fileCid);
   assert.equal(plan.storage.newChunkCount, Math.ceil(html.length / 16384));
   assert.equal(first.objectId.length, 64);
@@ -282,4 +286,14 @@ test("planners route Tezos collections through the new tools", () => {
   assert.equal(studioChainRoute({ family: "tezos", network, chainId: null, nativeCurrency: "XTZ", status: "ready" }), KEEL_STUDIO_TEZOS_COLLECTION_ROUTE);
   assert.equal(studioChainRoute({ family: "tezos", network, chainId: null, nativeCurrency: "XTZ", status: "blocked" }), null);
   assert.ok(groupKeelTezosOperations([]).length === 0);
+});
+
+test('native token metadata accepts the exact chain-qualified URI emitted for a custom Hold',()=>{
+ const plan=prepareKeelTezosHoldResources({network,creator,hold,resources:[{name:'art.html',mediaType:'text/html',bytes:new TextEncoder().encode('<p>current native artwork</p>')}]});
+ const uri=plan.resources[0].onchfsUri;
+ const info=buildKeelTezosTokenInfo({tokenId:1,name:'Native NFT',artifactUri:uri,displayUri:uri,displayMediaType:'image/png'});
+ assert.equal(info.artifactUri,uri);assert.equal(info.isBooleanAmount,'true');
+ assert.throws(()=>buildKeelTezosTokenInfo({tokenId:1,name:'Native NFT',artifactUri:uri.replace(network,'NetInvalid'),previewSvg:'<svg/>'}),/network/);
+ assert.throws(()=>buildKeelTezosTokenInfo({tokenId:1,name:'Native NFT',artifactUri:uri.replace(hold,hold.slice(0,-1)+'1'),previewSvg:'<svg/>'}),/Base58|checksum/);
+ assert.throws(()=>buildKeelTezosTokenInfo({tokenId:1,name:'Native NFT',artifactUri:uri.replace(/\/[a-f0-9]{64}$/,'/not-a-cid'),previewSvg:'<svg/>'}),/onchain carrier/);
 });

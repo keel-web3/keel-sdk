@@ -2,7 +2,9 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   KEEL_REGISTRY_ANCHOR_PROTOCOL,
+  KeelRetiredLocatorError,
   canonicalJson,
+  keelManifestURI,
   intersectCapabilities,
   createIntegrity,
   encodeBase64,
@@ -1000,6 +1002,31 @@ test("manifest loader resolves a canonical KeelIndex URI directly from KeelHold 
   );
 });
 
+test("manifest loader reads the standard web3:// manifest link and names a retired OCA scheme", async () => {
+  const value = await manifest();
+  const bytes = utf8ToBytes(canonicalJson(value));
+  const integrity = await manifestIntegrity(value);
+  const store = "0x1111111111111111111111111111111111111111";
+  const objectId = `0x${"22".repeat(32)}`;
+  const uri = keelManifestURI({ chainId: 31338, store, objectId });
+  assert.equal(uri, `web3://${store}:31338/haulObject/${objectId}?mime.type=application%2Fjson`);
+  const requests = [];
+  const adapters = { async readOnchainObject(request) { requests.push(request); return bytes; } };
+  const loaded = await loadArtifactManifest(uri, integrity, { adapters });
+  assert.equal(loaded.integrityVerified, true);
+  assert.deepEqual(requests, [{ chainId: 31338, store, objectId }]);
+  await assert.rejects(() => loadArtifactManifest(`web3://${store}:31338/getObject/${objectId}`, integrity, { adapters }), /haulObject/u);
+  await assert.rejects(() => loadArtifactManifest(`${uri.split("?")[0]}?mime.type=image%2Fpng`, integrity, { adapters }), /application\/json/u);
+  for (const retired of [`oca-onchain://31338/${store}/${objectId}`, "OCA:manifest"]) {
+    await assert.rejects(() => loadArtifactManifest(retired, integrity, { adapters }), (error) => {
+      assert.ok(error instanceof KeelRetiredLocatorError);
+      assert.match(error.message, /OCA is gone/u);
+      return true;
+    });
+  }
+  assert.equal(requests.length, 1);
+});
+
 
 test("registry adapter performs explicit active and confirmation contract calls", async () => {
   const calls = [];
@@ -1644,6 +1671,48 @@ test("Keel live injection pins reads while exposing only manifest-declared conte
   await assert.rejects(
     () => bindKeelManifest(value, commitment, { readContract: reader, blockNumber: 123n }),
     /block number, hash, and timestamp/i,
+  );
+});
+
+test("Keel token.seedHistory passes every revision's seed set as a checkpoint, oldest first", async () => {
+  const objectBytes = new TextEncoder().encode('<svg xmlns="http://www.w3.org/2000/svg"/>');
+  // Live binding follows the harness to its latest revision (3), where an exact one would pin the manifest's.
+  const { expectedViewer: _pinned, ...extension } = baseKeelExtension({
+    mode: "live",
+    seedRegistry: keelAddresses.seed,
+    injection: { protocol: "keel-injection@1", fields: ["token.seed", "token.seedHistory"] },
+  });
+  const { value, integrity, commitment } = await keelManifest(extension);
+  const seedFor = revision => `0x${String(revision).repeat(2).padStart(2, "0").repeat(32)}`;
+  const base = keelReader({ manifestDigest: integrity.digest, objectBytes, derivedSeed: seedFor(3) });
+  const reader = async request => {
+    const key = `${request.address}:${request.functionName}`;
+    if (key === `${keelAddresses.viewer}:effectiveHarness`) {
+      const result = await base(request);
+      return [result[0], 3n, ...result.slice(2)];
+    }
+    if (key === `${keelAddresses.seed}:seedSetForHarnessRevision`) {
+      const revision = request.args[1];
+      const result = await base(request);
+      // Revision 2 was published without a seed set: it is no checkpoint.
+      return [result[0], revision, result[2], result[3], result[4], result[5], 1_700_000_000n + revision * 100n, result[7], result[8], revision !== 2n];
+    }
+    if (key === `${keelAddresses.seed}:predictSeedSetId`) return `0x${String(request.args[1]).padStart(64, "0")}`;
+    if (key === `${keelAddresses.seed}:deriveTokenSeed`) return seedFor(Number(BigInt(request.args[0])));
+    return base(request);
+  };
+  const pinned = { readContract: reader, blockNumber: 123n, blockHash: `0x${"de".repeat(32)}`, blockTimestamp: 1700000400n };
+  const bound = await bindKeelManifest(value, commitment, pinned);
+  assert.equal(bound.binding.runtimeContext.derivedTokenSeed, seedFor(3));
+  assert.deepEqual(bound.binding.runtimeContext.seedHistory, [
+    { revision: 1, at: "1700000100", seed: seedFor(1) },
+    { revision: 3, at: "1700000300", seed: seedFor(3) },
+  ]);
+  const noRegistry = baseKeelExtension({ injection: { protocol: "keel-injection@1", fields: ["token.seedHistory"] } });
+  const unbound = await keelManifest(noRegistry);
+  await assert.rejects(
+    () => bindKeelManifest(unbound.value, unbound.commitment, pinned),
+    /seedHistory injection requires a seed registry/i,
   );
 });
 

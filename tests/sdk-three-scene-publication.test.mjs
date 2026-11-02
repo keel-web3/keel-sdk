@@ -77,7 +77,7 @@ test("the exact one-of-one Three.js scene fixture uses native storage and defaul
   assert.equal(resource.sources[0].store, HOLD);
   assert.equal(resource.sources[0].objectId, result.sceneObjectId);
   assert.equal(resource.sources[0].integrity.byteLength, SCENE_BYTES.byteLength);
-  assert.equal(result.viewer.manifestURI, `keel-onchain://31337/${HOLD}/${result.viewer.manifestObjectId}`);
+  assert.equal(result.viewer.manifestURI, `web3://${HOLD}:31337/haulObject/${result.viewer.manifestObjectId}?mime.type=application%2Fjson`);
   assert.equal(result.viewer.manifestPublication.storageMode, KEEL_NATIVE_CARRIER_V1);
   assert.equal(result.viewer.manifestPublication.operations.length, 1);
   assert.equal(result.viewer.modules.length, 1);

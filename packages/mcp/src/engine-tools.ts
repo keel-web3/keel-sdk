@@ -13,7 +13,8 @@ import { createIntegrity } from "@keel/protocol";
 import { PREPARED_COPY_TOOL_DEFINITIONS } from "./prepared-copy-tools.js";
 import { COPY_READ_TOOL_DEFINITIONS } from "./copy-read-tool.js";
 import { PREPARED_COPY_POLICY } from "./prepared-copy-guidance.js";
-import { issuePreflightReceipt, KEEL_STANDARD_WORKFLOW, readKeelSdkDocument } from "./standards.js";
+import { issuePreflightReceipt, KEEL_STANDARD_WORKFLOW, readKeelSdkDocument, StandardsRefusal } from "./standards.js";
+import { KEEL_TOKEN_URI_DIRECT_BUILDER_REMEDY, KEEL_TOKEN_URI_ROUTE_RULE, lintKeelTokenURIRelaySource, type KeelTokenURIRelaySourceFinding } from "@keel/sdk";
 import type { ToolContext } from "./types.js";
 
 const properties: Record<string, JsonSchema> = {};
@@ -109,7 +110,42 @@ const CONTRACT_WORKFLOW_DOCUMENTS = [
   "docs/PROOF_MARKET_PACKING.md",
 ] as const;
 
-async function contractWorkflowPreflight(context: ToolContext, issueReceipt = false) {
+/** The rule every agent must see first: one frame, the collection assembles the URI. */
+export const TOKEN_URI_ROUTE_RULE = KEEL_TOKEN_URI_ROUTE_RULE;
+
+const MAX_LINT_SOURCES = 128;
+const MAX_LINT_SOURCE_BYTES = 2_000_000;
+
+/** Optional Solidity lint inputs: inline sources and/or workspace paths. */
+async function readLintSources(context: ToolContext, input: Record<string, unknown>): Promise<Array<{ path: string; content: string }> | undefined> {
+  const sources: Array<{ path: string; content: string }> = [];
+  if (input.soliditySources !== undefined) {
+    if (!Array.isArray(input.soliditySources) || input.soliditySources.length > MAX_LINT_SOURCES) throw new TypeError(`soliditySources must be an array of at most ${MAX_LINT_SOURCES} { path, content } entries.`);
+    for (const entry of input.soliditySources) {
+      if (!entry || typeof entry !== "object" || Array.isArray(entry) || Object.keys(entry).some((key) => key !== "path" && key !== "content")) throw new TypeError("Each soliditySources entry is { path, content }.");
+      const { path, content } = entry as Record<string, unknown>;
+      if (typeof path !== "string" || !path.length || path.length > 1024 || typeof content !== "string" || content.length > MAX_LINT_SOURCE_BYTES) throw new TypeError("soliditySources entries need a path and bounded content.");
+      sources.push({ path, content });
+    }
+  }
+  if (input.solidityPaths !== undefined) {
+    if (!Array.isArray(input.solidityPaths) || input.solidityPaths.length > MAX_LINT_SOURCES || input.solidityPaths.some((path) => typeof path !== "string" || !path.length || path.length > 1024)) throw new TypeError(`solidityPaths must list at most ${MAX_LINT_SOURCES} workspace paths.`);
+    for (const path of input.solidityPaths as string[]) {
+      const loaded = await context.workspace.readFile(path, MAX_LINT_SOURCE_BYTES);
+      sources.push({ path, content: new TextDecoder("utf-8").decode(loaded.bytes) });
+    }
+  }
+  if (sources.length > MAX_LINT_SOURCES) throw new TypeError(`At most ${MAX_LINT_SOURCES} Solidity sources per preflight.`);
+  return sources.length ? sources : undefined;
+}
+
+function tokenUriRouteLint(sources: Array<{ path: string; content: string }> | undefined) {
+  if (sources === undefined) return { status: "not-run" as const, rule: TOKEN_URI_ROUTE_RULE, action: "Pass the collection, companion and renderer sources as soliditySources or solidityPaths to lint tokenURI relays before publication." };
+  const findings: readonly KeelTokenURIRelaySourceFinding[] = lintKeelTokenURIRelaySource(sources);
+  return { status: findings.length ? "fail" as const : "pass" as const, sources: sources.map((source) => source.path), findings, rule: TOKEN_URI_ROUTE_RULE, ...(findings.length ? { remedy: KEEL_TOKEN_URI_DIRECT_BUILDER_REMEDY } : {}) };
+}
+
+async function contractWorkflowPreflight(context: ToolContext, issueReceipt = false, lint?: ReturnType<typeof tokenUriRouteLint>) {
   const documents: Array<{ path: string; byteLength: number; sha256: string; status: "read" }> = [];
   const keelDocuments: Array<{ path: string; byteLength: number; sha256: string; status: "read"; source: "keel-sdk" }> = [];
   const unavailable: string[] = [];
@@ -132,10 +168,11 @@ async function contractWorkflowPreflight(context: ToolContext, issueReceipt = fa
   if (!documents.some((document) => document.path === "README.md")) throw new Error("Contract workflow preflight requires the target repository README.md.");
   if (!documents.some((document) => document.path.startsWith("docs/"))) throw new Error("Contract workflow preflight requires at least one target repository docs/ file.");
   const requiredNext = ["keel-engine-catalog", "keel-network-inspect", "keel-library-search", "keel-contract-controls", "keel-token-standard-audit"] as const;
-  const receipt = issueReceipt ? await issuePreflightReceipt(context.workspace, documents, requiredNext, undefined, keelDocuments) : undefined;
+  // A relaying tokenURI source never gets a receipt, whatever the declared intent.
+  const receipt = issueReceipt && lint?.status !== "fail" ? await issuePreflightReceipt(context.workspace, documents, requiredNext, undefined, keelDocuments) : undefined;
   return {
     schema: "keel-contract-workflow-preflight@1",
-    status: "docs-read-module-scan-required" as const,
+    status: lint?.status === "fail" ? "blocked-token-uri-relay" as const : "docs-read-module-scan-required" as const,
     workspace: context.workspace,
     documents,
     keelDocuments,
@@ -146,6 +183,7 @@ async function contractWorkflowPreflight(context: ToolContext, issueReceipt = fa
     enforcement: "Signing-request tools (wallet-request-prepare, publish-plan for metadata/viewer bytes, keel-creator-collection-prepare, wallet-link, keel-shell-prepare, module-review-prepare, Tezos prepare tools) refuse without standards.preflightReceipt; token, collection and metadata work also needs a passing keel-token-standard-audit digest as standards.auditDigest.",
     moduleScan: { required: true, selectedChain: "not-inspected", managerTool: "keel-manager-modules-inspect", replacementTool: "keel-manager-module-replacement-prepare", action: "Call keel-library-search against the selected chain. For EVM, inspect the existing Hold manager and actual consuming collection before concluding a module is immutable or proposing infrastructure replacement. Governed consumers use configureModule through executeGovernance; unchanged engine bytes stay in Hold." },
     preparedCopy: PREPARED_COPY_POLICY,
+    tokenUriRoute: lint ?? tokenUriRouteLint(undefined),
     edgeCases: ["existing-object copy-only assembly with zero new source bytes", "existing contract or proxy", "existing graph revision", "canonical shell and builder reuse", "selected-chain module/address ambiguity", "receipt and public byte read-back", "legacy presentation explicitly requested"],
     authority: "review-only",
     signing: "not-performed",
@@ -189,12 +227,23 @@ export const ENGINE_TOOL_DEFINITIONS: readonly ToolDefinition[] = [{
 }, {
   descriptor: {
     name: "keel-contract-workflow-preflight",
-    description: "Mandatory start for contract, collection, viewer, metadata, deployment or release work. Reads the target README and relevant docs, records their digests, lists the required engine, selected-chain, module-catalog, edge-case and contract-control checks, and returns a receipt (receipt.id) that every signing-request tool requires as standards.preflightReceipt. Then: keel-engine-catalog → keel-network-inspect → keel-library-search → keel-contract-controls → build → keel-token-standard-audit → request. Writes only the receipt under .keel-mcp/; never signs or submits.",
-    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+    description: "Mandatory start for contract, collection, viewer, metadata, deployment or release work. Reads the target README and relevant docs, records their digests, lists the required engine, selected-chain, module-catalog, edge-case and contract-control checks, and returns a receipt (receipt.id) that every signing-request tool requires as standards.preflightReceipt. Then: keel-engine-catalog → keel-network-inspect → keel-library-search → keel-contract-controls → build → keel-token-standard-audit → request. TOKENURI RULE (one frame: the collection assembles the URI): a tokenURI read through the actual collection must cost <= 20M gas; use KeelComposed721 + a small IKeelTokenURIComposer (the collection copies the prepared Hold fragments itself); otherwise at most the registered builder, forwarded raw with KeelRawStringReturn.forward, beside the collection; never relay the URI through companions/renderers/proxies (each Solidity relay hop costs ~3-4x the ~4.5M-per-1.5MB memory floor). Pass soliditySources/solidityPaths to lint tokenURI relays; with intent publication (default) a relay refuses and no receipt is issued. Writes only the receipt under .keel-mcp/; never signs or submits.",
+    inputSchema: { type: "object", properties: {
+      soliditySources: { type: "array", maxItems: MAX_LINT_SOURCES, description: "Solidity sources to lint for tokenURI/uri relays (collection, companion, renderer).", items: { type: "object", properties: { path: { type: "string", minLength: 1, maxLength: 1024 }, content: { type: "string", maxLength: MAX_LINT_SOURCE_BYTES } }, required: ["path", "content"], additionalProperties: false } },
+      solidityPaths: { type: "array", maxItems: MAX_LINT_SOURCES, description: "Workspace-relative Solidity files to lint for tokenURI/uri relays.", items: { type: "string", minLength: 1, maxLength: 1024 } },
+      intent: { type: "string", enum: ["publication", "review"], description: "publication (default) refuses on a tokenURI relay; review reports it. Neither issues a receipt for relaying sources." },
+    }, additionalProperties: false },
   },
   async run(context, value) {
-    if (!value || typeof value !== "object" || Array.isArray(value) || Object.keys(value).length) throw new TypeError("Contract workflow preflight accepts an empty object.");
-    const result = await contractWorkflowPreflight(context, true);
+    if (!value || typeof value !== "object" || Array.isArray(value) || Object.keys(value).some((key) => !["soliditySources", "solidityPaths", "intent"].includes(key))) throw new TypeError("Contract workflow preflight accepts only soliditySources, solidityPaths and intent.");
+    const input = value as Record<string, unknown>;
+    if (input.intent !== undefined && input.intent !== "publication" && input.intent !== "review") throw new TypeError("intent must be publication or review.");
+    const lint = tokenUriRouteLint(await readLintSources(context, input));
+    if (lint.status === "fail" && (input.intent ?? "publication") === "publication") {
+      const where = lint.findings.slice(0, 6).map((finding) => `${finding.path}:${finding.line} ${finding.function}() \`${finding.snippet}\``).join("; ");
+      throw new StandardsRefusal("keel-contract-workflow-preflight", "token-uri-relay-source", `tokenURI relays the URI through another contract (${lint.findings.length} finding${lint.findings.length === 1 ? "" : "s"}: ${where}). ${TOKEN_URI_ROUTE_RULE}`, "keel-contract-workflow-preflight", "Rewrite tokenURI so the collection calls the registered KEEL builder directly and returns KeelRawStringReturn.forward(builder, abi.encodeCall(...), false); then run the preflight again with the fixed sources.");
+    }
+    const result = await contractWorkflowPreflight(context, true, lint);
     return { ...result, workspace: context.workspace.root };
   },
 }, {

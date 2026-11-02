@@ -514,6 +514,12 @@ export interface RuntimeContext {
   readonly blockTimestamp?: string;
   readonly tokenId?: string;
   readonly derivedTokenSeed?: Hex;
+  /**
+   * The token's seed under every harness revision that has a seed set, oldest first: `at` is the
+   * seed set's creation time (Unix seconds, decimal), so art can keep each update's seed from its
+   * checkpoint on and leave what came before as it was.
+   */
+  readonly seedHistory?: readonly { readonly revision: number; readonly at: string; readonly seed: Hex }[];
   readonly packedAttributes?: Hex;
   readonly portableRoot?: Hex;
   readonly portableManifestObjectId?: Hex;

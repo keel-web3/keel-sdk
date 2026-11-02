@@ -9,9 +9,10 @@
  * any edit to them breaks the digest.
  */
 import { createHash } from "node:crypto";
+import { inspectPreparedShellForAudit, type PreparedShellAudit } from "./prepared-shell-audit.js";
 import { readFile } from "node:fs/promises";
 import { gunzipSync, inflateRawSync, inflateSync } from "node:zlib";
-import { buildCompactInlineKeelShell, KEEL_INLINE_SAFE_RPC_GAS } from "@keel/sdk";
+import { analyzeKeelTokenURIReadRoute, buildCompactInlineKeelShell, KEEL_INLINE_SAFE_RPC_GAS, KEEL_STANDARD_COLLECTION_TOKEN_URI_READ_GAS, KEEL_TOKEN_URI_DIRECT_BUILDER_REMEDY, KEEL_TOKEN_URI_ROUTE_MIN_BYTES, type KeelTokenURIReadRoute } from "@keel/sdk";
 import { createIntegrity } from "@keel/protocol";
 import type { ToolContext, Workspace } from "./types.js";
 
@@ -19,8 +20,12 @@ export const EVIDENCE_DIRECTORY = ".keel-mcp";
 export const PREFLIGHT_RECEIPT_SCHEMA = "keel-contract-workflow-receipt@1" as const;
 export const TOKEN_STANDARD_AUDIT_SCHEMA = "keel-token-standard-audit@1" as const;
 export const STANDARDS_CLEARANCE_SCHEMA = "keel-standards-clearance@1" as const;
-/** Public-read ceiling for tokenURI (the SDK's documented 60M public-RPC safety cap, one constant everywhere). */
+/** Absolute eth_call ceiling used to obtain the bytes at all (the SDK's 60M public-RPC safety cap). Not the standard. */
 export const TOKEN_URI_READ_GAS_LIMIT = Number(KEEL_INLINE_SAFE_RPC_GAS);
+/** The publication standard: a complete tokenURI read through the actual collection costs at most 20M gas. */
+export const TOKEN_URI_STANDARD_READ_GAS = Number(KEEL_STANDARD_COLLECTION_TOKEN_URI_READ_GAS);
+/** Without a callTracer route, a return at least this large fails closed (route-unverified, reviewed exception only). */
+export const TOKEN_URI_ROUTE_REQUIRED_BYTES = 512 * 1024;
 export const TOKEN_URI_MAX_BYTES = 2_000_000;
 export const EVIDENCE_TTL_MS = 24 * 60 * 60 * 1000;
 /** The single protocol literal allowed anywhere: the SVG namespace is syntax, not a fetch. */
@@ -41,6 +46,8 @@ const MAX_DECODE_DEPTH = 8;
 const MAX_DECODED_BYTES = 64 * 1024 * 1024;
 const MAX_FINDINGS = 200;
 const MAX_RPC_RESPONSE_BYTES = 16 * 1024 * 1024;
+/** A callTracer tree repeats the big output once per frame (hex), so it needs more room than one eth_call. */
+const MAX_TRACE_RESPONSE_BYTES = 128 * 1024 * 1024;
 
 // ─── shared helpers ──────────────────────────────────────────────────────────────────────────────────────────────
 
@@ -87,7 +94,8 @@ export type StandardsRefusalCode =
   | "work-kind-not-verified"
   | "contract-controls-required"
   | "gas-limit-required"
-  | "transaction-gas-cap-exceeded";
+  | "transaction-gas-cap-exceeded"
+  | "token-uri-relay-source";
 
 export interface StandardsRefusalDetail {
   readonly schema: "keel-standards-refusal@1";
@@ -229,6 +237,7 @@ export type AuditFindingCode =
   | "metadata-invalid-json"
   | "metadata-base64"
   | "external-locator"
+  | "retired-oca-locator"
   | "image-missing"
   | "image-not-onchain"
   | "data-uri-invalid"
@@ -236,11 +245,19 @@ export type AuditFindingCode =
   | "viewer-not-canonical-shell"
   | "viewer-relative-resource"
   | "decode-limit-exceeded"
-  | "graph-item-integrity-mismatch";
+  | "graph-item-integrity-mismatch"
+  | "collection-read-gas-exceeds-standard"
+  | "collection-read-gas-unmeasured"
+  | "token-uri-relay-chain"
+  | "token-uri-copying-relay"
+  | "token-uri-proxy-frame"
+  | "token-uri-route-unverified";
 
 /** These describe whether the token can be read at all; no exception can waive them. */
 const NON_EXCEPTABLE: ReadonlySet<AuditFindingCode> = new Set([
-  "read-failed", "read-gas-exceeds-limit", "token-uri-too-large", "token-uri-empty", "metadata-invalid-json", "data-uri-invalid", "decode-limit-exceeded", "image-missing", "graph-item-integrity-mismatch",
+  "read-failed", "retired-oca-locator", "read-gas-exceeds-limit", "token-uri-too-large", "token-uri-empty", "metadata-invalid-json", "data-uri-invalid", "decode-limit-exceeded", "image-missing", "graph-item-integrity-mismatch",
+  // One relay: the collection forwards the builder. A relay chain or a read over 20M is never waivable.
+  "collection-read-gas-exceeds-standard", "token-uri-relay-chain", "token-uri-copying-relay", "token-uri-proxy-frame",
 ]);
 
 export interface AuditFinding {
@@ -317,7 +334,7 @@ function parseDataUri(value: string): DataUri | undefined {
   return { mediaType, params, base64, bytes: percentDecode(payload) };
 }
 
-const LOCATOR = /\b(?:(?:https?|ipfs|ipns|web3|keel-onchain|arweave):[^\s"'<>\\`)\]]+|ar:\/\/[^\s"'<>\\`)\]]+)|keel\.invalid/giu;
+const LOCATOR = /\b(?:(?:https?|ipfs|ipns|web3|keel-onchain|oca-onchain|oca|arweave):[^\s"'<>\\`)\]]+|ar:\/\/[^\s"'<>\\`)\]]+)|keel\.invalid/giu;
 const PROTOCOL_RELATIVE = /(?:\b(?:src|href|action|poster|data|srcset)\s*=\s*["']?|\burl\(\s*["']?|@import\s+["'])(\/\/[A-Za-z0-9.-]+[^\s"'<>)]*)/giu;
 const RESOURCE_TAG = /<(?:img|iframe|script|link|video|audio|source|object|embed|form)\b[^>]+\b(?:src|href|action|poster|data-src|data-href)\s*=\s*["'](?!data:|#|about:blank|javascript:|blob:)([^"']+)/giu;
 const COMPRESSED_BASE64 = /(?:H4sI|eJ[wxyz0-9A-Za-z]|eF[0-9A-Za-z]|eNo|eAE)[A-Za-z0-9+/]{12,}={0,2}/gu;
@@ -327,6 +344,16 @@ class AuditWalker {
   readonly findings: AuditFinding[] = [];
   private readonly seen = new Set<string>();
   private decoded = 0;
+  private readonly preparedShells = new Map<string, PreparedShellAudit>();
+  async prepareAnimation(value: unknown): Promise<void> {
+    if (this.viewer === "none" || typeof value !== "string") return;
+    const parsed = parseDataUri(value);
+    if (parsed?.mediaType !== "text/html") return;
+    const html = utf8(parsed.bytes);
+    if (html === undefined) return;
+    try { const result = await inspectPreparedShellForAudit(html); if (result) this.preparedShells.set(html, result); }
+    catch (error) { this.add("viewer-not-canonical-shell", "$.animation_url", `COPY verification failed: ${error instanceof Error ? error.message : String(error)}`); }
+  }
   htmlDocuments = 0;
   canonicalShells = 0;
   constructor(private readonly shell: ShellFragments, private readonly viewer: "keel-verification-shell" | "none") {}
@@ -339,6 +366,15 @@ class AuditWalker {
     this.findings.push({ code, severity, at, detail: detail.length > 240 ? `${detail.slice(0, 237)}...` : detail, exceptable: !NON_EXCEPTABLE.has(code) });
   }
 
+  /** OCA is retired: its schemes are named as such, never treated as an ordinary external link. */
+  private locator(at: string, value: string): void {
+    if (/^oca(?:-onchain)?:/iu.test(value)) {
+      this.add("retired-oca-locator", at, `${value.slice(0, 120)} uses the retired OCA scheme. OCA is gone; present the token Inline, or link it with keelManifestURI (web3://).`);
+      return;
+    }
+    this.add("external-locator", at, value);
+  }
+
   private budget(bytes: number, at: string): boolean {
     this.decoded += bytes;
     if (this.decoded > MAX_DECODED_BYTES) {
@@ -349,12 +385,12 @@ class AuditWalker {
   }
 
   /** Scan text for locators, nested data: URIs and packed gzip/deflate slots. */
-  scanText(text: string, at: string, depth: number): void {
+  scanText(text: string, at: string, depth: number, javascript = false): void {
     if (!this.budget(text.length, at)) return;
     for (const match of text.matchAll(LOCATOR)) {
       const value = match[0].replace(/[),.;:]+$/u, "");
       if (ALLOWED_LITERAL_URLS.includes(value)) continue;
-      this.add("external-locator", at, value);
+      this.locator(at, value);
     }
     for (const match of text.matchAll(PROTOCOL_RELATIVE)) this.add("external-locator", at, match[1]!);
     if (depth >= MAX_DECODE_DEPTH) return;
@@ -364,12 +400,15 @@ class AuditWalker {
       if (once !== undefined && once !== text) {
         for (const match of once.matchAll(LOCATOR)) {
           const value = match[0].replace(/[),.;:]+$/u, "");
-          if (!ALLOWED_LITERAL_URLS.includes(value)) this.add("external-locator", at, value);
+          if (!ALLOWED_LITERAL_URLS.includes(value)) this.locator(at, value);
         }
       }
     }
     for (const match of text.matchAll(NESTED_DATA_URI)) {
       if (match.index === 0 && match[0].length === text.length) continue;
+      // A JavaScript template prefix is generated data, not a complete URI.
+      // Concrete strings and all external locator literals are still inspected.
+      if (javascript && /^data:[^,]+,\$\{/u.test(match[0])) continue;
       this.dataUri(match[0], `${at}>data:`, depth + 1);
     }
     for (const match of text.matchAll(COMPRESSED_BASE64)) {
@@ -412,7 +451,7 @@ class AuditWalker {
     const text = utf8(bytes);
     if (text === undefined) return;
     if (mediaType === "text/html" || /^\s*<!doctype html|^\s*<html[\s>]/iu.test(text)) this.html(text, at, depth);
-    else this.scanText(text, at, depth);
+    else this.scanText(text, at, depth, /^(?:text|application)\/javascript$/u.test(mediaType));
   }
 
   dataUri(value: string, at: string, depth: number): DataUri | undefined {
@@ -437,6 +476,19 @@ class AuditWalker {
     if (this.viewer === "none") {
       this.resourceReferences(text, at, new Set());
       this.scanText(text, at, depth);
+      return;
+    }
+    const prepared = this.preparedShells.get(text);
+    if (prepared !== undefined) {
+      this.canonicalShells += 1;
+      const previous = this.graphIds;
+      this.graphIds = new Set(prepared.resources.flatMap(item => [item.id, ...item.aliases]));
+      for (const item of prepared.resources) {
+        this.graphItems += 1;
+        this.bytes(item.bytes, item.mediaType, `${at}>${item.id}`, depth + 1);
+      }
+      this.graphIds = previous;
+      this.scanText(prepared.tail, at, depth);
       return;
     }
     const { prefix, suffix } = this.shell;
@@ -464,7 +516,7 @@ class AuditWalker {
   private resourceReferences(text: string, at: string, ids: ReadonlySet<string>): void {
     for (const match of text.matchAll(RESOURCE_TAG)) {
       const reference = match[1]!;
-      if (/^(?:https?|ipfs|ar|web3|keel-onchain):|^\/\//iu.test(reference)) continue; // reported as external-locator
+      if (/^(?:https?|ipfs|ar|web3|keel-onchain|oca-onchain|oca):|^\/\//iu.test(reference)) continue; // reported as external-locator
       if (ids.has(reference)) continue;
       this.add("viewer-relative-resource", at, ids.size
         ? `Resource tag loads ${reference.slice(0, 80)}, which is not a resource id in this KEEL graph.`
@@ -606,6 +658,7 @@ export async function analyzeTokenUri(tokenUri: string, options: { readonly view
     const decoded = parseDataUri(image);
     if (decoded === undefined || decoded.bytes.byteLength === 0) walker.add("image-not-onchain", "$.image", "image data: URI is empty or undecodable.");
   }
+  await walker.prepareAnimation(record.animation_url);
   walker.json(record, "$", 1);
   const animation = typeof record.animation_url === "string" ? record.animation_url.slice(0, 48) : undefined;
   return {
@@ -628,7 +681,7 @@ class RpcError extends Error {
   constructor(message: string, readonly rpcCode?: number) { super(message); }
 }
 
-async function rpc(url: string, method: string, params: readonly unknown[]): Promise<unknown> {
+async function rpc(url: string, method: string, params: readonly unknown[], maximumBytes = MAX_RPC_RESPONSE_BYTES): Promise<unknown> {
   const response = await fetch(url, {
     method: "POST",
     headers: { "content-type": "application/json" },
@@ -643,9 +696,9 @@ async function rpc(url: string, method: string, params: readonly unknown[]): Pro
       const next = await reader.read();
       if (next.done) break;
       size += next.value.byteLength;
-      if (size > MAX_RPC_RESPONSE_BYTES) {
+      if (size > maximumBytes) {
         await reader.cancel();
-        throw new RpcError(`${method} response exceeds ${MAX_RPC_RESPONSE_BYTES} bytes.`);
+        throw new RpcError(`${method} response exceeds ${maximumBytes} bytes.`);
       }
       parts.push(next.value);
     }
@@ -683,14 +736,19 @@ function tokenUriCalldata(tokenId: bigint): Hex {
  * limit whose returned bytes EQUAL the full-gas result. debug_traceCall's gasUsed, when the node offers it, is the
  * primary measurement; the searched limit is reported next to it.
  */
-async function measureReadGas(rpcUrl: string, call: { readonly to: string; readonly data: string }, block: string, fullResult: string): Promise<Pick<LiveRead, "measuredGas" | "measurement">> {
+async function measureReadGas(rpcUrl: string, call: { readonly to: string; readonly data: string }, block: string, fullResult: string): Promise<Pick<LiveRead, "measuredGas" | "measurement" | "route">> {
   let tracedGasUsed: number | undefined;
+  let trace: unknown;
   try {
-    const trace = await rpc(rpcUrl, "debug_traceCall", [{ ...call, gas: `0x${TOKEN_URI_READ_GAS_LIMIT.toString(16)}` }, block, { tracer: "callTracer" }]) as { readonly gasUsed?: unknown };
-    if (typeof trace?.gasUsed === "string") tracedGasUsed = Number(BigInt(trace.gasUsed));
+    trace = await rpc(rpcUrl, "debug_traceCall", [{ ...call, gas: `0x${TOKEN_URI_READ_GAS_LIMIT.toString(16)}` }, block, { tracer: "callTracer" }], MAX_TRACE_RESPONSE_BYTES);
+    const gasUsed = (trace as { readonly gasUsed?: unknown } | null)?.gasUsed;
+    if (typeof gasUsed === "string") tracedGasUsed = Number(BigInt(gasUsed));
   } catch {
     tracedGasUsed = undefined;
+    trace = undefined;
   }
+  // Which frames held the big bytes: builder + collection only, forwarded raw (KeelRawStringReturn.forward).
+  const route = analyzeKeelTokenURIReadRoute(trace);
   const expected = fullResult.toLowerCase();
   let low = 21_000;
   let high = TOKEN_URI_READ_GAS_LIMIT;
@@ -719,6 +777,7 @@ async function measureReadGas(rpcUrl: string, call: { readonly to: string; reado
   const measuredGas = tracedGasUsed ?? searchedGasLimit;
   return {
     ...(measuredGas === undefined ? {} : { measuredGas }),
+    route,
     measurement: {
       method: tracedGasUsed !== undefined ? "debug_traceCall" : "eth_call-binary-search-equal-bytes",
       ...(tracedGasUsed === undefined ? {} : { tracedGasUsed }),
@@ -742,6 +801,10 @@ export interface LiveRead {
   /** debug_traceCall gasUsed when available, else the smallest gas limit returning the full-gas bytes. */
   readonly measuredGas?: number;
   readonly measurement?: { readonly method: "debug_traceCall" | "eth_call-binary-search-equal-bytes"; readonly tracedGasUsed?: number; readonly searchedGasLimit?: number; readonly precision: number; readonly calls: number; readonly lowGasDivergentResults: number; readonly note?: string; readonly stopped?: string };
+  /** The callTracer frames that held the tokenURI bytes (one relay: the collection forwards the builder). */
+  readonly route?: KeelTokenURIReadRoute;
+  /** The publication standard the measured gas is judged against (20M through the actual collection). */
+  readonly standardReadGas?: number;
   readonly failure?: { readonly code: "read-failed" | "read-gas-exceeds-limit"; readonly detail: string };
 }
 
@@ -753,14 +816,14 @@ export async function readTokenUri(rpcUrl: string, contract: string, tokenId: bi
   const chainId = Number(BigInt(String(await rpc(rpcUrl, "eth_chainId", []))));
   const block = String(await rpc(rpcUrl, "eth_blockNumber", []));
   const call = { to: contract, data: tokenUriCalldata(tokenId) };
-  const estimateNote = "eth_estimateGas is advisory: nodes can silently truncate or undercount large string returns. The gate is the eth_call capped at 60,000,000 gas.";
+  const estimateNote = "eth_estimateGas is advisory: nodes can silently truncate or undercount large string returns. The bytes are read with an eth_call capped at 60,000,000 gas; the publication standard is the measured read through this collection at or below 20,000,000 gas.";
   let estimatedGas: number | undefined;
   try {
     estimatedGas = Number(BigInt(String(await rpc(rpcUrl, "eth_estimateGas", [call, block]))));
   } catch {
     estimatedGas = undefined;
   }
-  const base = { chainId, block, gasLimit: TOKEN_URI_READ_GAS_LIMIT, ...(estimatedGas === undefined ? {} : { estimatedGas }), estimateNote };
+  const base = { chainId, block, gasLimit: TOKEN_URI_READ_GAS_LIMIT, standardReadGas: TOKEN_URI_STANDARD_READ_GAS, ...(estimatedGas === undefined ? {} : { estimatedGas }), estimateNote };
   let result: unknown;
   try {
     result = await rpc(rpcUrl, "eth_call", [{ ...call, gas: `0x${TOKEN_URI_READ_GAS_LIMIT.toString(16)}` }, block]);
@@ -780,6 +843,29 @@ export async function readTokenUri(rpcUrl: string, contract: string, tokenId: bi
   } catch (error) {
     return { ...base, failure: { code: "read-failed", detail: error instanceof Error ? error.message : String(error) } };
   }
+}
+
+/**
+ * Judge a live read against the publication standard: <= 20M gas through the actual collection, and at most two
+ * big-byte frames (builder + collection) with the collection forwarding the builder's returndata raw.
+ */
+export function collectionReadStandardFindings(read: Pick<LiveRead, "measuredGas" | "measurement" | "route" | "tokenUri">): AuditFinding[] {
+  const findings: AuditFinding[] = [];
+  const add = (code: AuditFindingCode, detail: string, severity: AuditFinding["severity"] = "error") => {
+    findings.push({ code, severity, at: "$read", detail: detail.length > 1500 ? `${detail.slice(0, 1497)}...` : detail, exceptable: !NON_EXCEPTABLE.has(code) });
+  };
+  if (read.measuredGas === undefined) add("collection-read-gas-unmeasured", `The read gas could not be measured (${read.measurement?.stopped ?? "no trace and no equal-bytes search result"}); the ${TOKEN_URI_STANDARD_READ_GAS}-gas collection standard is unproven. Audit again on a provider that answers.`);
+  else if (read.measuredGas > TOKEN_URI_STANDARD_READ_GAS) add("collection-read-gas-exceeds-standard", `tokenURI through this collection costs ${read.measuredGas} gas; the standard is ${TOKEN_URI_STANDARD_READ_GAS}. ${KEEL_TOKEN_URI_DIRECT_BUILDER_REMEDY}`);
+  const route = read.route;
+  for (const finding of route?.findings ?? []) {
+    const hops = route!.hops.map((hop) => `${hop.role} ${hop.address} gas=${hop.gasUsed} self=${hop.selfGasUsed} bytes=${hop.outputBytes}`).join(" -> ");
+    add(finding.code, `${finding.detail} ${KEEL_TOKEN_URI_DIRECT_BUILDER_REMEDY} Hops: ${hops}.`);
+  }
+  if (route?.status === "unverified" && read.tokenUri !== undefined) {
+    const bytes = Buffer.byteLength(read.tokenUri, "utf8");
+    if (bytes >= KEEL_TOKEN_URI_ROUTE_MIN_BYTES) add("token-uri-route-unverified", `${route.note ?? "No callTracer route."} The ${bytes}-byte tokenURI route (which frames hold the bytes) is unproven; use a provider with debug_traceCall callTracer. ${KEEL_TOKEN_URI_DIRECT_BUILDER_REMEDY}`, bytes >= TOKEN_URI_ROUTE_REQUIRED_BYTES ? "error" : "warning");
+  }
+  return findings;
 }
 
 // ─── audit tool ──────────────────────────────────────────────────────────────────────────────────────────────────
@@ -819,10 +905,10 @@ export interface AuditRecordBody {
 /** Run the audit, persist the content-addressed record, and return the machine verdict. */
 export async function recordTokenStandardAudit(
   workspace: Workspace,
-  input: { readonly subject: AuditRecordBody["subject"]; readonly analysis?: TokenUriAnalysis; readonly readFinding?: AuditFinding; readonly exception?: AuditException; readonly read?: Omit<LiveRead, "tokenUri" | "failure"> },
+  input: { readonly subject: AuditRecordBody["subject"]; readonly analysis?: TokenUriAnalysis; readonly readFinding?: AuditFinding; readonly readFindings?: readonly AuditFinding[]; readonly exception?: AuditException; readonly read?: Omit<LiveRead, "tokenUri" | "failure"> },
   now = Date.now(),
 ) {
-  const findings = [...(input.readFinding === undefined ? [] : [input.readFinding]), ...(input.analysis?.findings ?? [])];
+  const findings = [...(input.readFinding === undefined ? [] : [input.readFinding]), ...(input.readFindings ?? []), ...(input.analysis?.findings ?? [])];
   const errors = findings.filter((finding) => finding.severity === "error");
   const exception = input.exception;
   if (exception !== undefined) {
@@ -867,7 +953,9 @@ export async function recordTokenStandardAudit(
     findings,
     ...(body.exception === undefined ? {} : { exception: body.exception }),
     next: verdict === "fail"
-      ? "Blocked. Fix every blocking finding (onchain data:image, registered canonical shell via keel-inline-prepare, raw-percent HTML, no external locators) and run keel-token-standard-audit again. A reviewed exception must be declared explicitly with codes, reason and reviewer."
+      ? remaining.some((finding) => /^(?:token-uri-(?:relay-chain|copying-relay|proxy-frame|route-unverified)|collection-read-gas-)/u.test(finding.code))
+        ? `Blocked: the tokenURI read is over the 20M-gas collection standard or relays the URI through extra frames. ${KEEL_TOKEN_URI_DIRECT_BUILDER_REMEDY} Then run keel-token-standard-audit again.`
+        : "Blocked. Fix every blocking finding (onchain data:image, registered canonical shell via keel-inline-prepare, raw-percent HTML, no external locators) and run keel-token-standard-audit again. A reviewed exception must be declared explicitly with codes, reason and reviewer."
       : "Pass this digest as standards.auditDigest (with standards.preflightReceipt) to the tool that prepares the wallet request.",
     signing: "not-performed" as const,
     submission: "not-performed" as const,
@@ -899,10 +987,12 @@ export async function tokenStandardAuditTool(context: ToolContext, value: unknow
       ? { code: "read-gas-exceeds-limit", severity: "error", at: "$read", detail: `eth_estimateGas reports ${read.estimatedGas} gas, above ${TOKEN_URI_READ_GAS_LIMIT}.`, exceptable: false }
       : undefined;
     const blockingRead = readFinding ?? estimateFinding;
+    const standardFindings = failure === undefined ? collectionReadStandardFindings(read) : [];
     return recordTokenStandardAudit(context.workspace, {
       subject,
       ...(analysis === undefined ? {} : { analysis }),
       ...(blockingRead === undefined ? {} : { readFinding: blockingRead }),
+      ...(standardFindings.length ? { readFindings: standardFindings } : {}),
       ...(exception === undefined ? {} : { exception }),
       read: readSummary,
     });

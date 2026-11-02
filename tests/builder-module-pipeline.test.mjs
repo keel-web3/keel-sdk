@@ -19,10 +19,10 @@ function runCli(args, options = {}) {
   return execFileAsync(process.execPath, [cli, ...args], { cwd: repositoryRoot, maxBuffer: 16 * 1024 * 1024, ...options });
 }
 
-test("the builder bin is keel with oca kept as a compatibility alias", async () => {
+test("the builder bin is keel alone", async () => {
   const manifest = JSON.parse(await readFile(path.join(repositoryRoot, "packages/builder/package.json"), "utf8"));
   assert.equal(manifest.bin.keel, "./dist/cli.js");
-  assert.equal(manifest.bin.oca, "./dist/cli.js");
+  assert.deepEqual(Object.keys(manifest.bin), ["keel"]);
   const { stdout } = await runCli(["help"]);
   assert.match(stdout, /keel module init <dir>/u);
   assert.match(stdout, /keel module build <dir>/u);

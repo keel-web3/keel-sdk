@@ -8,7 +8,7 @@
 import * as THREE from "/content/three.min.js";
 import { resolveSceneSeed } from "/content/scene-seed.mjs";
 
-const CONTEXT = globalThis.__KEEL_CONTEXT__ ?? globalThis.__OCA_CONTEXT__ ?? {};
+const CONTEXT = globalThis.__KEEL_CONTEXT__ ?? {};
 const SCENE_SEED = resolveSceneSeed(CONTEXT);
 const SEED = SCENE_SEED.word;
 const TOKEN_ID = CONTEXT.tokenId ?? "preview";

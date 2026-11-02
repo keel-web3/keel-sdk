@@ -57,6 +57,24 @@ export function createMintAuthorizationTypedData(
   };
 }
 
+/** Indivisible fill, replay-protected by the gate's existing account nonce.
+ * Uses a distinct signed type: legacy partial-fill signatures cannot authorize
+ * mintExact. Successful fills emit ExactAuthorizationConsumed; authorizationUsed
+ * remains the legacy lane's persistent usage ledger.
+ */
+export function createExactMintAuthorizationTypedData(
+  chainId: bigint | number,
+  verifyingContract: Address,
+  authorization: MintAuthorization,
+): Eip712TypedData<MintAuthorizationMessage> {
+  const normalized = createMintAuthorizationTypedData(chainId, verifyingContract, authorization);
+  return {
+    ...normalized,
+    primaryType: "ExactMintAuthorization",
+    types: { ExactMintAuthorization: MINT_AUTHORIZATION_TYPE },
+  };
+}
+
 export const COLLECTION_AUTHORIZATION_TYPE = [
   { name: "creator", type: "address" },
   { name: "agent", type: "address" },
