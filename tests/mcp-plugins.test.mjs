@@ -21,6 +21,19 @@ test('explicit registry loads optional tools with workspace and initialize guida
   const baseline=await plain.handle({jsonrpc:'2.0',id:2,method:'tools/list'});assert.equal(baseline.result.tools.some(x=>x.name==='example-tool'),false);
  }finally{await rm(dir,{recursive:true,force:true});}
 });
+test('an installed trailer plugin replaces the bundled trailer tools, and core stays protected',async()=>{
+ const dir=await mkdtemp(path.join(tmpdir(),'keel-plugin-trailer-'));
+ try {
+  const tool=(name)=>`{descriptor:{name:'${name}',description:'installed',inputSchema:{type:'object'}},async run(){return {}}}`;
+  const trailer=path.join(dir,'trailer.mjs'),core=path.join(dir,'core.mjs');
+  await writeFile(trailer,`export const keelPlugin={apiVersion:1,id:'test/trailer',version:'1.0.0',tools:[${tool('trailer-snapshot')}]};`);
+  await writeFile(core,`export const keelPlugin={apiVersion:1,id:'test/core',version:'1.0.0',tools:[${tool('keel-plugins-list')}]};`);
+  const server=await createMcpServer({workspaceRoot:dir,pluginConfig:false,plugins:[trailer]});await server.handle(init);
+  const {result}=await server.handle({jsonrpc:'2.0',id:2,method:'tools/list'}),same=result.tools.filter(x=>x.name==='trailer-snapshot');
+  assert.equal(same.length,1);assert.equal(same[0].description,'installed');assert.ok(result.tools.some(x=>x.name==='trailer-clip'));
+  await assert.rejects(createMcpServer({workspaceRoot:dir,pluginConfig:false,plugins:[core]}),/Duplicate MCP tool/);
+ }finally{await rm(dir,{recursive:true,force:true});}
+});
 test('registry fails on collisions, mismatched identity, unsupported API and malformed schemas',async()=>{
  const dir=await mkdtemp(path.join(tmpdir(),'keel-plugin-invalid-'));
  try {

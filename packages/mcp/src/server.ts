@@ -9,6 +9,7 @@ import { createWorkspace } from "./paths.js";
 import { getFrayAuctionReviewPrompt, getKeelAssetReviewPrompt, getKeelDraftRepairPrompt, getKeelProjectPlanPrompt, PROMPT_DEFINITIONS } from "./prompts.js";
 import { getMcpResource, McpResourceNotFoundError, RESOURCE_DEFINITIONS } from "./resources.js";
 import { TOOL_DEFINITIONS } from "./tools.js";
+import { TRAILER_TOOL_DEFINITIONS } from "./trailer-tools.js";
 import { loadMcpPlugins, type McpPluginOptions } from "./plugins.js";
 import type { ToolDefinition } from "./types.js";
 import {
@@ -152,8 +153,11 @@ function initializeParams(value: unknown): void {
 export async function createMcpServer(options: { readonly workspaceRoot?: string } & McpPluginOptions = {}): Promise<McpServer> {
   const workspace = await createWorkspace(options.workspaceRoot ?? ".");
   const info: ToolDefinition = { descriptor: { name: "keel-plugins-list", description: "List explicitly installed local KEEL plugins, versions, entries and tool names.", inputSchema: { type: "object", properties: {}, additionalProperties: false } }, async run(_context, input) { emptyParams(input, "keel-plugins-list"); return { schema: "keel-plugins@1", plugins: plugins.map(({id,version,entry,tools}) => ({id,version,entry,tools:tools.map(t=>t.descriptor.name)})) }; } };
-  const plugins = await loadMcpPlugins(options, [...TOOL_DEFINITIONS, info]);
-  const tools = [...TOOL_DEFINITIONS, info, ...plugins.flatMap(plugin => plugin.tools)];
+  // The bundled trailer tools are a floor: an installed keel-trailer moves ahead of them, so its versions win. Any other collision still refuses.
+  const bundledTrailer = new Set<ToolDefinition>(TRAILER_TOOL_DEFINITIONS);
+  const plugins = await loadMcpPlugins(options, [...TOOL_DEFINITIONS.filter(tool => !bundledTrailer.has(tool)), info]);
+  const provided = new Set(plugins.flatMap(plugin => plugin.tools.map(tool => tool.descriptor.name)));
+  const tools = [...TOOL_DEFINITIONS.filter(tool => !provided.has(tool.descriptor.name)), info, ...plugins.flatMap(plugin => plugin.tools)];
   const instructions = [MCP_INSTRUCTIONS, ...plugins.map(plugin => plugin.instructions ?? "")].join(" ");
   const active = new Map<string | number | null, AbortController>();
   let initialized = false;
