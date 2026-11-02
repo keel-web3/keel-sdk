@@ -40,7 +40,7 @@ export function createKeelCreatorPublicationJournal(input: {
 }): KeelCreatorPublicationJournal {
   if (![input.id,input.actorId,input.sourceRevision,input.settingsRevision].every(value=>typeof value==="string" && value.length>0 && value.length<=256)) throw new TypeError("An authenticated actor and exact source/settings revisions are required.");
   const owner=getAddress(input.owner),collection=getAddress(input.collection);
-  if (!input.steps.length || input.steps.length>255 || input.tokenId<=0n || input.prepared.prepaymentSimulation!=="required") throw new TypeError("Invalid fresh prepared publication plan.");
+  if (!input.steps.length || input.steps.length>=65_535 || input.tokenId<=0n || input.prepared.prepaymentSimulation!=="required") throw new TypeError("Invalid fresh prepared publication plan.");
   const phases: readonly Phase[]=["upload","validate","create-collection","bind","mint-route","mint"];
   const ids=new Set<string>();let prior=-1;
   for(const step of input.steps){

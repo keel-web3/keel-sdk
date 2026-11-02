@@ -81,7 +81,9 @@ export class KeelPublicationSimulationError extends Error {
 }
 const failure = (kind: KeelSimulationFailure, message: string, diagnostic?: Readonly<Record<string, string | number>>): never => { throw new KeelPublicationSimulationError(kind, message, diagnostic); };
 const record = (value: unknown): Record<string, unknown> | undefined => value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : undefined;
+// eth_simulateV1 accepts 256 blocks per request; consecutive calls share blocks past that.
 const KEEL_SIMULATION_MAXIMUM_BLOCKS = 256;
+// Diagnostics index calls as uint16, so one exact program holds at most this many.
 const KEEL_SIMULATION_MAXIMUM_CALLS = 65_535;
 
 const quantity = (value: unknown): bigint | undefined => typeof value === "string" && /^0x(?:0|[1-9a-f][0-9a-f]*)$/iu.test(value) ? BigInt(value) : undefined;
