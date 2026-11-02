@@ -30,6 +30,10 @@ export type { KeelExplicitExternalPreview } from "./external-preview.js";
 export const KEEL_LINK_GATE_PROTOCOL = "keel-link-gate@1" as const;
 /** The single protocol literal allowed in onchain bytes: the SVG namespace is syntax, not a fetch. */
 export const KEEL_LINK_GATE_ALLOWED_URLS: readonly string[] = Object.freeze(["http://www.w3.org/2000/svg"]);
+/** x264 writes its credit into every H.264 stream it encodes. Nothing fetches it, and only this exact line passes. */
+const X264_BANNER = /H\.264\/MPEG-4 AVC codec - Copyleft 2003-\d{4} - $/u;
+const X264_URL = "http://www.videolan.org/x264.html";
+const x264Banner = (text: string, start: number, end: number) => text.slice(end, end + 11) === " - options:" && X264_BANNER.test(text.slice(Math.max(0, start - 64), start));
 
 /**
  * Concrete network/content locators. Arweave locators carry an authority or a
@@ -709,7 +713,7 @@ function inspect(state: ScanState, layer: Layer): void {
   const pinned = layer.pinned ?? state.exemptLayer(layer.bytes);
   const text = byteText(layer.bytes);
   const record = (start: number, end: number, url: string, scheme: string, rawURL = url) => {
-    if (KEEL_LINK_GATE_ALLOWED_URLS.includes(rawURL)) return;
+    if (KEEL_LINK_GATE_ALLOWED_URLS.includes(rawURL) || (rawURL === X264_URL && x264Banner(text, start, end))) return;
     // The committed preview URI, also when a decoded view of it (`%20` → space) cuts the locator short.
     const preview = (value: string, at: number) => [...state.previews].some((uri) => {
       if (!value.startsWith(uri, at)) return false;

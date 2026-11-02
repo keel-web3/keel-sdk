@@ -14,8 +14,10 @@ for (const resource of installedRuntimeResources) {
   verifyRuntimeBytes(resource, bytes);
   await writeFile(`dist/runtime-modules/${resource.id}.js`, bytes);
 }
-await build({ entryPoints: ['src/main.ts'], outfile: 'dist/main.cjs', bundle: true, platform: 'node', format: 'cjs', external: ['electron', 'node:sqlite', '@keel/mcp', '@keel/sdk/inline-viewer-graph', 'langchain', '@langchain/*', '@modelcontextprotocol/sdk/*'], sourcemap: true });
-await build({ entryPoints: ['src/preview-worker.mjs'], outfile: 'dist/preview-worker.cjs', bundle: true, platform: 'node', format: 'cjs', external: ['node:sqlite', '@keel/sdk/inline-viewer-graph'] });
+// CommonJS has no import.meta, and the bundled SDK finds its packaged assets through it.
+const importMeta = { define: { 'import.meta.url': '__keelImportMetaURL' }, banner: { js: 'const __keelImportMetaURL=require("node:url").pathToFileURL(__filename).href;' } };
+await build({ ...importMeta, entryPoints: ['src/main.ts'], outfile: 'dist/main.cjs', bundle: true, platform: 'node', format: 'cjs', external: ['electron', 'node:sqlite', '@keel/mcp', '@keel/sdk/inline-viewer-graph', 'langchain', '@langchain/*', '@modelcontextprotocol/sdk/*'], sourcemap: true });
+await build({ ...importMeta, entryPoints: ['src/preview-worker.mjs'], outfile: 'dist/preview-worker.cjs', bundle: true, platform: 'node', format: 'cjs', external: ['node:sqlite', '@keel/sdk/inline-viewer-graph'] });
 await build({entryPoints:['src/raster-prepare-worker.mjs'],outfile:'dist/raster-prepare-worker.mjs',bundle:true,platform:'node',format:'esm',external:['@keel/sdk/raster-strips','@keel/sdk/raster-apng']});
 await build({entryPoints:['src/layer-image-worker.mjs'],outfile:'dist/layer-image-worker.mjs',bundle:true,platform:'node',format:'esm',external:['@keel/sdk/layered-image']});
 await build({entryPoints:['src/game-engine/game-engine-worker.mjs'],outfile:'dist/game-engine-worker.mjs',bundle:true,platform:'node',format:'esm',external:['@keel/sdk/*']});

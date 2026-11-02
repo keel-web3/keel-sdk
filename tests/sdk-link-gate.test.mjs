@@ -33,6 +33,14 @@ const ONE_PIXEL_PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kA
 const repositoryRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const previewCommitment = uri => ({schema:"keel-explicit-external-preview@1",uri,mediaType:"image/png",sourceIntegrity:{algorithm:"sha256",digest:"0x"+createHash("sha256").update(ONE_PIXEL_PNG).digest("hex"),byteLength:ONE_PIXEL_PNG.length}});
 
+test("only x264's own encoder credit passes, not its URL anywhere else", () => {
+  const banner = (url) => `x264 - core 164 - H.264/MPEG-4 AVC codec - Copyleft 2003-2021 - ${url} - options: cabac=1 ref=3`;
+  assert.equal(one("clip.mp4", banner("http://www.videolan.org/x264.html")).status, "clear");
+  assert.equal(one("clip.mp4", banner("http://evil.example/x264.html")).status, "blocked");
+  assert.equal(one("page.html", '<script src="http://www.videolan.org/x264.html"></script>').status, "blocked");
+  assert.equal(one("page.html", 'H.264/MPEG-4 AVC codec - Copyleft 2003-2021 - http://www.videolan.org/x264.html" onload="').status, "blocked");
+});
+
 test("a retired OCA locator is refused and named as retired", () => {
   const report = one("manifest.json", '{"manifestURI":"oca-onchain://11155111/0x0a4f/0x69c2"}');
   assert.equal(report.status, "blocked");

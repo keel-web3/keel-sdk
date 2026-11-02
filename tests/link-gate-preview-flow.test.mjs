@@ -41,7 +41,7 @@ test('a browser without Node codecs accepts plain calldata and PNG but blocks re
     const url='http://127.0.0.1:'+server.address().port+'/';
     let browser,result;
     try {
-      browser=await launchCspBrowser('/usr/bin/chromium',{fixtureMode:'byte-policy'});
+      browser=await launchCspBrowser(process.env.KEEL_CHROME_HEADLESS_SHELL??process.env.CHROMIUM_PATH??'/usr/bin/chromium',{fixtureMode:'byte-policy'});
       const errors=[];browser.on(({method,params})=>{if(method==='Runtime.exceptionThrown') errors.push(params.exceptionDetails.exception?.description??params.exceptionDetails.text);});
       const {targetId}=await browser.send('Target.createTarget',{url:'about:blank'});
       const {sessionId}=await browser.send('Target.attachToTarget',{targetId,flatten:true});
