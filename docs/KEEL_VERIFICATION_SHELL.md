@@ -1,7 +1,7 @@
 # The Keel verification shell (the "stamp")
 
 Every default collector-facing Keel viewer is wrapped in one canonical on-chain
-HTML verification shell: the seal button in the bottom-left corner (green or
+HTML verification shell: the seal button in the top-left corner (green or
 red by verification state) that opens a tabbed proof surface. A creator can
 explicitly select another compatible registered shell or preserve one
 self-contained UTF-8 HTML entrypoint with viewer=none as a creator-owned
