@@ -33,4 +33,28 @@ describe("payment output safety", () => {
     const reader = httpKeelOutputReader("http://localhost/r/utxo", async () => new Response("not found", { status: 404 }));
     expect((await classifyPaymentUtxos(session, [base], reader)).excluded).toHaveLength(1);
   });
+  it("excludes duplicate outpoints including conflicting values before reading", async () => {
+    let calls = 0;
+    const reader = { readOutput: async (output: typeof base) => { calls++; return output; } };
+    const result = await classifyPaymentUtxos(session, [base, { ...base, value: 10000 }], reader);
+    expect(result.spendable).toHaveLength(0);
+    expect(result.excluded.map(item => item.reason)).toEqual(["Duplicate payment outpoint", "Duplicate payment outpoint"]);
+    expect(calls).toBe(0);
+    const single = await classifyPaymentUtxos(session, [base], { readOutput: async () => base });
+    await expect(recheckPaymentInputs(session, [single.spendable[0]!, single.spendable[0]!], reader)).rejects.toThrow();
+  });
+  it("snapshots candidate inputs before awaiting and freezes the approved receipt", async () => {
+    const candidate = { ...base };
+    const result = await classifyPaymentUtxos(session, [candidate], { readOutput: async output => {
+      candidate.txid = "b".repeat(64);
+      candidate.value = 10000;
+      return { ...base, ...output };
+    } });
+    const receipt = result.spendable[0]!;
+    expect(receipt.output.txid).toBe(base.txid);
+    expect(receipt.output.value).toBe(base.value);
+    expect(() => { receipt.output.txid = "c".repeat(64); }).toThrow();
+    expect(() => { receipt.classificationHeight = 101; }).toThrow();
+    expect(await recheckPaymentInputs(session, result.spendable, { readOutput: async () => base })).toHaveLength(1);
+  });
 });

@@ -32,10 +32,17 @@ function same(a: PaymentUtxo, b: PaymentUtxo): boolean {
 }
 export async function classifyPaymentUtxos(session: BtcSession, candidates: PaymentUtxo[], reader: KeelOutputReader): Promise<ClassificationResult> {
   const result: ClassificationResult = { spendable: [], excluded: [] };
-  for (const output of candidates) {
+  const outputs = candidates.map(output => Object.freeze({ ...output }));
+  const counts = new Map<string, number>();
+  for (const output of outputs) {
+    const key = `${output.txid}:${output.vout}`;
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  for (const output of outputs) {
     let reason = "";
     let evidence: OutputEvidence | undefined;
-    if (!validOutput(session, output)) reason = "Invalid payment output";
+    if (counts.get(`${output.txid}:${output.vout}`) !== 1) reason = "Duplicate payment outpoint";
+    else if (!validOutput(session, output)) reason = "Invalid payment output";
     else try {
       evidence = await reader.readOutput({ ...output });
       if (!same(output, evidence)) reason = "Source disagreement";
@@ -45,7 +52,7 @@ export async function classifyPaymentUtxos(session: BtcSession, candidates: Paym
       else if (evidence.inscriptions.length || evidence.runes.length) reason = "Protected assets";
     } catch { reason = "Reader unavailable"; }
     if (reason) result.excluded.push({ output, reason });
-    else result.spendable.push({ output: { ...output }, classificationHeight: evidence!.indexHeight });
+    else result.spendable.push(Object.freeze({ output, classificationHeight: evidence!.indexHeight }));
   }
   return result;
 }
