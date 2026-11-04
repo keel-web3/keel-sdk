@@ -4,10 +4,11 @@ import * as ecc from "tiny-secp256k1";
 import { ECPairFactory } from "ecpair";
 import { Signer } from "bip322-js";
 import { createSession, sharedAddressSession } from "../src/accounts.js";
+import { validateAccount } from "../src/keys.js";
 import { createBitcoinWalletAdapter, type BitcoinWalletHost } from "../src/wallet.js";
 import { Bip322LoginManager } from "../src/login.js";
-import { connectXverse, reconcileXverse } from "../src/xverse.js";
-import { WalletProviderError } from "../src/providers.js";
+import { connectXverse, reconcileXverse, type XverseConnection } from "../src/xverse.js";
+import { WalletProviderError, unwrapWalletResponse } from "../src/providers.js";
 import type { LegacySignOptions, SigningProvider, WalletId } from "../src/signing.js";
 import type { BtcAccount, BtcNet, BtcSession, SignRequest } from "../src/types.js";
 import type { PaymentUtxo } from "../src/utxos.js";
@@ -114,7 +115,110 @@ function fixture(id: WalletId) {
   };
 }
 
+function xverseProviderFixture() {
+  const f = fixture("xverse");
+  let permission = false;
+  let rejectConnection = false;
+  let reportedNetwork = "Mainnet";
+  const wallet = { request: vi.fn(async (method: string, params: unknown) => {
+    if (method === "wallet_connect") {
+      if (rejectConnection) return { status: "error", error: { code: 4001, message: "Connection rejected" } };
+      permission = true;
+      return { status: "success", result: { addresses: [ordAccount, paymentAccount], walletType: "software" } };
+    }
+    if (!permission) throw new Error("Account read permission required");
+    if (method === "wallet_getNetwork") return { status: "success", result: { bitcoin: { name: reportedNetwork } } };
+    if (method === "wallet_getAccount") return { status: "success", result: { addresses: [ordAccount, paymentAccount], walletType: "software" } };
+    if (method === "signPsbt") {
+      const payload = params as { psbt: string; signInputs: Record<string, number[]> };
+      return { status: "success", result: { psbt: await f.sign(payload.psbt, Object.values(payload.signInputs).flat()) } };
+    }
+    throw new Error(`Unexpected wallet method ${method}`);
+  }) };
+  const toSession = (connection: XverseConnection) => createSession("xverse", connection.network,
+    connection.accounts.map(account => validateAccount({
+      ...account,
+      addressType: account.addressType === "p2sh" ? "p2sh-p2wpkh" : account.addressType,
+    }, connection.network)));
+  f.host.connect = vi.fn(async net => toSession(await connectXverse(wallet, net)));
+  f.host.readLiveSession = vi.fn(async net => toSession(await reconcileXverse(wallet, net)));
+  f.host.getNetwork = vi.fn(async () => {
+    const result = unwrapWalletResponse(await wallet.request("wallet_getNetwork", null)) as { bitcoin?: { name?: string } };
+    return result.bitcoin?.name === "Mainnet" ? "mainnet" : result.bitcoin?.name === "Signet" ? "signet" : "unknown";
+  });
+  f.host.signingProvider = wallet;
+  return { ...f, wallet, rejectConnection() { rejectConnection = true; }, setReportedNetwork(value: string) { reportedNetwork = value; } };
+}
+
 describe("guarded wallet integration", () => {
+  it("connects before the permission-gated network read and completes guarded signing", async () => {
+    const f = fixture("xverse"); let permission = false; const calls: string[] = [];
+    f.host.connect = vi.fn(async () => { calls.push("connect"); permission = true; return f.session; });
+    f.host.getNetwork = vi.fn(async () => {
+      calls.push("getNetwork");
+      if (!permission) throw new Error("Account read permission required");
+      return "mainnet";
+    });
+    await f.adapter.connect("mainnet");
+    expect(calls.slice(0, 2)).toEqual(["connect", "getNetwork"]);
+    const signed = await f.adapter.signPsbt(f.request);
+    await f.adapter.recheckBeforeBroadcast(signed);
+    expect(f.sign).toHaveBeenCalledOnce(); f.adapter.dispose();
+  });
+  it("connects a first-time Xverse provider through the real connection and reconciliation helpers", async () => {
+    const f = xverseProviderFixture();
+    await expect(f.wallet.request("wallet_getNetwork", null)).rejects.toThrow("Account read permission required");
+    await expect(f.wallet.request("wallet_getAccount", { addresses: ["ordinals", "payment"] })).rejects.toThrow("Account read permission required");
+    f.wallet.request.mockClear();
+    await f.adapter.connect("mainnet");
+    expect(f.wallet.request.mock.calls[0]).toEqual(["wallet_connect", { addresses: ["ordinals", "payment"], network: "Mainnet", message: "Connect your Ordinals and payment addresses to KEEL." }]);
+    expect(f.wallet.request.mock.calls).toContainEqual(["wallet_getAccount", { addresses: ["ordinals", "payment"] }]);
+    expect(f.wallet.request.mock.calls.map(call => call[0])).toContain("wallet_getNetwork");
+    const signed = await f.adapter.signPsbt(f.request);
+    await f.adapter.recheckBeforeBroadcast(signed);
+    expect(f.wallet.request.mock.calls).toContainEqual(["signPsbt", {
+      psbt: f.request.psbtBase64, broadcast: false,
+      signInputs: { [f.session.ordinals.address]: [0], [f.session.payment.address]: [1] },
+    }]);
+    expect(f.sign).toHaveBeenCalledOnce(); f.adapter.dispose();
+  });
+  it("preserves a rejected Xverse connection without reading the network or signing", async () => {
+    const f = xverseProviderFixture(); f.rejectConnection();
+    await expect(f.adapter.connect("mainnet")).rejects.toMatchObject({ code: 4001, rejected: true });
+    expect(f.wallet.request.mock.calls.map(call => call[0])).toEqual(["wallet_connect"]);
+    expect(f.sign).not.toHaveBeenCalled(); f.adapter.dispose();
+  });
+  it.each(["unknown", "signet"])("rejects a post-permission %s network without signing", async network => {
+    const f = fixture("xverse"); f.setNetwork(network);
+    await expect(f.adapter.connect("mainnet")).rejects.toThrow("Wallet network mismatch or unknown");
+    expect(f.host.connect).toHaveBeenCalledOnce();
+    expect(f.host.getNetwork).toHaveBeenCalledOnce();
+    expect(f.host.readLiveSession).not.toHaveBeenCalled();
+    await expect(f.adapter.signPsbt(f.request)).rejects.toThrow();
+    expect(f.sign).not.toHaveBeenCalled(); f.adapter.dispose();
+  });
+  it("propagates a provider network-read error after connection without signing", async () => {
+    const f = fixture("xverse");
+    f.host.getNetwork = vi.fn(async () => { throw new Error("Account read permission required"); });
+    await expect(f.adapter.connect("mainnet")).rejects.toThrow("Account read permission required");
+    expect(f.host.connect).toHaveBeenCalledOnce();
+    expect(f.host.getNetwork).toHaveBeenCalledOnce(); expect(f.sign).not.toHaveBeenCalled();
+    f.adapter.dispose();
+  });
+  it.each(["Unknown", "Signet"])("rejects Xverse's post-permission %s network without signing", async network => {
+    const f = xverseProviderFixture(); f.setReportedNetwork(network);
+    await expect(f.adapter.connect("mainnet")).rejects.toThrow("Xverse network mismatch or unknown");
+    expect(f.wallet.request.mock.calls.map(call => call[0])).toEqual(["wallet_connect", "wallet_getNetwork"]);
+    expect(f.sign).not.toHaveBeenCalled(); f.adapter.dispose();
+  });
+  it("reaches a rejected connection before a permission-gated network read", async () => {
+    const f = fixture("xverse");
+    f.host.connect = vi.fn(async () => { throw new Error("Intentional connect error"); });
+    f.host.getNetwork = vi.fn(async () => { throw new Error("Account read permission required"); });
+    await expect(f.adapter.connect("mainnet")).rejects.toThrow("Intentional connect error");
+    expect(f.host.connect).toHaveBeenCalledOnce();
+    expect(f.host.getNetwork).not.toHaveBeenCalled(); expect(f.sign).not.toHaveBeenCalled(); f.adapter.dispose();
+  });
   it.each(wallets)("%s signs actual key-path signatures, classifies prevouts and rechecks the exact result", async id => {
     const f = fixture(id);
     await f.adapter.connect("mainnet");
@@ -233,7 +337,7 @@ describe("guarded wallet integration", () => {
     expect(f.host.connect).not.toHaveBeenCalled();
     f.setNetwork("unknown");
     await expect(f.adapter.connect("mainnet")).rejects.toThrow("Wallet network mismatch or unknown");
-    expect(f.host.connect).not.toHaveBeenCalled(); f.adapter.dispose();
+    expect(f.host.connect).toHaveBeenCalledOnce(); f.adapter.dispose();
   });
   it("refuses Phantom and unsupported shared or separate wallet roles", async () => {
     const xverse = fixture("xverse");

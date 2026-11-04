@@ -147,8 +147,6 @@ export function createBitcoinWalletAdapter(host: BitcoinWalletHost) {
       guard = own;
       let version = generation;
       try {
-        assertWalletNetwork(net, await host.getNetwork());
-        current(own, version);
         const requested = checked(await host.connect(net), net);
         current(own, version);
         assertWalletNetwork(net, await host.getNetwork());
