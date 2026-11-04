@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      '@keel/bitcoin-wallets':
+        specifier: workspace:*
+        version: link:packages/bitcoin-wallets
       '@keel/builder':
         specifier: workspace:*
         version: link:packages/builder

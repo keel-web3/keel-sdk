@@ -141,6 +141,7 @@
     "solc": "0.8.36",
     "typescript": "^5.9.0",
     "viem": "^2.55.0",
+    "@keel/bitcoin-wallets": "workspace:*",
     "@keel/protocol": "workspace:*",
     "@keel/sdk": "workspace:*",
     "@keel/mcp": "workspace:*",
