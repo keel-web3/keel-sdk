@@ -1,23 +1,51 @@
 # Bitcoin wallets
 
-The adapter in pending T16 is a draft and is not yet exported or approved for signing. The following is a mocked mainnet integration sketch for the planned API; it does not connect to a live wallet.
+`@keel/bitcoin-wallets` connects typed wallet sessions, verifies both login roles, and signs reviewed PSBTs through the selected provider. It accepts no private keys. It never finalizes or broadcasts. Browser bundlers select the browser entry, which supplies Buffer for the BIP-322 dependency; verification uses browser-compatible curve primitives.
+
+Use `createBitcoinWalletAdapter` with callbacks bound to one selected provider: `connect(network)`, `readLiveSession(network)` and `getNetwork()`. Network reads must come from that provider. A testnet address prefix or a requested network is not evidence of the current chain. Supply event subscriptions, a focus target, an invalidation callback and a KEEL output reader. The adapter rechecks both addresses and network before and after signatures and clears pending work on changes.
+
+For Xverse, use `connectXverse` and `reconcileXverse`, then normalize their accounts with `createSession` and `validateAccount`:
 
 ```ts
+import {
+  connectXverse, reconcileXverse, createSession, validateAccount,
+  createBitcoinWalletAdapter, unwrapWalletResponse,
+  type BtcNet, type XverseConnection,
+} from "@keel/bitcoin-wallets";
+
+const toSession = (connection: XverseConnection) => createSession(
+  "xverse", connection.network,
+  connection.accounts.map(account => validateAccount({
+    ...account,
+    addressType: account.addressType === "p2sh" ? "p2sh-p2wpkh" : account.addressType,
+  }, connection.network)),
+);
+
+// selectedWallet, keelReader, subscriptions and clearSession belong to the host.
 const adapter = createBitcoinWalletAdapter({
   id: "xverse",
-  connect: async network => toValidatedSession(await connectXverse(selectedProvider, network)),
-  readLiveSession: network => readSelectedProviderSession(selectedProvider, network),
-  getNetwork: () => readSelectedProviderNetwork(selectedProvider),
-  signingProvider: selectedSigningProvider,
+  connect: async (net: BtcNet) => toSession(await connectXverse(selectedWallet, net)),
+  readLiveSession: async (net: BtcNet) => toSession(await reconcileXverse(selectedWallet, net)),
+  getNetwork: async () => {
+    const result = unwrapWalletResponse(await selectedWallet.request("wallet_getNetwork", null));
+    const name = (result as { bitcoin?: { name?: string } }).bitcoin?.name;
+    return name === "Mainnet" ? "mainnet" : name === "Signet" ? "signet"
+      : name === "Regtest" ? "regtest" : "unknown";
+  },
+  signingProvider: selectedWallet,
   reader: keelReader,
-  subscribe: selectedProviderSubscriptions,
-  onInvalidate: () => clearLoginUtxosAndPendingPsbts(),
+  subscribe: subscriptions,
+  onInvalidate: clearSession,
 });
-await adapter.connect("mainnet"); // mocked provider only
+await adapter.connect("mainnet"); // use a mocked provider for local tests
 ```
 
-The host supplies the mock functions and converts the low-level connection into a validated session with explicit roles. Bind all callbacks and transports to the same selected provider. Use the reviewed low-level connection helpers and a KEEL reader with complete classification evidence. Reconcile live identity before signing and on focus; invalidate login, UTXOs and pending PSBTs on account, network or disconnect events. The current live reader cannot classify outputs, and 404 fails closed.
+Leather and Magic Eden have explicit connection helpers. UniSat and OKX hosts normalize their single Taproot address with `sharedAddressSession`; OKX provider selection uses `selectOkxProvider` for the requested network. No helper chooses whichever provider happens to exist. Bind all host callbacks and signing/message transports to that same provider.
 
-Before local finalization and broadcast, call `recheckBeforeBroadcast` on the returned PSBT and recheck the transaction and inputs. The package never signs server-side, finalizes or broadcasts. The server login manager is single-process only. The host issues an httpOnly cookie and must use shared atomic challenge storage when scaled.
+Show the exact transaction review before calling `adapter.signPsbt(reviewedRequest)`. The adapter derives payment prevouts from those bytes, requires current asset-free reader evidence, checks per-input signing scope, and verifies every wallet return. It also classifies shared-address inputs that match the payment script. Before local finalization and broadcast, call `adapter.recheckBeforeBroadcast(signedPsbtBase64)` on the exact returned bytes. This rechecks identity, signatures and classification. Direct RPC broadcasts outside this API remain the host's responsibility. Dispose the adapter when its host unmounts.
 
-See [capability evidence](../../docs/ordinals-wallets/CAPABILITIES.md).
+The current live recursion reader has no classification index. A 404, unknown, stale or incomplete result is unspendable. Do not describe mocked reader tests as live payment readiness. The API does not provide an asset-transfer policy that bypasses this payment guard.
+
+`Bip322LoginManager` issues a server challenge binding domain, URI, network and both addresses. Sign both roles with `signMessageBip322`; a shared address needs one proof. The manager verifies strict signatures and consumes the nonce once. It is single-process only; scaled hosts need shared atomic challenge storage and issue their own httpOnly session cookie. Never persist signatures in browser storage.
+
+See the [wallet-by-flow matrix](../../docs/ordinals-wallets/CAPABILITIES.md) and [source provenance](PROVENANCE.md). Mocked provider support is separate from live extension, service and hardware acceptance, which remains untested.
