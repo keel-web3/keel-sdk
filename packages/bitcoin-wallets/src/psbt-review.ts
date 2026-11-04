@@ -1,4 +1,4 @@
-import { Buffer } from "node:buffer";
+import { Buffer } from "buffer";
 
 import {
   address as bitcoinAddress,
@@ -10,7 +10,7 @@ import {
   Transaction,
   type Network,
 } from "bitcoinjs-lib";
-import * as ecc from "tiny-secp256k1";
+import * as ecc from "@bitcoinerlab/secp256k1";
 import type {
   TrustedVaultSettlementPlan,
   VaultPsbtIndexedEvidence,

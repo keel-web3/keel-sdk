@@ -1,3 +1,4 @@
+import { Buffer } from "buffer";
 import { address, networks } from "bitcoinjs-lib";
 import type { BtcNet, BtcSession } from "./types.js";
 

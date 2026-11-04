@@ -187,12 +187,18 @@ importers:
 
   packages/bitcoin-wallets:
     dependencies:
+      '@bitcoinerlab/secp256k1':
+        specifier: 1.2.0
+        version: 1.2.0
       bip322-js:
         specifier: ^4.0.1
         version: 4.0.1(typescript@5.9.3)
       bitcoinjs-lib:
         specifier: ^7.0.1
         version: 7.0.5(typescript@5.9.3)
+      buffer:
+        specifier: 6.0.3
+        version: 6.0.3
       ecpair:
         specifier: ^3.0.1
         version: 3.0.2(typescript@5.9.3)

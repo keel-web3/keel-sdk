@@ -1,6 +1,6 @@
-import { Buffer } from "node:buffer";
+import { Buffer } from "buffer";
 import { initEccLib, networks, payments, Psbt, script, Transaction } from "bitcoinjs-lib";
-import * as ecc from "tiny-secp256k1";
+import * as ecc from "@bitcoinerlab/secp256k1";
 import { assertVaultTaprootSpendProof, vaultTaprootRequiredPublicKeys } from "./psbt-review.js";
 import type { BtcSession, SignRequest } from "./types.js";
 

@@ -1,4 +1,4 @@
-import { randomBytes } from "node:crypto";
+import { Buffer } from "buffer";
 import { address as bitcoinAddress } from "bitcoinjs-lib";
 import { assertAddressNetwork, bitcoinNetwork } from "./network.js";
 import { verifyBip322Message } from "./messages.js";
@@ -27,7 +27,7 @@ export class Bip322LoginManager {
     const now = this.now();
     for (const [key, value] of this.challenges) if (value.expiresAt <= now) this.challenges.delete(key);
     if (this.challenges.size >= this.maxEntries) throw new Error("Challenge store full");
-    const nonce = randomBytes(32).toString("hex");
+    const nonce = Buffer.from(globalThis.crypto.getRandomValues(new Uint8Array(32))).toString("hex");
     const fields = { ...this.context, ordinals: identity.ordinals, payment: identity.payment, nonce, issuedAt: now, expiresAt: now + this.lifetimeMs };
     const message = `KEEL Bitcoin login\nDomain: ${fields.domain}\nURI: ${fields.uri}\nNetwork: ${fields.network}\nOrdinals: ${fields.ordinals}\nPayment: ${fields.payment}\nNonce: ${nonce}\nIssued At: ${fields.issuedAt}\nExpires At: ${fields.expiresAt}`;
     const challenge = { ...fields, message }; this.challenges.set(nonce, challenge); return { ...challenge };
