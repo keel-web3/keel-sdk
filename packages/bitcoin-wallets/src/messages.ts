@@ -3,7 +3,13 @@ import { assertAddressNetwork, assertWalletNetwork } from "./network.js";
 import type { BtcNet } from "./types.js";
 
 export function verifyBip322Message(address: string, message: string, signature: string): boolean {
-  try { return Verifier.verifySignature(address, message, signature, true); } catch { return false; }
+  try {
+    const bytes = Buffer.from(signature, "base64");
+    if (!signature || bytes.toString("base64") !== signature) return false;
+    // Compact BIP-137 signatures remain valid only for legacy P2PKH addresses.
+    if (bytes.length === 65 && bytes[0]! >= 27 && bytes[0]! <= 42 && !/^[1mn]/.test(address)) return false;
+    return Verifier.verifySignature(address, message, signature, true);
+  } catch { return false; }
 }
 
 type Transport =

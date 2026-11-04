@@ -1,4 +1,5 @@
 import { randomBytes } from "node:crypto";
+import { address as bitcoinAddress } from "bitcoinjs-lib";
 import { assertAddressNetwork, bitcoinNetwork } from "./network.js";
 import { verifyBip322Message } from "./messages.js";
 import type { BtcNet } from "./types.js";
@@ -21,6 +22,8 @@ export class Bip322LoginManager {
   }
   issue(identity: Identity): LoginChallenge {
     assertAddressNetwork(identity.ordinals, this.context.network); assertAddressNetwork(identity.payment, this.context.network);
+    const ordinalScript = bitcoinAddress.toOutputScript(identity.ordinals, bitcoinNetwork(this.context.network));
+    if (ordinalScript.length !== 34 || ordinalScript[0] !== 0x51 || ordinalScript[1] !== 0x20) throw new Error("Ordinals login requires a Taproot address");
     const now = this.now();
     for (const [key, value] of this.challenges) if (value.expiresAt <= now) this.challenges.delete(key);
     if (this.challenges.size >= this.maxEntries) throw new Error("Challenge store full");
