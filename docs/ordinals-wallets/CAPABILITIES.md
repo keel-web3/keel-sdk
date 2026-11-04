@@ -1,17 +1,38 @@
 # Wallet capabilities
 
-The typed matrix in `packages/bitcoin-wallets/src/capabilities.ts` records API-level evidence. Supported means a mock or package helper covers the flow, not that an extension or hardware wallet accepted it. Every live cell is untested. Pending T07 signing is not integrated or verified here. A network cell describes the connection helper, not a live wallet. Testnet address prefixes do not distinguish testnet3, testnet4 and signet. Xverse rejects testnet3 and testnet4 as ambiguous. Magic Eden uses a mocked legacy callback; its live availability is unverified.
+Supported means mocked provider or package-helper coverage. Every live extension and hardware flow is **untested**. Network cells describe package connection/transport boundaries and require an explicit live network callback; address prefixes cannot distinguish testnet3, testnet4 and signet. Xverse's connection helper rejects testnet3/testnet4 as ambiguous. Magic Eden's legacy callback is mocked; live availability is unverified.
 
-Only supported vault leaf templates may use script path; generic script paths are unsupported. Leather and Magic Eden do not support BIP-322 here. The live KEEL reader does not classify outputs; a 404 fails closed.
+| Flow | xverse | leather | unisat | okx | magic-eden |
+|---|---|---|---|---|---|
+| Connect | supported | supported | untested | untested | supported |
+| Separate roles | supported | supported | unsupported | unsupported | supported |
+| Shared roles | unsupported | unsupported | supported | supported | unsupported |
+| Dual-role BIP-322 | supported | unsupported | supported | supported | unsupported |
+| Key-path PSBT | supported | supported | supported | supported | supported |
+| Custom sighash | unsupported | unsupported | supported | supported | unsupported |
+| Vault leaf | unsupported | unsupported | supported | supported | unsupported |
+| Generic script | unsupported | unsupported | unsupported | unsupported | unsupported |
+| Events | supported | untested | supported | untested | untested |
+| Mainnet | supported | supported | supported | supported | supported |
+| Testnet3 | unsupported | supported | supported | supported | unsupported |
+| Testnet4 | unsupported | unsupported | unsupported | unsupported | unsupported |
+| Signet | supported | supported | unsupported | untested | unsupported |
+| Regtest | supported | unsupported | unsupported | unsupported | unsupported |
 
-Negative test pointers for the nine audit defects:
+Custom sighash means modes beyond ALL/DEFAULT. Vault leaves are the supported cooperative/refund templates; generic script paths fail closed. UniSat/OKX connection requires host callbacks that normalize a single Taproot address into explicit shared roles. Their native provider discovery is outside this package. OKX Signet is documented but not accepted as a tested complete connection here. Leather/ME BIP-322 remains unsupported.
 
-1. Network selection: `test/network.test.ts`.
-2. Xverse network ambiguity: `test/xverse.test.ts`.
-3. Roles: `test/accounts.test.ts`, rejects missing and duplicate roles.
-4. Keys and prevouts: `test/keys.test.ts`, rejects mismatches.
-5. Signing: pending T07 `test/signing.test.ts`; integration and coverage remain under review.
-6. Session changes: `test/session.test.ts`, refuses an in-flight signature after invalidation.
-7. Login: `test/login.test.ts`, rejects forged proof and replay.
-8. Provider errors: `test/providers.test.ts`, preserves rejection and rejects invalid roles.
-9. Returned PSBT: `test/signed-review.test.ts`, rejects changed output and sequence.
+The current live KEEL recursion reader has no output-classification index. A 404, lag, missing field or unknown asset status makes an output unspendable. Mocked reader evidence does not prove live classification readiness.
+
+| Audit defect | Negative coverage |
+|---|---|
+| 1. Provider/network selection | `test/network.test.ts`: exact provider, ambiguous/mismatched chain |
+| 2. Legacy Xverse connection | `test/xverse.test.ts`: missing roles and ambiguous network |
+| 3. Purpose inference | `test/accounts.test.ts`: bare strings, unknown/duplicate/missing roles |
+| 4. Key and prevout metadata | `test/keys.test.ts`: wrong key, txid/vout and caller mutation |
+| 5. Signing scope/sighash/tweak | `test/signing.test.ts`: invalid leaf/key/control block, scope and modes |
+| 6. Session lifecycle | `test/session.test.ts`: all events, hydration and in-flight invalidation |
+| 7. Protocol label | `test/messages.test.ts`: Phantom and compact legacy proofs on SegWit/Taproot |
+| 8. Errors/missing wallets | `test/providers.test.ts`: preserved rejection, bad roles and unknown Leather type |
+| 9. Signed return integrity | `test/signed-review.test.ts`: bytes, signatures, metadata and unsupported retained input |
+
+`test/login.test.ts` covers real dual-role nonce proofs. `test/utxos.test.ts` covers inscriptions at 546, 10k and 1 BTC, runes, rare/unknown/stale outputs, duplicate outpoints and immutable receipts. Guarded integration coverage lives in `test/wallet.test.ts`.
