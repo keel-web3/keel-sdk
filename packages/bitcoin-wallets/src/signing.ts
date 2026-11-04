@@ -1,6 +1,7 @@
 import * as bitcoin from 'bitcoinjs-lib';
 import { accountInputMetadata, validateAccount } from './keys.js';
 import { assertVaultTaprootSpendProof, vaultTaprootRequiredPublicKeys } from './psbt-review.js';
+import { normalizeWalletError, unwrapWalletResponse, WalletProviderError } from './providers.js';
 import type { BtcNet, BtcSession, SignRequest } from './types.js';
 
 export type WalletId = 'xverse' | 'unisat' | 'okx' | 'leather' | 'magic-eden';
@@ -144,7 +145,7 @@ export async function signWithProvider(walletId: WalletId, provider: SigningProv
     (groups[account.address] ??= []).push(item.index);
     return {
       index: item.index,
-      ...(item.path === 'key' ? { address: account.address } : { publicKey: account.publicKey }),
+      ...(item.path === 'key' && !(walletId === 'okx' && tap) ? { address: account.address } : { publicKey: account.publicKey }),
       sighashTypes: [item.sighash],
       ...(tap ? { disableTweakSigner: item.path !== 'key', useTweakedSigner: item.path === 'key' } : {}),
     };
@@ -158,8 +159,7 @@ export async function signWithProvider(walletId: WalletId, provider: SigningProv
     const send = (provider as XverseSigningProvider).request;
     if (typeof send !== 'function') throw new Error('Missing provider capability');
     const result = await send.call(provider, 'signPsbt', { psbt: request.psbtBase64, signInputs: groups, broadcast: false });
-    if (field(result, 'status') !== 'success') throw new Error('Xverse signing failed');
-    const value = field(field(result, 'result'), 'psbt');
+    const value = field(unwrapWalletResponse(result), 'psbt');
     base64(value);
     return value as string;
   }
@@ -168,12 +168,12 @@ export async function signWithProvider(walletId: WalletId, provider: SigningProv
     if (typeof send !== 'function') throw new Error('Missing provider capability');
     const network = session.network === 'testnet3' ? 'testnet' : session.network as 'mainnet' | 'signet';
     const result = await send.call(provider, 'signPsbt', { hex: bytes.toString('hex'), signAtIndex: request.inputs.map(i => i.index), allowedSighash: [1], network, broadcast: false });
-    return fromHex(field(field(result, 'result'), 'hex'));
+    return fromHex(field(unwrapWalletResponse(result), 'hex'));
   }
   const sign = (provider as MagicEdenSigningProvider).signTransaction;
   if (typeof sign !== 'function') throw new Error('Missing provider capability');
   const result = await new Promise<unknown>((resolve, reject) => {
-    Promise.resolve(sign.call(provider, { payload: { network: { type: 'Mainnet' }, message: 'Sign the reviewed transaction.', psbtBase64: request.psbtBase64, inputsToSign: Object.entries(groups).map(([address, signingIndexes]) => ({ address, signingIndexes })), broadcast: false }, onFinish: resolve, onCancel: () => reject(new Error('Wallet cancelled')) })).catch(reject);
+    Promise.resolve(sign.call(provider, { payload: { network: { type: 'Mainnet' }, message: 'Sign the reviewed transaction.', psbtBase64: request.psbtBase64, inputsToSign: Object.entries(groups).map(([address, signingIndexes]) => ({ address, signingIndexes })), broadcast: false }, onFinish: resolve, onCancel: () => reject(new WalletProviderError('Wallet cancelled', 'rejected')) })).catch(error => reject(normalizeWalletError(error)));
   });
   const value = field(result, 'psbtBase64');
   base64(value);

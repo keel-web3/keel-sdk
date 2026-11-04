@@ -97,7 +97,7 @@ it.each(['unisat', 'okx'] as const)('%s scopes key and real vault leaf inputs wi
   expect(sig.signature[64]).toBe(131);
   expect(call).toHaveBeenCalledOnce();
   expect(call).toHaveBeenCalledWith(hex, { autoFinalized: false, toSignInputs: [
-    { index: 0, address: session.ordinals.address, sighashTypes: [1], disableTweakSigner: false, useTweakedSigner: true },
+    { index: 0, ...(wallet === 'okx' ? { publicKey: key } : { address: session.ordinals.address }), sighashTypes: [1], disableTweakSigner: false, useTweakedSigner: true },
     { index: 2, publicKey: key, sighashTypes: [131], disableTweakSigner: true, useTweakedSigner: false },
   ] });
 });
@@ -354,7 +354,13 @@ describe('provider responses', () => {
   });
   it('rejects Xverse error results even if they contain a PSBT', async () => {
     const { session, psbt, inputs } = fixture('xverse');
-    await expect(signWithProvider('xverse', { request: vi.fn().mockResolvedValue({ status: 'error', result: { psbt: psbt.toBase64() } }) }, session, request(psbt, inputs))).rejects.toThrow('Xverse signing failed');
+    const error = { code: -32000, message: 'User cancelled' };
+    await expect(signWithProvider('xverse', { request: vi.fn().mockResolvedValue({ status: 'error', error, result: { psbt: psbt.toBase64() } }) }, session, request(psbt, inputs))).rejects.toMatchObject({ code: -32000, kind: 'rejected', cause: error });
+  });
+  it('preserves Leather rejection codes rather than parsing an error as a result', async () => {
+    const { session, psbt, inputs } = fixture('leather');
+    const error = { code: 4001, message: 'User cancelled' };
+    await expect(signWithProvider('leather', { request: vi.fn().mockResolvedValue({ error, result: { hex: psbt.toHex() } }) }, session, request(psbt, inputs))).rejects.toMatchObject({ code: 4001, kind: 'rejected', cause: error });
   });
   it('rejects malformed Leather and Magic Eden results', async () => {
     const leather = fixture('leather');
