@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { crypto, payments, Psbt } from "bitcoinjs-lib";
-import { ECPair, REGTEST_NETWORK, createTaprootAuctionVault, createCooperativeVaultPsbt, signVaultPsbt } from "../src/taproot-auction-vault.js";
+import { ECPair, REGTEST_NETWORK, createTaprootAuctionVault, createCooperativeVaultPsbt, signVaultPsbt } from "./taproot-auction-vault.js";
 import { assertVaultTaprootSpendProof } from "../src/psbt-review.js";
 import { validateSignedPsbt } from "../src/signed-review.js";
 import type { BtcSession, SignRequest } from "../src/types.js";
