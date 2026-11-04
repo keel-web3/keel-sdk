@@ -8,6 +8,7 @@ await cleanBuildOutputs(root);
 
 run("node", ["scripts/build-keel-market-wallet.mjs"]);
 
+tsc("packages/bitcoin-wallets/tsconfig.json");
 tsc("packages/protocol/tsconfig.json");
 tsc("packages/viewer/tsconfig.json");
 run("node", ["packages/viewer/scripts/build-wrapper-viewer.mjs"]);

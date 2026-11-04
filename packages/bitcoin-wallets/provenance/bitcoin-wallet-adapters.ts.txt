@@ -1,0 +1,398 @@
+"use client";
+/* eslint-disable complexity, max-lines -- wallet providers expose different connection and signing capabilities. */
+
+export type BitcoinWalletId = "xverse" | "unisat" | "phantom" | "okx" | "local-regtest";
+export type BitcoinMessageProtocol = "ecdsa" | "bip322-simple";
+export type BitcoinNetwork = "mainnet" | "testnet" | "regtest";
+
+export interface BitcoinWalletAccount {
+  readonly address: string;
+  readonly network?: BitcoinNetwork;
+  readonly publicKey?: string;
+  readonly purpose: "payment" | "ordinals";
+}
+
+const localTestWalletEnabled = process.env["NEXT_PUBLIC_PVB_ORDINALS_TEST_WALLET"] === "1";
+
+export const BITCOIN_WALLETS: readonly { id: BitcoinWalletId; label: string }[] = [
+  { id: "xverse", label: "Xverse" },
+  { id: "unisat", label: "UniSat" },
+  { id: "phantom", label: "Phantom" },
+  { id: "okx", label: "OKX" },
+  ...(localTestWalletEnabled ? [{ id: "local-regtest" as const, label: "Local regtest" }] : []),
+];
+
+interface InjectedBitcoinProvider {
+  connect?: () => Promise<unknown>;
+  getAccounts?: () => Promise<unknown>;
+  getPublicKey?: () => Promise<string>;
+  requestAccounts?: () => Promise<unknown>;
+  signMessage?: (message: string, protocol?: BitcoinMessageProtocol) => Promise<unknown>;
+  sendBitcoin?: (address: string, satoshis: number, options?: unknown) => Promise<unknown>;
+  signPsbt?: (psbt: string, options?: unknown) => Promise<string>;
+}
+
+interface PhantomBitcoinProvider {
+  requestAccounts: () => Promise<unknown>;
+  signMessage?: (address: string, message: Uint8Array) => Promise<unknown>;
+  sendBitcoin?: (address: string, satoshis: number) => Promise<unknown>;
+  signPSBT: (psbt: Uint8Array, options: unknown) => Promise<Uint8Array>;
+}
+
+export interface BitcoinMessageSignature {
+  readonly protocol: BitcoinMessageProtocol;
+  readonly signature: string;
+}
+
+export async function connectBitcoinWallet(id: BitcoinWalletId): Promise<readonly BitcoinWalletAccount[]> {
+  if (id === "local-regtest") return connectLocalRegtestWallet();
+  if (id === "xverse") return connectXverse();
+  if (id === "phantom") return connectPhantom();
+  const provider = injectedProvider(id);
+  if (provider === undefined) throw new Error(`${walletLabel(id)} is not installed.`);
+  const result = provider.requestAccounts !== undefined
+    ? await provider.requestAccounts()
+    : provider.connect !== undefined
+      ? await provider.connect()
+      : provider.getAccounts !== undefined
+        ? await provider.getAccounts()
+        : undefined;
+  const publicKey = await provider.getPublicKey?.();
+  const accounts = injectedAccounts(result, publicKey);
+  if (accounts.length === 0) throw new Error(`${walletLabel(id)} returned no Bitcoin account.`);
+  return accounts;
+}
+
+export async function signBitcoinPsbt(input: {
+  readonly account: BitcoinWalletAccount;
+  readonly inputIndexes: readonly number[];
+  readonly psbtHex: string;
+  readonly walletId: BitcoinWalletId;
+}): Promise<string> {
+  if (input.walletId === "local-regtest") {
+    return localRegtestRequest<string>("/api/ordinals/test-wallet/psbt", {
+      address: input.account.address,
+      psbtHex: input.psbtHex,
+    }, "The local regtest wallet could not sign this PSBT.");
+  }
+  if (input.walletId === "phantom") return signPhantom(input);
+  if (input.walletId === "xverse") return signXverse(input);
+  const provider = injectedProvider(input.walletId);
+  if (provider?.signPsbt === undefined) throw new Error(`${walletLabel(input.walletId)} cannot sign PSBTs here.`);
+  return provider.signPsbt(input.psbtHex, {
+    autoFinalized: false,
+    toSignInputs: input.inputIndexes.map((index) => ({
+      address: input.account.address,
+      index,
+      ...(input.account.publicKey === undefined ? {} : { publicKey: input.account.publicKey }),
+    })),
+  });
+}
+
+export async function sendBitcoin(input: {
+  readonly account?: BitcoinWalletAccount;
+  readonly walletId: BitcoinWalletId;
+  readonly recipientAddress: string;
+  readonly amountSats: string;
+}): Promise<string> {
+  const amountSats = Number(input.amountSats);
+  if (!Number.isSafeInteger(amountSats) || amountSats <= 0) {
+    throw new Error("Bitcoin transfer amount must be a positive whole number of sats.");
+  }
+  if (input.walletId === "local-regtest") {
+    if (input.account === undefined) throw new Error("The local regtest wallet account is missing.");
+    const result = await localRegtestRequest<{ transactionId: string }>(
+      "/api/ordinals/test-wallet/send",
+      {
+        amountSats: input.amountSats,
+        recipientAddress: input.recipientAddress,
+        walletAddress: input.account.address,
+      },
+      "The local regtest wallet could not fund this vault.",
+    );
+    return result.transactionId;
+  }
+  if (input.walletId === "xverse") {
+    const walletModule = await import("sats-connect");
+    const response: unknown = await walletModule.default.request("sendTransfer", {
+      recipients: [{ address: input.recipientAddress, amount: amountSats }],
+    });
+    return transactionId(responseResult(response), "Xverse did not return the funding transaction.");
+  }
+  if (input.walletId === "phantom") {
+    const provider = phantomProvider();
+    if (provider?.sendBitcoin === undefined) {
+      throw new Error("Phantom can sign PSBTs, but this Bitcoin provider cannot create a funding transfer here.");
+    }
+    return transactionId(
+      await provider.sendBitcoin(input.recipientAddress, amountSats),
+      "Phantom did not return the funding transaction.",
+    );
+  }
+  const provider = injectedProvider(input.walletId);
+  if (provider?.sendBitcoin === undefined) {
+    throw new Error(`${walletLabel(input.walletId)} cannot create Bitcoin transfers here.`);
+  }
+  return transactionId(
+    await provider.sendBitcoin(input.recipientAddress, amountSats),
+    `${walletLabel(input.walletId)} did not return the funding transaction.`,
+  );
+}
+
+export function bitcoinMessageProtocol(account: BitcoinWalletAccount): BitcoinMessageProtocol {
+  return account.purpose === "ordinals" ? "bip322-simple" : "ecdsa";
+}
+
+export async function signBitcoinMessage(input: {
+  readonly account: BitcoinWalletAccount;
+  readonly message: string;
+  readonly protocol: BitcoinMessageProtocol;
+  readonly walletId: BitcoinWalletId;
+}): Promise<BitcoinMessageSignature> {
+  if (input.walletId === "local-regtest") {
+    return localRegtestRequest<BitcoinMessageSignature>(
+      "/api/ordinals/test-wallet/sign",
+      {
+        address: input.account.address,
+        message: input.message,
+        protocol: input.protocol,
+      },
+      "The local regtest wallet could not sign this message.",
+    );
+  }
+  if (input.walletId === "xverse") return signXverseMessage(input);
+  if (input.walletId === "phantom") return signPhantomMessage(input);
+  const provider = injectedProvider(input.walletId);
+  if (provider?.signMessage === undefined) {
+    throw new Error(`${walletLabel(input.walletId)} cannot sign Bitcoin messages here.`);
+  }
+  return {
+    protocol: input.protocol,
+    signature: stringSignature(
+      await provider.signMessage(input.message, input.protocol),
+      `${walletLabel(input.walletId)} returned no Bitcoin message signature.`,
+    ),
+  };
+}
+
+async function connectXverse(): Promise<readonly BitcoinWalletAccount[]> {
+  const walletModule = await import("sats-connect");
+  const response: unknown = await walletModule.default.request("getAccounts", {
+    purposes: [walletModule.AddressPurpose.Ordinals, walletModule.AddressPurpose.Payment],
+    message: "Connect your Ordinals and payment addresses to Fray.",
+  });
+  return normalizeSatsResponse(response);
+}
+
+async function signXverse(input: Parameters<typeof signBitcoinPsbt>[0]): Promise<string> {
+  const walletModule = await import("sats-connect");
+  const response: unknown = await walletModule.default.request("signPsbt", {
+    broadcast: false,
+    psbt: hexToBase64(input.psbtHex),
+    signInputs: { [input.account.address]: [...input.inputIndexes] },
+  });
+  const result = responseResult(response);
+  if (typeof result === "object" && result !== null && "psbt" in result && typeof result.psbt === "string") {
+    return base64ToHex(result.psbt);
+  }
+  throw new Error("Xverse did not return a signed PSBT.");
+}
+
+async function signXverseMessage(input: Parameters<typeof signBitcoinMessage>[0]): Promise<BitcoinMessageSignature> {
+  const walletModule = await import("sats-connect");
+  const response: unknown = await walletModule.default.request("signMessage", {
+    address: input.account.address,
+    message: input.message,
+    protocol: input.protocol === "bip322-simple"
+      ? walletModule.MessageSigningProtocols.BIP322
+      : walletModule.MessageSigningProtocols.ECDSA,
+  });
+  const result = responseResult(response);
+  if (typeof result === "object" && result !== null && "address" in result && result.address !== input.account.address) {
+    throw new Error("Xverse signed with a different Bitcoin address.");
+  }
+  if (typeof result === "object" && result !== null && "signature" in result && typeof result.signature === "string") {
+    return { protocol: input.protocol, signature: result.signature };
+  }
+  throw new Error("Xverse did not return a Bitcoin message signature.");
+}
+
+async function connectPhantom(): Promise<readonly BitcoinWalletAccount[]> {
+  const provider = phantomProvider();
+  if (provider === undefined) throw new Error("Phantom Bitcoin is not installed.");
+  const accounts = accountObjects(await provider.requestAccounts());
+  if (accounts.length === 0) throw new Error("The wallet returned no Bitcoin account.");
+  return accounts;
+}
+
+async function signPhantom(input: Parameters<typeof signBitcoinPsbt>[0]): Promise<string> {
+  const provider = phantomProvider();
+  if (provider === undefined) throw new Error("Phantom Bitcoin is not installed.");
+  const signed = await provider.signPSBT(hexBytes(input.psbtHex), {
+    inputsToSign: [{ address: input.account.address, signingIndexes: [...input.inputIndexes] }],
+  });
+  return bytesHex(signed);
+}
+
+async function signPhantomMessage(input: Parameters<typeof signBitcoinMessage>[0]): Promise<BitcoinMessageSignature> {
+  const provider = phantomProvider();
+  if (provider?.signMessage === undefined) throw new Error("Phantom Bitcoin cannot sign messages here.");
+  const response = await provider.signMessage(input.account.address, new TextEncoder().encode(input.message));
+  const signature = typeof response === "object" && response !== null && "signature" in response
+    ? response.signature
+    : response;
+  if (!(signature instanceof Uint8Array)) throw new Error("Phantom did not return a Bitcoin message signature.");
+  return { protocol: input.protocol, signature: bytesToBase64(signature) };
+}
+
+function injectedProvider(id: "unisat" | "okx"): InjectedBitcoinProvider | undefined {
+  const root = globalThis as unknown as {
+    okxwallet?: {
+      bitcoin?: InjectedBitcoinProvider;
+      bitcoinSignet?: InjectedBitcoinProvider;
+      bitcoinTestnet?: InjectedBitcoinProvider;
+    };
+    unisat?: InjectedBitcoinProvider;
+  };
+  return id === "unisat"
+    ? root.unisat
+    : root.okxwallet?.bitcoinTestnet ?? root.okxwallet?.bitcoinSignet ?? root.okxwallet?.bitcoin;
+}
+
+function phantomProvider(): PhantomBitcoinProvider | undefined {
+  return (globalThis as unknown as { phantom?: { bitcoin?: PhantomBitcoinProvider } }).phantom?.bitcoin;
+}
+
+function normalizeSatsResponse(value: unknown): readonly BitcoinWalletAccount[] {
+  const result = responseResult(value);
+  const source = Array.isArray(result) ? result : [];
+  const accounts = source.flatMap((item) => accountFromUnknown(item));
+  if (accounts.length === 0) throw new Error("Xverse returned no Bitcoin account.");
+  return accounts;
+}
+
+function responseResult(value: unknown): unknown {
+  if (typeof value !== "object" || value === null) return value;
+  if ("status" in value && value.status === "error") throw new Error("The wallet rejected the request.");
+  return "result" in value ? value.result : value;
+}
+
+function accountObjects(value: unknown): readonly BitcoinWalletAccount[] {
+  const accounts = (Array.isArray(value) ? value : []).flatMap((item) => accountFromUnknown(item));
+  return accounts;
+}
+
+function injectedAccounts(value: unknown, publicKey: string | undefined): readonly BitcoinWalletAccount[] {
+  const singleAccount = accountFromUnknown(value);
+  if (singleAccount.length > 0) return singleAccount;
+  const objectAccounts = accountObjects(value);
+  if (objectAccounts.length > 0) return objectAccounts;
+  return stringArray(value).map((address, index) => {
+    const network = bitcoinNetworkForAddress(address);
+    return {
+      address,
+      ...(network === undefined ? {} : { network }),
+      ...(index === 0 && publicKey !== undefined ? { publicKey } : {}),
+      purpose: index === 0 ? "ordinals" : "payment",
+    };
+  });
+}
+
+function accountFromUnknown(value: unknown): BitcoinWalletAccount[] {
+  if (typeof value !== "object" || value === null) return [];
+  const address = stringProperty(value, "address");
+  if (address === undefined) return [];
+  const purpose = "purpose" in value && value.purpose === "payment" ? "payment" : "ordinals";
+  const publicKey = stringProperty(value, "publicKey");
+  const network = bitcoinNetworkForAddress(address);
+  return [{ address, ...(network === undefined ? {} : { network }), ...(publicKey === undefined ? {} : { publicKey }), purpose }];
+}
+
+export function bitcoinNetworkForAddress(address: string): BitcoinNetwork | undefined {
+  const normalized = address.toLowerCase();
+  if (normalized.startsWith("bcrt1")) return "regtest";
+  if (normalized.startsWith("tb1") || /^[mn2]/.test(normalized)) return "testnet";
+  if (normalized.startsWith("bc1") || /^[13]/.test(normalized)) return "mainnet";
+  return undefined;
+}
+
+function stringProperty(value: object, key: string): string | undefined {
+  const record = value as Record<string, unknown>;
+  return typeof record[key] === "string" ? record[key] : undefined;
+}
+
+function stringArray(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
+}
+
+function walletLabel(id: BitcoinWalletId): string {
+  return BITCOIN_WALLETS.find((wallet) => wallet.id === id)?.label ?? id;
+}
+
+async function connectLocalRegtestWallet(): Promise<readonly BitcoinWalletAccount[]> {
+  const body = await localRegtestRequest<{ account: BitcoinWalletAccount }>(
+    "/api/ordinals/test-wallet",
+    undefined,
+    "The local regtest wallet is unavailable.",
+    "GET",
+  );
+  return [body.account];
+}
+
+async function localRegtestRequest<T>(
+  path: string,
+  body: Record<string, unknown> | undefined,
+  fallback: string,
+  method: "GET" | "POST" = "POST",
+): Promise<T> {
+  const response = await fetch(path, {
+    method,
+    ...(body === undefined ? {} : {
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
+    }),
+  });
+  const payload = await response.json() as T & { error?: string };
+  if (!response.ok) throw new Error(payload.error ?? fallback);
+  return payload;
+}
+
+function hexBytes(hex: string): Uint8Array {
+  if (!/^(?:[\da-f]{2})+$/i.test(hex)) throw new Error("PSBT must be even-length hexadecimal.");
+  return Uint8Array.from(hex.match(/.{2}/g) ?? [], (byte) => Number.parseInt(byte, 16));
+}
+
+function bytesHex(bytes: Uint8Array): string {
+  return [...bytes].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function bytesToBase64(bytes: Uint8Array): string {
+  return btoa(String.fromCharCode(...bytes));
+}
+
+function stringSignature(value: unknown, message: string): string {
+  if (typeof value === "string" && value.length > 0) return value;
+  if (typeof value === "object" && value !== null && "signature" in value && typeof value.signature === "string" && value.signature.length > 0) {
+    return value.signature;
+  }
+  throw new Error(message);
+}
+
+function transactionId(value: unknown, message: string): string {
+  if (typeof value === "string" && /^[0-9a-f]{64}$/i.test(value)) return value;
+  if (typeof value === "object" && value !== null) {
+    for (const key of ["txid", "txId", "txHash", "transactionId"]) {
+      const candidate = (value as Record<string, unknown>)[key];
+      if (typeof candidate === "string" && /^[0-9a-f]{64}$/i.test(candidate)) return candidate;
+    }
+  }
+  throw new Error(message);
+}
+
+function hexToBase64(hex: string): string {
+  return btoa(String.fromCharCode(...hexBytes(hex)));
+}
+
+export function base64ToHex(value: string): string {
+  return bytesHex(Uint8Array.from(atob(value), (character) => character.charCodeAt(0)));
+}
