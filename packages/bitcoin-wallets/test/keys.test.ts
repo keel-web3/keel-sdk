@@ -25,11 +25,39 @@ describe('account key and prevout binding', () => {
     for (const type of ['p2wpkh', 'p2sh-p2wpkh', 'p2pkh'] as const) {
       const a = account(type); const script = bitcoin.address.toOutputScript(a.address, n);
       const tx = new bitcoin.Transaction(); tx.addInput(new Uint8Array(32), 0); tx.addOutput(script, 100n);
-      const m = accountInputMetadata({ ...a, bip32: { fingerprint: '12345678', path: "m/84'/1'/0'/0/0" } }, 'testnet3', { script, value: 100n }, tx.toBuffer());
+      const m = accountInputMetadata({ ...a, bip32: { fingerprint: '12345678', path: "m/84'/1'/0'/0/0" } }, 'testnet3', { script, value: 100n }, tx.toBuffer(), { txid: tx.getId(), index: 0 });
       expect(m.bip32Derivation).toHaveLength(1);
       if (type === 'p2sh-p2wpkh') expect(m.redeemScript).toBeDefined();
       if (type === 'p2pkh') expect(m.witnessUtxo).toBeUndefined();
     }
+  });
+  it('binds previous transactions to the exact txid and output index', () => {
+    const a = account('p2pkh');
+    const script = bitcoin.address.toOutputScript(a.address, n);
+    const tx = new bitcoin.Transaction();
+    tx.addInput(new Uint8Array(32), 0);
+    tx.addOutput(script, 100n);
+    tx.addOutput(script, 200n);
+    const utxo = { script, value: 100n };
+    const bytes = tx.toBuffer();
+    expect(() => accountInputMetadata(a, 'testnet3', utxo, bytes)).toThrow(/outpoint/);
+    expect(() => accountInputMetadata(a, 'testnet3', utxo, bytes, { txid: '11'.repeat(32), index: 0 })).toThrow(/outpoint/);
+    expect(() => accountInputMetadata(a, 'testnet3', utxo, bytes, { txid: tx.getId(), index: 1 })).toThrow(/output/);
+  });
+  it('copies validated accounts and previous-output metadata', () => {
+    const a = { ...account('p2wpkh'), bip32: { fingerprint: '12345678', path: 'm/0' } };
+    const checked = validateAccount(a, 'testnet3');
+    a.bip32.path = 'm/1';
+    expect(checked.bip32?.path).toBe('m/0');
+    const utxo = { script: bitcoin.address.toOutputScript(a.address, n), value: 100n };
+    const tx = new bitcoin.Transaction(); tx.addInput(new Uint8Array(32), 0); tx.addOutput(utxo.script, 100n);
+    const bytes = tx.toBuffer();
+    const metadata = accountInputMetadata(a, 'testnet3', utxo, bytes, { txid: tx.getId(), index: 0 });
+    const expectedScript = hx(utxo.script); const expectedPrevious = hx(bytes);
+    utxo.value = 200n; utxo.script.fill(0); bytes.fill(0);
+    expect(metadata.witnessUtxo?.value).toBe(100n);
+    expect(hx(metadata.witnessUtxo!.script)).toBe(expectedScript);
+    expect(hx(metadata.nonWitnessUtxo!)).toBe(expectedPrevious);
   });
   it('rejects mismatches, output keys, malformed keys, scripts, derivations and networks', () => {
     const a = account('p2tr'); const output = bitcoin.address.toOutputScript(a.address, n).slice(2);

@@ -50,20 +50,22 @@ function checked(account: BtcAccount, net: BtcNet) {
 }
 export function validateAccount(account: BtcAccount, net: BtcNet): BtcAccount {
   const c = checked(account, net);
-  return { ...account, ...(c.internal ? { internalKeyXOnly: Buffer.from(c.internal).toString('hex') } : {}), ...(c.redeem ? { redeemScript: Buffer.from(c.redeem).toString('hex') } : {}) };
+  return { ...account, ...(account.bip32 ? { bip32: { ...account.bip32 } } : {}), ...(c.internal ? { internalKeyXOnly: Buffer.from(c.internal).toString('hex') } : {}), ...(c.redeem ? { redeemScript: Buffer.from(c.redeem).toString('hex') } : {}) };
 }
-export function accountInputMetadata(account: BtcAccount, net: BtcNet, witnessUtxo: { script: Uint8Array; value: bigint }, nonWitnessUtxo?: Uint8Array) {
+export function accountInputMetadata(account: BtcAccount, net: BtcNet, witnessUtxo: { script: Uint8Array; value: bigint }, nonWitnessUtxo?: Uint8Array, outpoint?: { txid: string; index: number }) {
   const c = checked(account, net);
   if (!equal(c.output, witnessUtxo.script) || witnessUtxo.value < 0n) throw new Error('Prevout mismatch');
   if (account.addressType === 'p2pkh' && !nonWitnessUtxo) throw new Error('Legacy input requires nonWitnessUtxo');
   if (nonWitnessUtxo) {
     const tx = bitcoin.Transaction.fromBuffer(nonWitnessUtxo);
-    if (!tx.outs.some(o => o.value === witnessUtxo.value && equal(o.script, witnessUtxo.script))) throw new Error('Previous transaction mismatch');
+    if (!outpoint || !/^[0-9a-f]{64}$/.test(outpoint.txid) || !Number.isSafeInteger(outpoint.index) || outpoint.index < 0 || tx.getId() !== outpoint.txid) throw new Error('Previous transaction outpoint mismatch');
+    const previous = tx.outs[outpoint.index];
+    if (!previous || previous.value !== witnessUtxo.value || !equal(previous.script, witnessUtxo.script)) throw new Error('Previous transaction output mismatch');
   }
   const derivation = account.bip32 && { masterFingerprint: hex(account.bip32.fingerprint, 4), path: account.bip32.path, pubkey: c.internal ?? c.key };
   return {
-    ...(account.addressType !== 'p2pkh' ? { witnessUtxo } : {}),
-    ...(nonWitnessUtxo ? { nonWitnessUtxo } : {}),
+    ...(account.addressType !== 'p2pkh' ? { witnessUtxo: { value: witnessUtxo.value, script: Uint8Array.from(witnessUtxo.script) } } : {}),
+    ...(nonWitnessUtxo ? { nonWitnessUtxo: Uint8Array.from(nonWitnessUtxo) } : {}),
     ...(c.internal ? { tapInternalKey: c.internal } : {}),
     ...(c.redeem ? { redeemScript: c.redeem } : {}),
     ...(derivation ? (c.internal ? { tapBip32Derivation: [{ ...derivation, leafHashes: [] as Uint8Array[] }] } : { bip32Derivation: [derivation] }) : {})
