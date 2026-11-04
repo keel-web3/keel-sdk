@@ -21,17 +21,17 @@ function record(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new WalletProviderError("Malformed wallet response", "malformed", value);
   return value as Record<string, unknown>;
 }
-function providerError(value: unknown): WalletProviderError {
+export function normalizeWalletError(value: unknown): WalletProviderError {
   if (value instanceof WalletProviderError) return value;
   const obj = value && typeof value === "object" ? value as Record<string, unknown> : {};
   const code = typeof obj.code === "number" || typeof obj.code === "string" ? obj.code : undefined;
-  const rejected = code === -32000 || code === "-32000" || code === "USER_REJECTION";
+  const rejected = code === -32000 || code === "-32000" || code === 4001 || code === -4001 || code === "4001" || code === "-4001" || code === "USER_REJECTION";
   const unsupported = code === -32601 || code === "-32601" || code === "UNSUPPORTED";
   return new WalletProviderError(typeof obj.message === "string" ? obj.message : "Wallet request failed", rejected ? "rejected" : unsupported ? "unsupported" : "provider", value, code);
 }
 export function unwrapWalletResponse(value: unknown): unknown {
   const response = record(value);
-  if (response.status === "error" || response.error !== undefined) throw providerError(response.error);
+  if (response.status === "error" || response.error !== undefined) throw normalizeWalletError(response.error ?? response);
   if (response.status !== undefined && response.status !== "success") throw new WalletProviderError("Malformed wallet response", "malformed", value);
   if (!("result" in response)) throw new WalletProviderError("Malformed wallet response", "malformed", value);
   return response.result;
@@ -50,7 +50,7 @@ export async function connectLeather(provider: LeatherProvider, net: BtcNet): Pr
   const network = networks[net];
   if (!network || !provider || typeof provider.request !== "function") throw new WalletProviderError("Unsupported Leather network or provider", "unsupported");
   let response: unknown;
-  try { response = await provider.request("getAddresses", { network }); } catch (e) { throw providerError(e); }
+  try { response = await provider.request("getAddresses", { network }); } catch (e) { throw normalizeWalletError(e); }
   const result = record(unwrapWalletResponse(response));
   if (!Array.isArray(result.addresses)) return malformed(result);
   const entries = result.addresses.map(record);
@@ -75,8 +75,8 @@ export async function connectMagicEden<P>(transport: MagicEdenTransport<P>, net:
   if (net !== "mainnet" || !transport || !transport.provider || typeof transport.getAddress !== "function") throw new WalletProviderError("Unsupported Magic Eden network or provider", "unsupported");
   const response = await new Promise<unknown>((resolve, reject) => {
     try {
-      Promise.resolve(transport.getAddress({ payload: { purposes: ["ordinals", "payment"], message: "Address for receiving Ordinals and payments", network: { type: "Mainnet" } }, getProvider: async () => transport.provider, onFinish: resolve, onCancel: () => reject(new WalletProviderError("Wallet request cancelled", "rejected")) })).catch(e => reject(providerError(e)));
-    } catch (e) { reject(providerError(e)); }
+      Promise.resolve(transport.getAddress({ payload: { purposes: ["ordinals", "payment"], message: "Address for receiving Ordinals and payments", network: { type: "Mainnet" } }, getProvider: async () => transport.provider, onFinish: resolve, onCancel: () => reject(new WalletProviderError("Wallet request cancelled", "rejected")) })).catch(e => reject(normalizeWalletError(e)));
+    } catch (e) { reject(normalizeWalletError(e)); }
   });
   const result = record(response);
   if (!Array.isArray(result.addresses) || result.addresses.length !== 2) return malformed(result);

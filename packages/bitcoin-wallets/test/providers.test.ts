@@ -13,7 +13,7 @@ const request = (addresses: unknown[]) => vi.fn(async () => ({ result: { address
 function transport(fn: MagicEdenTransport<object>['getAddress']): MagicEdenTransport<object> { return { provider: {}, getAddress: fn }; }
 describe('wallet providers', () => {
   it('preserves RPC rejection, provider and unsupported codes and causes', () => {
-    for (const [code, kind] of [[-32000, 'rejected'], ['USER_REJECTION', 'rejected'], [-32601, 'unsupported'], ['OTHER', 'provider']] as const) {
+    for (const [code, kind] of [[-32000, 'rejected'], [4001, 'rejected'], [-4001, 'rejected'], ['USER_REJECTION', 'rejected'], [-32601, 'unsupported'], ['OTHER', 'provider']] as const) {
       const cause = { code, message: 'failure' };
       try { unwrapWalletResponse({ status: 'error', error: cause }); throw Error('expected error'); } catch (e) { expect(e).toBeInstanceOf(WalletProviderError); expect(e).toMatchObject({ code, kind, cause }); }
     }
