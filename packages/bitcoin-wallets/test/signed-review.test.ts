@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { crypto, payments, Psbt } from "bitcoinjs-lib";
+import { crypto, payments, Psbt, Transaction } from "bitcoinjs-lib";
 import { ECPair, REGTEST_NETWORK, createTaprootAuctionVault, createCooperativeVaultPsbt, signVaultPsbt } from "./taproot-auction-vault.js";
 import { assertVaultTaprootSpendProof } from "../src/psbt-review.js";
 import { validateSignedPsbt } from "../src/signed-review.js";
@@ -98,4 +98,17 @@ it("rejects a signature on an unrequested input", () => {
   const request: SignRequest = { psbtBase64: tx.toBase64(), inputs: [{ index: 0, account: "payment", sighash: 1, path: "key" }] };
   tx.signInput(0, key); tx.signInput(1, key);
   expect(() => validateSignedPsbt(session, request, tx.toBase64())).toThrow();
+});
+
+it("rejects an existing legacy signature even when a separate requested segwit input is valid", () => {
+  const legacy = payments.p2pkh({ pubkey: key.publicKey, network: REGTEST_NETWORK });
+  const parent = new Transaction(); parent.addInput(Buffer.alloc(32), 0); parent.addOutput(legacy.output!, 10000n);
+  const tx = new Psbt({ network: REGTEST_NETWORK });
+  tx.addInput({ hash: parent.getId(), index: 0, nonWitnessUtxo: parent.toBuffer(), sighashType: 1 });
+  tx.addInput({ hash: "99".repeat(32), index: 0, witnessUtxo: { script: p2w.output!, value: 10000n }, sighashType: 1 });
+  tx.addOutput({ address: p2w.address!, value: 19000n });
+  tx.signInput(0, key);
+  const request: SignRequest = { psbtBase64: tx.toBase64(), inputs: [{ index: 1, account: "payment", sighash: 1, path: "key" }] };
+  tx.signInput(1, key);
+  expect(() => validateSignedPsbt(session, request, tx.toBase64())).toThrow(/legacy/);
 });

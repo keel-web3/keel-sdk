@@ -108,7 +108,17 @@ export function validateSignedPsbt(session: BtcSession, request: SignRequest, si
         }
       }
     }
-    if (b.partialSig.length && !returned.validateSignaturesOfInput(i, (pubkey, hash, sig) => ecc.verify(hash, pubkey, sig))) throw new Error("Invalid signature");
+    if (b.partialSig.length) {
+      const prevout = after.witnessUtxo;
+      if (!prevout) throw new Error("Unsupported existing legacy signature");
+      for (const signature of b.partialSig) {
+        const witness = payments.p2wpkh({ pubkey: signature.pubkey, network });
+        const native = equal(prevout.script, witness.output);
+        const wrapped = equal(after.redeemScript, witness.output) && equal(prevout.script, payments.p2sh({ redeem: witness, network }).output);
+        if ((!native && !wrapped) || script.signature.decode(signature.signature).hashType !== after.sighashType) throw new Error("Unsupported existing signature template or sighash");
+      }
+      if (!returned.validateSignaturesOfInput(i, (pubkey, hash, sig) => ecc.verify(hash, pubkey, sig))) throw new Error("Invalid signature");
+    }
   }
   return returned.toBase64();
 }
