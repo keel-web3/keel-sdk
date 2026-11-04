@@ -1,3 +1,4 @@
+import { Buffer } from "buffer";
 import * as bitcoin from 'bitcoinjs-lib';
 import { accountInputMetadata, validateAccount } from './keys.js';
 import { assertVaultTaprootSpendProof, vaultTaprootRequiredPublicKeys } from './psbt-review.js';
