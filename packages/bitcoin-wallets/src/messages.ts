@@ -1,5 +1,7 @@
+import { Buffer } from "buffer";
 import { Verifier } from "bip322-js";
 import { assertAddressNetwork, assertWalletNetwork } from "./network.js";
+import { normalizeWalletError, unwrapWalletResponse } from "./providers.js";
 import type { BtcNet } from "./types.js";
 
 export function verifyBip322Message(address: string, message: string, signature: string): boolean {
@@ -23,13 +25,17 @@ export async function signBip322Message(input: { transport: Transport; network: 
   const t = input.transport;
   let signature: unknown;
   if (t.wallet === "xverse") {
-    const response = await t.request("signMessage", { address: input.address, message: input.message, protocol: "BIP322" });
-    if (typeof response !== "object" || response === null || !("status" in response) || response.status !== "success" || !("result" in response) || typeof response.result !== "object" || response.result === null) throw new Error("Invalid Xverse response");
-    const result = response.result as { address?: unknown; signature?: unknown };
+    let response: unknown;
+    try { response = await t.request("signMessage", { address: input.address, message: input.message, protocol: "BIP322" }); }
+    catch (error) { throw normalizeWalletError(error); }
+    const unwrapped = unwrapWalletResponse(response);
+    if (typeof response !== "object" || response === null || !("status" in response) || response.status !== "success" || typeof unwrapped !== "object" || unwrapped === null) throw new Error("Invalid Xverse response");
+    const result = unwrapped as { address?: unknown; signature?: unknown };
     if (result.address !== undefined && result.address !== input.address) throw new Error("Wrong signing address");
     signature = result.signature;
   } else if (t.wallet === "unisat" || t.wallet === "okx") {
-    signature = await t.signMessage(input.message, "bip322-simple");
+    try { signature = await t.signMessage(input.message, "bip322-simple"); }
+    catch (error) { throw normalizeWalletError(error); }
   } else { throw new Error("Unsupported wallet message protocol"); }
   if (typeof signature !== "string" || !verifyBip322Message(input.address, input.message, signature)) throw new Error("Invalid BIP-322 signature");
   return signature;

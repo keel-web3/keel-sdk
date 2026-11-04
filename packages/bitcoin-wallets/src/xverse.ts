@@ -1,4 +1,5 @@
 import type { BtcNet } from "./types.js";
+import { normalizeWalletError, unwrapWalletResponse } from "./providers.js";
 
 export interface XverseTransport {
   request(method: string, params: unknown): Promise<unknown>;
@@ -22,8 +23,13 @@ function object(value: unknown): Record<string, unknown> {
 }
 function result(value: unknown): Record<string, unknown> {
   const response = object(value);
+  const unwrapped = unwrapWalletResponse(response);
   if (response.status !== "success") throw new Error("Xverse request failed or unsupported");
-  return object(response.result);
+  return object(unwrapped);
+}
+async function request(transport: XverseTransport, method: string, params: unknown): Promise<unknown> {
+  try { return await transport.request(method, params); }
+  catch (error) { throw normalizeWalletError(error); }
 }
 function networkName(net: BtcNet): string {
   switch (net) {
@@ -37,10 +43,10 @@ async function readConnection(transport: XverseTransport, net: BtcNet, method: "
   const expected = networkName(net);
   if (!transport || typeof transport.request !== "function") throw new Error("Xverse request transport required");
   const addresses = ["ordinals", "payment"];
-  const account = result(await transport.request(method, method === "wallet_connect"
+  const account = result(await request(transport, method, method === "wallet_connect"
     ? { addresses, network: expected, message: "Connect your Ordinals and payment addresses to KEEL." }
     : { addresses }));
-  const networks = result(await transport.request("wallet_getNetwork", null));
+  const networks = result(await request(transport, "wallet_getNetwork", null));
   if (object(networks.bitcoin).name !== expected) throw new Error("Xverse network mismatch or unknown");
   if (account.network !== undefined && object(object(account.network).bitcoin).name !== expected) throw new Error("Xverse network mismatch or unknown");
   if (account.walletType !== "software" && account.walletType !== "ledger") throw new Error("Unknown Xverse wallet type");

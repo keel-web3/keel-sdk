@@ -1,2 +1,15 @@
 export * from "./types.js";
 export * from "./psbt-vault.js";
+export * from "./accounts.js";
+export * from "./keys.js";
+export * from "./network.js";
+export * from "./providers.js";
+export * from "./xverse.js";
+export * from "./session.js";
+export * from "./utxos.js";
+export * from "./signed-review.js";
+export * from "./login.js";
+export * from "./capabilities.js";
+export { verifyBip322Message } from "./messages.js";
+export { createBitcoinWalletAdapter, type BitcoinWalletHost } from "./wallet.js";
+export type { WalletId, SigningProvider, XverseSigningProvider, LeatherSigningProvider, InjectedSigningProvider, MagicEdenSigningProvider } from "./signing.js";
