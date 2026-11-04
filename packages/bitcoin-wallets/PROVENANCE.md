@@ -10,3 +10,5 @@ a14a67947407ca226adab379bbcfd81f2b468921609a23160984baa3c7815773  packages/ordin
 7759287da009c11cc8ac89b92963c192e51edf10bacc45be017ce70141911277  packages/ordinals/test/psbt-vault.test.ts
 c25a0d71ba7e66e7667f258257a92eb3b131293afe0586dfb4f3729082bf9eb3  packages/ordinals/test/vault-test-helpers.ts
 36c8aeec02a7f14cccf8f092796ba3ed035e2862555cd769a7e5a9d0958f9a01  apps/web/src/features/wallet/bitcoin/bitcoin-wallet-adapters.ts
+
+The Taproot auction builder and local-key signer are test fixtures under test/, excluded from shipped dist. The copied single-vault review is retained for regression comparison; the general wallet API uses per-input signed review and the KEEL reader.

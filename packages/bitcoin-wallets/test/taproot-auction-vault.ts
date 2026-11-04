@@ -16,7 +16,7 @@ import {
   assertVaultTaprootInputSignaturesValid,
   assertVaultTaprootSpendProof,
   vaultTaprootRequiredPublicKeys,
-} from "./psbt-review.js";
+} from "../src/psbt-review.js";
 
 initEccLib(ecc);
 

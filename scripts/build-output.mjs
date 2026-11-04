@@ -4,6 +4,7 @@ import path from "node:path";
 // Only compiler/package outputs owned by build.mjs. Never remove contracts,
 // verification evidence, user assets, or dependency directories here.
 export const buildPackages = [
+  "bitcoin-wallets",
   "protocol", "viewer", "sdk", "builder", "ethereum-adapter", "mcp",
   "sprite-codex", "studio-core", "sandbox-sdk", "mint-queue",
 ];

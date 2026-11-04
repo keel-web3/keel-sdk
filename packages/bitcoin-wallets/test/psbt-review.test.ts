@@ -12,7 +12,7 @@ import {
   ECPair,
   REGTEST_NETWORK,
   signVaultPsbt,
-} from "../src/taproot-auction-vault.js";
+} from "./taproot-auction-vault.js";
 import { corruptOwnerTaprootSignature } from "./vault-test-helpers.js";
 
 const INSCRIPTION_ID = `${"ab".repeat(32)}i0`;
