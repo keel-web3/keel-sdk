@@ -28,6 +28,7 @@ describe('wallet providers', () => {
     const call = request(leather);
     await expect(connectLeather({ request: call }, 'testnet4')).rejects.toMatchObject({ kind: 'unsupported' }); expect(call).not.toHaveBeenCalled();
     await expect(connectLeather({ request: request([...leather, { type: 'p2wsh' }]) }, 'mainnet')).rejects.toMatchObject({ kind: 'unsupported' });
+    await expect(connectLeather({ request: request([...leather, { type: 'unknown' }]) }, 'mainnet')).rejects.toMatchObject({ kind: 'malformed' });
     await expect(connectLeather({ request: request([leather[0]]) }, 'mainnet')).rejects.toMatchObject({ kind: 'malformed' });
     await expect(connectLeather({ request: request([leather[0], { ...leather[1], tweakedPublicKey: '00'.repeat(32) }]) }, 'mainnet')).rejects.toMatchObject({ kind: 'malformed' });
   });

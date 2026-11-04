@@ -55,6 +55,7 @@ export async function connectLeather(provider: LeatherProvider, net: BtcNet): Pr
   if (!Array.isArray(result.addresses)) return malformed(result);
   const entries = result.addresses.map(record);
   if (entries.some(e => e.type === "p2wsh" || e.status === "proposed")) throw new WalletProviderError("Leather vault accounts are unsupported", "unsupported");
+  if (entries.some(e => e.type !== "p2tr" && e.type !== "p2wpkh")) return malformed(entries);
   const select = (type: string) => { const found = entries.filter(e => e.type === type); if (found.length !== 1) return malformed(found); return found[0]!; };
   const convert = (item: Record<string, unknown>, purpose: BtcAccount["purpose"], addressType: BtcAccount["addressType"]): BtcAccount => {
     const account: BtcAccount = { purpose, addressType, address: requiredString(item.address), publicKey: requiredString(item.publicKey) };
