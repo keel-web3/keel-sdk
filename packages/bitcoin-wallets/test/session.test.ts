@@ -6,15 +6,42 @@ const account = (purpose: "ordinals" | "payment", address: string) => ({ purpose
 const session = (address = "a") => createSession("xverse", "testnet4", [account("ordinals", address), account("payment", "b")]);
 
 describe("wallet session guard", () => {
-  it("clears auth, UTXOs and PSBT on events and cleans listeners", async () => {
+  it.each([
+    ["xverse", "accountChange"], ["xverse", "networkChange"], ["xverse", "accountDisconnected"],
+    ["unisat", "accountsChanged"], ["unisat", "networkChanged"],
+  ])("clears auth, UTXOs and PSBT on %s %s and cleans listeners", async (walletId, event) => {
     const listeners = new Map<string, () => void>();
     const provider = { on: (e: string, f: () => void) => listeners.set(e, f), removeListener: (e: string) => listeners.delete(e) };
     const state = { auth: true, utxos: true, psbt: true };
-    const guard = new WalletSessionGuard({ getLiveSession: async () => session(), subscribe: [subscribeWalletEvents("xverse", provider)], clear: () => { state.auth = state.utxos = state.psbt = false; } });
+    const guard = new WalletSessionGuard({ getLiveSession: async () => session(), subscribe: [subscribeWalletEvents(walletId, provider)], clear: () => { state.auth = state.utxos = state.psbt = false; } });
     await guard.connect(); state.auth = state.utxos = state.psbt = true;
-    listeners.get("accountChange")!();
+    listeners.get(event)!();
     expect(state).toEqual({ auth: false, utxos: false, psbt: false });
     expect(guard.session).toBeNull(); guard.dispose(); expect(listeners.size).toBe(0);
+  });
+  it("refuses a restored identity that differs from the live wallet", async () => {
+    const guard = new WalletSessionGuard({ getLiveSession: async () => session("other"), clear: () => {} });
+    await expect(guard.connect(sessionIdentity(session()))).rejects.toThrow(/mismatch/);
+    expect(guard.session).toBeNull();
+    guard.dispose();
+  });
+  it("cannot restore a session when connect is invalidated while reading", async () => {
+    let finish!: (value: ReturnType<typeof session>) => void;
+    const guard = new WalletSessionGuard({ getLiveSession: () => new Promise(resolve => { finish = resolve; }), clear: () => {} });
+    const pending = guard.connect();
+    guard.invalidate(); finish(session());
+    await expect(pending).rejects.toThrow(/changed/);
+    expect(guard.session).toBeNull();
+    guard.dispose();
+  });
+  it("cannot reuse an invalidated in-flight reconciliation", async () => {
+    let finish!: (value: ReturnType<typeof session>) => void;
+    let slow = false;
+    const guard = new WalletSessionGuard({ getLiveSession: () => slow ? new Promise(resolve => { finish = resolve; }) : Promise.resolve(session()), clear: () => {} });
+    await guard.connect(); slow = true;
+    const pending = guard.reconcile(); guard.invalidate(); finish(session());
+    await expect(pending).rejects.toThrow(/changed/);
+    expect(guard.session).toBeNull(); guard.dispose();
   });
   it("blocks signing after a silent account switch and accepts a matching live identity", async () => {
     let live = session(); const sign = vi.fn(async () => "signed");
