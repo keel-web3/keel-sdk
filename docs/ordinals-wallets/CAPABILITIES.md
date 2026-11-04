@@ -19,7 +19,7 @@ Supported means mocked provider or package-helper coverage. Every live extension
 | Signet | supported | supported | unsupported | untested | unsupported |
 | Regtest | supported | unsupported | unsupported | unsupported | unsupported |
 
-Custom sighash means modes beyond ALL/DEFAULT. Vault leaves are the supported cooperative/refund templates; generic script paths fail closed. UniSat/OKX connection requires host callbacks that normalize a single Taproot address into explicit shared roles. Their native provider discovery is outside this package. OKX Signet is documented but not accepted as a tested complete connection here. Leather/ME BIP-322 remains unsupported.
+Custom sighash means modes beyond ALL/DEFAULT. Vault leaves are the supported cooperative/refund templates for the ordinals role; generic script paths fail closed. A payment-role vault whose script differs from the payment address is unsupported by the address-bound reader policy and is rejected before provider signing. UniSat/OKX connection requires host callbacks that normalize a single Taproot address into explicit shared roles. Their native provider discovery is outside this package. OKX Signet is documented but not accepted as a tested complete connection here. Leather/ME BIP-322 remains unsupported.
 
 The current live KEEL recursion reader has no output-classification index. A 404, lag, missing field or unknown asset status makes an output unspendable. Mocked reader evidence does not prove live classification readiness.
 

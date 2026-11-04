@@ -44,6 +44,8 @@ Leather and Magic Eden have explicit connection helpers. UniSat and OKX hosts no
 
 Show the exact transaction review before calling `adapter.signPsbt(reviewedRequest)`. The adapter derives payment prevouts from those bytes, requires current asset-free reader evidence, checks per-input signing scope, and verifies every wallet return. It also classifies shared-address inputs that match the payment script. Before local finalization and broadcast, call `adapter.recheckBeforeBroadcast(signedPsbtBase64)` on the exact returned bytes. This rechecks identity, signatures and classification. Direct RPC broadcasts outside this API remain the host's responsibility. Dispose the adapter when its host unmounts.
 
+A requested payment-role vault input whose script differs from the payment address is unsupported: the current reader schema binds outputs to that address, so the adapter rejects the input before invoking the provider. Supported ordinals-role vault signing keeps its explicit role.
+
 The current live recursion reader has no classification index. A 404, unknown, stale or incomplete result is unspendable. Do not describe mocked reader tests as live payment readiness. The API does not provide an asset-transfer policy that bypasses this payment guard.
 
 `Bip322LoginManager` issues a server challenge binding domain, URI, network and both addresses. Sign both roles with `signMessageBip322`; a shared address needs one proof. The manager verifies strict signatures and consumes the nonce once. It is single-process only; scaled hosts need shared atomic challenge storage and issue their own httpOnly session cookie. Never persist signatures in browser storage.
