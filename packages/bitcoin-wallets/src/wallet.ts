@@ -119,6 +119,7 @@ export function createBitcoinWalletAdapter(host: BitcoinWalletHost) {
   function paymentInputs(session: BtcSession, request: SignRequest): PaymentUtxo[] {
     const psbt = Psbt.fromBase64(request.psbtBase64, { network: bitcoinNetwork(session.network) });
     const paymentScript = Buffer.from(address.toOutputScript(session.payment.address, bitcoinNetwork(session.network)));
+    const requestedPayment = new Set(request.inputs.filter(item => item.account === "payment").map(item => item.index));
     return psbt.txInputs.flatMap((input, index) => {
       const data = psbt.data.inputs[index]!;
       const prevout = data.witnessUtxo;
@@ -129,7 +130,10 @@ export function createBitcoinWalletAdapter(host: BitcoinWalletHost) {
         const output = previous.outs[input.index];
         if (previous.getId() !== txid || !output || output.value !== prevout.value || !Buffer.from(output.script).equals(Buffer.from(prevout.script))) throw new Error("Previous transaction output mismatch");
       }
-      if (!Buffer.from(prevout.script).equals(paymentScript)) return [];
+      if (!Buffer.from(prevout.script).equals(paymentScript)) {
+        if (requestedPayment.has(index)) throw new Error("Payment input cannot be classified for the wallet address");
+        return [];
+      }
       const value = Number(prevout.value);
       if (!Number.isSafeInteger(value)) throw new Error("Invalid input value");
       return [{ txid, vout: input.index, value, script: Buffer.from(prevout.script).toString("hex"), address: session.payment.address, network: session.network }];

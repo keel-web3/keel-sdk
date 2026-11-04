@@ -150,6 +150,87 @@ function xverseProviderFixture() {
   return { ...f, wallet, rejectConnection() { rejectConnection = true; }, setReportedNetwork(value: string) { reportedNetwork = value; } };
 }
 
+function guardedVaultFixture(id: "unisat" | "okx", evidence: "404" | "inscription" | "rune" | "safe", mixed = false) {
+  const f = fixture(id);
+  const leaf = bitcoin.script.compile([
+    ordinalKey.publicKey.slice(1), bitcoin.opcodes.OP_CHECKSIGVERIFY,
+    paymentKey.publicKey.slice(1), bitcoin.opcodes.OP_CHECKSIG,
+  ]);
+  const vault = bitcoin.payments.p2tr({
+    internalPubkey: Buffer.from("50929b74c1a04954b78b4b6035e97a5e078a5a0f28ec96d547bfee9ace803ac0", "hex"),
+    scriptTree: { output: leaf }, redeem: { output: leaf, redeemVersion: 0xc0 },
+  });
+  const psbt = new bitcoin.Psbt();
+  if (mixed) psbt.addInput({ hash: "44".repeat(32), index: 0, witnessUtxo: { script: tap.output!, value: 10000n }, tapInternalKey: ordinalKey.publicKey.slice(1), sighashType: 1 });
+  const vaultIndex = mixed ? 1 : 0;
+  psbt.addInput({ hash: "33".repeat(32), index: 0, witnessUtxo: { script: vault.output!, value: 10000n },
+    tapLeafScript: [{ script: leaf, leafVersion: 0xc0, controlBlock: vault.witness!.at(-1)! }] });
+  psbt.data.inputs[vaultIndex]!.sighashType = 0;
+  psbt.addOutput({ address: payment.address!, value: mixed ? 19000n : 9000n });
+  psbt.signTaprootInput(vaultIndex, paymentKey);
+  const leafHash = hex(psbt.data.inputs[vaultIndex]!.tapScriptSig![0]!.leafHash);
+  const request: SignRequest = { psbtBase64: psbt.toBase64(), inputs: [
+    ...(mixed ? [{ index: 0, account: "payment" as const, sighash: 1, path: "key" as const }] : []),
+    { index: vaultIndex, account: "payment", sighash: 0, path: { leafHash } },
+  ] };
+  const sign = (tx: bitcoin.Psbt) => {
+    if (mixed) tx.signInput(0, ordinalKey.tweak(bitcoin.crypto.taggedHash("TapTweak", ordinalKey.publicKey.slice(1))), [1]);
+    tx.signTaprootInput(vaultIndex, ordinalKey);
+    return tx;
+  };
+  const external = sign(psbt.clone());
+  const provider = vi.fn(async (psbtHex: string) => sign(bitcoin.Psbt.fromHex(psbtHex)).toHex());
+  const reader = vi.fn(async (output: PaymentUtxo) => {
+    if (evidence === "404") throw new Error("Reader HTTP 404");
+    return { ...output, confirmed: true, spent: false, indexed: true, indexHeight: 100, chainHeight: 100,
+      inscriptions: evidence === "inscription" ? ["fixture-inscription"] : [],
+      runes: evidence === "rune" ? ["fixture-rune"] : [], satRarities: ["common"] };
+  });
+  f.host.reader = { readOutput: reader };
+  f.host.signingProvider = { signPsbt: provider };
+  return { ...f, request, external, vaultIndex, reader, provider };
+}
+
+describe("payment vault classification", () => {
+  it.each([
+    ["unisat", "404"], ["unisat", "inscription"], ["unisat", "rune"],
+    ["okx", "404"], ["okx", "inscription"], ["okx", "rune"],
+  ] as const)(
+    "%s refuses an unclassifiable payment vault with %s evidence before signing", async (id, evidence) => {
+      const f = guardedVaultFixture(id, evidence);
+      const verify = (pubkey: Uint8Array, hash: Uint8Array, signature: Uint8Array) => ecc.verifySchnorr(hash, pubkey, signature);
+      expect(f.external.data.inputs[f.vaultIndex]!.tapScriptSig).toHaveLength(2);
+      expect(f.external.validateSignaturesOfInput(f.vaultIndex, verify)).toBe(true);
+      await f.adapter.connect("mainnet");
+      await expect(f.adapter.signPsbt(f.request)).rejects.toThrow("Payment input cannot be classified for the wallet address");
+      expect(f.provider).not.toHaveBeenCalled(); expect(f.reader).not.toHaveBeenCalled();
+      await expect(f.adapter.recheckBeforeBroadcast(f.external.toBase64())).rejects.toThrow("Unknown signed PSBT");
+      expect(f.provider).not.toHaveBeenCalled(); f.adapter.dispose();
+    },
+  );
+  it.each(["unisat", "okx"] as const)("%s refuses a payment vault even alongside an ordinary payment input", async id => {
+    const f = guardedVaultFixture(id, "safe", true); await f.adapter.connect("mainnet");
+    await expect(f.adapter.signPsbt(f.request)).rejects.toThrow("Payment input cannot be classified for the wallet address");
+    expect(f.provider).not.toHaveBeenCalled(); expect(f.reader).not.toHaveBeenCalled();
+    await expect(f.adapter.recheckBeforeBroadcast(f.external.toBase64())).rejects.toThrow("Unknown signed PSBT");
+    f.adapter.dispose();
+  });
+  it.each(["unisat", "okx"] as const)("%s still signs a reviewed ordinals-role vault leaf", async id => {
+    const f = guardedVaultFixture(id, "404"); await f.adapter.connect("mainnet");
+    const request: SignRequest = { ...f.request, inputs: [{ ...f.request.inputs[0]!, account: "ordinals" }] };
+    const signed = await f.adapter.signPsbt(request);
+    expect(bitcoin.Psbt.fromBase64(signed).data.inputs[0]!.tapScriptSig).toHaveLength(2);
+    await f.adapter.recheckBeforeBroadcast(signed);
+    expect(f.provider).toHaveBeenCalledOnce(); expect(f.reader).not.toHaveBeenCalled(); f.adapter.dispose();
+  });
+  it.each(["unisat", "okx"] as const)("%s still signs and rechecks ordinary classified payment inputs", async id => {
+    const f = fixture(id); await f.adapter.connect("mainnet");
+    const signed = await f.adapter.signPsbt(f.request);
+    await f.adapter.recheckBeforeBroadcast(signed);
+    expect(f.sign).toHaveBeenCalledOnce(); expect(f.readOutput).toHaveBeenCalled(); f.adapter.dispose();
+  });
+});
+
 describe("guarded wallet integration", () => {
   it("connects before the permission-gated network read and completes guarded signing", async () => {
     const f = fixture("xverse"); let permission = false; const calls: string[] = [];
