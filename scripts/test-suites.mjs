@@ -91,6 +91,11 @@ export const TEST_FILES_ON_DISK = Object.freeze(readdirSync(TEST_ROOT)
  * its execution boundary.
  */
 export const DETERMINISTIC_TEST_FILES = Object.freeze([
+  "tests/inline-binary-dependency-policy.test.mjs",
+  "tests/link-gate-duplicate-work.test.mjs",
+  "tests/registered-inline-derived-sources.test.mjs",
+  "tests/registered-inline-javascript-projection.test.mjs",
+  "tests/studio-media-mime-normalization.test.mjs",
   "tests/actual-media-container.test.mjs",
   "tests/actual-media-pair.test.mjs",
   "tests/audio-clock-binding-mcp.test.mjs",
@@ -140,6 +145,9 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/proof-runtime-package.test.mjs",
   "tests/proof-state-reader.test.mjs",
   "tests/proof-state-reader-cache.test.mjs",
+  "tests/proof-state-reader-latency-fallback.test.mjs",
+  "tests/rpc-rate-control-regression.test.mjs",
+  "tests/sdk-provider-admission-compatibility.test.mjs",
   "tests/sdk-owned-simulation-transport.test.mjs",
   "tests/sdk-public-simulation-qualification.test.mjs",
   "tests/field-permissions.test.mjs",

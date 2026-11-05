@@ -2,11 +2,14 @@ import type { EntrypointMode, ResourceRole } from "@keel/protocol";
 import type { NormalizedStudioAsset, StudioAssetInput } from "./types.js";
 
 const MEDIA_BY_EXTENSION: Readonly<Record<string, string>> = {
+  ".aac": "audio/aac",
+  ".apng": "image/png",
   ".avif": "image/avif",
   ".bin": "application/octet-stream",
   ".css": "text/css",
   ".csv": "text/csv",
   ".gif": "image/gif",
+  ".flac": "audio/flac",
   ".glb": "model/gltf-binary",
   ".gltf": "model/gltf+json",
   ".html": "text/html",
@@ -18,12 +21,15 @@ const MEDIA_BY_EXTENSION: Readonly<Record<string, string>> = {
   ".json": "application/json",
   ".mjs": "text/javascript",
   ".mp3": "audio/mpeg",
+  ".m4a": "audio/mp4",
   ".mp4": "video/mp4",
   ".mov": "video/quicktime",
   ".m4v": "video/x-m4v",
   ".mtl": "text/plain",
   ".obj": "model/obj",
   ".ogg": "audio/ogg",
+  ".oga": "audio/ogg",
+  ".opus": "audio/ogg",
   ".ogv": "video/ogg",
   ".otf": "font/otf",
   ".png": "image/png",
@@ -60,7 +66,17 @@ export function sourceUriForFile(fileName: string): string {
 
 export function inferMediaType(fileName: string, declared?: string): string {
   if (declared !== undefined && declared.trim().length > 0 && declared !== "application/octet-stream") {
-    return declared.toLowerCase();
+    // Browser and signature-detector aliases describe the same native bytes.
+    // Keep one canonical spelling for registered viewer and source selection.
+    const mediaType = declared.toLowerCase();
+    switch (mediaType) {
+      case "image/apng": return "image/png";
+      case "application/javascript": return "text/javascript";
+      case "audio/vnd.wave": return "audio/wav";
+      case "audio/x-flac": return "audio/flac";
+      case "audio/x-m4a": return "audio/mp4";
+      default: return mediaType;
+    }
   }
   return MEDIA_BY_EXTENSION[extension(fileName)] ?? "application/octet-stream";
 }

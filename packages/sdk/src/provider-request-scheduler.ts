@@ -70,6 +70,8 @@ function classify(error: unknown): Failure {
     if (status === 429 || code === 429 || code === -32005 || item?.reason === "rate-limited" || diagnostic?.transportFailure === "rate-limited") return { retryable: true, retryAfterMs: delay, transportFailure: "rate-limited", ...(status === 429 ? { httpStatus: 429 } : {}), ...(code === 429 || code === -32005 ? { rpcCode: code } : {}) };
     if ([502, 503, 504].includes(Number(status))) return { retryable: true, retryAfterMs: delay, httpStatus: Number(status), transportFailure: "http-error" };
     if (["timeout", "connection-reset"].includes(String(diagnostic?.transportFailure))) return { retryable: true, retryAfterMs: delay, transportFailure: String(diagnostic?.transportFailure) };
+    if (item?.name === "TimeoutError" || ["ETIMEDOUT", "UND_ERR_CONNECT_TIMEOUT", "UND_ERR_HEADERS_TIMEOUT", "UND_ERR_BODY_TIMEOUT"].includes(String(code))) return { retryable: true, retryAfterMs: delay, transportFailure: "timeout" };
+    if (["ECONNRESET", "UND_ERR_SOCKET"].includes(String(code))) return { retryable: true, retryAfterMs: delay, transportFailure: "connection-reset" };
     value = item?.cause;
   }
   return { retryable: false, retryAfterMs: 0 };
@@ -206,8 +208,9 @@ export function createKeelProviderRequestScheduler(options: KeelProviderRequestS
   };
   return {
     providerId,
-    status() { return Object.freeze({ providerId, chainId: options.chainId, activeRequests: active, queuedRequests: queue.length,
-      retryAfterMs: Math.max(0, cooldownUntil - Date.now()), cachedMethods: capabilities.size }); },
+    status() { const restriction = cached("*"); return Object.freeze({ providerId, chainId: options.chainId, activeRequests: active, queuedRequests: queue.length,
+      retryAfterMs: Math.max(0, cooldownUntil - Date.now()), cachedMethods: capabilities.size,
+      ...(restriction?.status === "access-denied" ? { accessDeniedStatus: restriction.failure?.httpStatus as 401 | 403 } : {}) }); },
     /** Invalidate availability after an explicit provider/chain configuration change.
      * Existing requests retain their own cancellation; no proof is ever cached. */
     invalidateCapabilities() { capabilities.clear(); },

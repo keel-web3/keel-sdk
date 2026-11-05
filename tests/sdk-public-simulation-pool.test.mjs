@@ -1180,7 +1180,7 @@ test('configured root URLs keep distinct credential identities without exposing 
 // Captured operator categories, synthetic data only. Library evidence
 // libfile_bf7ede842b2081919bc7c130c019a4d6 (2026-10-10 10:29–10:34 UTC).
 test('rate/access diagnostics survive approved whole-program failover without shopping deterministic rejections',async()=>{
-  for(const fault of [{http:429,httpCode:-32005},{http:403},{error:-32005},{error:403}]) {
+  for(const fault of [{http:429,httpCode:-32005},{http:429,httpCode:-32029},{http:403},{error:-32005},{error:403}]) {
     const f=fixture([fault,{}]), attempts=[];
     const transport=createKeelPublicSepoliaSimulationPool({...f.options,onAttempt:d=>attempts.push(d)});
     try {
@@ -1510,4 +1510,22 @@ test('a publication over 256 calls reaches the pool as shared blocks, and the pu
       .map(r=>r.body.params[0].blockStateCalls.map(b=>b.calls.length));
     assert.ok(projects.every(blocks=>probes.some(layout=>JSON.stringify(layout)===JSON.stringify(blocks.map(b=>b.calls.length)))));
   } finally {await f.transport.close();}
+});
+
+test('public simulation host admission wraps every qualified physical request without changing recipients', async () => {
+  const f = fixture([{}]), admitted = [], dispatched = [];
+  const transport = createKeelPublicSepoliaSimulationPool({ ...f.options,
+    providerAdmission: async (provider, methods, operation, signal) => {
+      assert.equal(provider, urls[0]); assert.equal(methods.length, 1); assert.ok(signal instanceof AbortSignal);
+      admitted.push(methods[0]);
+      return operation({ beforeDispatch: async () => { dispatched.push(['before', methods[0]]); }, afterDispatch: () => { dispatched.push(['after', methods[0]]); } });
+    },
+  });
+  try {
+    assert.equal((await transport.request(program())).length, 5);
+    assert.deepEqual(admitted, f.requests.map(request => request.body.method));
+    assert.ok(admitted.includes('eth_chainId')); assert.ok(admitted.includes('eth_simulateV1'));
+    assert.deepEqual(dispatched, admitted.flatMap(method => [['before', method], ['after', method]]));
+    assert.ok(f.requests.every(request => request.index === 0));
+  } finally { await transport.close(); await f.transport.close(); }
 });

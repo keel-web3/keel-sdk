@@ -755,7 +755,10 @@ function inspect(state: ScanState, layer: Layer): void {
   };
   const child = (bytes: Uint8Array | undefined, codec: string, at: number, map?: Uint32Array) => {
     if (bytes === undefined || bytes.byteLength === 0) return;
-    if (layer.depth >= MAX_DEPTH) { state.uninspected.add(`${codec}: exceeds the ${MAX_DEPTH}-layer nesting bound`); return; }
+    // An alternate path to an inspected digest needs no further nesting.
+    // Decoding already happened, so charge its bytes even for duplicate views.
+    const visited = state.visited.has(`${layer.resource}\u0000${digestOf(state, bytes)}`);
+    if (!visited && layer.depth >= MAX_DEPTH) { state.uninspected.add(`${codec}: exceeds the ${MAX_DEPTH}-layer nesting bound`); return; }
     if (state.expandedBytes + bytes.byteLength > MAX_EXPANDED_BYTES) { state.uninspected.add(`${codec}: exceeds the ${MAX_EXPANDED_BYTES}-byte scan bound`); return; }
     state.expandedBytes += bytes.byteLength;
     const toParent = map === undefined ? () => at : (offset: number) => map[offset] ?? Number.NaN;

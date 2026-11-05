@@ -1268,6 +1268,8 @@ async function assertCanonicalAssetDisplayModule(module: KeelInlineModuleFragmen
  */
 export async function buildKeelInlineLocalDocument(input: {
   readonly shell: KeelInlineShellFragments;
+  /** Authenticated selected-chain binding consumed by native audio preparation. */
+  readonly registeredNativeGzipBinding?: KeelRegisteredNativeGzipBinding;
   readonly payloadStorage?: KeelPayloadStorageMode;
   readonly modules: readonly KeelInlineModuleFragment[];
   /**

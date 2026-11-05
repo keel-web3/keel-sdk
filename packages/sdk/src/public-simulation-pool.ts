@@ -28,6 +28,7 @@ export interface KeelPublicSimulationPoolOptions {
   readonly readTransport: KeelPreflightTransport;
   readonly block: { readonly number: bigint; readonly hash: string };
   readonly fetchImpl?: typeof fetch;
+  readonly providerAdmission?: KeelRpcPoolOptions["providerAdmission"];
   readonly minIntervalMs?: number;
   /** Entire qualification + project request deadline; callers may only lower the 120s bound. */
   readonly requestTimeoutMs?: number;
@@ -71,6 +72,12 @@ export function createKeelConfiguredReadAccessDenialHandler(options: ConfiguredR
 export function createKeelConfiguredReadRateLimitHandler(options: ConfiguredReadRecipient) {
   const scheduler = configuredReadScheduler(options);
   return (retryAfterMs: number) => scheduler.observeRateLimit(retryAfterMs);
+}
+/** Numeric availability of this exact existing recipient. No URL, request,
+ * response, owner evidence or proof is returned. Whole-read coordinators may
+ * skip a cooldown, but a retained access restriction stays terminal. */
+export function keelConfiguredReadProviderStatus(options: ConfiguredReadRecipient) {
+  return configuredReadScheduler(options).status();
 }
 
 /** Admit the caller's existing configured reader without discovering an endpoint,
@@ -214,7 +221,7 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
   // Each owner keeps a separate parser/identity cache and private observer. Only
   // admission/cooldown/capability availability is shared, never owner evidence.
   const pool = createKeelRpcPool({ rpcUrls: urls, chainId, timeoutMs: 30_000, simulationTimeoutMs: 90_000, maxResponseBytes: 64 * 1024 * 1024,
-    ...(options.fetchImpl ? { fetchImpl: options.fetchImpl } : {}), ...(options.minIntervalMs === undefined ? {} : { minIntervalMs: options.minIntervalMs }),
+    ...(options.fetchImpl ? { fetchImpl: options.fetchImpl } : {}), ...(options.providerAdmission ? { providerAdmission: options.providerAdmission } : {}), ...(options.minIntervalMs === undefined ? {} : { minIntervalMs: options.minIntervalMs }),
     ...(options.observe ? { onPrivateResponse(event) {
       const active = activeObservations.get(event.providerIndex);
       if (active) notify({ ...active, type: event.error !== undefined || object(event.response)?.error !== undefined || (event.httpStatus ?? 200) >= 400 ? "rpc-error" : "rpc-response",
@@ -520,7 +527,7 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
         // -38026 is Geth's client limit, also used for non-gas limits. Only
         // separately authenticated request-capacity evidence permits fallback.
         const clientCapacityRejection = code === -38026 && requestCapacityEvidence;
-        const rateRejection = failure.diagnostic?.transportFailure === "rate-limited" && (code === undefined || code === 429 || code === -32005);
+        const rateRejection = failure.diagnostic?.transportFailure === "rate-limited" && (code === undefined || code === 429 || code === -32005 || code === -32029 && failure.diagnostic?.httpStatus === 429);
         const accessRejection = failure.diagnostic?.failureReason === "access-denied" && (code === undefined || code === 401 || code === 403);
         const retryableRpcRejection = code === undefined || code === -32601 || rateRejection || accessRejection
           || failure.kind === "provider-limit" && (failure.diagnostic?.providerGasCap !== undefined || failure.diagnostic?.httpStatus === 413 || failure.diagnostic?.gasCapacityScope === "request-bytes"

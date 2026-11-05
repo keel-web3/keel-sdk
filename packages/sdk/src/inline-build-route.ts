@@ -5,6 +5,19 @@ export { selectKeelRegisteredInlineCandidate, keelRegisteredInlineRecipeDigest }
 export type { KeelRegisteredInlineCodec, KeelRegisteredInlineSource, KeelRegisteredInlinePart, KeelRegisteredInlineRecipe,
   KeelRegisteredInlineMeasurementScope, KeelRegisteredInlineBuiltCandidate, KeelRegisteredInlineCandidate } from "./registered-inline-candidates.js";
 
+/** Narrow compatibility policy for admitted non-model HTML/JavaScript dependencies.
+ * MIME/context are planning inputs, not proof: native Gzip still requires the
+ * authenticated selected reader and all existing source/proof validation. */
+export function keelInlineDependencyRequiresNativeGzip(input: {
+  readonly entrypointMediaType?: string;
+  readonly role?: "entrypoint" | "asset" | "data";
+  readonly mediaType?: string;
+}): boolean {
+  return ["text/html", "text/javascript", "application/javascript"].includes(input.entrypointMediaType ?? "")
+    && (input.role === "asset" || input.role === "data")
+    && ["font/ttf", "font/otf", "font/woff", "font/woff2", "application/wasm", "application/octet-stream"].includes(input.mediaType ?? "");
+}
+
 /** Build policy is resolved before any upload. Capabilities must come from the
  * authenticated selected publication path, never the decoder installed locally. */
 export function resolveKeelInlineBuildRoute(input: {
@@ -14,7 +27,9 @@ export function resolveKeelInlineBuildRoute(input: {
   /** Planning input from the selected reader's authenticated fresh carriage.
    * This is not registration evidence. Omit to retain the unqualified planner. */
   readonly freshReaderCompressions?: readonly ("none" | "gzip" | "brotli")[];
-  readonly resources: readonly { readonly id: string; readonly bytes: Uint8Array }[];
+  readonly entrypointMediaType?: string;
+  readonly resources: readonly { readonly id: string; readonly bytes: Uint8Array;
+    readonly mediaType?: string; readonly role?: "entrypoint" | "asset" | "data" }[];
 }) {
   const storage = resolveKeelPayloadStorage(input.payloadStorage);
   if (storage === "raw" && input.compression !== undefined && input.compression !== "none") {
@@ -32,20 +47,27 @@ export function resolveKeelInlineBuildRoute(input: {
   }
   const effectiveCompression = compression === "auto" && freshReaderCompressions !== undefined && !freshReaderCompressions.includes("brotli") ? "none" : compression;
   const resources = input.resources.map(resource => {
-    if (effectiveCompression === "gzip") {
+    const resourceCompression = effectiveCompression === "none" && compression === "auto"
+      && freshReaderCompressions?.includes("gzip")
+      && keelInlineDependencyRequiresNativeGzip({
+        ...(input.entrypointMediaType === undefined ? {} : { entrypointMediaType: input.entrypointMediaType }),
+        ...(resource.role === undefined ? {} : { role: resource.role }),
+        ...(resource.mediaType === undefined ? {} : { mediaType: resource.mediaType }),
+      }) ? "gzip" : effectiveCompression;
+    if (resourceCompression === "gzip") {
       const packed = gzipSync(resource.bytes, { level: 9 });
       return { id: resource.id, compression: "gzip" as const, sourceBytes: resource.bytes.length,
         compressedBytes: packed.length, preparedBytes: null, uncompressedPreparedBytes: null, preparedBytesSaved: null,
         sourceByteIdentity: "verified-exact" as const, selection: compression };
     }
-    const payload = prepareKeelDensePayload(resource.bytes, { compression: effectiveCompression,
+    const payload = prepareKeelDensePayload(resource.bytes, { compression: resourceCompression,
       ...(input.brotliQuality === undefined ? {} : { brotliQuality: input.brotliQuality }) });
     return { id: resource.id, compression: payload.compression, ...payload.optimization, selection: compression };
   });
   const prepared = resources.some(resource => resource.compression === "brotli");
   return { route: prepared ? "creator-prepared-copy" as const : "legacy-uncompressed" as const,
     compression, resources, ...(freshReaderCompressions === undefined ? {} : { freshReaderCompressions,
-      readerSelection: effectiveCompression === "none" && compression === "auto" ? "auto-reader-compatible-none" as const : "reader-compatible" as const }),
+      readerSelection: effectiveCompression === "none" && compression === "auto" && !resources.some(resource => resource.compression === "gzip") ? "auto-reader-compatible-none" as const : "reader-compatible" as const }),
     sourceBytes: resources.reduce((n, r) => n + r.sourceBytes, 0),
     compressedBytes: resources.reduce((n, r) => n + r.compressedBytes, 0),
     storagePlacement: "onchain" as const,

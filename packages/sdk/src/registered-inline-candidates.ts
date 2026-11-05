@@ -1,3 +1,5 @@
+import { orderKeelModules } from "./data-layer.js";
+import { KEEL_THREE_R180 } from "./three-module.js";
 import type { KeelRegisteredNativeGzipProof } from "./registered-native-gzip.js";
 import { createHash } from "node:crypto";
 import { brotliDecompressSync, gunzipSync } from "node:zlib";
@@ -20,6 +22,13 @@ export type KeelRegisteredInlinePart = {
 /** The selected-chain adapter supplies this only after authenticating the real
  * registry, runtime and read-back. This local selector does not establish that
  * authentication or manufacture object identities/receipts. */
+export interface KeelRegisteredJavaScriptProjection {
+  readonly schema: "keel-javascript-entry-projection@1";
+  readonly source: { readonly id: string; readonly mediaType: "text/javascript" } & Commitment;
+  readonly output: { readonly mediaType: "text/html" } & Commitment;
+  readonly modules: readonly ({ readonly id: string; readonly objectId: Hash; readonly mediaType: "text/javascript";
+    readonly execution: "classic" | "module"; readonly phase: "runtime" | "data" | "render"; readonly weight: number } & Commitment)[];
+}
 export interface KeelRegisteredInlineRecipe {
   readonly profile: string;
   readonly chainId: number;
@@ -31,12 +40,15 @@ export interface KeelRegisteredInlineRecipe {
   readonly revision: number;
   readonly codec: KeelRegisteredInlineCodec;
   readonly sourceReader: "canonical-items";
+  readonly javascriptProjection?: KeelRegisteredJavaScriptProjection;
   readonly registeredParts: readonly ({ readonly objectId: Hash; readonly role: KeelRegisteredInlinePart["role"] } & Commitment)[];
   /** Distinct from reader registration. The normal selected-chain adapter
    * authenticates these source-object receipts/read-backs before supplying
    * them. This selector only verifies bytes and binds that evidence identity. */
   readonly reusedSourceObjects?: readonly ({ readonly objectId: Hash; readonly role: "payload" | "image" | "table" | "program";
     readonly sourceIds: readonly string[]; readonly transactionHash: Hash; readonly blockHash: Hash; readonly evidenceDigest: Hash } & Commitment)[];
+  /** Deterministic presentation commitments from the trusted source adapter, fixed before rendering. */
+  readonly derivedSources?: readonly ({ readonly id: string; readonly mediaType: string } & Commitment)[];
   readonly sharedSources?: readonly ({ readonly id: string; readonly mediaType: string } & Commitment)[];
 }
 export type KeelRegisteredInlineMeasurementScope =
@@ -91,6 +103,36 @@ function jsonSnapshot<T>(value: T): T {
   if (enc.encode(text).length > 256 * 1024) throw new RangeError("Candidate metadata/recipe exceeds its local preparation bound.");
   return JSON.parse(text) as T;
 }
+/** Independently replay only the existing deterministic standalone JS projection.
+ * Original bytes are never inferred from the renderer or recovered from its HTML. */
+export function replayKeelJavaScriptProjection(source: KeelRegisteredInlineSource, projection: KeelRegisteredJavaScriptProjection): Uint8Array {
+  const p = jsonSnapshot(projection);
+  const exactKeys = (value: unknown, keys: readonly string[]) => { record(value); if (canonicalJson(Object.keys(value).sort()) !== canonicalJson([...keys].sort())) throw new TypeError("Unknown JavaScript projection field."); };
+  exactKeys(p,["schema","source","output","modules"]); exactKeys(p.source,["id","mediaType","digest","byteLength"]); exactKeys(p.output,["mediaType","digest","byteLength"]);
+  if (p.schema !== "keel-javascript-entry-projection@1" || p.source.id !== source.id || p.source.mediaType !== "text/javascript" || source.mediaType !== "text/javascript"
+    || p.source.digest !== sha(source.bytes) || p.source.byteLength !== source.bytes.length || p.output.mediaType !== "text/html") throw new TypeError("JavaScript projection changed its original source or MIME.");
+  hash(p.source.digest); hash(p.output.digest); integer(p.output.byteLength,32*1024*1024,"projected source size");
+  if (p.modules.length > 128) throw new TypeError("Too many JavaScript projection modules.");
+  const ids = new Set<string>();
+  for (const m of p.modules) {
+    exactKeys(m,["id","objectId","mediaType","digest","byteLength","execution","phase","weight"]);
+    hash(m.objectId); hash(m.digest); integer(m.byteLength,32*1024*1024,"projected module size");
+    if (!/^[A-Za-z0-9][A-Za-z0-9._:-]*$/u.test(m.id) || ids.has(m.id) || m.mediaType !== "text/javascript" || !["classic","module"].includes(m.execution)
+      || !["runtime","data","render"].includes(m.phase) || !Number.isSafeInteger(m.weight) || m.phase === "data" && m.execution !== "classic") throw new TypeError("Invalid JavaScript projection module identity.");
+    ids.add(m.id);
+  }
+  if (canonicalJson(orderKeelModules(p.modules.map(m=>({...m,moduleId:m.id}))).map(m=>m.id)) !== canonicalJson(p.modules.map(m=>m.id))) throw new TypeError("JavaScript projection module order changed.");
+  // Match canonical JS builder decoding; the input commitment still includes BOM bytes.
+  let text = new TextDecoder("utf-8", { fatal: true }).decode(source.bytes);
+  if (/<\/script/iu.test(text)) throw new TypeError("An Inline JavaScript entry cannot contain a closing script tag.");
+  if (ids.has(KEEL_THREE_R180.main.id) && ids.has(KEEL_THREE_R180.core.id)) {
+    for (const profile of [KEEL_THREE_R180.main,KEEL_THREE_R180.core]) { const m=p.modules.find(m=>m.id===profile.id)!; if(m.digest!==profile.digest.replace("sha256:","0x") || m.byteLength!==profile.byteLength || m.execution!=="module") throw new TypeError("Three JavaScript projection requires exact maintained module identities."); }
+    text=text.replace(/((?:\bfrom\s*|\bimport\s*\(?\s*)["'])(three(?:\.js)?)(["'])/gu,(_match,before,_name,after)=>`${before}three.module.min.js${after}`);
+  }
+  const bytes=enc.encode(['<div id="stage"></div>',...p.modules.filter(m=>m.execution==='classic').map(m=>`<script src="${m.id}"></script>`),`<script type="module">${text}</script>`].join(''));
+  if (sha(bytes)!==p.output.digest || bytes.length!==p.output.byteLength) throw new TypeError("JavaScript projection output commitment changed.");
+  return bytes;
+}
 function recipeSnapshot(input: KeelRegisteredInlineRecipe) {
   const recipe = jsonSnapshot(input);
   integer(recipe.chainId, Number.MAX_SAFE_INTEGER, "candidate chain"); integer(recipe.revision, Number.MAX_SAFE_INTEGER, "reader revision");
@@ -110,6 +152,14 @@ function recipeSnapshot(input: KeelRegisteredInlineRecipe) {
     if (ids.has(part.objectId) || !["payload", "image", "table", "program"].includes(part.role) || !part.sourceIds.length
       || new Set(part.sourceIds).size !== part.sourceIds.length) throw new TypeError("Ambiguous reused source object attribution.");
     ids.add(part.objectId);
+  }
+  const derivedIds = new Set<string>();
+  if ((recipe.derivedSources?.length ?? 0) > 16) throw new TypeError("Too many derived presentation members.");
+  for (const source of recipe.derivedSources ?? []) {
+    hash(source.digest); integer(source.byteLength, 32 * 1024 * 1024, "derived source size");
+    if (!source.id || source.mediaType !== "text/html" || derivedIds.has(source.id)
+      || recipe.sharedSources?.some(shared => shared.id === source.id)) throw new TypeError("Ambiguous derived presentation member.");
+    derivedIds.add(source.id);
   }
   return recipe;
 }
@@ -216,6 +266,11 @@ export async function selectKeelRegisteredInlineCandidate(input: {
     if (candidate.status === "unavailable") { filtered.push({ id: candidate.id, codec, reason: candidate.reason }); continue; }
     const recipe = candidate.recipe, recipeDigest = keelRegisteredInlineRecipeDigest(recipe);
     if (recipe.reusedSourceObjects?.some(part => part.sourceIds.some(id => !sourceIds.has(id)))) throw new TypeError("Reused object attribution differs from the exact source snapshot.");
+    if (recipe.derivedSources?.some(source => sourceIds.has(source.id))) throw new TypeError("Derived presentation cannot replace an original source.");
+    const projection = recipe.javascriptProjection;
+    const projectedSource = projection && sources.find(source=>source.id===projection.source.id);
+    if (projection && (!projectedSource || recipe.sharedSources?.some(source=>source.id===projection.source.id) || recipe.derivedSources?.some(source=>source.id===projection.source.id))) throw new TypeError("Ambiguous JavaScript projection membership.");
+    const projectedBytes = projection && projectedSource ? replayKeelJavaScriptProjection(projectedSource,projection) : undefined;
     // Builders receive isolated copies; even a mutating asynchronous builder
     // cannot alter the shared source snapshot or another candidate's input.
     const buildSources = sources.map(source => ({ ...source, bytes: Uint8Array.from(source.bytes) }));
@@ -283,6 +338,14 @@ export async function selectKeelRegisteredInlineCandidate(input: {
         const descriptor: unknown = JSON.parse(text.slice(1)); record(descriptor);
         return canonicalJson(descriptor);
       });
+    if (projection) {
+      const moduleParts=parts.filter(part=>part.disposition==="reused" && part.role==="module" && recipe.registeredParts.some(r=>r.objectId===part.objectId && r.role==="module"));
+      if (moduleParts.length!==projection.modules.length) throw new TypeError("JavaScript projection module inventory changed.");
+      for(const [i,m] of projection.modules.entries()) { const descriptor=JSON.parse(registeredModuleDescriptors[i]!); const shared=recipe.sharedSources?.find(s=>s.id===m.id);
+        if(moduleParts[i]!.objectId!==m.objectId || descriptor.id!==m.id || descriptor.mediaType!==m.mediaType || descriptor.integrity?.digest!==m.digest || descriptor.integrity?.byteLength!==m.byteLength
+          || !shared || shared.mediaType!==m.mediaType || shared.digest!==m.digest || shared.byteLength!==m.byteLength) throw new TypeError("JavaScript projection module commitment changed.");
+      }
+    }
     if (inspectKeelPreparedDenseCopyDocument(dec.decode(html)) !== undefined) throw new TypeError("Current registered candidates require canonical resource items, not a compatibility container.");
     const nativeBrowserGzip = built.registeredNativeGzip !== undefined;
     const resources = canonicalSources(html, maximum);
@@ -291,14 +354,19 @@ export async function selectKeelRegisteredInlineCandidate(input: {
     for (const resource of resources) {
       if (seen.has(resource.id)) throw new TypeError("Duplicate candidate source membership."); seen.add(resource.id);
       const expected = sources.find(source => source.id === resource.id);
+      const derived = recipe.derivedSources?.find(source => source.id === resource.id);
       if (expected) {
-        if (resource.mediaType !== expected.mediaType || !bytesEqual(resource.bytes, expected.bytes)) throw new TypeError("Candidate changed an original source or its MIME.");
+        if (projection && projection.source.id === expected.id) {
+          if (resource.mediaType !== projection.output.mediaType || !projectedBytes || !bytesEqual(resource.bytes,projectedBytes)) throw new TypeError("Candidate changed the independently verified JavaScript projection.");
+        } else if (resource.mediaType !== expected.mediaType || !bytesEqual(resource.bytes, expected.bytes)) throw new TypeError("Candidate changed an original source or its MIME.");
+      } else if (derived) {
+        if (derived.mediaType !== resource.mediaType || derived.digest !== sha(resource.bytes) || derived.byteLength !== resource.bytes.length) throw new TypeError("Candidate changed a derived presentation or its MIME.");
       } else {
         const shared = recipe.sharedSources?.find(source => source.id === resource.id);
         if (!shared || shared.mediaType !== resource.mediaType || shared.digest !== sha(resource.bytes) || shared.byteLength !== resource.bytes.length) throw new TypeError("Candidate introduced an unregistered source member.");
       }
       const resourceCodec = "compression" in resource ? resource.compression : undefined;
-      if (expected) {
+      if (expected || derived) {
         if (resourceCodec !== undefined && resourceCodec !== "none" && resourceCodec !== recipe.codec) throw new TypeError("Candidate silently changed its selected codec.");
       } else if (resourceCodec !== "none") {
         // A creator's codec choice cannot re-encode an immutable shared module.
@@ -311,6 +379,7 @@ export async function selectKeelRegisteredInlineCandidate(input: {
         }
       }
     }
+    if (recipe.derivedSources?.some(source => !seen.has(source.id))) throw new TypeError("Candidate omitted a derived presentation.");
     if (sources.some(source => !seen.has(source.id))) throw new TypeError("Candidate omitted an original source.");
     if (input.sources.length !== sources.length || input.sources.some((source, i) => source.id !== sources[i]!.id
       || source.mediaType !== sources[i]!.mediaType || !bytesEqual(source.bytes, sources[i]!.bytes))) throw new TypeError("Source changed while candidates were being measured.");
@@ -332,7 +401,8 @@ export async function selectKeelRegisteredInlineCandidate(input: {
       nativeBrowserGzip, javascriptCodecDecoderBytes: nativeBrowserGzip ? 0 : null,
       /** Zero standalone decoder objects is not proof of zero inlined decoder code. */
       decoderCostScope: "exact-distinct-stored-object-roles" as const,
-      ...(built.registeredNativeGzip === undefined ? {} : { nativeBrowserGzip: true as const, javascriptGzipDecoderBytes: 0 as const }), sourceByteIdentity: "verified-exact" as const };
+      ...(built.registeredNativeGzip === undefined ? {} : { nativeBrowserGzip: true as const, javascriptGzipDecoderBytes: 0 as const }), sourceByteIdentity: projection ? "verified-original-and-deterministic-javascript-projection" as const : "verified-exact" as const,
+      ...(projection ? { javascriptProjection: projection } : {}) };
     measurements.push(Object.freeze(measured));
   }
   measurements.sort((a, b) => a.completeTokenURIBytes - b.completeTokenURIBytes || a.newStoredBytes - b.newStoredBytes || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
