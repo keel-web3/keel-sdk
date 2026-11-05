@@ -146,14 +146,22 @@ export function createBitcoinWalletAdapter(host: BitcoinWalletHost) {
       bitcoinNetwork(net);
       if (!networks[host.id].includes(net)) throw new Error("Unsupported wallet network");
       if (guard) guard.dispose(); else clear();
+      guard = undefined;
       network = net;
-      const own = newGuard();
-      guard = own;
+      let own: WalletSessionGuard | undefined;
       let version = generation;
       try {
+        // Grant account-read permission before subscribing to account events.
+        // The guard then rereads the exact requested identity and network;
+        // no session or signing authority exists during the permission prompt.
         const requested = checked(await host.connect(net), net);
-        current(own, version);
+        available();
+        if (generation !== version || guard) throw new Error("Wallet session changed");
         assertWalletNetwork(net, await host.getNetwork());
+        available();
+        if (generation !== version || guard) throw new Error("Wallet session changed");
+        own = newGuard();
+        guard = own;
         current(own, version);
         connectingGuard = true;
         let connecting: Promise<BtcSession>;
@@ -163,7 +171,8 @@ export function createBitcoinWalletAdapter(host: BitcoinWalletHost) {
         current(own, version);
         return session;
       } catch (error) {
-        if (guard === own && generation === version) { own.dispose(); guard = undefined; network = undefined; }
+        if (own && guard === own && generation === version) { own.dispose(); guard = undefined; network = undefined; }
+        else if (!own && generation === version && !guard) { clear(); network = undefined; }
         throw error;
       }
     },

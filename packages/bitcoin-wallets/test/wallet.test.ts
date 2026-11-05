@@ -232,6 +232,46 @@ describe("payment vault classification", () => {
 });
 
 describe("guarded wallet integration", () => {
+  it("connects and verifies a UniSat testnet4 BIP-322 message", async () => {
+    const f = fixture("unisat");
+    const address = bitcoin.payments.p2tr({ internalPubkey: ordinalKey.publicKey.slice(1), network: bitcoin.networks.testnet }).address!;
+    const session = sharedAddressSession("unisat", "testnet4", { address, addressType: "p2tr", publicKey: ordAccount.publicKey });
+    f.host.connect = async () => session; f.host.readLiveSession = async () => session; f.host.getNetwork = async () => "testnet4";
+    const signMessage = vi.fn(async (message: string) => Signer.sign(ordinalKey.toWIF(), address, message));
+    f.host.messageTransport = { wallet: "unisat", signMessage };
+    await f.adapter.connect("testnet4"); await f.adapter.signMessageBip322(session.ordinals, "login");
+    expect(signMessage).toHaveBeenCalledOnce(); f.adapter.dispose();
+  });
+  it("subscribes only after permission and signs with the reconciled identity", async () => {
+    const f = fixture("unisat"); let permission = false; const off = vi.fn();
+    f.host.connect = vi.fn(async () => { permission = true; return f.session; });
+    f.host.subscribe = [() => { if (!permission) throw new Error("permission required"); return off; }];
+    // The adapter captures the host and reads subscriptions on connection.
+    await f.adapter.connect("mainnet");
+    await f.adapter.signMessageBip322(f.session.ordinals, "login");
+    expect(f.injectedMessage).toHaveBeenCalledOnce(); f.adapter.dispose(); expect(off).toHaveBeenCalledOnce();
+  });
+  it.each(["identity", "network", "unknown"] as const)("refuses changed %s after permission before authority", async change => {
+    const f = fixture("unisat");
+    f.host.connect = vi.fn(async () => {
+      if (change === "identity") f.setLive({ ...f.session, ordinals: { ...f.session.ordinals, address: other.address!, publicKey: hex(otherKey.publicKey) } });
+      else f.setNetwork(change === "network" ? "testnet3" : "mystery");
+      return f.session;
+    });
+    await expect(f.adapter.connect("mainnet")).rejects.toThrow();
+    await expect(f.adapter.signMessageBip322(f.session.ordinals, "login")).rejects.toThrow();
+    expect(f.injectedMessage).not.toHaveBeenCalled(); f.adapter.dispose();
+  });
+  it.each(["dispose", "concurrent"] as const)("refuses stale permission after %s", async action => {
+    const f = fixture("unisat"); const wait = deferred<BtcSession>(); let calls = 0;
+    f.host.connect = vi.fn(async () => ++calls === 1 ? wait.promise : f.session);
+    const first = f.adapter.connect("mainnet");
+    if (action === "dispose") f.adapter.dispose(); else await f.adapter.connect("mainnet");
+    wait.resolve(f.session); await expect(first).rejects.toThrow();
+    if (action === "dispose") await expect(f.adapter.signMessageBip322(f.session.ordinals, "login")).rejects.toThrow();
+    expect(f.injectedMessage).not.toHaveBeenCalled(); f.adapter.dispose();
+  });
+
   it("connects before the permission-gated network read and completes guarded signing", async () => {
     const f = fixture("xverse"); let permission = false; const calls: string[] = [];
     f.host.connect = vi.fn(async () => { calls.push("connect"); permission = true; return f.session; });
@@ -440,7 +480,8 @@ describe("guarded wallet integration", () => {
   });
   it.each(["event", "disconnect", "dispose"] as const)("cannot complete a connect invalidated by %s", async reason => {
     const f = fixture("xverse"); const delayed = deferred<BtcSession>(); const started = deferred<void>();
-    f.host.connect = () => { started.resolve(); return delayed.promise; };
+    if (reason === "event") f.host.readLiveSession = () => { started.resolve(); return delayed.promise; };
+    else f.host.connect = () => { started.resolve(); return delayed.promise; };
     const connecting = f.adapter.connect("mainnet"); await started.promise;
     if (reason === "event") f.invalidate(); else f.adapter[reason]();
     delayed.resolve(f.session); await expect(connecting).rejects.toThrow();

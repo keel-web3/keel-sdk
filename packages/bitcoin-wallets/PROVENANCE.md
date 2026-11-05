@@ -14,3 +14,5 @@ c25a0d71ba7e66e7667f258257a92eb3b131293afe0586dfb4f3729082bf9eb3  packages/ordin
 The Taproot auction builder and local-key signer are test fixtures under test/, excluded from shipped dist. The copied single-vault review is retained for regression comparison; the general wallet API uses per-input signed review and the KEEL reader.
 
 Browser adaptation uses the BitcoinJS-compatible @bitcoinerlab/secp256k1 implementation (also used by BIP-322), explicit Buffer imports and Web Crypto nonces. The browser entry supplies the standard Buffer global required by BIP-322. These changes preserve the reviewed signature and key checks.
+
+UniSat connection changes follow nocturnes-genesis 0220c4c249193e46fa43be9c8429a7f637af6b8a, site/vendor/keel/bitcoin-wallets/src. The separate live run observed UniSat 1.7.19 testnet4 BIP-322 login; it did not establish testnet4 PSBT acceptance. Capability matrices remain mock evidence, and live capabilities remain untested here.
