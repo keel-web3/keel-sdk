@@ -73,7 +73,7 @@ function field(value: unknown, key: string): unknown {
 function supportedNetwork(wallet: WalletId, network: BtcNet): void {
   const supported: Record<WalletId, readonly BtcNet[]> = {
     xverse: ['mainnet', 'testnet3', 'signet', 'regtest'],
-    unisat: ['mainnet', 'testnet3'],
+    unisat: ['mainnet', 'testnet3', 'testnet4'],
     okx: ['mainnet', 'testnet3', 'signet'],
     leather: ['mainnet', 'testnet3', 'signet'],
     'magic-eden': ['mainnet'],

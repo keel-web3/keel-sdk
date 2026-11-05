@@ -8,7 +8,7 @@ const session = (address = "a") => createSession("xverse", "testnet4", [account(
 describe("wallet session guard", () => {
   it.each([
     ["xverse", "accountChange"], ["xverse", "networkChange"], ["xverse", "accountDisconnected"],
-    ["unisat", "accountsChanged"], ["unisat", "networkChanged"],
+    ["unisat", "accountsChanged"], ["unisat", "networkChanged"], ["unisat", "chainChanged"],
   ])("clears auth, UTXOs and PSBT on %s %s and cleans listeners", async (walletId, event) => {
     const listeners = new Map<string, () => void>();
     const provider = { on: (e: string, f: () => void) => listeners.set(e, f), removeListener: (e: string) => listeners.delete(e) };

@@ -318,7 +318,7 @@ describe('pre-call refusal', () => {
     expect(call).not.toHaveBeenCalled();
   });
   it.each([
-    ['xverse', 'testnet4'], ['unisat', 'signet'], ['unisat', 'testnet4'], ['unisat', 'regtest'],
+    ['xverse', 'testnet4'], ['unisat', 'signet'], ['unisat', 'regtest'],
     ['okx', 'testnet4'], ['okx', 'regtest'], ['leather', 'testnet4'], ['leather', 'regtest'], ['magic-eden', 'testnet3'],
   ] as const)('%s rejects unverified network %s before calling the wallet', async (wallet, network) => {
     const { session, psbt, inputs } = fixture(wallet);

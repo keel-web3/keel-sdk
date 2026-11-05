@@ -13,5 +13,7 @@ describe("wallet capability evidence", () => {
     for (const wallet of ["leather", "magic-eden"] as const) expect(mockedCapabilities[wallet].dualRoleBip322).toBe("unsupported");
     expect(mockedCapabilities.xverse.testnet3).toBe("unsupported");
     expect(mockedCapabilities.xverse.testnet4).toBe("unsupported");
+    expect(mockedCapabilities.unisat.testnet4).toBe("supported");
+    expect(liveCapabilities.unisat.testnet4).toBe("untested");
   });
 });

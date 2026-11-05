@@ -31,13 +31,13 @@ function snapshot(session: BtcSession): BtcSession {
 }
 
 /** Xverse emits accountChange, networkChange and accountDisconnected; UniSat emits
- * accountsChanged and networkChanged. Other wallets must use live reconciliation. */
+ * accountsChanged, networkChanged and chainChanged. Other wallets use live reconciliation. */
 export function subscribeWalletEvents(walletId: string, provider: {
   on(event: string, listener: () => void): unknown;
   removeListener(event: string, listener: () => void): unknown;
 }): Subscribe {
   const events = walletId === "xverse" ? ["accountChange", "networkChange", "accountDisconnected"] :
-    walletId === "unisat" ? ["accountsChanged", "networkChanged"] : [];
+    walletId === "unisat" ? ["accountsChanged", "networkChanged", "chainChanged"] : [];
   return (invalidate) => {
     for (const event of events) provider.on(event, invalidate);
     return () => { for (const event of events) provider.removeListener(event, invalidate); };

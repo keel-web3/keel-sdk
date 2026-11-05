@@ -28,7 +28,7 @@ export interface BitcoinWalletHost {
 
 const networks: Record<WalletId, readonly BtcNet[]> = {
   xverse: ["mainnet", "signet", "regtest"],
-  unisat: ["mainnet", "testnet3"],
+  unisat: ["mainnet", "testnet3", "testnet4"],
   okx: ["mainnet", "testnet3", "signet"],
   leather: ["mainnet", "testnet3", "signet"],
   "magic-eden": ["mainnet"],
