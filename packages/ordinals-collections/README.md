@@ -97,3 +97,25 @@ in the recipe, and leaves entries without a position pending. `challenge verify`
 requires supplied mint history to assess eligibility, as well as full-block
 position evidence; omitted paused, late and over-cap entries are accepted as
 refund candidates, while before-open reveals remain excluded. These caller-supplied histories still require authentication.
+
+Fee helpers derive mint protection from transaction evidence, including the
+recipe ID committed in the envelope and its matching marker. `bumpRbf` recomputes
+the current fee from the UTXOs and permits only change after output 2 on a KOC1
+reveal; every matching escrow/marker script is protected. Missing, moved or
+mismatched markers on inscription spends are refused. `protectedOutputs` in a
+returned plan is informational, and dropping it during an unsigned PSBT round
+trip does not weaken these checks. Output 0 also stays protected for commits.
+
+`buildCpfp` excludes output 0 for every parent and outputs 0–2 for KOC1 parents,
+including stripped parents. `anchorVout`, when supplied, must equal the selected
+change/anchor index and cannot override protected outputs. Inputs must still be
+known clean funding; these pure helpers do not scan arbitrary Bitcoin history
+for unrelated inscriptions or ordinal pointers. Unclassified inscription
+transactions are refused rather than assigned a guessed KOC1 change layout.
+
+For `L_t` and `L_e`, the signing helper recognizes the exact 2-of-3 tapscript
+suffix and uses the first two available writer keys in script order, independent
+of private-key argument order. The third slot stays empty even when all keys are
+available. Missing keys still produce empty slots for negative consensus tests.
+The regtest matrix also has Core's descriptor wallet sign and finalize an
+unsigned builder PSBT via `walletprocesspsbt`/`finalizepsbt`, then broadcasts it.

@@ -24,7 +24,7 @@ test('KOC1 prepare validates reference policy and emits unsigned commit/reveal P
  const check=await run('verify',{recipeBytes:out.recipeBytes,inscriptionId:args.recipe.id,height:args.recipe.height,txIndex:args.recipe.txIndex,refs:args.refs});assert.equal(check.valid,true);
 });
 test('KOC1 prepare rejects invalid refs, W/CSV, key collisions, funding and unknown signing fields',async()=>{
- for(const modify of [a=>a.refs={},a=>a.recipe.payment.collectAfter=0,a=>a.recipe.payment.treasuryKey=a.recipe.payment.writerKeys[0],a=>a.funding=[],a=>a.privateKey='secret']){const a=prepareArgs();modify(a);await assert.rejects(()=>run('prepare',a));}
+ for(const modify of [a=>a.refs={},a=>a.recipe.payment.collectAfter=0,a=>a.recipe.payment.treasuryKey=a.recipe.payment.writerKeys[0],a=>a.funding=[],a=>a.privateKey='secret',a=>a.changeIndex=1,a=>a.operation='bumpRbf']){const a=prepareArgs();modify(a);await assert.rejects(()=>run('prepare',a));}
 });
 test('KOC1 verify resolves inscription evidence, rejects hash/root mutations, and leaves ID-only requests pending',async()=>{
  const {recipe,refs}=base(),out=await run('prepare',prepareArgs());
@@ -56,7 +56,8 @@ test('KOC1 pending validation deduplicates, authenticates commits, applies next-
 test('KOC1 MCP tools list and dispatch through the production server',async()=>{
  const root=await mkdtemp(path.join(tmpdir(),'koc1-mcp-test-'));
  try{const server=await createMcpServer({workspaceRoot:root});await server.handle({jsonrpc:'2.0',id:0,method:'initialize',params:{protocolVersion:'2024-11-05',capabilities:{},clientInfo:{name:'koc1-test',version:'1'}}});
- const list=await server.handle({jsonrpc:'2.0',id:1,method:'tools/list',params:{}});for(const tool of KOC1_TOOL_DEFINITIONS)assert.ok(list.result.tools.some(t=>t.name===tool.descriptor.name));
+ const list=await server.handle({jsonrpc:'2.0',id:1,method:'tools/list',params:{}});for(const tool of KOC1_TOOL_DEFINITIONS){assert.ok(list.result.tools.some(t=>t.name===tool.descriptor.name));assert.ok(!Object.hasOwn(tool.descriptor.inputSchema.properties,'changeIndex'));}
+ assert.ok(!list.result.tools.some(t=>/^keel-ordinals-collection-.*(?:bump|cpfp)/.test(t.name)));
  const r=await server.handle({jsonrpc:'2.0',id:2,method:'tools/call',params:{name:'keel-ordinals-collection-verify',arguments:base()}});assert.ok(!r.result.isError,JSON.stringify(r));assert.equal(r.result.structuredContent.valid,true);
  const clean=await server.handle({jsonrpc:'2.0',id:3,method:'tools/call',params:{name:'keel-ordinals-collection-prepare',arguments:prepareArgs()}});assert.ok(!clean.result.isError,JSON.stringify(clean));
  const linked=prepareArgs();linked.recipe.description='https://example.com/offchain-art';

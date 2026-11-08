@@ -2,7 +2,7 @@
 // Pure Bitcoin builders. txid fields use internal byte order, like parseTx.
 // PSBT v0 with BIP371 Taproot fields; no RPC, wallet, or broadcast side effects.
 import { schnorr, secp256k1 } from '@noble/curves/secp256k1';
-import { b, hex, cat, sha, tagged, compact, le32, serializeTx, parseTx, tapleaf, tapOutput } from './core.ts';
+import { b, hex, cat, sha, tagged, compact, le32, serializeTx, parseTx, tapleaf, tapOutput, parseOrdEnvelopes, decodeCbor } from './core.ts';
 const u64 = n => { const v = Buffer.alloc(8); v.writeBigUInt64LE(BigInt(n)); return v; };
 const field = (key, value) => cat(compact(b(key).length), key, compact(b(value).length), value);
 const outputBytes = o => cat(u64(o.value), compact(b(o.script).length), o.script);
@@ -63,7 +63,15 @@ export function signTransaction(plan, privateKeys) {
   const keys = new Map(privateKeys.map(k=>[xOnly(k),b(k)])); const tx = structuredClone(plan.tx);
   tx.inputs.forEach((input,i)=> {
     const p = plan.paths[i], digest = taprootSighash(plan,i);
-    if (p.script) input.witness = [...p.signers].reverse().map(pub=> keys.has(pub) ? hex(schnorr.sign(digest,keys.get(pub),Buffer.alloc(32))) : '').concat([p.script,p.controlBlock]);
+    if (p.script) {
+      // The actual tapscript, not an optional plan flag, fixes the 2-of-3 rule.
+      const suffix = p.script.match(/20([0-9a-f]{64})ac20([0-9a-f]{64})ba20([0-9a-f]{64})ba529c$/);
+      const writers = suffix ? suffix.slice(1) : [];
+      if (suffix && (p.signers.length !== 4 || writers.some((pub,j)=>p.signers[j+1]!==pub))) throw Error('writer witness layout mismatch');
+      const selected = new Set(writers.filter(pub=>keys.has(pub)).slice(0,2));
+      input.witness = p.signers.map((pub,j)=>keys.has(pub) && (!suffix || j===0 || selected.has(pub))
+        ? hex(schnorr.sign(digest,keys.get(pub),Buffer.alloc(32))) : '').reverse().concat([p.script,p.controlBlock]);
+    }
     else {
       const key = keys.get(p.internalKey); if (!key) throw Error('missing key-path signer');
       input.witness = [hex(schnorr.sign(digest,tweakedKey(key,p.root || ''),Buffer.alloc(32)))];
@@ -80,14 +88,58 @@ export function buildCancel({commit, template, outputScript, fee}) {
   sats(fee);
   return buildKeySpend({inputs:[{txid:c.txid,vout:0,...o,internalKey:template.internalKey,root:template.root}],outputs:[{value:o.value-fee,script:outputScript}]});
 }
+// Recover the KOC1 layout from on-transaction evidence. Losing serialized plan
+// hints cannot turn the payment/inscription/marker into fee funding. A missing or
+// moved marker on an inscription spend is ambiguous and is refused, not guessed.
+function mintLayout(tx, paths = []) {
+  let hasEnvelope = false;
+  const recipes = [];
+  for (let i=0;i<tx.inputs.length;i++) {
+    const witness = [...(tx.inputs[i].witness || [])];
+    if (witness.at(-1)?.startsWith('50')) witness.pop();
+    const script = paths[i]?.script || (witness.length>=2 ? witness.at(-2) : '');
+    for (const envelope of parseOrdEnvelopes(script || '')) {
+      hasEnvelope = true;
+      const chunks = [];
+      for (let j=0;j<envelope.payload.length && envelope.payload[j].length;j+=2) {
+        if (hex(envelope.payload[j])==='05') chunks.push(envelope.payload[j+1]);
+      }
+      if (chunks.length) {
+        const metadata = decodeCbor(Buffer.concat(chunks));
+        if (metadata.p==='koc1' && metadata.op==='mint') {
+          if (!Buffer.isBuffer(metadata.r) || metadata.r.length!==36) throw Error('invalid mint recipe');
+          recipes.push(hex(metadata.r));
+        }
+      }
+    }
+  }
+  const markers = tx.outputs.map((o,i)=>o.script.startsWith('6a284b4f4331') ? i : -1).filter(i=>i>=0);
+  if (!markers.length && !hasEnvelope) return null;
+  if (markers.length!==1 || markers[0]!==2 || tx.outputs[2].value!==0 || !/^6a284b4f4331[0-9a-f]{72}$/.test(tx.outputs[2].script) || !tx.outputs[0] || !tx.outputs[1]) throw Error('canonical mint marker and change output required');
+  if (hasEnvelope && (recipes.length!==1 || tx.outputs[2].script!=='6a284b4f4331'+recipes[0])) throw Error('mint recipe/marker mismatch');
+  return {paymentScript:tx.outputs[1].script,markerScript:tx.outputs[2].script};
+}
 export function bumpRbf(plan, {fee, changeIndex}) {
   sats(fee);
-  if (fee<=plan.fee || !plan.tx.inputs.some(i=>i.sequence<0xfffffffe)) throw Error('not an RBF fee increase');
-  if (!Number.isInteger(changeIndex) || changeIndex < (plan.protectedOutputs || 0) || !plan.tx.outputs[changeIndex]) throw Error('change output required');
-  const tx=structuredClone(plan.tx); tx.outputs[changeIndex].value-=fee-plan.fee;
-  const result=unsignedPsbt(tx,plan.prevouts,plan.paths); return {...result,protectedOutputs:plan.protectedOutputs};
+  // Rebuild and check the unsigned transaction; never trust caller fee/hints.
+  const checked = unsignedPsbt(plan.tx,plan.prevouts,plan.paths);
+  if (fee<=checked.fee || !checked.tx.inputs.some(i=>i.sequence<0xfffffffe)) throw Error('not an RBF fee increase');
+  const layout = mintLayout(checked.tx,checked.paths);
+  const protectedOutputs = layout ? 3 : 1;
+  const change = checked.tx.outputs[changeIndex];
+  if (!Number.isInteger(changeIndex) || changeIndex<protectedOutputs || !change ||
+      (layout && [layout.paymentScript,layout.markerScript].includes(change.script))) throw Error('unprotected change output required');
+  const tx=structuredClone(checked.tx); tx.outputs[changeIndex].value-=fee-checked.fee;
+  return {...unsignedPsbt(tx,checked.prevouts,checked.paths),protectedOutputs};
 }
-export function buildCpfp({parent,vout,internalKey,root='',outputScript,fee}) {
+export function buildCpfp({parent,vout,internalKey,root='',outputScript,fee,anchorVout}) {
   sats(fee); const tx=parseTx(parent), o=tx.outputs[vout]; if (!o) throw Error('missing parent output');
+  if (tx.end!==b(parent).length) throw Error('parent trailing bytes');
+  const layout = mintLayout(tx);
+  // KOC1 places the inscription on vout 0, payment on 1, marker on 2. An
+  // explicit anchor cannot override those exclusions, including for raw parents.
+  if (!Number.isInteger(vout) || vout<(layout ? 3 : 1) ||
+      (layout && [layout.paymentScript,layout.markerScript].includes(o.script)) ||
+      (anchorVout!==undefined && anchorVout!==vout)) throw Error('CPFP requires non-inscription change or anchor output');
   return buildKeySpend({inputs:[{txid:tx.txid,vout,...o,internalKey,root}],outputs:[{value:o.value-fee,script:outputScript}]});
 }

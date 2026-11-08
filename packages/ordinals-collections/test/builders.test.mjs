@@ -38,3 +38,29 @@ test('escrow without early leaf has 65-byte controls and refuses early refund',(
  assert.equal(tree.controlBlocks.L_m.length/2,65);assert.equal(tree.controlBlocks.L_t.length/2,65);assert.equal(tree.scripts.L_e,undefined);
  assert.throws(()=>buildEscrowSpend({payment:p,minter:buyer,leaf:'L_e',utxo:{...input,script:tree.scriptPubKey},outputScript:script,fee:1000}),/leaf/);
 });
+test('RBF guards survive unsigned PSBT round trips, false fee hints, and marker mutations',async()=>{
+ const {unsignedPsbt}=await import('../src/tx.ts');
+ const raw=signTransaction(commit(),[keys[0]]),r=reveal(raw),plain=unsignedPsbt(r.tx,r.prevouts,r.paths);
+ plain.protectedOutputs=0;plain.fee=0;
+ for(const changeIndex of [0,1,2])assert.throws(()=>bumpRbf(plain,{fee:3000,changeIndex}));
+ const bumped=bumpRbf(plain,{fee:3000,changeIndex:3});
+ assert.equal(bumped.tx.outputs[3].value,r.tx.outputs[3].value-2000);
+ assert.deepEqual(bumped.tx.outputs.slice(0,3),r.tx.outputs.slice(0,3));
+ for(const mutate of [tx=>tx.outputs.splice(2,1),tx=>tx.outputs[2].script='6a284b4f4331'+'ff'.repeat(36),tx=>tx.outputs.push({...tx.outputs[2]})]){
+   const tx=structuredClone(r.tx);mutate(tx);const changed=unsignedPsbt(tx,r.prevouts,r.paths);
+   assert.throws(()=>bumpRbf(changed,{fee:3000,changeIndex:3}),/marker|change/);
+ }
+ const repeated=buildReveal({commit:raw,template,payment,recipientScript:script,price:20000,fee:1000,changeScript:escrowTemplate(payment,buyer).scriptPubKey});
+ assert.throws(()=>bumpRbf(unsignedPsbt(repeated.tx,repeated.prevouts,repeated.paths),{fee:3000,changeIndex:3}),/change/);
+});
+test('CPFP refuses protected outputs with stripped parent or explicit anchor override',()=>{
+ const raw=signTransaction(reveal(signTransaction(commit(),[keys[0]])),[keys[0]]);
+ const stripped=parseTx(raw).strippedHex;
+ for(const parent of [raw,stripped])for(const vout of [0,1,2])assert.throws(()=>buildCpfp({parent,vout,anchorVout:vout,internalKey:buyer,outputScript:script,fee:30}));
+ const child=buildCpfp({parent:raw,vout:3,anchorVout:3,internalKey:buyer,outputScript:script,fee:1000});assert.equal(child.tx.inputs[0].vout,3);
+});
+test('writer signing selects the same two keys in script order for any provided key order',()=>{
+ const tree=escrowTemplate(payment,buyer),plan=buildEscrowSpend({payment,minter:buyer,leaf:'L_t',utxo:{...input,script:tree.scriptPubKey},outputScript:script,fee:1000});
+ const a=signTransaction(plan,keys),b=signTransaction(plan,[...keys].reverse());assert.deepEqual(a,b);
+ const w=parseTx(a).inputs[0].witness;assert.equal(w[0],'');assert.ok(w[1]);assert.ok(w[2]);assert.ok(w[3]);
+});
