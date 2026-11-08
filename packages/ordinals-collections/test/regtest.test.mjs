@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtempSync,rmSync} from 'node:fs';
+import {mkdtempSync,rmSync,existsSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {spawnSync} from 'node:child_process';
@@ -18,13 +18,17 @@ test('regtest blocks produce identical roots through each source', {skip:!availa
   cli('createwallet','fixture');const addr=cli('-rpcwallet=fixture','getnewaddress');cli('-rpcwallet=fixture','generatetoaddress','3',addr);
   const genesis=cli('getblockhash','0'), hashes=[1,2,3].map(n=>cli('getblockhash',String(n))), blocks=new Map(hashes.map(h=>[h,cli('getblock',h,'0')]));
   const fetcher=async(url,opts)=>{
-   if(opts?.method==='POST'){const q=JSON.parse(opts.body);return Response.json({result:q.method==='getblockhash'?(q.params[0]===0?genesis:hashes[q.params[0]-1]):blocks.get(q.params[0])})}
-   if(url.includes('/block-height/')||url.includes('/r/blockhash/')){const h=Number(url.split('/').at(-1));return new Response(h===0?genesis:hashes[h-1])}
+   if(opts?.method==='POST'){const q=JSON.parse(opts.body);if(q.method==='getblockhash' && ![0,3].includes(q.params[0]))throw Error('mutable intermediate height read');return Response.json({result:q.method==='getblockhash'?(q.params[0]===0?genesis:hashes[q.params[0]-1]):blocks.get(q.params[0])})}
+   if(url.includes('/block-height/')||url.includes('/r/blockhash/')){const h=Number(url.split('/').at(-1));if(![0,3].includes(h))throw Error('mutable intermediate height read');return new Response(h===0?genesis:hashes[h-1])}
    const hash=url.split('/').find(x=>blocks.has(x)), hex=blocks.get(hash);
    return new Response(url.includes('/r/block/')?hex:Buffer.from(hex,'hex'));
   };
   const sources=[rpcSource('https://fixture.invalid',{fetcher}),esploraSource('https://fixture.invalid',{fetcher}),recursionSource('https://fixture.invalid',{fetcher})];
   const all=await Promise.all(sources.map(source=>scanBlocks({source,network:'regtest',from:1,to:3,state:[],reduceBlock:(roots,b)=>[...roots,indexRoot({recipe:'00'.repeat(36),height:b.height,blockhash:b.internalHash,members:[],refunds:[]}).indexRoot]})));
   assert.deepEqual(all[0],all[1]);assert.deepEqual(all[1],all[2]);assert.equal(all[0].state.length,3);
- } finally {if(started)try{cli('stop')}catch{};rmSync(dir,{recursive:true,force:true})}
+ } finally {
+  if(started){try{cli('stop')}catch{};for(let n=0;n<100 && existsSync(join(dir,'regtest','bitcoind.pid'));n++)await new Promise(resolve=>setTimeout(resolve,100));}
+  if(existsSync(join(dir,'regtest','bitcoind.pid')))throw Error('regtest daemon did not stop; retained its data directory');
+  rmSync(dir,{recursive:true,force:true,maxRetries:10,retryDelay:100});
+ }
 });
