@@ -277,3 +277,171 @@ def escrow_policy(data):
         policy = consensus and not data['member'] and data['settled'] and not data['unresolved']
     else: return False, False
     return consensus, policy
+
+
+class _Reader:
+    def __init__(self, raw): self.raw, self.pos = raw, 0
+    def take(self, n):
+        if n < 0 or self.pos+n > len(self.raw): raise ValueError('truncated')
+        out = self.raw[self.pos:self.pos+n]; self.pos += n; return out
+    def integer(self, n): return int.from_bytes(self.take(n), 'little')
+    def compact(self):
+        n = self.integer(1)
+        if n < 253: return n
+        size = {253:2,254:4,255:8}[n]; value = self.integer(size)
+        if value < {2:253,4:65536,8:4294967296}[size]: raise ValueError('noncanonical compact size')
+        return value
+    def blob(self): return self.take(self.compact())
+
+
+def _varint(n):
+    if n < 253: return bytes([n])
+    if n < 65536: return b'\xfd'+n.to_bytes(2,'little')
+    if n < 2**32: return b'\xfe'+n.to_bytes(4,'little')
+    return b'\xff'+n.to_bytes(8,'little')
+
+
+def parse_tx(raw):
+    r = _Reader(bytes.fromhex(raw) if isinstance(raw,str) else raw)
+    version = r.take(4); witness = r.raw[r.pos:r.pos+2] == b'\x00\x01'
+    if witness: r.take(2)
+    count = r.compact()
+    if count == 0: raise ValueError('no inputs')
+    inputs = []; stripped = version + _varint(count)
+    for _ in range(count):
+        prev = r.take(32); index = r.integer(4); script = r.blob(); sequence = r.take(4)
+        stripped += prev+index.to_bytes(4,'little')+_varint(len(script))+script+sequence
+        inputs.append({'prev':prev,'index':index,'script':script,'witness':[]})
+    count = r.compact(); stripped += _varint(count); outputs = []
+    for _ in range(count):
+        value = r.integer(8); script = r.blob()
+        stripped += value.to_bytes(8,'little')+_varint(len(script))+script
+        outputs.append({'value':value,'script':script})
+    if witness:
+        for vin in inputs:
+            vin['witness'] = [r.blob() for _ in range(r.compact())]
+    stripped += r.take(4)
+    if r.pos != len(r.raw): raise ValueError('trailing tx bytes')
+    return {'inputs':inputs,'outputs':outputs,'txid':digest(digest(stripped))}
+
+
+def authenticate_commit(reveal_raw, commit_raw):
+    try:
+        reveal, commit = parse_tx(reveal_raw), parse_tx(commit_raw)
+        vin = reveal['inputs'][0]; stack = vin['witness'][:]
+        if len(stack) >= 2 and stack[-1][:1] == b'\x50': stack.pop()
+        if len(stack) < 2 or vin['prev'] != commit['txid'] or vin['index'] >= len(commit['outputs']): return False
+        script, control = stack[-2:]
+        if len(control) < 33 or (len(control)-33) % 32 or len(control) > 33+128*32 or control[0] & 0xfe != 0xc0: return False
+        internal = control[1:33]; point = _lift(int.from_bytes(internal,'big'))
+        root = _tag('TapLeaf',b'\xc0'+_compact(len(script))+script)
+        for i in range(33,len(control),32): root = _branch(root,control[i:i+32])
+        tweak = int.from_bytes(_tag('TapTweak',internal+root),'big')
+        if tweak >= _N: return False
+        point = _add(point,_mul(tweak,_G))
+        return point is not None and point[1] % 2 == control[0] % 2 and commit['outputs'][vin['index']]['script'] == b'\x51\x20'+point[0].to_bytes(32,'big')
+    except (ValueError,KeyError,IndexError,TypeError,OverflowError): return False
+
+
+def _cbor(raw):
+    reader = _Reader(raw)
+    def item():
+        head = reader.integer(1); major = head >> 5; n = head & 31
+        if n >= 24:
+            if n not in (24,25,26,27): raise ValueError('indefinite CBOR')
+            n = int.from_bytes(reader.take({24:1,25:2,26:4,27:8}[n]),'big')
+        if major == 0: return n
+        if major == 1: return -1-n
+        if major == 2: return reader.take(n)
+        if major == 3: return reader.take(n).decode('utf8')
+        if major == 4: return [item() for _ in range(n)]
+        if major == 5:
+            result = {}
+            for _ in range(n):
+                key = item()
+                if key in result: raise ValueError('duplicate CBOR key')
+                result[key] = item()
+            return result
+        if major == 7 and n in (20,21,22): return {20:False,21:True,22:None}[n]
+        raise ValueError('unsupported CBOR')
+    result = item()
+    if reader.pos != len(raw): raise ValueError('trailing CBOR')
+    return result
+
+
+def _tokens(script):
+    r = _Reader(script); result = []
+    while r.pos < len(script):
+        op = r.integer(1)
+        if 1 <= op <= 75: data = r.take(op); minimal = True
+        elif op == 76:
+            size = r.integer(1); data = r.take(size); minimal = size >= 76
+        elif op == 77:
+            size = r.integer(2); data = r.take(size); minimal = size > 255
+        elif op == 78:
+            size = r.integer(4); data = r.take(size); minimal = size > 65535
+        elif op == 0: data = b''; minimal = True
+        else: data = None; minimal = True
+        result.append((op,data,minimal))
+    return result
+
+
+def _envelopes(tx):
+    found = []
+    for vin, inp in enumerate(tx['inputs']):
+        stack = inp['witness'][:]
+        if len(stack) >= 2 and stack[-1][:1] == b'\x50': stack.pop()
+        if len(stack) < 2: continue
+        toks = _tokens(stack[-2]); i = 0
+        while i+2 < len(toks):
+            if toks[i][0] == 0 and toks[i+1][0] == 0x63 and toks[i+2][1] == b'ord':
+                start = i+3; end = start
+                while end < len(toks) and toks[end][0] != 0x68: end += 1
+                if end < len(toks): found.append((vin,toks[start:end])); i = end
+            i += 1
+    return found
+
+
+def _mint_fields(tokens):
+    fields = {}; i = 0; body = False
+    while i < len(tokens):
+        op, tag, canonical = tokens[i]
+        if op == 0:
+            body = True; i += 1; break
+        if tag is None or not canonical or not tag or tag[-1] == 0 or i+1 >= len(tokens): raise ValueError('tag')
+        number = int.from_bytes(tag,'little'); val = tokens[i+1]
+        if val[1] is None or not val[2] or len(val[1]) > 520 or number % 2 == 0 or (number in fields and number != 5): raise ValueError('field')
+        fields.setdefault(number,[]).append(val[1]); i += 2
+    if not body or i != len(tokens): raise ValueError('body')
+    return fields
+
+
+def check_mint(data):
+    def ignored(reason): return {'status':'ignored','reason':reason}
+    try:
+        recipe = data['recipe']; tx = parse_tx(data['rawTx']); env = _envelopes(tx)
+        if len(env) != 1: return ignored('envelope-count')
+        if env[0][0] != 0: return ignored('envelope-input')
+        try: fields = _mint_fields(env[0][1]); meta = _cbor(b''.join(fields[5]))
+        except (ValueError,KeyError,TypeError,UnicodeDecodeError): return ignored('canonical-envelope')
+        viewer = bytes.fromhex(recipe['art']['viewer']['id']); index = int.from_bytes(viewer[32:],'big')
+        delegate = viewer[:32] + (index.to_bytes(4,'little').rstrip(b'\x00') if index else b'')
+        if not isinstance(meta, dict): return ignored('tags')
+        m = meta.get('m')
+        if (fields.get(7) != [b'koc1'] or fields.get(11) != [delegate] or meta.get('p') != 'koc1' or meta.get('op') != 'mint'
+            or meta.get('r') != bytes.fromhex(recipe['id']) or not isinstance(m,bytes) or len(m) != 32 or set(meta)-{'p','op','r','m','ch','seen'}): return ignored('tags')
+        if recipe_errors(recipe,data['refs']): return ignored('recipe')
+        if set(data.get('charms',[])) & {'cursed','unbound','reinscription'}: return ignored('charms')
+        if not authenticate_commit(data['rawTx'],data.get('commitTx')): return ignored('commit-authentication')
+        outputs = tx['outputs']; marker = bytes.fromhex('6a284b4f4331'+recipe['id'])
+        if len(outputs) < 3 or outputs[2]['script'] != marker or outputs[2]['value'] != 0 or sum(o['script'].startswith(bytes.fromhex('6a284b4f4331')) for o in outputs) != 1: return ignored('marker')
+        if outputs[0]['value'] < 330: return ignored('recipient')
+        payment = recipe['payment']; target = bytes.fromhex(escrow(payment,m.hex())['scriptPubKey']) if payment['mode'] == 'escrow' else bytes.fromhex(payment['treasuryScript'])
+        if outputs[1]['value'] < recipe['price'] or outputs[1]['script'] != target: return ignored('payment')
+        height = data.get('height')
+        if height is None: return {'status':'pending','position':None}
+        end = recipe['end']
+        if height < end['open'] or (end.get('close') is not None and height > end['close']): return {'status':'refund','reason':'window'}
+        position = 1+data.get('earlierValid',0); cap = end.get('max')
+        return {'status':'over-cap' if cap is not None and position > cap else 'member','position':position,'txid':tx['txid'].hex()}
+    except (ValueError,KeyError,TypeError,IndexError,OverflowError): return ignored('malformed')

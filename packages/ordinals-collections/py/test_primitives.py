@@ -69,3 +69,19 @@ class PolicyVectors(unittest.TestCase):
         for case in json.loads((VECTORS / 'escrow-policy.json').read_text())['cases']:
             with self.subTest(case=case['id']):
                 self.assertEqual(escrow_policy(case['input']), (case['expected']['consensus'], case['expected']['writerPolicy']))
+
+class CommitVectors(unittest.TestCase):
+    def test_commit_authentication(self):
+        from koc1 import authenticate_commit
+        for case in json.loads((VECTORS / 'commit-auth.json').read_text())['cases']:
+            with self.subTest(case=case['id']):
+                i = case['input']
+                self.assertEqual(authenticate_commit(i.get('rawTx'), i.get('commitTx')), case['expected']['authenticated'])
+
+class MintVectors(unittest.TestCase):
+    def test_mints(self):
+        from koc1 import check_mint
+        for filename in ('mint.json','mint-boundaries.json'):
+            for case in json.loads((VECTORS / filename).read_text())['cases']:
+                with self.subTest(case=case['id']):
+                    self.assertEqual(check_mint(case['input']),case['expected'])
