@@ -1,0 +1,7 @@
+# Independent KOC1 v1 vectors
+
+Run `python3 -m unittest discover -s packages/ordinals-collections/py -v` from the repository root. This standard-library implementation reads the frozen KOC1 specification and JSON vectors, not the TypeScript implementation. It uses no network, keys, ord client, or signing.
+
+`check_mint` authenticates the commit and checks a single reveal; `compute_index` runs those checks and applies the controls to each block. `bitcoin_proof` binds a branch and header to a caller-provided host hash. `apply_challenge` and `writer_merge` take fixture entry facts and validated correction facts as already verified inputs. In particular the `valid` fields in these synthetic fixtures are not cryptographic evidence: a real caller must independently verify all entry and correction evidence first. `shell_policy` accepts fixture policy facts; it is not a deployed shell or a bridge proof verifier. The pure Python elliptic-curve code is for public verification and is not suitable for secret-key operations.
+
+The fixture suite includes expected presentation fields as well as protocol checks. The spec's Decisions D1–D32 and owner decisions E1–E4 resolve the wire and trust choices. The reason strings and precedence in single-mint results, the `cycle` fixture field, and policy result naming are fixture-facing conventions, not additional consensus rules. In writer vectors, explicit `valid` correction and entry fields are test-provided verification results, not evidence that a writer or registry entry is trustworthy.

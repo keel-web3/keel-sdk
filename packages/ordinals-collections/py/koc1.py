@@ -301,8 +301,8 @@ def _varint(n):
     return b'\xff'+n.to_bytes(8,'little')
 
 
-def parse_tx(raw):
-    r = _Reader(bytes.fromhex(raw) if isinstance(raw,str) else raw)
+def parse_tx(raw, *, _reader=None):
+    r = _reader if _reader is not None else _Reader(bytes.fromhex(raw) if isinstance(raw,str) else raw)
     version = r.take(4); witness = r.raw[r.pos:r.pos+2] == b'\x00\x01'
     if witness: r.take(2)
     count = r.compact()
@@ -321,8 +321,8 @@ def parse_tx(raw):
         for vin in inputs:
             vin['witness'] = [r.blob() for _ in range(r.compact())]
     stripped += r.take(4)
-    if r.pos != len(r.raw): raise ValueError('trailing tx bytes')
-    return {'inputs':inputs,'outputs':outputs,'txid':digest(digest(stripped))}
+    if _reader is None and r.pos != len(r.raw): raise ValueError('trailing tx bytes')
+    return {'inputs':inputs,'outputs':outputs,'txid':digest(digest(stripped)),'stripped':stripped}
 
 
 def authenticate_commit(reveal_raw, commit_raw):
@@ -566,3 +566,161 @@ def writer_merge(data):
     merged = [{'id':e['id'],'txid':e['txid'],'n':n,'settled':covered is not None and e['height'] <= covered,
                'final':covered is not None and e['height']+data['W'] <= covered and not data['unresolved']} for n,e in enumerate(entries,1)]
     return {'chains':chains,'merged':{'C':covered,'entries':merged}}
+
+
+def wire_vector(display_txid, index, recipe):
+    tx = bytes.fromhex(display_txid)[::-1]; outpoint = tx+u32(index)
+    delegate = tx+index.to_bytes(4,'little').rstrip(b'\x00')
+    marker = bytes.fromhex('6a284b4f4331')
+    return {'outpoint':outpoint.hex(),'recipeMarker':(marker+bytes(36)).hex(),
+            'mintMarker':(marker+bytes.fromhex(recipe)).hex(),'markerBytes':42,
+            'ordDelegateValue':delegate.hex(),'ordDelegateRoundtrip':(delegate[:32]+u32(int.from_bytes(delegate[32:],'little'))).hex()}
+
+
+def validate_headers(headers, host_hashes):
+    previous = None; previous_height = None
+    try:
+        for item in headers:
+            h = item['height']; raw = bytes.fromhex(item['hex'])
+            if len(raw) != 80: return False
+            hashed = digest(digest(raw)); bits = int.from_bytes(raw[72:76],'little'); exp = bits >> 24; mantissa = bits & 0x7fffff
+            target = (mantissa << (8*(exp-3))) if exp >= 3 else (mantissa >> (8*(3-exp)))
+            if bits & 0x800000 or target <= 0 or target >= 2**256 or int.from_bytes(hashed,'little') > target or host_hashes.get(str(h)) != hashed.hex(): return False
+            if previous is not None and (h != previous_height+1 or raw[4:36] != previous): return False
+            previous,previous_height = hashed,h
+        return bool(headers)
+    except (KeyError,ValueError,OverflowError,TypeError): return False
+
+
+def parse_block(raw):
+    r = _Reader(bytes.fromhex(raw) if isinstance(raw,str) else raw)
+    header = r.take(80); count = r.compact()
+    if not count: raise ValueError('empty block')
+    txs = [parse_tx(None,_reader=r)['txid'] for _ in range(count)]
+    if r.pos != len(r.raw): raise ValueError('trailing block bytes')
+    level = txs[:]
+    while len(level) > 1:
+        nxt = []
+        for i in range(0,len(level),2):
+            a = level[i]; b = level[i+1] if i+1 < len(level) else a
+            if i+1 < len(level) and a == b: raise ValueError('mutated tree')
+            nxt.append(digest(digest(a+b)))
+        level = nxt
+    if level[0] != header[36:68]: raise ValueError('merkle mismatch')
+    return header, txs
+
+
+def transaction_order(data):
+    valid, rejected = [], []
+    blocks = {}
+    for entry in data['entries']:
+        ok = False
+        if data['source'] == 'branch':
+            p = entry.get('proof',{})
+            ok = (p.get('mint') == entry['txid'] and p.get('height') == entry['height'] and p.get('txIndex') == entry['txIndex'] and bitcoin_proof(p,data['hostHashes']))
+        elif data['source'] == 'block':
+            try:
+                h = entry['height']
+                if h not in blocks: blocks[h] = parse_block(data['blocks'][str(h)])
+                header,txs = blocks[h]; index = entry['txIndex']
+                ok = digest(digest(header)).hex() == data['hostHashes'][str(h)] and 0 <= index < len(txs) and txs[index].hex() == entry['txid']
+            except (KeyError,ValueError,IndexError): ok = False
+        (valid if ok else rejected).append(entry)
+    return {'canonical':[e['id'] for e in sorted(valid,key=lambda e:(e['height'],e['txIndex']))],
+            'rejected':[e['id'] for e in rejected],
+            'diagnosticOrdOrder':[e['id'] for e in sorted(data['entries'],key=lambda e:e['ordNumber'])], 'inscriptionNumberProvesOrder':False}
+
+
+def shell_policy(data):
+    depth = max(0,data['tip']-data['height']+1)
+    own = check_mint(data['self'])['status'] in ('member','over-cap')
+    current = data['recipeValid'] and data['inIndex'] and not data['burned'] and own
+    incomplete = data['challenges'] > 32 or data['pageEntries'] > 1000
+    verified = data['recipeValid'] and current and depth >= data['F'] and not incomplete
+    final = verified and data['C'] is not None and data['height']+data['W'] <= data['C'] and not data.get('unresolved',False)
+    leaf = bytes.fromhex(data['leaf'])
+    for sibling in data['path']:
+        other = bytes.fromhex(sibling['hash'])
+        leaf = digest(b'\x01'+(other+leaf if sibling['side']=='left' else leaf+other))
+    return {'depth':depth,'verified':verified,'final':final,'current':current,
+            'artVerified':digest(bytes.fromhex(data['artBytes'])).hex()==data['artHash'],
+            'metadataVerified':leaf.hex()==data['root'], 'entryAssurance':'exhaustive' if data['count'] <= 1000 else 'sampled',
+            'ownEntryAssurance':'full' if own else 'failed','challengeBudget':min(32,data['challenges']), 'incomplete':incomplete,
+            'followNextAsAuthority':False,'bridgeAccepted':not data['bridged'] or data.get('existingGroth16Verified') is True,
+            'spentKnown':data.get('spenderResponse') is not None, 'scanStopped':data['endHeight'] is not None and data['C'] is not None and data['endHeight']+data['F'] <= data['C'],
+            'cancelReservesSupply':False,'directOptInRequired':data['paymentMode']=='direct'}
+
+
+def pending_mints(data):
+    recipe = data['recipe']; payment = recipe['payment']; end = recipe['end']; next_height = data['tip']+1
+    scripts = [escrow(payment,key)['scriptPubKey'] for key in data['minterKeys']] if payment['mode']=='escrow' else [payment['treasuryScript']]
+    scripts = list(dict.fromkeys(scripts))
+    accepted,_ = controls_at(recipe,data['controls'],data['tip'])
+    paused = False; close = end.get('close'); cap = end.get('max')
+    for control in accepted:
+        if control['at'] > next_height: continue
+        if control['action'] == 'pause': paused = True
+        elif control['action'] == 'resume': paused = False
+        elif control['action'] == 'close': close = min(close,control['at']) if close is not None else control['at']
+        elif control['action'] == 'lowerCap' and cap is not None: cap = min(cap,max(control['cap'],data['confirmed']+data['settling']))
+    opened = next_height >= end['open'] and (close is None or next_height <= close) and not paused
+    found = set()
+    if opened:
+        for candidate in data['candidates']:
+            try:
+                if candidate.get('height') is not None or check_mint(candidate)['status'] != 'pending': continue
+                tx = parse_tx(candidate['rawTx'])
+                if tx['outputs'][1]['script'].hex() in scripts: found.add(tx['txid'])
+            except (ValueError,IndexError,KeyError,TypeError): continue
+    coverage = data['coverageComplete'] and data['discovery'] == 'escrow-payment-script' and bool(scripts)
+    pending = len(found) if coverage else None
+    remaining = max(0,cap-data['confirmed']-data['settling']-pending) if cap is not None and pending is not None else None
+    return {'queryScripts':scripts,'markerIndexUsed':False,'observedPending':len(found),'pending':pending,'windowOpen':opened,
+            'remaining':remaining,'refuseSend':not opened or pending is None or (remaining is not None and remaining == 0)}
+
+
+def encode_cbor(value):
+    def prefix(major,n):
+        if n < 24: return bytes([major*32+n])
+        for flag,size in ((24,1),(25,2),(26,4),(27,8)):
+            if n < 1 << (8*size): return bytes([major*32+flag])+n.to_bytes(size,'big')
+        raise ValueError('CBOR integer too large')
+    if value is None: return b'\xf6'
+    if type(value) is bool: return b'\xf5' if value else b'\xf4'
+    if type(value) is int: return prefix(0,value) if value >= 0 else prefix(1,-1-value)
+    if isinstance(value,bytes): return prefix(2,len(value))+value
+    if isinstance(value,str):
+        raw = value.encode(); return prefix(3,len(raw))+raw
+    if isinstance(value,list): return prefix(4,len(value))+b''.join(map(encode_cbor,value))
+    if isinstance(value,dict):
+        entries = sorted(((encode_cbor(k),encode_cbor(v)) for k,v in value.items()),key=lambda x:(len(x[0]),x[0]))
+        return prefix(5,len(entries))+b''.join(k+v for k,v in entries)
+    raise ValueError('unsupported CBOR')
+
+
+def tagged_record(tag, metadata):
+    valid = tag == 'koc1' and metadata.get('p') == 'koc1' and metadata.get('op') in {'recipe','mint','index','challenge','control','writer','koc1-pin','koc1-number'}
+    return {'valid':valid,'cbor':encode_cbor(metadata).hex()}
+
+
+def registry_outcome(children, originals, burn_height=None):
+    seen = set(originals); accepted = []; ignored = []
+    for child in children:
+        authority = child.get('authority'); ok = child.get('authorized') is True and child.get('p') == 'koc1' and child.get('op') == 'writer' and isinstance(authority,str) and len(authority)==72 and authority not in seen and len(accepted)<16 and (burn_height is None or child.get('height',burn_height+1)<=burn_height)
+        if ok:
+            try: bytes.fromhex(authority)
+            except ValueError: ok = False
+        if ok: seen.add(authority); accepted.append(authority)
+        else: ignored.append(child['id'])
+    return {'accepted':accepted,'ignored':ignored}
+
+
+def metadata_proof(leaves, index):
+    if not 0 <= index < len(leaves): raise ValueError('index')
+    level = list(leaves); path = []
+    while len(level)>1:
+        if index & 1: path.append({'side':'left','hash':level[index-1].hex()})
+        elif index+1 < len(level): path.append({'side':'right','hash':level[index+1].hex()})
+        level = [digest(b'\x01'+level[i]+level[i+1]) if i+1<len(level) else level[i] for i in range(0,len(level),2)]
+        index //= 2
+    return path

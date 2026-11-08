@@ -23,6 +23,18 @@ class PrimitiveVectors(unittest.TestCase):
             self.assertEqual(merkle_root(leaves).hex(), expected['root'])
             self.assertEqual(merkle_root([]).hex(), expected['emptyRoot'])
             self.assertEqual(merkle_root(leaves[:1]).hex(), expected['singletonRoot'])
+            from koc1 import metadata_proof
+            self.assertEqual(digest(b'\x01'+leaves[0]+leaves[1]).hex(),expected['node12'])
+            self.assertEqual(metadata_proof(leaves,1),expected['proof2'])
+            self.assertEqual(metadata_proof(leaves,2),expected['proof3'])
+            for n in (1,2):
+                value=leaves[n]
+                for item in metadata_proof(leaves,n):
+                    sibling=bytes.fromhex(item['hash'])
+                    value=digest(b'\x01'+(sibling+value if item['side']=='left' else value+sibling))
+                self.assertEqual(value,merkle_root(leaves))
+            self.assertTrue(expected['proofsValid'])
+            self.assertEqual([(n-1)%len(leaves)+1 for n in data['positions']],expected['cycle'])
 
 if __name__ == '__main__':
     unittest.main()
@@ -54,14 +66,20 @@ class ChallengeVectors(unittest.TestCase):
                 cap = i['recipe']['end']['max']
                 root = commitment_for_entries(i['cache']['r'], i['cache']['h'], i['cache']['hash'], entries[:cap], entries[cap:])
                 self.assertEqual(root.hex(), e['patchedRoot'])
+                old = {entry['txid']:n for n,entry in enumerate(i['cache']['entries'],1)}
+                positions = [{'id':entry['id'],'n':n,'shift':None if entry['txid'] not in old else n-old[entry['txid']]} for n,entry in enumerate(entries,1)]
+                self.assertEqual(positions,e['positions'])
+                self.assertEqual(len(entries[:cap]),e['count'])
+                self.assertEqual(len(entries[cap:]),e['over'])
+                self.assertEqual(root.hex()==i['canonicalRoot'],e['canonicalMatch'])
 
 class RegistryVectors(unittest.TestCase):
     def test_registry(self):
-        from koc1 import registry_additions
+        from koc1 import registry_outcome
         for case in json.loads((VECTORS / 'registry.json').read_text())['cases']:
             with self.subTest(case=case['id']):
                 i = case['input']
-                self.assertEqual(registry_additions(i['children'], i['originals'], i['burnHeight']), case['expected']['accepted'])
+                self.assertEqual(registry_outcome(i['children'], i['originals'], i['burnHeight']), case['expected'])
 
 class PolicyVectors(unittest.TestCase):
     def test_policy(self):
@@ -111,3 +129,70 @@ class WriterVectors(unittest.TestCase):
         for case in json.loads((VECTORS / 'writers.json').read_text())['cases']:
             with self.subTest(case=case['id']):
                 self.assertEqual(writer_merge(case['input']),case['expected'])
+
+class WireAndHeaderVectors(unittest.TestCase):
+    def test_wire(self):
+        from koc1 import wire_vector
+        for case in json.loads((VECTORS / 'wire.json').read_text())['cases']:
+            i = case['input']
+            with self.subTest(case=case['id']): self.assertEqual(wire_vector(i['displayTxid'],i['index'],i['recipe']),case['expected'])
+    def test_headers(self):
+        from koc1 import validate_headers
+        for case in json.loads((VECTORS / 'headers.json').read_text())['cases']:
+            i = case['input']
+            with self.subTest(case=case['id']): self.assertEqual(validate_headers(i['headers'],i['hostHashes']),case['expected']['valid'])
+    def test_light_switch(self):
+        for case in json.loads((VECTORS / 'light-switch.json').read_text())['cases']:
+            i = case['input']
+            actual = {'switchAllowed':i['challengeValid'] and i['patchedRoot']==i['nextRoot'], 'completenessProven':False, 'fullRejectsCache':i['computedRoot']!=i['cacheRoot']}
+            with self.subTest(case=case['id']): self.assertEqual(actual,case['expected'])
+
+class BlockVectors(unittest.TestCase):
+    def test_order(self):
+        from koc1 import transaction_order
+        for case in json.loads((VECTORS / 'transaction-order.json').read_text())['cases']:
+            with self.subTest(case=case['id']): self.assertEqual(transaction_order(case['input']),case['expected'])
+    def test_public_block(self):
+        from koc1 import parse_block, digest
+        for case in json.loads((VECTORS / 'testnet4-block.json').read_text())['cases']:
+            h, txs = parse_block(case['input']['raw']); hashed = digest(digest(h)); e = case['expected']
+            self.assertEqual({'hash':hashed[::-1].hex(),'internalHash':hashed.hex(),'merkleRoot':h[36:68].hex(), 'headerMerkleRoot':h[36:68].hex(),'txids':[t.hex() for t in txs],'valid':True},e)
+
+class ShellVectors(unittest.TestCase):
+    def test_shell(self):
+        from koc1 import shell_policy
+        for case in json.loads((VECTORS / 'shell-policy.json').read_text())['cases']:
+            with self.subTest(case=case['id']): self.assertEqual(shell_policy(case['input']),case['expected'])
+
+class PendingVectors(unittest.TestCase):
+    def test_pending(self):
+        from koc1 import pending_mints
+        for case in json.loads((VECTORS / 'pending-mints.json').read_text())['cases']:
+            with self.subTest(case=case['id']): self.assertEqual(pending_mints(case['input']),case['expected'])
+
+class TagVectors(unittest.TestCase):
+    def test_tags(self):
+        from koc1 import tagged_record
+        for case in json.loads((VECTORS / 'tags.json').read_text())['cases']:
+            i = case['input']
+            with self.subTest(case=case['id']): self.assertEqual(tagged_record(i['tag7'],i['metadata']),case['expected'])
+
+class TrustVectors(unittest.TestCase):
+    def test_trust(self):
+        from koc1 import parse_tx, authenticate_commit
+        for case in json.loads((VECTORS / 'trust-boundaries.json').read_text())['cases']:
+            i = case['input']; a,b = parse_tx(i['a']),parse_tx(i['b'])
+            actual = {'sameTxid':a['txid']==b['txid'],'sameStripped':a['stripped']==b['stripped'],
+                      'sameWitness':[x['witness'] for x in a['inputs']]==[x['witness'] for x in b['inputs']],
+                      's2AloneAuthenticatesEnvelope':False,'originalCommitAuthenticated':authenticate_commit(i['a'],i['commitTx']),
+                      'forgedCommitAuthenticated':authenticate_commit(i['b'],i['commitTx'])}
+            with self.subTest(case=case['id']): self.assertEqual(actual,case['expected'])
+
+class CoverageInventory(unittest.TestCase):
+    def test_vector_file_inventory(self):
+        expected = {'pending-mints','recipes','testnet4-block','registry','mint-boundaries','challenges',
+                    'metadata','commit-auth','trust-boundaries','shell-policy','numbering-controls-roots',
+                    'headers','mint','escrow','light-switch','permutation','transaction-order','tags',
+                    'escrow-policy','writers','wire'}
+        actual = {p.stem for p in VECTORS.glob('*.json') if 'cases' in json.loads(p.read_text())}
+        self.assertEqual(actual,expected, 'new vector families need independent tests')
