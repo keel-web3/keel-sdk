@@ -40,3 +40,10 @@ K1-T01 core and this trust-sensitive layer both require independent review.
 
 Position proofs require the complete raw block to authenticate transaction count,
 position and the non-mutated Merkle tree; branch-only proofs are insufficient.
+
+Writer-chain validation requires the matching recipe policy and authenticated
+control history; it rejects updates when that policy is unavailable. Merge uses
+that policy to classify members and refunds, counts distinct original writer
+authorities, and leaves entries without a position pending. `challenge verify`
+requires supplied mint history to assess eligibility, as well as full-block
+position evidence. These caller-supplied histories still require authentication.

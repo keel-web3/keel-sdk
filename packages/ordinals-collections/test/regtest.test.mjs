@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtempSync,rmSync} from 'node:fs';
+import {mkdtempSync,rmSync,existsSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {spawnSync} from 'node:child_process';
@@ -26,5 +26,9 @@ test('regtest blocks produce identical roots through each source', {skip:!availa
   const sources=[rpcSource('https://fixture.invalid',{fetcher}),esploraSource('https://fixture.invalid',{fetcher}),recursionSource('https://fixture.invalid',{fetcher})];
   const all=await Promise.all(sources.map(source=>scanBlocks({source,network:'regtest',from:1,to:3,state:[],reduceBlock:(roots,b)=>[...roots,indexRoot({recipe:'00'.repeat(36),height:b.height,blockhash:b.internalHash,members:[],refunds:[]}).indexRoot]})));
   assert.deepEqual(all[0],all[1]);assert.deepEqual(all[1],all[2]);assert.equal(all[0].state.length,3);
- } finally {if(started)try{cli('stop')}catch{};rmSync(dir,{recursive:true,force:true})}
+ } finally {
+  if(started){try{cli('stop')}catch{};for(let n=0;n<100 && existsSync(join(dir,'regtest','bitcoind.pid'));n++)await new Promise(resolve=>setTimeout(resolve,100));}
+  if(existsSync(join(dir,'regtest','bitcoind.pid')))throw Error('regtest daemon did not stop; retained its data directory');
+  rmSync(dir,{recursive:true,force:true,maxRetries:10,retryDelay:100});
+ }
 });

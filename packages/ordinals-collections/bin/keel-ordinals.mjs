@@ -52,8 +52,12 @@ try {
     if(!tx.outputs[0] || tx.outputs[0].value<330 || marks.length!==1 || tx.outputs[2]?.script!==marker(input.recipe.id) || tx.outputs[2]?.value!==0) return {entry:location,validity:'invalid'};
    }
    if(!Array.isArray(item.charms)||!item.commitTx)return {entry:location,validity:'unknown'};
+   if(item.height<input.recipe.end.open)return {entry:location,validity:'unknown'};
    const checked=formCheck({...item,recipe:input.recipe,refs:input.refs});
-   return checked.error ? {entry:location,validity:'unknown'} : {entry:checked,validity:'valid'};
+   if(checked.error || !Array.isArray(input.history))return {entry:location,validity:'unknown'};
+   const candidate={...item,id:id};
+   const state=indexState(input.recipe,input.refs,[...input.history.filter(x=>x.id!==id),candidate],input.cache.h,input.cache.hash??'00'.repeat(32),input.controls??[]);
+   return state.members.some(x=>x.txid===id) ? {entry:checked,validity:'valid'} : {entry:location,validity:'unknown'};
   };
   const valid=validateChallenge(input.challenge,input.cache,resolver,input.hostHashes);
   const patched=valid ? applyChallenge(input.cache.entries,input.challenge,resolver).map(x=>x.txid) : undefined;
