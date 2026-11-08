@@ -18,8 +18,8 @@ test('regtest blocks produce identical roots through each source', {skip:!availa
   cli('createwallet','fixture');const addr=cli('-rpcwallet=fixture','getnewaddress');cli('-rpcwallet=fixture','generatetoaddress','3',addr);
   const genesis=cli('getblockhash','0'), hashes=[1,2,3].map(n=>cli('getblockhash',String(n))), blocks=new Map(hashes.map(h=>[h,cli('getblock',h,'0')]));
   const fetcher=async(url,opts)=>{
-   if(opts?.method==='POST'){const q=JSON.parse(opts.body);return Response.json({result:q.method==='getblockhash'?(q.params[0]===0?genesis:hashes[q.params[0]-1]):blocks.get(q.params[0])})}
-   if(url.includes('/block-height/')||url.includes('/r/blockhash/')){const h=Number(url.split('/').at(-1));return new Response(h===0?genesis:hashes[h-1])}
+   if(opts?.method==='POST'){const q=JSON.parse(opts.body);if(q.method==='getblockhash' && ![0,3].includes(q.params[0]))throw Error('mutable intermediate height read');return Response.json({result:q.method==='getblockhash'?(q.params[0]===0?genesis:hashes[q.params[0]-1]):blocks.get(q.params[0])})}
+   if(url.includes('/block-height/')||url.includes('/r/blockhash/')){const h=Number(url.split('/').at(-1));if(![0,3].includes(h))throw Error('mutable intermediate height read');return new Response(h===0?genesis:hashes[h-1])}
    const hash=url.split('/').find(x=>blocks.has(x)), hex=blocks.get(hash);
    return new Response(url.includes('/r/block/')?hex:Buffer.from(hex,'hex'));
   };

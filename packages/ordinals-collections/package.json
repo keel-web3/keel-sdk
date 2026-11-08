@@ -30,7 +30,9 @@
     "./challenge": "./src/challenge/index.mjs",
     "./sources": "./indexer/sources.mjs",
     "./block-loop": "./indexer/loop.mjs",
-    "./discovery": "./indexer/discovery.mjs"
+    "./discovery": "./indexer/discovery.mjs",
+    "./cache": "./indexer/cache.mjs",
+    "./verify-token": "./src/verify/token.mjs"
   },
   "bin": {
     "keel-ordinals": "./bin/keel-ordinals.mjs"
