@@ -25,6 +25,16 @@
     "./controls": "./src/controls.ts",
     "./merkle": "./src/merkle.ts",
     "./perm": "./src/perm.ts",
-    "./challenge": "./src/challenge/index.mjs"
+    "./index-root": "./src/index/root.mjs",
+    "./merge": "./src/merge/index.mjs",
+    "./challenge": "./src/challenge/index.mjs",
+    "./sources": "./indexer/sources.mjs",
+    "./block-loop": "./indexer/loop.mjs",
+    "./discovery": "./indexer/discovery.mjs",
+    "./cache": "./indexer/cache.mjs",
+    "./verify-token": "./src/verify/token.mjs"
+  },
+  "bin": {
+    "keel-ordinals": "./bin/keel-ordinals.mjs"
   }
 }

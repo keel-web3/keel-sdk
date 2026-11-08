@@ -1,0 +1,37 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {writerChain,merge} from '../src/merge/index.mjs';
+import {validateChallenge,applyChallenge} from '../src/challenge/index.mjs';
+import {indexRoot} from '../src/index/root.mjs';
+const load=name=>JSON.parse(readFileSync(new URL(`../spec/vectors/${name}.json`,import.meta.url)));
+const resolve=entries=>id=>{const entry=entries[id];return entry ? {entry,validity:entry.valid===true?'valid':entry.valid===false?'invalid':'unknown'} : null};
+test('challenge vectors',()=>{
+ for(const {id,input,expected} of load('challenges').cases) {
+  const get=resolve(input.entries), valid=validateChallenge(input.challenge,input.cache,get,input.hostHashes);
+  assert.equal(valid,expected.valid && input.challenge.kind === 'invalid' && input.entries[input.challenge.mint]?.valid === false,id);
+  if (expected.valid && !valid) continue; // frozen synthetic branch-only proofs cannot authenticate total
+  const rows=valid ? applyChallenge(input.cache.entries,input.challenge,get) : input.cache.entries;
+  const cap=input.recipe.end.max ?? rows.length;
+  let root;
+  try { root=indexRoot({recipe:input.recipe.id,height:input.cache.h,blockhash:input.cache.hash,members:rows.slice(0,cap),refunds:rows.slice(cap)}); }
+  catch (error) { assert.equal(valid,false,id); continue; }
+  assert.equal(root.indexRoot,expected.patchedRoot,id);
+ }
+});
+test('writer and quorum vectors',()=>{
+ for(const {id,input,expected} of load('writers').cases) {
+  const originals=input.writers.map((w,i)=>writerChain(w.updates,{authority:w.authority,recipe:input.recipe,hostHashes:input.hostHashes,pins:input.pins.filter(p=>p.writerIndex===i),policy:{id:input.recipe,end:{open:0,...(input.cap==null?{}:{max:input.cap})}},resolveCorrection:cid=>{const c=input.corrections?.[cid];return c?.valid ? {valid:true,challenge:c.challenge,resolveEntry:resolve(c.entries)} : null}}));
+  assert.deepEqual(originals.map(({entries,authority,...rest})=>rest),expected.chains,id);
+  const {refund,pending,...merged}=merge({originals,registry:input.registry,self:input.self,challenges:input.challenges,ch:input.ch,q:input.q,W:input.W,unresolved:input.unresolved,verifyEntry:x=>x.valid!==false,policy:{end:{open:0},writers:input.writers.map(w=>({authority:w.authority}))}});assert.deepEqual(merged,expected.merged,id);
+ }
+});
+test('omitted over-cap vector patches into overRoot without a member number',async()=>{
+ const {classifyEntries}=await import('../src/index/classify.mjs');
+ const {input,expected}=load('challenges').cases.find(c=>c.id==='omitted-valid-over-cap-refund');
+ const added=input.entries[input.challenge.mint],rows=applyChallenge(input.cache.entries,input.challenge,resolve(input.entries));
+ const state=classifyEntries(rows,input.recipe,[],input.cache.h);
+ assert.ok(state.refund.some(x=>x.txid===added.txid));assert.ok(!state.members.some(x=>x.txid===added.txid));
+ const root=indexRoot({recipe:input.recipe.id,height:input.cache.h,blockhash:input.cache.hash,members:state.members,refunds:state.refund});
+ assert.equal(root.indexRoot,expected.patchedRoot);assert.equal(expected.valid,true);
+});

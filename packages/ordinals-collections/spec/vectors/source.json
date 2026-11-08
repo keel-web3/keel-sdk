@@ -51,5 +51,17 @@
       "transaction position never inscription number",
       "pending discovery uses escrow payment output scripts"
     ]
+  },
+  "errata": {
+    "authority": "owner direction for K1-T02 round 2, 2026-11-08",
+    "changes": [
+      "time edition without max requires cycle with finite Merkle metadata",
+      "omitted challenges may insert valid-form over-cap, paused and late refund candidates",
+      "full-block 64-byte guard applies only to challenged leaf"
+    ],
+    "vectors": [
+      "numbering-controls-roots/time-end",
+      "challenges/omitted-valid-over-cap-refund"
+    ]
   }
 }

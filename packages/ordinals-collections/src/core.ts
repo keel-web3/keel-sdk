@@ -647,7 +647,7 @@ export function recipeCheck(r, refs) {
         b(m.root).length !== 32 ||
         (e.max > m.count && !m.cycle))) ||
     (m.order === "blind" && e.mode === "open" && e.close === undefined) ||
-    (e.mode === "open" && m.mode === "merkle" && !m.cycle)
+    ((e.mode === "open" || (e.mode === "time" && uint(e.close))) && e.max === undefined && m.mode === "merkle" && !m.cycle)
   )
     errors.push("metadata");
   if (
@@ -907,7 +907,9 @@ export function indexState(r, refs, candidates, h, hash, controls = []) {
   let sold = null,
     cap = r.end.max ?? null,
     endHeight = r.end.close ?? null;
+  for (const x of candidates) if (!uint(x.height) || !uint(x.txIndex)) pending.push(x.id);
   const rows = candidates
+    .filter((x) => uint(x.height) && uint(x.txIndex))
     .map((x) => ({ input: x, entry: formCheck({ ...x, recipe: r, refs }) }))
     .sort(
       (a, c) =>
@@ -971,7 +973,6 @@ export function indexState(r, refs, candidates, h, hash, controls = []) {
       endHeight = Math.min(endHeight ?? Infinity, height);
     }
   }
-  for (const { input: x } of rows) if (x.height === null) pending.push(x.id);
   const members = valid.filter((_, i) => cap === null || i < cap),
     over = valid
       .filter((_, i) => cap !== null && i >= cap)

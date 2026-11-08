@@ -28,7 +28,7 @@ export function verifyPosition(proof, entry, hostHashes) {
     const ids = [];
     for (let j = 0; j < total; j++) {
       const tx = parseTx(block, pos);
-      if (tx.strippedHex.length === 128) return false;
+      if (j === proof.txIndex && tx.strippedHex.length === 128) return false;
       ids.push(tx.txid); pos = tx.end;
     }
     if (pos !== block.length || ids[proof.txIndex] !== proof.mint || !merkle(ids, true).equals(header.subarray(36,68))) return false;

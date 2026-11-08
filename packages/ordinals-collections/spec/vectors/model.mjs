@@ -613,7 +613,7 @@ export function recipeCheck(r, refs) {
         b(m.root).length !== 32 ||
         (e.max > m.count && !m.cycle))) ||
     (m.order === "blind" && e.mode === "open" && e.close === undefined) ||
-    (e.mode === "open" && m.mode === "merkle" && !m.cycle)
+    ((e.mode === "open" || (e.mode === "time" && uint(e.close))) && e.max === undefined && m.mode === "merkle" && !m.cycle)
   )
     errors.push("metadata");
   if (
