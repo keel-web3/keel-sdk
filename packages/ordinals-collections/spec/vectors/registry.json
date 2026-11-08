@@ -1,0 +1,411 @@
+{
+  "version": "koc1@1",
+  "network": "testnet4",
+  "kind": "registry",
+  "cases": [
+    {
+      "id": "first-16-distinct",
+      "rules": [
+        "KOC1-R42"
+      ],
+      "input": {
+        "children": [
+          {
+            "id": "bad-registry",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "e5f4a7557c51ecaeb5f0b31a2088717cb7fd8c15bb76704c9d8d753f77de366d00000000",
+            "height": 100,
+            "authorized": false
+          },
+          {
+            "id": "registry-0",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "e5f4a7557c51ecaeb5f0b31a2088717cb7fd8c15bb76704c9d8d753f77de366d00000000",
+            "height": 100,
+            "authorized": true
+          },
+          {
+            "id": "registry-1",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "45d442d6533300eded73c3dd2eeea5b065f4db57c35169a57041aa1ed64f970200000000",
+            "height": 101,
+            "authorized": true
+          },
+          {
+            "id": "registry-2",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "99079b151408d43a263f9a6bed64f6a25710174ccfbe03154f52b48d9f838f8e00000000",
+            "height": 102,
+            "authorized": true
+          },
+          {
+            "id": "registry-3",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "5a39c594ec04442de121efcb2c1ed444305f7e2fb29c8b62b0ced7554d9acfad00000000",
+            "height": 103,
+            "authorized": true
+          },
+          {
+            "id": "registry-4",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "091332ab463035880e95cfad405e8f08a276b5ab7e2db2661fd16e3f96124d5900000000",
+            "height": 104,
+            "authorized": true
+          },
+          {
+            "id": "registry-5",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "4bd45910635e9ed8f2c03f141acb98f954fcac0d91e31aa75e9f078c7f769bba00000000",
+            "height": 105,
+            "authorized": true
+          },
+          {
+            "id": "registry-6",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "1dd298b772f90346435cb87f139bebe9a912eb4e466f4c6a2b7d61755cbfdbe600000000",
+            "height": 106,
+            "authorized": true
+          },
+          {
+            "id": "registry-7",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "14328cb6ba6a288d3c7e60389830da404bd3802dfc08fd7a987198582c69713600000000",
+            "height": 107,
+            "authorized": true
+          },
+          {
+            "id": "registry-8",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "7bc7938ad31576a27cdcad4ce2dae48796a181482751b173f57480cd7aa98a3f00000000",
+            "height": 108,
+            "authorized": true
+          },
+          {
+            "id": "registry-9",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "34cf4ad070b146e71c93c765dc9610224b6a48c6812c170e73f93fac3c29ca6600000000",
+            "height": 109,
+            "authorized": true
+          },
+          {
+            "id": "registry-10",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "658656e921a1c28d262f80ab91c60f3a2475750d766f164bddd9ebf7ac2632bd00000000",
+            "height": 110,
+            "authorized": true
+          },
+          {
+            "id": "registry-11",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "ac6b2513b2bff88eee4fbbf17050e432e221db0aee74c79c0a38b106866f8ba900000000",
+            "height": 111,
+            "authorized": true
+          },
+          {
+            "id": "registry-12",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "d085c49c1f4a75a31895be70ae67afa2643ff242ac0acfb1c89b1c654792464f00000000",
+            "height": 112,
+            "authorized": true
+          },
+          {
+            "id": "registry-13",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "642c6e3545ce7b3b0d86cf5af7646e445ab9c0a00330bac553957995f7991c9700000000",
+            "height": 113,
+            "authorized": true
+          },
+          {
+            "id": "registry-14",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "5cc28712f17cd164447c527cbf809310d2f99478afa765cb191eeddd9532141000000000",
+            "height": 114,
+            "authorized": true
+          },
+          {
+            "id": "registry-15",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "cc9c551e85569fe41211706a46b2a43f458d0b16506faa0e7b5db083e8bd8ee700000000",
+            "height": 115,
+            "authorized": true
+          },
+          {
+            "id": "registry-16",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "afb4bdaa8be4f9d54f4c2a27214a237508b77e54734adc057154c5a1bc5de35a00000000",
+            "height": 116,
+            "authorized": true
+          },
+          {
+            "id": "registry-17",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "02bb96d01d7bcb0173929cc056db3fbee46ee01bff27a0bb3bc5ef1b495d2e1300000000",
+            "height": 117,
+            "authorized": true
+          },
+          {
+            "id": "duplicate-registry",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "e5f4a7557c51ecaeb5f0b31a2088717cb7fd8c15bb76704c9d8d753f77de366d00000000",
+            "height": 100,
+            "authorized": true
+          }
+        ],
+        "originals": [
+          "4ab9c870bca18a35161456c19359890ece11023f6a23c1916e2fe35f1566702c00000000",
+          "caef788a4b418b2946f228b003b2f1ec3a3b3b32a4fe2f02f1dd0beea6f09cf600000000",
+          "11cf95fb8971c73efc959f13bffa6c13039f90488c496fb96053c66ca953f6e700000000"
+        ],
+        "burnHeight": null
+      },
+      "expected": {
+        "accepted": [
+          "e5f4a7557c51ecaeb5f0b31a2088717cb7fd8c15bb76704c9d8d753f77de366d00000000",
+          "45d442d6533300eded73c3dd2eeea5b065f4db57c35169a57041aa1ed64f970200000000",
+          "99079b151408d43a263f9a6bed64f6a25710174ccfbe03154f52b48d9f838f8e00000000",
+          "5a39c594ec04442de121efcb2c1ed444305f7e2fb29c8b62b0ced7554d9acfad00000000",
+          "091332ab463035880e95cfad405e8f08a276b5ab7e2db2661fd16e3f96124d5900000000",
+          "4bd45910635e9ed8f2c03f141acb98f954fcac0d91e31aa75e9f078c7f769bba00000000",
+          "1dd298b772f90346435cb87f139bebe9a912eb4e466f4c6a2b7d61755cbfdbe600000000",
+          "14328cb6ba6a288d3c7e60389830da404bd3802dfc08fd7a987198582c69713600000000",
+          "7bc7938ad31576a27cdcad4ce2dae48796a181482751b173f57480cd7aa98a3f00000000",
+          "34cf4ad070b146e71c93c765dc9610224b6a48c6812c170e73f93fac3c29ca6600000000",
+          "658656e921a1c28d262f80ab91c60f3a2475750d766f164bddd9ebf7ac2632bd00000000",
+          "ac6b2513b2bff88eee4fbbf17050e432e221db0aee74c79c0a38b106866f8ba900000000",
+          "d085c49c1f4a75a31895be70ae67afa2643ff242ac0acfb1c89b1c654792464f00000000",
+          "642c6e3545ce7b3b0d86cf5af7646e445ab9c0a00330bac553957995f7991c9700000000",
+          "5cc28712f17cd164447c527cbf809310d2f99478afa765cb191eeddd9532141000000000",
+          "cc9c551e85569fe41211706a46b2a43f458d0b16506faa0e7b5db083e8bd8ee700000000"
+        ],
+        "ignored": [
+          "bad-registry",
+          "registry-16",
+          "registry-17",
+          "duplicate-registry"
+        ]
+      }
+    },
+    {
+      "id": "burn-freezes-registry",
+      "rules": [
+        "KOC1-R42"
+      ],
+      "input": {
+        "children": [
+          {
+            "id": "bad-registry",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "e5f4a7557c51ecaeb5f0b31a2088717cb7fd8c15bb76704c9d8d753f77de366d00000000",
+            "height": 100,
+            "authorized": false
+          },
+          {
+            "id": "registry-0",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "e5f4a7557c51ecaeb5f0b31a2088717cb7fd8c15bb76704c9d8d753f77de366d00000000",
+            "height": 100,
+            "authorized": true
+          },
+          {
+            "id": "registry-1",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "45d442d6533300eded73c3dd2eeea5b065f4db57c35169a57041aa1ed64f970200000000",
+            "height": 101,
+            "authorized": true
+          },
+          {
+            "id": "registry-2",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "99079b151408d43a263f9a6bed64f6a25710174ccfbe03154f52b48d9f838f8e00000000",
+            "height": 102,
+            "authorized": true
+          },
+          {
+            "id": "registry-3",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "5a39c594ec04442de121efcb2c1ed444305f7e2fb29c8b62b0ced7554d9acfad00000000",
+            "height": 103,
+            "authorized": true
+          },
+          {
+            "id": "registry-4",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "091332ab463035880e95cfad405e8f08a276b5ab7e2db2661fd16e3f96124d5900000000",
+            "height": 104,
+            "authorized": true
+          },
+          {
+            "id": "registry-5",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "4bd45910635e9ed8f2c03f141acb98f954fcac0d91e31aa75e9f078c7f769bba00000000",
+            "height": 105,
+            "authorized": true
+          },
+          {
+            "id": "registry-6",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "1dd298b772f90346435cb87f139bebe9a912eb4e466f4c6a2b7d61755cbfdbe600000000",
+            "height": 106,
+            "authorized": true
+          },
+          {
+            "id": "registry-7",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "14328cb6ba6a288d3c7e60389830da404bd3802dfc08fd7a987198582c69713600000000",
+            "height": 107,
+            "authorized": true
+          },
+          {
+            "id": "registry-8",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "7bc7938ad31576a27cdcad4ce2dae48796a181482751b173f57480cd7aa98a3f00000000",
+            "height": 108,
+            "authorized": true
+          },
+          {
+            "id": "registry-9",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "34cf4ad070b146e71c93c765dc9610224b6a48c6812c170e73f93fac3c29ca6600000000",
+            "height": 109,
+            "authorized": true
+          },
+          {
+            "id": "registry-10",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "658656e921a1c28d262f80ab91c60f3a2475750d766f164bddd9ebf7ac2632bd00000000",
+            "height": 110,
+            "authorized": true
+          },
+          {
+            "id": "registry-11",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "ac6b2513b2bff88eee4fbbf17050e432e221db0aee74c79c0a38b106866f8ba900000000",
+            "height": 111,
+            "authorized": true
+          },
+          {
+            "id": "registry-12",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "d085c49c1f4a75a31895be70ae67afa2643ff242ac0acfb1c89b1c654792464f00000000",
+            "height": 112,
+            "authorized": true
+          },
+          {
+            "id": "registry-13",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "642c6e3545ce7b3b0d86cf5af7646e445ab9c0a00330bac553957995f7991c9700000000",
+            "height": 113,
+            "authorized": true
+          },
+          {
+            "id": "registry-14",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "5cc28712f17cd164447c527cbf809310d2f99478afa765cb191eeddd9532141000000000",
+            "height": 114,
+            "authorized": true
+          },
+          {
+            "id": "registry-15",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "cc9c551e85569fe41211706a46b2a43f458d0b16506faa0e7b5db083e8bd8ee700000000",
+            "height": 115,
+            "authorized": true
+          },
+          {
+            "id": "registry-16",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "afb4bdaa8be4f9d54f4c2a27214a237508b77e54734adc057154c5a1bc5de35a00000000",
+            "height": 116,
+            "authorized": true
+          },
+          {
+            "id": "registry-17",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "02bb96d01d7bcb0173929cc056db3fbee46ee01bff27a0bb3bc5ef1b495d2e1300000000",
+            "height": 117,
+            "authorized": true
+          },
+          {
+            "id": "duplicate-registry",
+            "p": "koc1",
+            "op": "writer",
+            "authority": "e5f4a7557c51ecaeb5f0b31a2088717cb7fd8c15bb76704c9d8d753f77de366d00000000",
+            "height": 100,
+            "authorized": true
+          }
+        ],
+        "originals": [
+          "4ab9c870bca18a35161456c19359890ece11023f6a23c1916e2fe35f1566702c00000000",
+          "caef788a4b418b2946f228b003b2f1ec3a3b3b32a4fe2f02f1dd0beea6f09cf600000000",
+          "11cf95fb8971c73efc959f13bffa6c13039f90488c496fb96053c66ca953f6e700000000"
+        ],
+        "burnHeight": 105
+      },
+      "expected": {
+        "accepted": [
+          "e5f4a7557c51ecaeb5f0b31a2088717cb7fd8c15bb76704c9d8d753f77de366d00000000",
+          "45d442d6533300eded73c3dd2eeea5b065f4db57c35169a57041aa1ed64f970200000000",
+          "99079b151408d43a263f9a6bed64f6a25710174ccfbe03154f52b48d9f838f8e00000000",
+          "5a39c594ec04442de121efcb2c1ed444305f7e2fb29c8b62b0ced7554d9acfad00000000",
+          "091332ab463035880e95cfad405e8f08a276b5ab7e2db2661fd16e3f96124d5900000000",
+          "4bd45910635e9ed8f2c03f141acb98f954fcac0d91e31aa75e9f078c7f769bba00000000"
+        ],
+        "ignored": [
+          "bad-registry",
+          "registry-6",
+          "registry-7",
+          "registry-8",
+          "registry-9",
+          "registry-10",
+          "registry-11",
+          "registry-12",
+          "registry-13",
+          "registry-14",
+          "registry-15",
+          "registry-16",
+          "registry-17",
+          "duplicate-registry"
+        ]
+      }
+    }
+  ]
+}

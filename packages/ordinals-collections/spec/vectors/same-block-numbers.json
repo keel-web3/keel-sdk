@@ -1,0 +1,54 @@
+{
+  "version": "koc1@1",
+  "network": "testnet4",
+  "kind": "numbers",
+  "cases": [
+    {
+      "id": "relative-ord-and-recursion-order",
+      "rules": [
+        "KOC1-R13",
+        "KOC1-R47"
+      ],
+      "input": {
+        "height": 100,
+        "entries": [
+          {
+            "id": "c",
+            "txIndex": 7,
+            "ordNumber": 510,
+            "rpcNumber": 100000070000
+          },
+          {
+            "id": "b",
+            "txIndex": 3,
+            "ordNumber": 503,
+            "rpcNumber": 100000030000
+          },
+          {
+            "id": "a",
+            "txIndex": 1,
+            "ordNumber": 500,
+            "rpcNumber": 100000010000
+          }
+        ]
+      },
+      "expected": {
+        "ord": [
+          "a",
+          "b",
+          "c"
+        ],
+        "rpc": [
+          "a",
+          "b",
+          "c"
+        ],
+        "chain": [
+          "a",
+          "b",
+          "c"
+        ]
+      }
+    }
+  ]
+}

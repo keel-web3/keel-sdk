@@ -1,0 +1,794 @@
+{
+  "version": "koc1@1",
+  "network": "testnet4",
+  "kind": "escrow-policy",
+  "cases": [
+    {
+      "id": "collect-w1-w2",
+      "rules": [
+        "KOC1-R25",
+        "KOC1-R26",
+        "KOC1-R27"
+      ],
+      "input": {
+        "height": 100,
+        "spendHeight": 103,
+        "payment": {
+          "mode": "escrow",
+          "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+          "writerKeys": [
+            "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+            "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+            "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+          ],
+          "collectAfter": 3,
+          "refundAfter": 18,
+          "earlyRefund": true
+        },
+        "version": 2,
+        "sequence": 3,
+        "signers": [
+          "treasury",
+          "w1",
+          "w2"
+        ],
+        "member": true,
+        "settled": true,
+        "depth": 3,
+        "W": 3,
+        "unresolved": false,
+        "path": "L_t"
+      },
+      "expected": {
+        "consensus": true,
+        "writerPolicy": true
+      }
+    },
+    {
+      "id": "collect-w1-w3",
+      "rules": [
+        "KOC1-R25",
+        "KOC1-R26",
+        "KOC1-R27"
+      ],
+      "input": {
+        "height": 100,
+        "spendHeight": 103,
+        "payment": {
+          "mode": "escrow",
+          "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+          "writerKeys": [
+            "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+            "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+            "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+          ],
+          "collectAfter": 3,
+          "refundAfter": 18,
+          "earlyRefund": true
+        },
+        "version": 2,
+        "sequence": 3,
+        "signers": [
+          "treasury",
+          "w1",
+          "w3"
+        ],
+        "member": true,
+        "settled": true,
+        "depth": 3,
+        "W": 3,
+        "unresolved": false,
+        "path": "L_t"
+      },
+      "expected": {
+        "consensus": true,
+        "writerPolicy": true
+      }
+    },
+    {
+      "id": "collect-w2-w3",
+      "rules": [
+        "KOC1-R25",
+        "KOC1-R26",
+        "KOC1-R27"
+      ],
+      "input": {
+        "height": 100,
+        "spendHeight": 103,
+        "payment": {
+          "mode": "escrow",
+          "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+          "writerKeys": [
+            "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+            "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+            "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+          ],
+          "collectAfter": 3,
+          "refundAfter": 18,
+          "earlyRefund": true
+        },
+        "version": 2,
+        "sequence": 3,
+        "signers": [
+          "treasury",
+          "w2",
+          "w3"
+        ],
+        "member": true,
+        "settled": true,
+        "depth": 3,
+        "W": 3,
+        "unresolved": false,
+        "path": "L_t"
+      },
+      "expected": {
+        "consensus": true,
+        "writerPolicy": true
+      }
+    },
+    {
+      "id": "collect-too-early",
+      "rules": [
+        "KOC1-R26"
+      ],
+      "input": {
+        "height": 100,
+        "spendHeight": 102,
+        "payment": {
+          "mode": "escrow",
+          "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+          "writerKeys": [
+            "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+            "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+            "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+          ],
+          "collectAfter": 3,
+          "refundAfter": 18,
+          "earlyRefund": true
+        },
+        "version": 2,
+        "sequence": 3,
+        "signers": [
+          "treasury",
+          "w1",
+          "w2"
+        ],
+        "member": true,
+        "settled": true,
+        "depth": 3,
+        "W": 3,
+        "unresolved": false,
+        "path": "L_t"
+      },
+      "expected": {
+        "consensus": false,
+        "writerPolicy": true
+      }
+    },
+    {
+      "id": "collect-one-writer",
+      "rules": [
+        "KOC1-R25",
+        "KOC1-R27"
+      ],
+      "input": {
+        "height": 100,
+        "spendHeight": 103,
+        "payment": {
+          "mode": "escrow",
+          "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+          "writerKeys": [
+            "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+            "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+            "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+          ],
+          "collectAfter": 3,
+          "refundAfter": 18,
+          "earlyRefund": true
+        },
+        "version": 2,
+        "sequence": 3,
+        "signers": [
+          "treasury",
+          "w3"
+        ],
+        "member": true,
+        "settled": true,
+        "depth": 3,
+        "W": 3,
+        "unresolved": false,
+        "path": "L_t"
+      },
+      "expected": {
+        "consensus": false,
+        "writerPolicy": true
+      }
+    },
+    {
+      "id": "CSV-disable-flag",
+      "rules": [
+        "KOC1-R26"
+      ],
+      "input": {
+        "height": 100,
+        "spendHeight": 103,
+        "payment": {
+          "mode": "escrow",
+          "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+          "writerKeys": [
+            "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+            "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+            "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+          ],
+          "collectAfter": 3,
+          "refundAfter": 18,
+          "earlyRefund": true
+        },
+        "version": 2,
+        "sequence": 2147483651,
+        "signers": [
+          "treasury",
+          "w1",
+          "w2"
+        ],
+        "member": true,
+        "settled": true,
+        "depth": 3,
+        "W": 3,
+        "unresolved": false,
+        "path": "L_t"
+      },
+      "expected": {
+        "consensus": false,
+        "writerPolicy": true
+      }
+    },
+    {
+      "id": "CSV-time-flag",
+      "rules": [
+        "KOC1-R26"
+      ],
+      "input": {
+        "height": 100,
+        "spendHeight": 103,
+        "payment": {
+          "mode": "escrow",
+          "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+          "writerKeys": [
+            "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+            "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+            "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+          ],
+          "collectAfter": 3,
+          "refundAfter": 18,
+          "earlyRefund": true
+        },
+        "version": 2,
+        "sequence": 4194307,
+        "signers": [
+          "treasury",
+          "w1",
+          "w2"
+        ],
+        "member": true,
+        "settled": true,
+        "depth": 3,
+        "W": 3,
+        "unresolved": false,
+        "path": "L_t"
+      },
+      "expected": {
+        "consensus": false,
+        "writerPolicy": true
+      }
+    },
+    {
+      "id": "CSV-version-one",
+      "rules": [
+        "KOC1-R26"
+      ],
+      "input": {
+        "height": 100,
+        "spendHeight": 103,
+        "payment": {
+          "mode": "escrow",
+          "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+          "writerKeys": [
+            "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+            "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+            "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+          ],
+          "collectAfter": 3,
+          "refundAfter": 18,
+          "earlyRefund": true
+        },
+        "version": 1,
+        "sequence": 3,
+        "signers": [
+          "treasury",
+          "w1",
+          "w2"
+        ],
+        "member": true,
+        "settled": true,
+        "depth": 3,
+        "W": 3,
+        "unresolved": false,
+        "path": "L_t"
+      },
+      "expected": {
+        "consensus": false,
+        "writerPolicy": true
+      }
+    },
+    {
+      "id": "unsettled-member-policy-refusal",
+      "rules": [
+        "KOC1-R27"
+      ],
+      "input": {
+        "height": 100,
+        "spendHeight": 103,
+        "payment": {
+          "mode": "escrow",
+          "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+          "writerKeys": [
+            "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+            "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+            "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+          ],
+          "collectAfter": 3,
+          "refundAfter": 18,
+          "earlyRefund": true
+        },
+        "version": 2,
+        "sequence": 3,
+        "signers": [
+          "treasury",
+          "w1",
+          "w2"
+        ],
+        "member": true,
+        "settled": false,
+        "depth": 3,
+        "W": 3,
+        "unresolved": false,
+        "path": "L_t"
+      },
+      "expected": {
+        "consensus": true,
+        "writerPolicy": false
+      }
+    },
+    {
+      "id": "nonmember-collusion-is-accountable",
+      "rules": [
+        "KOC1-R27",
+        "KOC1-R28"
+      ],
+      "input": {
+        "height": 100,
+        "spendHeight": 103,
+        "payment": {
+          "mode": "escrow",
+          "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+          "writerKeys": [
+            "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+            "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+            "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+          ],
+          "collectAfter": 3,
+          "refundAfter": 18,
+          "earlyRefund": true
+        },
+        "version": 2,
+        "sequence": 3,
+        "signers": [
+          "treasury",
+          "w1",
+          "w2"
+        ],
+        "member": false,
+        "settled": true,
+        "depth": 3,
+        "W": 3,
+        "unresolved": false,
+        "path": "L_t"
+      },
+      "expected": {
+        "consensus": true,
+        "writerPolicy": false
+      }
+    },
+    {
+      "id": "open-challenge-policy-refusal",
+      "rules": [
+        "KOC1-R27"
+      ],
+      "input": {
+        "height": 100,
+        "spendHeight": 103,
+        "payment": {
+          "mode": "escrow",
+          "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+          "writerKeys": [
+            "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+            "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+            "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+          ],
+          "collectAfter": 3,
+          "refundAfter": 18,
+          "earlyRefund": true
+        },
+        "version": 2,
+        "sequence": 3,
+        "signers": [
+          "treasury",
+          "w1",
+          "w2"
+        ],
+        "member": true,
+        "settled": true,
+        "depth": 3,
+        "W": 3,
+        "unresolved": true,
+        "path": "L_t"
+      },
+      "expected": {
+        "consensus": true,
+        "writerPolicy": false
+      }
+    },
+    {
+      "id": "refund-before-unconditional-opens",
+      "rules": [
+        "KOC1-R26",
+        "KOC1-R28"
+      ],
+      "input": {
+        "height": 100,
+        "spendHeight": 117,
+        "payment": {
+          "mode": "escrow",
+          "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+          "writerKeys": [
+            "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+            "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+            "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+          ],
+          "collectAfter": 3,
+          "refundAfter": 18,
+          "earlyRefund": true
+        },
+        "version": 2,
+        "sequence": 18,
+        "signers": [
+          "buyer"
+        ],
+        "member": true,
+        "settled": true,
+        "depth": 3,
+        "W": 3,
+        "unresolved": false,
+        "path": "L_m"
+      },
+      "expected": {
+        "consensus": false,
+        "writerPolicy": true
+      }
+    },
+    {
+      "id": "unconditional-refund-member-keeps-token",
+      "rules": [
+        "KOC1-R28"
+      ],
+      "input": {
+        "height": 100,
+        "spendHeight": 118,
+        "payment": {
+          "mode": "escrow",
+          "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+          "writerKeys": [
+            "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+            "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+            "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+          ],
+          "collectAfter": 3,
+          "refundAfter": 18,
+          "earlyRefund": true
+        },
+        "version": 2,
+        "sequence": 18,
+        "signers": [
+          "buyer"
+        ],
+        "member": true,
+        "settled": false,
+        "depth": 3,
+        "W": 3,
+        "unresolved": false,
+        "path": "L_m"
+      },
+      "expected": {
+        "consensus": true,
+        "writerPolicy": true
+      }
+    },
+    {
+      "id": "early-refund-settled-loser",
+      "rules": [
+        "KOC1-R27",
+        "KOC1-R28"
+      ],
+      "input": {
+        "height": 100,
+        "spendHeight": 100,
+        "payment": {
+          "mode": "escrow",
+          "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+          "writerKeys": [
+            "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+            "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+            "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+          ],
+          "collectAfter": 3,
+          "refundAfter": 18,
+          "earlyRefund": true
+        },
+        "version": 2,
+        "sequence": 3,
+        "signers": [
+          "buyer",
+          "w1",
+          "w2"
+        ],
+        "member": false,
+        "settled": true,
+        "depth": 3,
+        "W": 3,
+        "unresolved": false,
+        "path": "L_e"
+      },
+      "expected": {
+        "consensus": true,
+        "writerPolicy": true
+      }
+    },
+    {
+      "id": "early-refund-no-writers",
+      "rules": [
+        "KOC1-R25",
+        "KOC1-R28"
+      ],
+      "input": {
+        "height": 100,
+        "spendHeight": 103,
+        "payment": {
+          "mode": "escrow",
+          "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+          "writerKeys": [
+            "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+            "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+            "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+          ],
+          "collectAfter": 3,
+          "refundAfter": 18,
+          "earlyRefund": true
+        },
+        "version": 2,
+        "sequence": 3,
+        "signers": [
+          "buyer"
+        ],
+        "member": true,
+        "settled": true,
+        "depth": 3,
+        "W": 3,
+        "unresolved": false,
+        "path": "L_e"
+      },
+      "expected": {
+        "consensus": false,
+        "writerPolicy": false
+      }
+    },
+    {
+      "id": "collect-after-refund-path-opens",
+      "rules": [
+        "KOC1-R26",
+        "KOC1-R28"
+      ],
+      "input": {
+        "height": 100,
+        "spendHeight": 118,
+        "payment": {
+          "mode": "escrow",
+          "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+          "writerKeys": [
+            "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+            "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+            "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+          ],
+          "collectAfter": 3,
+          "refundAfter": 18,
+          "earlyRefund": true
+        },
+        "version": 2,
+        "sequence": 3,
+        "signers": [
+          "treasury",
+          "w1",
+          "w2"
+        ],
+        "member": true,
+        "settled": true,
+        "depth": 3,
+        "W": 3,
+        "unresolved": false,
+        "path": "L_t"
+      },
+      "expected": {
+        "consensus": true,
+        "writerPolicy": true
+      }
+    },
+    {
+      "id": "early-refund-disabled",
+      "rules": [
+        "KOC1-R25",
+        "KOC1-R28"
+      ],
+      "input": {
+        "height": 100,
+        "spendHeight": 103,
+        "payment": {
+          "mode": "escrow",
+          "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+          "writerKeys": [
+            "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+            "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+            "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+          ],
+          "collectAfter": 3,
+          "refundAfter": 18,
+          "earlyRefund": false
+        },
+        "version": 2,
+        "sequence": 3,
+        "signers": [
+          "buyer",
+          "w1",
+          "w2"
+        ],
+        "member": true,
+        "settled": true,
+        "depth": 3,
+        "W": 3,
+        "unresolved": false,
+        "path": "L_e"
+      },
+      "expected": {
+        "consensus": false,
+        "writerPolicy": false
+      }
+    },
+    {
+      "id": "collect-three-writers-is-not-two",
+      "rules": [
+        "KOC1-R25",
+        "KOC1-R27"
+      ],
+      "input": {
+        "height": 100,
+        "spendHeight": 103,
+        "payment": {
+          "mode": "escrow",
+          "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+          "writerKeys": [
+            "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+            "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+            "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+          ],
+          "collectAfter": 3,
+          "refundAfter": 18,
+          "earlyRefund": true
+        },
+        "version": 2,
+        "sequence": 3,
+        "signers": [
+          "treasury",
+          "w1",
+          "w2",
+          "w3"
+        ],
+        "member": true,
+        "settled": true,
+        "depth": 3,
+        "W": 3,
+        "unresolved": false,
+        "path": "L_t"
+      },
+      "expected": {
+        "consensus": false,
+        "writerPolicy": true
+      }
+    },
+    {
+      "id": "collect-without-treasury",
+      "rules": [
+        "KOC1-R25"
+      ],
+      "input": {
+        "height": 100,
+        "spendHeight": 103,
+        "payment": {
+          "mode": "escrow",
+          "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+          "writerKeys": [
+            "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+            "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+            "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+          ],
+          "collectAfter": 3,
+          "refundAfter": 18,
+          "earlyRefund": true
+        },
+        "version": 2,
+        "sequence": 3,
+        "signers": [
+          "w1",
+          "w2"
+        ],
+        "member": true,
+        "settled": true,
+        "depth": 3,
+        "W": 3,
+        "unresolved": false,
+        "path": "L_t"
+      },
+      "expected": {
+        "consensus": false,
+        "writerPolicy": true
+      }
+    },
+    {
+      "id": "duplicate-writer-is-not-two",
+      "rules": [
+        "KOC1-R25"
+      ],
+      "input": {
+        "height": 100,
+        "spendHeight": 103,
+        "payment": {
+          "mode": "escrow",
+          "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+          "writerKeys": [
+            "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+            "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+            "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+          ],
+          "collectAfter": 3,
+          "refundAfter": 18,
+          "earlyRefund": true
+        },
+        "version": 2,
+        "sequence": 3,
+        "signers": [
+          "treasury",
+          "w1",
+          "w1"
+        ],
+        "member": true,
+        "settled": true,
+        "depth": 3,
+        "W": 3,
+        "unresolved": false,
+        "path": "L_t"
+      },
+      "expected": {
+        "consensus": false,
+        "writerPolicy": true
+      }
+    }
+  ]
+}

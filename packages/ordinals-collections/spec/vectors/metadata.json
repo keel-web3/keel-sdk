@@ -1,0 +1,70 @@
+{
+  "version": "koc1@1",
+  "network": "testnet4",
+  "kind": "metadata",
+  "cases": [
+    {
+      "id": "research-1.12-metadata",
+      "rules": [
+        "KOC1-R15",
+        "KOC1-R51"
+      ],
+      "input": {
+        "messages": [
+          "{\"name\":\"BLAH #1\",\"trait\":\"red\"}",
+          "{\"name\":\"BLAH #2\",\"trait\":\"blue\"}",
+          "{\"name\":\"BLAH #3\",\"trait\":\"gold\"}"
+        ],
+        "positions": [
+          1,
+          2,
+          3,
+          4,
+          21,
+          22
+        ]
+      },
+      "expected": {
+        "messageHashes": [
+          "7ad201b5b88e3d64f0d8e04a29a590e6c1538c8640fdff2cd28e191b0152ddd9",
+          "1806453aedb1e84bf88306578450ef15171e8eb6810a99e27120cad0f889906d",
+          "2a7a70998d8807dcdf0f7bb17bc7b2f33d43b55b0a60235830ab2cf9487725af"
+        ],
+        "leaves": [
+          "4df264c81bb73e78bae3b05c1c163e27d25a269a6fdfb2a24e874f5f19f8bf2d",
+          "ecae9b184e86ef39abbd2f780bee3a9849b75b829cc0ff571c238b20e7017f70",
+          "0d73381b9339d6da99e2eae08c68f9dcd20a3e0179a830c8131d2ff5de1565fd"
+        ],
+        "node12": "e855940b92e9d20a4a52de32b34079e15e9f5660ee790a028bd8571f6820177e",
+        "root": "58e3264fe062e6ea843b36122519ab32f477ce27ea93764102e2d469f28df3fe",
+        "proof2": [
+          {
+            "side": "left",
+            "hash": "4df264c81bb73e78bae3b05c1c163e27d25a269a6fdfb2a24e874f5f19f8bf2d"
+          },
+          {
+            "side": "right",
+            "hash": "0d73381b9339d6da99e2eae08c68f9dcd20a3e0179a830c8131d2ff5de1565fd"
+          }
+        ],
+        "proof3": [
+          {
+            "side": "left",
+            "hash": "e855940b92e9d20a4a52de32b34079e15e9f5660ee790a028bd8571f6820177e"
+          }
+        ],
+        "proofsValid": true,
+        "emptyRoot": "0000000000000000000000000000000000000000000000000000000000000000",
+        "singletonRoot": "4df264c81bb73e78bae3b05c1c163e27d25a269a6fdfb2a24e874f5f19f8bf2d",
+        "cycle": [
+          1,
+          2,
+          3,
+          1,
+          3,
+          1
+        ]
+      }
+    }
+  ]
+}

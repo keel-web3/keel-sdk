@@ -1,0 +1,983 @@
+{
+  "version": "koc1@1",
+  "network": "testnet4",
+  "kind": "shell",
+  "cases": [
+    {
+      "id": "native-current-final",
+      "rules": [
+        "KOC1-R17",
+        "KOC1-R19",
+        "KOC1-R41",
+        "KOC1-R45",
+        "KOC1-R48",
+        "KOC1-R49",
+        "KOC1-R51"
+      ],
+      "input": {
+        "height": 100,
+        "tip": 105,
+        "F": 2,
+        "W": 3,
+        "C": 105,
+        "recipeValid": true,
+        "inIndex": true,
+        "burned": false,
+        "artBytes": "617274",
+        "artHash": "d3cec99112255db9bf4963f7798562b6a36f1bd0b2016918629e007d474deb70",
+        "leaf": "ecae9b184e86ef39abbd2f780bee3a9849b75b829cc0ff571c238b20e7017f70",
+        "path": [
+          {
+            "side": "left",
+            "hash": "4df264c81bb73e78bae3b05c1c163e27d25a269a6fdfb2a24e874f5f19f8bf2d"
+          },
+          {
+            "side": "right",
+            "hash": "0d73381b9339d6da99e2eae08c68f9dcd20a3e0179a830c8131d2ff5de1565fd"
+          }
+        ],
+        "root": "58e3264fe062e6ea843b36122519ab32f477ce27ea93764102e2d469f28df3fe",
+        "count": 21,
+        "challenges": 2,
+        "pageEntries": 20,
+        "bridged": false,
+        "endHeight": 102,
+        "paymentMode": "escrow"
+      },
+      "expected": {
+        "depth": 6,
+        "verified": true,
+        "final": true,
+        "current": true,
+        "artVerified": true,
+        "metadataVerified": true,
+        "entryAssurance": "exhaustive",
+        "challengeBudget": 2,
+        "incomplete": false,
+        "followNextAsAuthority": false,
+        "bridgeAccepted": true,
+        "spentKnown": false,
+        "scanStopped": true,
+        "cancelReservesSupply": false,
+        "directOptInRequired": false
+      }
+    },
+    {
+      "id": "burned-no-badge",
+      "rules": [
+        "KOC1-R14",
+        "KOC1-R45",
+        "KOC1-R51"
+      ],
+      "input": {
+        "height": 100,
+        "tip": 105,
+        "F": 2,
+        "W": 3,
+        "C": 105,
+        "recipeValid": true,
+        "inIndex": true,
+        "burned": true,
+        "artBytes": "617274",
+        "artHash": "d3cec99112255db9bf4963f7798562b6a36f1bd0b2016918629e007d474deb70",
+        "leaf": "ecae9b184e86ef39abbd2f780bee3a9849b75b829cc0ff571c238b20e7017f70",
+        "path": [
+          {
+            "side": "left",
+            "hash": "4df264c81bb73e78bae3b05c1c163e27d25a269a6fdfb2a24e874f5f19f8bf2d"
+          },
+          {
+            "side": "right",
+            "hash": "0d73381b9339d6da99e2eae08c68f9dcd20a3e0179a830c8131d2ff5de1565fd"
+          }
+        ],
+        "root": "58e3264fe062e6ea843b36122519ab32f477ce27ea93764102e2d469f28df3fe",
+        "count": 21,
+        "challenges": 2,
+        "pageEntries": 20,
+        "bridged": false,
+        "endHeight": 102,
+        "paymentMode": "escrow"
+      },
+      "expected": {
+        "depth": 6,
+        "verified": false,
+        "final": false,
+        "current": false,
+        "artVerified": true,
+        "metadataVerified": true,
+        "entryAssurance": "exhaustive",
+        "challengeBudget": 2,
+        "incomplete": false,
+        "followNextAsAuthority": false,
+        "bridgeAccepted": true,
+        "spentKnown": false,
+        "scanStopped": true,
+        "cancelReservesSupply": false,
+        "directOptInRequired": false
+      }
+    },
+    {
+      "id": "no-index-no-badge",
+      "rules": [
+        "KOC1-R45"
+      ],
+      "input": {
+        "height": 100,
+        "tip": 105,
+        "F": 2,
+        "W": 3,
+        "C": 105,
+        "recipeValid": true,
+        "inIndex": false,
+        "burned": false,
+        "artBytes": "617274",
+        "artHash": "d3cec99112255db9bf4963f7798562b6a36f1bd0b2016918629e007d474deb70",
+        "leaf": "ecae9b184e86ef39abbd2f780bee3a9849b75b829cc0ff571c238b20e7017f70",
+        "path": [
+          {
+            "side": "left",
+            "hash": "4df264c81bb73e78bae3b05c1c163e27d25a269a6fdfb2a24e874f5f19f8bf2d"
+          },
+          {
+            "side": "right",
+            "hash": "0d73381b9339d6da99e2eae08c68f9dcd20a3e0179a830c8131d2ff5de1565fd"
+          }
+        ],
+        "root": "58e3264fe062e6ea843b36122519ab32f477ce27ea93764102e2d469f28df3fe",
+        "count": 21,
+        "challenges": 2,
+        "pageEntries": 20,
+        "bridged": false,
+        "endHeight": 102,
+        "paymentMode": "escrow"
+      },
+      "expected": {
+        "depth": 6,
+        "verified": false,
+        "final": false,
+        "current": false,
+        "artVerified": true,
+        "metadataVerified": true,
+        "entryAssurance": "exhaustive",
+        "challengeBudget": 2,
+        "incomplete": false,
+        "followNextAsAuthority": false,
+        "bridgeAccepted": true,
+        "spentKnown": false,
+        "scanStopped": true,
+        "cancelReservesSupply": false,
+        "directOptInRequired": false
+      }
+    },
+    {
+      "id": "invalid-recipe-no-badge",
+      "rules": [
+        "KOC1-R45",
+        "KOC1-R46"
+      ],
+      "input": {
+        "height": 100,
+        "tip": 105,
+        "F": 2,
+        "W": 3,
+        "C": 105,
+        "recipeValid": false,
+        "inIndex": true,
+        "burned": false,
+        "artBytes": "617274",
+        "artHash": "d3cec99112255db9bf4963f7798562b6a36f1bd0b2016918629e007d474deb70",
+        "leaf": "ecae9b184e86ef39abbd2f780bee3a9849b75b829cc0ff571c238b20e7017f70",
+        "path": [
+          {
+            "side": "left",
+            "hash": "4df264c81bb73e78bae3b05c1c163e27d25a269a6fdfb2a24e874f5f19f8bf2d"
+          },
+          {
+            "side": "right",
+            "hash": "0d73381b9339d6da99e2eae08c68f9dcd20a3e0179a830c8131d2ff5de1565fd"
+          }
+        ],
+        "root": "58e3264fe062e6ea843b36122519ab32f477ce27ea93764102e2d469f28df3fe",
+        "count": 21,
+        "challenges": 2,
+        "pageEntries": 20,
+        "bridged": false,
+        "endHeight": 102,
+        "paymentMode": "escrow"
+      },
+      "expected": {
+        "depth": 6,
+        "verified": false,
+        "final": false,
+        "current": false,
+        "artVerified": true,
+        "metadataVerified": true,
+        "entryAssurance": "exhaustive",
+        "challengeBudget": 2,
+        "incomplete": false,
+        "followNextAsAuthority": false,
+        "bridgeAccepted": true,
+        "spentKnown": false,
+        "scanStopped": true,
+        "cancelReservesSupply": false,
+        "directOptInRequired": false
+      }
+    },
+    {
+      "id": "F-not-yet-reached",
+      "rules": [
+        "KOC1-R17",
+        "KOC1-R45",
+        "KOC1-R47"
+      ],
+      "input": {
+        "height": 100,
+        "tip": 100,
+        "F": 2,
+        "W": 3,
+        "C": 105,
+        "recipeValid": true,
+        "inIndex": true,
+        "burned": false,
+        "artBytes": "617274",
+        "artHash": "d3cec99112255db9bf4963f7798562b6a36f1bd0b2016918629e007d474deb70",
+        "leaf": "ecae9b184e86ef39abbd2f780bee3a9849b75b829cc0ff571c238b20e7017f70",
+        "path": [
+          {
+            "side": "left",
+            "hash": "4df264c81bb73e78bae3b05c1c163e27d25a269a6fdfb2a24e874f5f19f8bf2d"
+          },
+          {
+            "side": "right",
+            "hash": "0d73381b9339d6da99e2eae08c68f9dcd20a3e0179a830c8131d2ff5de1565fd"
+          }
+        ],
+        "root": "58e3264fe062e6ea843b36122519ab32f477ce27ea93764102e2d469f28df3fe",
+        "count": 21,
+        "challenges": 2,
+        "pageEntries": 20,
+        "bridged": false,
+        "endHeight": 102,
+        "paymentMode": "escrow"
+      },
+      "expected": {
+        "depth": 1,
+        "verified": false,
+        "final": false,
+        "current": true,
+        "artVerified": true,
+        "metadataVerified": true,
+        "entryAssurance": "exhaustive",
+        "challengeBudget": 2,
+        "incomplete": false,
+        "followNextAsAuthority": false,
+        "bridgeAccepted": true,
+        "spentKnown": false,
+        "scanStopped": true,
+        "cancelReservesSupply": false,
+        "directOptInRequired": false
+      }
+    },
+    {
+      "id": "W-not-yet-covered",
+      "rules": [
+        "KOC1-R41",
+        "KOC1-R45"
+      ],
+      "input": {
+        "height": 100,
+        "tip": 105,
+        "F": 2,
+        "W": 3,
+        "C": 102,
+        "recipeValid": true,
+        "inIndex": true,
+        "burned": false,
+        "artBytes": "617274",
+        "artHash": "d3cec99112255db9bf4963f7798562b6a36f1bd0b2016918629e007d474deb70",
+        "leaf": "ecae9b184e86ef39abbd2f780bee3a9849b75b829cc0ff571c238b20e7017f70",
+        "path": [
+          {
+            "side": "left",
+            "hash": "4df264c81bb73e78bae3b05c1c163e27d25a269a6fdfb2a24e874f5f19f8bf2d"
+          },
+          {
+            "side": "right",
+            "hash": "0d73381b9339d6da99e2eae08c68f9dcd20a3e0179a830c8131d2ff5de1565fd"
+          }
+        ],
+        "root": "58e3264fe062e6ea843b36122519ab32f477ce27ea93764102e2d469f28df3fe",
+        "count": 21,
+        "challenges": 2,
+        "pageEntries": 20,
+        "bridged": false,
+        "endHeight": 102,
+        "paymentMode": "escrow"
+      },
+      "expected": {
+        "depth": 6,
+        "verified": true,
+        "final": false,
+        "current": true,
+        "artVerified": true,
+        "metadataVerified": true,
+        "entryAssurance": "exhaustive",
+        "challengeBudget": 2,
+        "incomplete": false,
+        "followNextAsAuthority": false,
+        "bridgeAccepted": true,
+        "spentKnown": false,
+        "scanStopped": false,
+        "cancelReservesSupply": false,
+        "directOptInRequired": false
+      }
+    },
+    {
+      "id": "open-challenge-no-final",
+      "rules": [
+        "KOC1-R41",
+        "KOC1-R45"
+      ],
+      "input": {
+        "height": 100,
+        "tip": 105,
+        "F": 2,
+        "W": 3,
+        "C": 105,
+        "recipeValid": true,
+        "inIndex": true,
+        "burned": false,
+        "artBytes": "617274",
+        "artHash": "d3cec99112255db9bf4963f7798562b6a36f1bd0b2016918629e007d474deb70",
+        "leaf": "ecae9b184e86ef39abbd2f780bee3a9849b75b829cc0ff571c238b20e7017f70",
+        "path": [
+          {
+            "side": "left",
+            "hash": "4df264c81bb73e78bae3b05c1c163e27d25a269a6fdfb2a24e874f5f19f8bf2d"
+          },
+          {
+            "side": "right",
+            "hash": "0d73381b9339d6da99e2eae08c68f9dcd20a3e0179a830c8131d2ff5de1565fd"
+          }
+        ],
+        "root": "58e3264fe062e6ea843b36122519ab32f477ce27ea93764102e2d469f28df3fe",
+        "count": 21,
+        "challenges": 2,
+        "pageEntries": 20,
+        "bridged": false,
+        "endHeight": 102,
+        "paymentMode": "escrow",
+        "unresolved": true
+      },
+      "expected": {
+        "depth": 6,
+        "verified": true,
+        "final": false,
+        "current": true,
+        "artVerified": true,
+        "metadataVerified": true,
+        "entryAssurance": "exhaustive",
+        "challengeBudget": 2,
+        "incomplete": false,
+        "followNextAsAuthority": false,
+        "bridgeAccepted": true,
+        "spentKnown": false,
+        "scanStopped": true,
+        "cancelReservesSupply": false,
+        "directOptInRequired": false
+      }
+    },
+    {
+      "id": "at-most-32-challenges",
+      "rules": [
+        "KOC1-R49"
+      ],
+      "input": {
+        "height": 100,
+        "tip": 105,
+        "F": 2,
+        "W": 3,
+        "C": 105,
+        "recipeValid": true,
+        "inIndex": true,
+        "burned": false,
+        "artBytes": "617274",
+        "artHash": "d3cec99112255db9bf4963f7798562b6a36f1bd0b2016918629e007d474deb70",
+        "leaf": "ecae9b184e86ef39abbd2f780bee3a9849b75b829cc0ff571c238b20e7017f70",
+        "path": [
+          {
+            "side": "left",
+            "hash": "4df264c81bb73e78bae3b05c1c163e27d25a269a6fdfb2a24e874f5f19f8bf2d"
+          },
+          {
+            "side": "right",
+            "hash": "0d73381b9339d6da99e2eae08c68f9dcd20a3e0179a830c8131d2ff5de1565fd"
+          }
+        ],
+        "root": "58e3264fe062e6ea843b36122519ab32f477ce27ea93764102e2d469f28df3fe",
+        "count": 21,
+        "challenges": 33,
+        "pageEntries": 20,
+        "bridged": false,
+        "endHeight": 102,
+        "paymentMode": "escrow"
+      },
+      "expected": {
+        "depth": 6,
+        "verified": false,
+        "final": false,
+        "current": true,
+        "artVerified": true,
+        "metadataVerified": true,
+        "entryAssurance": "exhaustive",
+        "challengeBudget": 32,
+        "incomplete": true,
+        "followNextAsAuthority": false,
+        "bridgeAccepted": true,
+        "spentKnown": false,
+        "scanStopped": true,
+        "cancelReservesSupply": false,
+        "directOptInRequired": false
+      }
+    },
+    {
+      "id": "paging-incomplete",
+      "rules": [
+        "KOC1-R49"
+      ],
+      "input": {
+        "height": 100,
+        "tip": 105,
+        "F": 2,
+        "W": 3,
+        "C": 105,
+        "recipeValid": true,
+        "inIndex": true,
+        "burned": false,
+        "artBytes": "617274",
+        "artHash": "d3cec99112255db9bf4963f7798562b6a36f1bd0b2016918629e007d474deb70",
+        "leaf": "ecae9b184e86ef39abbd2f780bee3a9849b75b829cc0ff571c238b20e7017f70",
+        "path": [
+          {
+            "side": "left",
+            "hash": "4df264c81bb73e78bae3b05c1c163e27d25a269a6fdfb2a24e874f5f19f8bf2d"
+          },
+          {
+            "side": "right",
+            "hash": "0d73381b9339d6da99e2eae08c68f9dcd20a3e0179a830c8131d2ff5de1565fd"
+          }
+        ],
+        "root": "58e3264fe062e6ea843b36122519ab32f477ce27ea93764102e2d469f28df3fe",
+        "count": 21,
+        "challenges": 2,
+        "pageEntries": 1001,
+        "bridged": false,
+        "endHeight": 102,
+        "paymentMode": "escrow"
+      },
+      "expected": {
+        "depth": 6,
+        "verified": false,
+        "final": false,
+        "current": true,
+        "artVerified": true,
+        "metadataVerified": true,
+        "entryAssurance": "exhaustive",
+        "challengeBudget": 2,
+        "incomplete": true,
+        "followNextAsAuthority": false,
+        "bridgeAccepted": true,
+        "spentKnown": false,
+        "scanStopped": true,
+        "cancelReservesSupply": false,
+        "directOptInRequired": false
+      }
+    },
+    {
+      "id": "large-collection-sampled",
+      "rules": [
+        "KOC1-R48"
+      ],
+      "input": {
+        "height": 100,
+        "tip": 105,
+        "F": 2,
+        "W": 3,
+        "C": 105,
+        "recipeValid": true,
+        "inIndex": true,
+        "burned": false,
+        "artBytes": "617274",
+        "artHash": "d3cec99112255db9bf4963f7798562b6a36f1bd0b2016918629e007d474deb70",
+        "leaf": "ecae9b184e86ef39abbd2f780bee3a9849b75b829cc0ff571c238b20e7017f70",
+        "path": [
+          {
+            "side": "left",
+            "hash": "4df264c81bb73e78bae3b05c1c163e27d25a269a6fdfb2a24e874f5f19f8bf2d"
+          },
+          {
+            "side": "right",
+            "hash": "0d73381b9339d6da99e2eae08c68f9dcd20a3e0179a830c8131d2ff5de1565fd"
+          }
+        ],
+        "root": "58e3264fe062e6ea843b36122519ab32f477ce27ea93764102e2d469f28df3fe",
+        "count": 1001,
+        "challenges": 2,
+        "pageEntries": 20,
+        "bridged": false,
+        "endHeight": 102,
+        "paymentMode": "escrow"
+      },
+      "expected": {
+        "depth": 6,
+        "verified": true,
+        "final": true,
+        "current": true,
+        "artVerified": true,
+        "metadataVerified": true,
+        "entryAssurance": "sampled",
+        "challengeBudget": 2,
+        "incomplete": false,
+        "followNextAsAuthority": false,
+        "bridgeAccepted": true,
+        "spentKnown": false,
+        "scanStopped": true,
+        "cancelReservesSupply": false,
+        "directOptInRequired": false
+      }
+    },
+    {
+      "id": "wrong-metadata-proof",
+      "rules": [
+        "KOC1-R15",
+        "KOC1-R51"
+      ],
+      "input": {
+        "height": 100,
+        "tip": 105,
+        "F": 2,
+        "W": 3,
+        "C": 105,
+        "recipeValid": true,
+        "inIndex": true,
+        "burned": false,
+        "artBytes": "617274",
+        "artHash": "d3cec99112255db9bf4963f7798562b6a36f1bd0b2016918629e007d474deb70",
+        "leaf": "ecae9b184e86ef39abbd2f780bee3a9849b75b829cc0ff571c238b20e7017f70",
+        "path": [
+          {
+            "side": "left",
+            "hash": "6b030d65e11a53523d72fb53f6f3509aac4b96287cac50c30c116e9fe76bbaca"
+          },
+          {
+            "side": "right",
+            "hash": "0d73381b9339d6da99e2eae08c68f9dcd20a3e0179a830c8131d2ff5de1565fd"
+          }
+        ],
+        "root": "58e3264fe062e6ea843b36122519ab32f477ce27ea93764102e2d469f28df3fe",
+        "count": 21,
+        "challenges": 2,
+        "pageEntries": 20,
+        "bridged": false,
+        "endHeight": 102,
+        "paymentMode": "escrow"
+      },
+      "expected": {
+        "depth": 6,
+        "verified": true,
+        "final": true,
+        "current": true,
+        "artVerified": true,
+        "metadataVerified": false,
+        "entryAssurance": "exhaustive",
+        "challengeBudget": 2,
+        "incomplete": false,
+        "followNextAsAuthority": false,
+        "bridgeAccepted": true,
+        "spentKnown": false,
+        "scanStopped": true,
+        "cancelReservesSupply": false,
+        "directOptInRequired": false
+      }
+    },
+    {
+      "id": "wrong-art-hash",
+      "rules": [
+        "KOC1-R51"
+      ],
+      "input": {
+        "height": 100,
+        "tip": 105,
+        "F": 2,
+        "W": 3,
+        "C": 105,
+        "recipeValid": true,
+        "inIndex": true,
+        "burned": false,
+        "artBytes": "00",
+        "artHash": "d3cec99112255db9bf4963f7798562b6a36f1bd0b2016918629e007d474deb70",
+        "leaf": "ecae9b184e86ef39abbd2f780bee3a9849b75b829cc0ff571c238b20e7017f70",
+        "path": [
+          {
+            "side": "left",
+            "hash": "4df264c81bb73e78bae3b05c1c163e27d25a269a6fdfb2a24e874f5f19f8bf2d"
+          },
+          {
+            "side": "right",
+            "hash": "0d73381b9339d6da99e2eae08c68f9dcd20a3e0179a830c8131d2ff5de1565fd"
+          }
+        ],
+        "root": "58e3264fe062e6ea843b36122519ab32f477ce27ea93764102e2d469f28df3fe",
+        "count": 21,
+        "challenges": 2,
+        "pageEntries": 20,
+        "bridged": false,
+        "endHeight": 102,
+        "paymentMode": "escrow"
+      },
+      "expected": {
+        "depth": 6,
+        "verified": true,
+        "final": true,
+        "current": true,
+        "artVerified": false,
+        "metadataVerified": true,
+        "entryAssurance": "exhaustive",
+        "challengeBudget": 2,
+        "incomplete": false,
+        "followNextAsAuthority": false,
+        "bridgeAccepted": true,
+        "spentKnown": false,
+        "scanStopped": true,
+        "cancelReservesSupply": false,
+        "directOptInRequired": false
+      }
+    },
+    {
+      "id": "bridge-no-substitute",
+      "rules": [
+        "KOC1-R51"
+      ],
+      "input": {
+        "height": 100,
+        "tip": 105,
+        "F": 2,
+        "W": 3,
+        "C": 105,
+        "recipeValid": true,
+        "inIndex": true,
+        "burned": false,
+        "artBytes": "617274",
+        "artHash": "d3cec99112255db9bf4963f7798562b6a36f1bd0b2016918629e007d474deb70",
+        "leaf": "ecae9b184e86ef39abbd2f780bee3a9849b75b829cc0ff571c238b20e7017f70",
+        "path": [
+          {
+            "side": "left",
+            "hash": "4df264c81bb73e78bae3b05c1c163e27d25a269a6fdfb2a24e874f5f19f8bf2d"
+          },
+          {
+            "side": "right",
+            "hash": "0d73381b9339d6da99e2eae08c68f9dcd20a3e0179a830c8131d2ff5de1565fd"
+          }
+        ],
+        "root": "58e3264fe062e6ea843b36122519ab32f477ce27ea93764102e2d469f28df3fe",
+        "count": 21,
+        "challenges": 2,
+        "pageEntries": 20,
+        "bridged": true,
+        "endHeight": 102,
+        "paymentMode": "escrow",
+        "existingGroth16Verified": false
+      },
+      "expected": {
+        "depth": 6,
+        "verified": true,
+        "final": true,
+        "current": true,
+        "artVerified": true,
+        "metadataVerified": true,
+        "entryAssurance": "exhaustive",
+        "challengeBudget": 2,
+        "incomplete": false,
+        "followNextAsAuthority": false,
+        "bridgeAccepted": false,
+        "spentKnown": false,
+        "scanStopped": true,
+        "cancelReservesSupply": false,
+        "directOptInRequired": false
+      }
+    },
+    {
+      "id": "bridge-existing-proof-interface-only",
+      "rules": [
+        "KOC1-R51"
+      ],
+      "input": {
+        "height": 100,
+        "tip": 105,
+        "F": 2,
+        "W": 3,
+        "C": 105,
+        "recipeValid": true,
+        "inIndex": true,
+        "burned": false,
+        "artBytes": "617274",
+        "artHash": "d3cec99112255db9bf4963f7798562b6a36f1bd0b2016918629e007d474deb70",
+        "leaf": "ecae9b184e86ef39abbd2f780bee3a9849b75b829cc0ff571c238b20e7017f70",
+        "path": [
+          {
+            "side": "left",
+            "hash": "4df264c81bb73e78bae3b05c1c163e27d25a269a6fdfb2a24e874f5f19f8bf2d"
+          },
+          {
+            "side": "right",
+            "hash": "0d73381b9339d6da99e2eae08c68f9dcd20a3e0179a830c8131d2ff5de1565fd"
+          }
+        ],
+        "root": "58e3264fe062e6ea843b36122519ab32f477ce27ea93764102e2d469f28df3fe",
+        "count": 21,
+        "challenges": 2,
+        "pageEntries": 20,
+        "bridged": true,
+        "endHeight": 102,
+        "paymentMode": "escrow",
+        "existingGroth16Verified": true
+      },
+      "expected": {
+        "depth": 6,
+        "verified": true,
+        "final": true,
+        "current": true,
+        "artVerified": true,
+        "metadataVerified": true,
+        "entryAssurance": "exhaustive",
+        "challengeBudget": 2,
+        "incomplete": false,
+        "followNextAsAuthority": false,
+        "bridgeAccepted": true,
+        "spentKnown": false,
+        "scanStopped": true,
+        "cancelReservesSupply": false,
+        "directOptInRequired": false
+      }
+    },
+    {
+      "id": "stop-scan-only-when-quorum-settled",
+      "rules": [
+        "KOC1-R19",
+        "KOC1-R40"
+      ],
+      "input": {
+        "height": 100,
+        "tip": 105,
+        "F": 2,
+        "W": 3,
+        "C": 103,
+        "recipeValid": true,
+        "inIndex": true,
+        "burned": false,
+        "artBytes": "617274",
+        "artHash": "d3cec99112255db9bf4963f7798562b6a36f1bd0b2016918629e007d474deb70",
+        "leaf": "ecae9b184e86ef39abbd2f780bee3a9849b75b829cc0ff571c238b20e7017f70",
+        "path": [
+          {
+            "side": "left",
+            "hash": "4df264c81bb73e78bae3b05c1c163e27d25a269a6fdfb2a24e874f5f19f8bf2d"
+          },
+          {
+            "side": "right",
+            "hash": "0d73381b9339d6da99e2eae08c68f9dcd20a3e0179a830c8131d2ff5de1565fd"
+          }
+        ],
+        "root": "58e3264fe062e6ea843b36122519ab32f477ce27ea93764102e2d469f28df3fe",
+        "count": 21,
+        "challenges": 2,
+        "pageEntries": 20,
+        "bridged": false,
+        "endHeight": 102,
+        "paymentMode": "escrow"
+      },
+      "expected": {
+        "depth": 6,
+        "verified": true,
+        "final": true,
+        "current": true,
+        "artVerified": true,
+        "metadataVerified": true,
+        "entryAssurance": "exhaustive",
+        "challengeBudget": 2,
+        "incomplete": false,
+        "followNextAsAuthority": false,
+        "bridgeAccepted": true,
+        "spentKnown": false,
+        "scanStopped": false,
+        "cancelReservesSupply": false,
+        "directOptInRequired": false
+      }
+    },
+    {
+      "id": "unbounded-scan-continues",
+      "rules": [
+        "KOC1-R19"
+      ],
+      "input": {
+        "height": 100,
+        "tip": 105,
+        "F": 2,
+        "W": 3,
+        "C": 105,
+        "recipeValid": true,
+        "inIndex": true,
+        "burned": false,
+        "artBytes": "617274",
+        "artHash": "d3cec99112255db9bf4963f7798562b6a36f1bd0b2016918629e007d474deb70",
+        "leaf": "ecae9b184e86ef39abbd2f780bee3a9849b75b829cc0ff571c238b20e7017f70",
+        "path": [
+          {
+            "side": "left",
+            "hash": "4df264c81bb73e78bae3b05c1c163e27d25a269a6fdfb2a24e874f5f19f8bf2d"
+          },
+          {
+            "side": "right",
+            "hash": "0d73381b9339d6da99e2eae08c68f9dcd20a3e0179a830c8131d2ff5de1565fd"
+          }
+        ],
+        "root": "58e3264fe062e6ea843b36122519ab32f477ce27ea93764102e2d469f28df3fe",
+        "count": 21,
+        "challenges": 2,
+        "pageEntries": 20,
+        "bridged": false,
+        "endHeight": null,
+        "paymentMode": "escrow"
+      },
+      "expected": {
+        "depth": 6,
+        "verified": true,
+        "final": true,
+        "current": true,
+        "artVerified": true,
+        "metadataVerified": true,
+        "entryAssurance": "exhaustive",
+        "challengeBudget": 2,
+        "incomplete": false,
+        "followNextAsAuthority": false,
+        "bridgeAccepted": true,
+        "spentKnown": false,
+        "scanStopped": false,
+        "cancelReservesSupply": false,
+        "directOptInRequired": false
+      }
+    },
+    {
+      "id": "direct-explicit-opt-in",
+      "rules": [
+        "KOC1-R29"
+      ],
+      "input": {
+        "height": 100,
+        "tip": 105,
+        "F": 2,
+        "W": 3,
+        "C": 105,
+        "recipeValid": true,
+        "inIndex": true,
+        "burned": false,
+        "artBytes": "617274",
+        "artHash": "d3cec99112255db9bf4963f7798562b6a36f1bd0b2016918629e007d474deb70",
+        "leaf": "ecae9b184e86ef39abbd2f780bee3a9849b75b829cc0ff571c238b20e7017f70",
+        "path": [
+          {
+            "side": "left",
+            "hash": "4df264c81bb73e78bae3b05c1c163e27d25a269a6fdfb2a24e874f5f19f8bf2d"
+          },
+          {
+            "side": "right",
+            "hash": "0d73381b9339d6da99e2eae08c68f9dcd20a3e0179a830c8131d2ff5de1565fd"
+          }
+        ],
+        "root": "58e3264fe062e6ea843b36122519ab32f477ce27ea93764102e2d469f28df3fe",
+        "count": 21,
+        "challenges": 2,
+        "pageEntries": 20,
+        "bridged": false,
+        "endHeight": 102,
+        "paymentMode": "direct"
+      },
+      "expected": {
+        "depth": 6,
+        "verified": true,
+        "final": true,
+        "current": true,
+        "artVerified": true,
+        "metadataVerified": true,
+        "entryAssurance": "exhaustive",
+        "challengeBudget": 2,
+        "incomplete": false,
+        "followNextAsAuthority": false,
+        "bridgeAccepted": true,
+        "spentKnown": false,
+        "scanStopped": true,
+        "cancelReservesSupply": false,
+        "directOptInRequired": true
+      }
+    },
+    {
+      "id": "spent-known-only-from-spender",
+      "rules": [
+        "KOC1-R51"
+      ],
+      "input": {
+        "height": 100,
+        "tip": 105,
+        "F": 2,
+        "W": 3,
+        "C": 105,
+        "recipeValid": true,
+        "inIndex": true,
+        "burned": false,
+        "artBytes": "617274",
+        "artHash": "d3cec99112255db9bf4963f7798562b6a36f1bd0b2016918629e007d474deb70",
+        "leaf": "ecae9b184e86ef39abbd2f780bee3a9849b75b829cc0ff571c238b20e7017f70",
+        "path": [
+          {
+            "side": "left",
+            "hash": "4df264c81bb73e78bae3b05c1c163e27d25a269a6fdfb2a24e874f5f19f8bf2d"
+          },
+          {
+            "side": "right",
+            "hash": "0d73381b9339d6da99e2eae08c68f9dcd20a3e0179a830c8131d2ff5de1565fd"
+          }
+        ],
+        "root": "58e3264fe062e6ea843b36122519ab32f477ce27ea93764102e2d469f28df3fe",
+        "count": 21,
+        "challenges": 2,
+        "pageEntries": 20,
+        "bridged": false,
+        "endHeight": 102,
+        "paymentMode": "escrow",
+        "spenderResponse": {
+          "txid": "661e1e9edb2609c0298f3d208088bb29a394b5a9a874de80f6e0a2177013ef87",
+          "height": 104
+        }
+      },
+      "expected": {
+        "depth": 6,
+        "verified": true,
+        "final": true,
+        "current": true,
+        "artVerified": true,
+        "metadataVerified": true,
+        "entryAssurance": "exhaustive",
+        "challengeBudget": 2,
+        "incomplete": false,
+        "followNextAsAuthority": false,
+        "bridgeAccepted": true,
+        "spentKnown": true,
+        "scanStopped": true,
+        "cancelReservesSupply": false,
+        "directOptInRequired": false
+      }
+    }
+  ]
+}

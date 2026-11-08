@@ -1,0 +1,160 @@
+{
+  "version": "koc1@1",
+  "network": "testnet4",
+  "kind": "tags",
+  "cases": [
+    {
+      "id": "tagged-recipe",
+      "rules": [
+        "KOC1-R1"
+      ],
+      "input": {
+        "tag7": "koc1",
+        "metadata": {
+          "p": "koc1",
+          "op": "recipe"
+        }
+      },
+      "expected": {
+        "valid": true,
+        "cbor": "a26170646b6f6331626f7066726563697065"
+      }
+    },
+    {
+      "id": "tagged-mint",
+      "rules": [
+        "KOC1-R1"
+      ],
+      "input": {
+        "tag7": "koc1",
+        "metadata": {
+          "p": "koc1",
+          "op": "mint"
+        }
+      },
+      "expected": {
+        "valid": true,
+        "cbor": "a26170646b6f6331626f70646d696e74"
+      }
+    },
+    {
+      "id": "tagged-index",
+      "rules": [
+        "KOC1-R1"
+      ],
+      "input": {
+        "tag7": "koc1",
+        "metadata": {
+          "p": "koc1",
+          "op": "index"
+        }
+      },
+      "expected": {
+        "valid": true,
+        "cbor": "a26170646b6f6331626f7065696e646578"
+      }
+    },
+    {
+      "id": "tagged-challenge",
+      "rules": [
+        "KOC1-R1"
+      ],
+      "input": {
+        "tag7": "koc1",
+        "metadata": {
+          "p": "koc1",
+          "op": "challenge"
+        }
+      },
+      "expected": {
+        "valid": true,
+        "cbor": "a26170646b6f6331626f70696368616c6c656e6765"
+      }
+    },
+    {
+      "id": "tagged-control",
+      "rules": [
+        "KOC1-R1"
+      ],
+      "input": {
+        "tag7": "koc1",
+        "metadata": {
+          "p": "koc1",
+          "op": "control"
+        }
+      },
+      "expected": {
+        "valid": true,
+        "cbor": "a26170646b6f6331626f7067636f6e74726f6c"
+      }
+    },
+    {
+      "id": "tagged-writer",
+      "rules": [
+        "KOC1-R1"
+      ],
+      "input": {
+        "tag7": "koc1",
+        "metadata": {
+          "p": "koc1",
+          "op": "writer"
+        }
+      },
+      "expected": {
+        "valid": true,
+        "cbor": "a26170646b6f6331626f7066777269746572"
+      }
+    },
+    {
+      "id": "tagged-koc1-pin",
+      "rules": [
+        "KOC1-R1"
+      ],
+      "input": {
+        "tag7": "koc1",
+        "metadata": {
+          "p": "koc1",
+          "op": "koc1-pin"
+        }
+      },
+      "expected": {
+        "valid": true,
+        "cbor": "a26170646b6f6331626f70686b6f63312d70696e"
+      }
+    },
+    {
+      "id": "tagged-koc1-number",
+      "rules": [
+        "KOC1-R1"
+      ],
+      "input": {
+        "tag7": "koc1",
+        "metadata": {
+          "p": "koc1",
+          "op": "koc1-number"
+        }
+      },
+      "expected": {
+        "valid": true,
+        "cbor": "a26170646b6f6331626f706b6b6f63312d6e756d626572"
+      }
+    },
+    {
+      "id": "wrong-metaprotocol",
+      "rules": [
+        "KOC1-R1"
+      ],
+      "input": {
+        "tag7": "koc2",
+        "metadata": {
+          "p": "koc1",
+          "op": "mint"
+        }
+      },
+      "expected": {
+        "valid": false,
+        "cbor": "a26170646b6f6331626f70646d696e74"
+      }
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "name": "@keel/ordinals-collections",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "KOC1 v1 specification and deterministic conformance vectors",
+  "scripts": {
+    "vectors:generate": "node spec/vectors/generate.mjs",
+    "vectors:check": "node spec/vectors/check.mjs",
+    "test": "node spec/vectors/check.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@noble/curves": "1.9.7"
+  }
+}

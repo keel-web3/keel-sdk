@@ -1,0 +1,412 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:keel:koc1:1:vectors",
+  "title": "KOC1 v1 conformance vector suite",
+  "type": "object",
+  "required": [
+    "version",
+    "network",
+    "kind",
+    "cases"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "koc1@1"
+    },
+    "network": {
+      "const": "testnet4"
+    },
+    "kind": {
+      "enum": [
+        "metadata",
+        "permutation",
+        "wire",
+        "escrow",
+        "mint",
+        "recipe",
+        "state",
+        "challenge",
+        "writers",
+        "registry",
+        "escrow-policy",
+        "shell",
+        "headers",
+        "block",
+        "numbers",
+        "witness-boundary",
+        "light-switch",
+        "tags"
+      ]
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/case"
+      }
+    }
+  },
+  "$defs": {
+    "hex": {
+      "type": "string",
+      "pattern": "^(?:[0-9a-f]{2})*$"
+    },
+    "hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{72}$"
+    },
+    "uint": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295
+    },
+    "case": {
+      "type": "object",
+      "required": [
+        "id",
+        "rules",
+        "input",
+        "expected"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
+        },
+        "rules": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^KOC1-R[1-9][0-9]*$"
+          }
+        },
+        "input": {
+          "type": "object"
+        },
+        "expected": {
+          "type": [
+            "object",
+            "array"
+          ]
+        }
+      }
+    },
+    "transaction": {
+      "type": "object",
+      "required": [
+        "id",
+        "recipe",
+        "refs",
+        "rawTx",
+        "height",
+        "txIndex",
+        "charms",
+        "commitVerified"
+      ],
+      "properties": {
+        "rawTx": {
+          "$ref": "#/$defs/hex"
+        },
+        "height": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "txIndex": {
+          "$ref": "#/$defs/uint"
+        },
+        "charms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "commitVerified": {
+          "type": "boolean"
+        },
+        "recipe": {
+          "type": "object"
+        },
+        "refs": {
+          "type": "object"
+        }
+      }
+    },
+    "header": {
+      "type": "object",
+      "required": [
+        "height",
+        "hex"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "height": {
+          "$ref": "#/$defs/uint"
+        },
+        "hex": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{160}$"
+        }
+      }
+    },
+    "reveal": {
+      "type": "object",
+      "required": [
+        "id",
+        "rawTx",
+        "height",
+        "txIndex",
+        "charms",
+        "commitVerified"
+      ],
+      "properties": {
+        "rawTx": {
+          "$ref": "#/$defs/hex"
+        },
+        "height": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "txIndex": {
+          "$ref": "#/$defs/uint"
+        },
+        "charms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "commitVerified": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "mint"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "cases": {
+            "items": {
+              "properties": {
+                "input": {
+                  "$ref": "#/$defs/transaction"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "state"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "cases": {
+            "items": {
+              "properties": {
+                "input": {
+                  "required": [
+                    "recipe",
+                    "refs",
+                    "candidates",
+                    "heights",
+                    "controls"
+                  ],
+                  "properties": {
+                    "candidates": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/reveal"
+                      }
+                    },
+                    "heights": {
+                      "type": "array",
+                      "minItems": 3
+                    },
+                    "controls": {
+                      "type": "array"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "headers"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "cases": {
+            "items": {
+              "properties": {
+                "input": {
+                  "required": [
+                    "headers",
+                    "hostHashes"
+                  ],
+                  "properties": {
+                    "headers": {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "$ref": "#/$defs/header"
+                      }
+                    },
+                    "hostHashes": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "challenge"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "cases": {
+            "items": {
+              "properties": {
+                "input": {
+                  "required": [
+                    "recipe",
+                    "cache",
+                    "entries",
+                    "hostHashes",
+                    "canonicalRoot",
+                    "challenge"
+                  ],
+                  "properties": {
+                    "canonicalRoot": {
+                      "$ref": "#/$defs/hash"
+                    },
+                    "challenge": {
+                      "type": "object",
+                      "required": [
+                        "p",
+                        "op",
+                        "r",
+                        "index",
+                        "kind",
+                        "mint"
+                      ],
+                      "properties": {
+                        "p": {
+                          "const": "koc1"
+                        },
+                        "op": {
+                          "const": "challenge"
+                        },
+                        "r": {
+                          "$ref": "#/$defs/id"
+                        },
+                        "index": {
+                          "$ref": "#/$defs/id"
+                        },
+                        "mint": {
+                          "$ref": "#/$defs/hash"
+                        },
+                        "kind": {
+                          "enum": [
+                            "omitted",
+                            "invalid",
+                            "order"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "block"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "cases": {
+            "items": {
+              "properties": {
+                "input": {
+                  "required": [
+                    "height",
+                    "raw",
+                    "source",
+                    "retrieved"
+                  ],
+                  "properties": {
+                    "height": {
+                      "$ref": "#/$defs/uint"
+                    },
+                    "raw": {
+                      "$ref": "#/$defs/hex"
+                    },
+                    "source": {
+                      "type": "string"
+                    },
+                    "retrieved": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

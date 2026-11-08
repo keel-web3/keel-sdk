@@ -1,0 +1,64 @@
+{
+  "version": "koc1@1",
+  "network": "testnet4",
+  "kind": "light-switch",
+  "cases": [
+    {
+      "id": "corrected-root-match",
+      "rules": [
+        "KOC1-R34",
+        "KOC1-R43",
+        "KOC1-R44"
+      ],
+      "input": {
+        "challengeValid": true,
+        "patchedRoot": "3edb7a8439abcadaf110770f3c8ca7ea1de5ef384958542444c3e72025cfe874",
+        "nextRoot": "3edb7a8439abcadaf110770f3c8ca7ea1de5ef384958542444c3e72025cfe874",
+        "computedRoot": "3edb7a8439abcadaf110770f3c8ca7ea1de5ef384958542444c3e72025cfe874",
+        "cacheRoot": "41de97ff537171527fe72a33a9be1bf24882ce0f29943d2a01806becb598984c"
+      },
+      "expected": {
+        "switchAllowed": true,
+        "completenessProven": false,
+        "fullRejectsCache": true
+      }
+    },
+    {
+      "id": "corrected-root-mismatch",
+      "rules": [
+        "KOC1-R34",
+        "KOC1-R44"
+      ],
+      "input": {
+        "challengeValid": true,
+        "patchedRoot": "3edb7a8439abcadaf110770f3c8ca7ea1de5ef384958542444c3e72025cfe874",
+        "nextRoot": "6b030d65e11a53523d72fb53f6f3509aac4b96287cac50c30c116e9fe76bbaca",
+        "computedRoot": "3edb7a8439abcadaf110770f3c8ca7ea1de5ef384958542444c3e72025cfe874",
+        "cacheRoot": "41de97ff537171527fe72a33a9be1bf24882ce0f29943d2a01806becb598984c"
+      },
+      "expected": {
+        "switchAllowed": false,
+        "completenessProven": false,
+        "fullRejectsCache": true
+      }
+    },
+    {
+      "id": "invalid-challenge-no-switch",
+      "rules": [
+        "KOC1-R44"
+      ],
+      "input": {
+        "challengeValid": false,
+        "patchedRoot": "3edb7a8439abcadaf110770f3c8ca7ea1de5ef384958542444c3e72025cfe874",
+        "nextRoot": "3edb7a8439abcadaf110770f3c8ca7ea1de5ef384958542444c3e72025cfe874",
+        "computedRoot": "3edb7a8439abcadaf110770f3c8ca7ea1de5ef384958542444c3e72025cfe874",
+        "cacheRoot": "3edb7a8439abcadaf110770f3c8ca7ea1de5ef384958542444c3e72025cfe874"
+      },
+      "expected": {
+        "switchAllowed": false,
+        "completenessProven": false,
+        "fullRejectsCache": false
+      }
+    }
+  ]
+}

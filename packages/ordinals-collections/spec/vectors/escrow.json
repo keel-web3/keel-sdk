@@ -1,0 +1,92 @@
+{
+  "version": "koc1@1",
+  "network": "testnet4",
+  "kind": "escrow",
+  "cases": [
+    {
+      "id": "escrow-three-leaf",
+      "rules": [
+        "KOC1-R11",
+        "KOC1-R25",
+        "KOC1-R26"
+      ],
+      "input": {
+        "payment": {
+          "mode": "escrow",
+          "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+          "writerKeys": [
+            "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+            "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+            "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+          ],
+          "collectAfter": 3,
+          "refundAfter": 18,
+          "earlyRefund": true
+        },
+        "minter": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556"
+      },
+      "expected": {
+        "scripts": {
+          "L_t": "53b27520c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5ad20f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9ac20e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13ba202f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4ba529c",
+          "L_m": "0112b27520fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556ac",
+          "L_e": "20fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556ad20f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9ac20e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13ba202f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4ba529c"
+        },
+        "leaves": {
+          "L_t": "7ea9342d68784a367662c85c7d707e257d21f748ae406a2fb5459bf578d9c320",
+          "L_m": "54d9f6ace2bc44e4305bdbbd4a182601845abfad90ec4556e1151ad1335d7bfa",
+          "L_e": "8fde55fc42cdd2f78c7403a24556c176ebcdc4b2495cca2267d83afbb67c55f5"
+        },
+        "root": "26b4e429cee051123a730d29d9db5cf560009a0f063e39b3174e8937e4c74178",
+        "outputKey": "c9c51f3842bde1813ff5324d5ed210f38cb693f0cd794e439ba554973623a1f4",
+        "scriptPubKey": "5120c9c51f3842bde1813ff5324d5ed210f38cb693f0cd794e439ba554973623a1f4",
+        "address": "tb1pe8z37wzzhhscz0l4xfx4a5ss7wxtdylse4u5usum542fwd3r586qmyzhwf",
+        "controlBlocks": {
+          "L_t": "c150929b74c1a04954b78b4b6035e97a5e078a5a0f28ec96d547bfee9ace803ac05af62614fb382c2aaedf710aa69cf47677b76c417af9ca9400538caf1e9c20dc",
+          "L_m": "c150929b74c1a04954b78b4b6035e97a5e078a5a0f28ec96d547bfee9ace803ac08fde55fc42cdd2f78c7403a24556c176ebcdc4b2495cca2267d83afbb67c55f57ea9342d68784a367662c85c7d707e257d21f748ae406a2fb5459bf578d9c320",
+          "L_e": "c150929b74c1a04954b78b4b6035e97a5e078a5a0f28ec96d547bfee9ace803ac054d9f6ace2bc44e4305bdbbd4a182601845abfad90ec4556e1151ad1335d7bfa7ea9342d68784a367662c85c7d707e257d21f748ae406a2fb5459bf578d9c320"
+        }
+      }
+    },
+    {
+      "id": "escrow-two-leaf",
+      "rules": [
+        "KOC1-R11",
+        "KOC1-R25",
+        "KOC1-R26"
+      ],
+      "input": {
+        "payment": {
+          "mode": "escrow",
+          "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+          "writerKeys": [
+            "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+            "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+            "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+          ],
+          "collectAfter": 3,
+          "refundAfter": 18,
+          "earlyRefund": false
+        },
+        "minter": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556"
+      },
+      "expected": {
+        "scripts": {
+          "L_t": "53b27520c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5ad20f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9ac20e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13ba202f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4ba529c",
+          "L_m": "0112b27520fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556ac"
+        },
+        "leaves": {
+          "L_t": "7ea9342d68784a367662c85c7d707e257d21f748ae406a2fb5459bf578d9c320",
+          "L_m": "54d9f6ace2bc44e4305bdbbd4a182601845abfad90ec4556e1151ad1335d7bfa"
+        },
+        "root": "7b7d1822412f6e7fb7d80050fcd3282088c40c293c9f3deb7052fd53835f4951",
+        "outputKey": "9cc340fb6780fb40eebb684377b935d53a9d899d3de19d1e2df84a8357249058",
+        "scriptPubKey": "51209cc340fb6780fb40eebb684377b935d53a9d899d3de19d1e2df84a8357249058",
+        "address": "tb1pnnp5p7m8sra5pm4mdpph0wf465afmzva8hse683dlp9gx4eyjpvqmmgyd4",
+        "controlBlocks": {
+          "L_t": "c050929b74c1a04954b78b4b6035e97a5e078a5a0f28ec96d547bfee9ace803ac054d9f6ace2bc44e4305bdbbd4a182601845abfad90ec4556e1151ad1335d7bfa",
+          "L_m": "c050929b74c1a04954b78b4b6035e97a5e078a5a0f28ec96d547bfee9ace803ac07ea9342d68784a367662c85c7d707e257d21f748ae406a2fb5459bf578d9c320"
+        }
+      }
+    }
+  ]
+}

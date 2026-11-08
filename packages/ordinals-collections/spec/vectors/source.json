@@ -1,0 +1,36 @@
+{
+  "version": "koc1@1",
+  "network": "testnet4",
+  "research": {
+    "path": "sprints/RESEARCH/keel-ordinals-service-spec.md",
+    "sha256": "e43f0b87b583ee69109c6bd8fba6d10cd2c3b1ee352a43647cca46dc5dbbf39b",
+    "bytes": 65329,
+    "sections": [
+      "1.3",
+      "1.4",
+      "1.5",
+      "1.5.1",
+      "1.5.3",
+      "1.6",
+      "1.9",
+      "1.11",
+      "1.12"
+    ]
+  },
+  "plan": {
+    "path": "sprints/KOC1/plan.md",
+    "sha256": "9238d18c55ab686796759a5d1ebb089ab19f0cde55fce32c148a36ed6bcead5f",
+    "bytes": 19870,
+    "deliverables": [
+      "K0.1",
+      "K0.2"
+    ]
+  },
+  "baseCommit": "127e2bae42fa085a64940053b36ec804d34ccde6",
+  "assumptions": [
+    "synthetic transaction signatures are placeholders; Bitcoin admission is assumed",
+    "commitVerified supplies independently authenticated commit/script-path context",
+    "public testnet4 block is a separate pinned raw-byte fixture",
+    "K1 independent Python parity and trust review remain required"
+  ]
+}
