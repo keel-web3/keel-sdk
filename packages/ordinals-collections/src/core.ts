@@ -670,7 +670,7 @@ export function recipeCheck(r, refs) {
     if (
       !key(p.treasuryKey) ||
       p.writerKeys?.length !== 3 ||
-      new Set(p.writerKeys).size !== 3 ||
+      new Set([p.treasuryKey, ...p.writerKeys].map(k => typeof k === "string" ? k.toLowerCase() : k)).size !== 4 ||
       !p.writerKeys.every(key) ||
       !uint(p.collectAfter) ||
       p.collectAfter < r.challengeWindow ||

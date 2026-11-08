@@ -24,6 +24,7 @@
     "./end": "./src/end.ts",
     "./controls": "./src/controls.ts",
     "./merkle": "./src/merkle.ts",
-    "./perm": "./src/perm.ts"
+    "./perm": "./src/perm.ts",
+    "./challenge": "./src/challenge/index.mjs"
   }
 }

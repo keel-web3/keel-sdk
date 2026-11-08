@@ -16,3 +16,11 @@ signatures are not consensus validation. Hashes and transaction IDs in the core
 are internal-order hex as specified in KOC1 D1. `parseOrdEnvelopes` returns raw
 push payloads and ord offsets; canonical KOC1 constraints are stricter and are
 applied by `formCheck`.
+
+`verifyPosition` in the `challenge` subpath requires `proof.rawBlock`, the full
+raw block hex for the header. It authenticates the header against the supplied
+host hash, recomputes the complete non-mutated transaction Merkle tree, binds
+`total` and transaction position to that block, and verifies the branch. It
+fails closed on any 64-byte stripped transaction because of the leaf/internal
+node ambiguity. The caller must independently establish host best-chain and
+consensus admission. Branch-only evidence does not establish the count.
