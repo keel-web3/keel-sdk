@@ -3,12 +3,7 @@
   "$id": "urn:keel:koc1:1:vectors",
   "title": "KOC1 v1 conformance vector suite",
   "type": "object",
-  "required": [
-    "version",
-    "network",
-    "kind",
-    "cases"
-  ],
+  "required": ["version", "network", "kind", "cases"],
   "additionalProperties": false,
   "properties": {
     "version": {
@@ -33,10 +28,12 @@
         "shell",
         "headers",
         "block",
-        "numbers",
         "witness-boundary",
         "light-switch",
-        "tags"
+        "tags",
+        "ordering",
+        "commit-auth",
+        "pending"
       ]
     },
     "cases": {
@@ -67,12 +64,7 @@
     },
     "case": {
       "type": "object",
-      "required": [
-        "id",
-        "rules",
-        "input",
-        "expected"
-      ],
+      "required": ["id", "rules", "input", "expected"],
       "additionalProperties": false,
       "properties": {
         "id": {
@@ -92,10 +84,7 @@
           "type": "object"
         },
         "expected": {
-          "type": [
-            "object",
-            "array"
-          ]
+          "type": ["object", "array"]
         }
       }
     },
@@ -109,17 +98,14 @@
         "height",
         "txIndex",
         "charms",
-        "commitVerified"
+        "commitTx"
       ],
       "properties": {
         "rawTx": {
           "$ref": "#/$defs/hex"
         },
         "height": {
-          "type": [
-            "integer",
-            "null"
-          ],
+          "type": ["integer", "null"],
           "minimum": 0
         },
         "txIndex": {
@@ -131,23 +117,21 @@
             "type": "string"
           }
         },
-        "commitVerified": {
-          "type": "boolean"
-        },
         "recipe": {
           "type": "object"
         },
         "refs": {
           "type": "object"
+        },
+        "commitTx": {
+          "type": ["string", "null"],
+          "pattern": "^(?:[0-9a-f]{2})*$"
         }
       }
     },
     "header": {
       "type": "object",
-      "required": [
-        "height",
-        "hex"
-      ],
+      "required": ["height", "hex"],
       "additionalProperties": false,
       "properties": {
         "height": {
@@ -161,23 +145,13 @@
     },
     "reveal": {
       "type": "object",
-      "required": [
-        "id",
-        "rawTx",
-        "height",
-        "txIndex",
-        "charms",
-        "commitVerified"
-      ],
+      "required": ["id", "rawTx", "height", "txIndex", "charms", "commitTx"],
       "properties": {
         "rawTx": {
           "$ref": "#/$defs/hex"
         },
         "height": {
-          "type": [
-            "integer",
-            "null"
-          ],
+          "type": ["integer", "null"],
           "minimum": 0
         },
         "txIndex": {
@@ -189,8 +163,9 @@
             "type": "string"
           }
         },
-        "commitVerified": {
-          "type": "boolean"
+        "commitTx": {
+          "type": ["string", "null"],
+          "pattern": "^(?:[0-9a-f]{2})*$"
         }
       }
     }
@@ -275,10 +250,7 @@
             "items": {
               "properties": {
                 "input": {
-                  "required": [
-                    "headers",
-                    "hostHashes"
-                  ],
+                  "required": ["headers", "hostHashes"],
                   "properties": {
                     "headers": {
                       "type": "array",
@@ -326,14 +298,7 @@
                     },
                     "challenge": {
                       "type": "object",
-                      "required": [
-                        "p",
-                        "op",
-                        "r",
-                        "index",
-                        "kind",
-                        "mint"
-                      ],
+                      "required": ["p", "op", "r", "index", "kind", "mint"],
                       "properties": {
                         "p": {
                           "const": "koc1"
@@ -351,11 +316,7 @@
                           "$ref": "#/$defs/hash"
                         },
                         "kind": {
-                          "enum": [
-                            "omitted",
-                            "invalid",
-                            "order"
-                          ]
+                          "enum": ["omitted", "invalid", "order"]
                         }
                       }
                     }
@@ -381,12 +342,7 @@
             "items": {
               "properties": {
                 "input": {
-                  "required": [
-                    "height",
-                    "raw",
-                    "source",
-                    "retrieved"
-                  ],
+                  "required": ["height", "raw", "source", "retrieved"],
                   "properties": {
                     "height": {
                       "$ref": "#/$defs/uint"

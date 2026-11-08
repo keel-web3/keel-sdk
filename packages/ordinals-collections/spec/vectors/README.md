@@ -20,7 +20,7 @@ use `--min-release-age=0` for this pinned installation. Do not regenerate the
 workspace lockfile as part of K0-T02; the package is private and K1's workspace
 integration owns that change.
 
-`generate.mjs` rewrites only the 18 generated suite JSON files. `source.json` is
+`generate.mjs` rewrites only the 20 generated suite JSON files. `source.json` is
 pinned source provenance, `testnet4-block.json` is pinned public evidence, and
 `schema.json` describes suite/case structure. Generation performs no network
 reads. The checker validates the schema without a schema-library dependency,
@@ -48,14 +48,18 @@ internal hash are both retained to prevent accidental byte-order conflation.
 | `writers.json`, `registry.json` | q=2/k=3, equivocation, append/root checks, corrections, ratchet, dead/racing writers, bounded registry |
 | `escrow-policy.json` | CSV boundaries and signer-role matrix; consensus capability versus writer membership policy |
 | `shell-policy.json`, `light-switch.json` | Display/scan/resource/bridge interface policies, challenge discovery and corrected-root switch |
-| `headers.json`, `same-block-numbers.json` | Header hash/PoW/linkage, relative ordinal-number ordering |
+| `headers.json`, `transaction-order.json` | Header hash/PoW/linkage, proven transaction positions and the fee-spent ordinal counterexample |
 | `testnet4-block.json` | Actual height-1 testnet4 raw block, parsed txids, recomputed Bitcoin Merkle root and header hash |
-| `trust-boundaries.json` | Same stripped transaction/txid with a different witness envelope (E1) |
+| `commit-auth.json`, `trust-boundaries.json` | Concrete commit-prevout/Taproot authentication; forged same-txid witness rejected (approved E1) |
+| `pending-mints.json` | Escrow script discovery, per-minter scripts, reveal validation, deduplication and unknown coverage |
 
-Synthetic reveals contain placeholder signature bytes. `commitVerified` is a
-required authenticated-input assumption supplied to this K0 classifier. It is not
-computed by this vector model and does not mean a signature or prevout was
-verified. Challenge input `entries` supplies independently checked mint form and
+Synthetic reveals contain placeholder signature bytes. Every reveal has a concrete
+commit transaction whose stripped txid matches vin[0]'s prevout. The classifier
+reconstructs the envelope's Taproot leaf/control path and matches the commit
+output key and parity; it no longer accepts a `commitVerified` boolean.
+This authenticates the envelope script, not signatures, annex bytes or admission
+by Bitcoin consensus.
+Challenge input `entries` supplies independently checked mint form and
 location facts; the vector verifies branches and patching against those facts.
 Registry authorization and bridge-proof validity are likewise explicit boundary
 inputs. K1 implements the actual source adapters and independent Python twin;
@@ -73,6 +77,6 @@ without starting any node; it is not testnet4 chain/difficulty evidence. The rea
 height-1 header is checked separately. Bitcoin Merkle trees duplicate odd nodes;
 KOC1 metadata/member trees promote them. The checker tests this distinction.
 
-Trust-review items E1–E4 remain in KOC1.md. Passing JS self-check is K0 evidence,
+Owner-approved E1–E4 are applied and documented in KOC1.md. Passing JS self-check is K0 evidence,
 not K1 cross-language agreement, onchain execution, full shell implementation,
-public readiness, or a reason to bypass the required reviewer before merge.
+public readiness, or independent cross-language validation.

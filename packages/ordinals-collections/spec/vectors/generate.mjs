@@ -81,6 +81,34 @@ export function base() {
     },
   };
 }
+export function bindCommit(tx, nonce, siblings = []) {
+  const witness = tx.inputs[0].witness,
+    script = witness.at(-2),
+    internal = M.publicPoint(6);
+  let root = M.tapleaf(script);
+  for (const sibling of siblings) root = M.tapbranch(root, sibling);
+  const q = M.tapOutput(internal, root);
+  const commit = {
+    version: 2,
+    inputs: [
+      {
+        txid: hash("funding-" + nonce),
+        vout: 0,
+        sequence: 0xfffffffd,
+        witness: [],
+      },
+    ],
+    outputs: [{ value: 3000, script: "5120" + q.key }],
+    locktime: nonce,
+  };
+  const commitTx = M.hex(M.serializeTx(commit, false));
+  tx.inputs[0].txid = M.parseTx(commitTx).txid;
+  tx.inputs[0].vout = 0;
+  witness[witness.length - 1] = M.hex(
+    M.cat(Buffer.from([0xc0 | q.parity]), M.b(internal), ...siblings.map(M.b)),
+  );
+  return commitTx;
+}
 export function mint(n, height = 100, txIndex = n, options = {}) {
   const { recipe, refs } = base(),
     m = M.publicPoint(6),
@@ -101,6 +129,7 @@ export function mint(n, height = 100, txIndex = n, options = {}) {
     ];
   let tx = { version: 2, inputs, outputs, locktime: n };
   if (options.mutate) options.mutate(tx, meta, recipe);
+  const commitTx = bindCommit(tx, n);
   return {
     id: "mint-" + n,
     recipe,
@@ -109,7 +138,7 @@ export function mint(n, height = 100, txIndex = n, options = {}) {
     height,
     txIndex,
     charms: [],
-    commitVerified: true,
+    commitTx,
     ...options.context,
   };
 }
@@ -205,6 +234,7 @@ export async function build() {
   const alter = (x, fn) => {
     const tx = M.parseTx(x.rawTx);
     fn(tx);
+    x.commitTx = bindCommit(tx, tx.locktime);
     x.rawTx = M.hex(M.serializeTx(tx));
   };
   mintCase("valid", [7, 8, 9, 10, 11, 12, 13, 14, 46]);
@@ -350,8 +380,8 @@ export async function build() {
       );
     }),
   );
-  boundary("unverified-commit-context", [7], (x) => {
-    x.commitVerified = false;
+  boundary("missing-commit-prevout", [7, 46], (x) => {
+    x.commitTx = null;
   });
   boundary("nonzero-ord-delegate-index", [2, 8], (x) => {
     const old = x.recipe.art.viewer.id,
@@ -560,6 +590,12 @@ export async function build() {
   });
   stateCase("before-open-does-not-enter-index", [12, 13, 33], (x) => {
     x.candidates.push(mint(9999, 99, 1));
+  });
+  stateCase("lowered-cap-never-raised-by-later-control", [20, 22, 24], (x) => {
+    x.controls = [
+      control(1, "lowerCap", 101, { cap: 5 }),
+      control(2, "lowerCap", 102, { cap: 18 }),
+    ];
   });
   suites["numbering-controls-roots.json"] = wrap("state", states);
 
@@ -1039,6 +1075,7 @@ export async function build() {
       bridged: false,
       endHeight: 102,
       paymentMode: "escrow",
+      self: mint(1600, 100, 1),
     };
   const sc = [];
   function shell(name, ns, edit) {
@@ -1073,6 +1110,12 @@ export async function build() {
   });
   shell("large-collection-sampled", [48], (x) => {
     x.count = 1001;
+  });
+  shell("sampled-others-still-check-own-entry", [46, 48], (x) => {
+    x.count = 1001;
+    const tx = M.parseTx(x.self.rawTx);
+    tx.inputs[0].witness[1] += "00";
+    x.self.rawTx = M.hex(M.serializeTx(tx));
   });
   shell("wrong-metadata-proof", [15, 51], (x) => {
     x.path[0].hash = hash("wrong");
@@ -1154,16 +1197,207 @@ export async function build() {
     }),
   );
   suites["headers.json"] = wrap("headers", hs);
-  suites["same-block-numbers.json"] = wrap("numbers", [
-    test("numbers", "relative-ord-and-recursion-order", [13, 47], {
-      height: 100,
-      entries: [
-        { id: "a", txIndex: 1, ordNumber: 500, rpcNumber: 100000010000 },
-        { id: "b", txIndex: 3, ordNumber: 503, rpcNumber: 100000030000 },
-        { id: "c", txIndex: 7, ordNumber: 510, rpcNumber: 100000070000 },
-      ].reverse(),
-    }),
-  ]);
+  const orderMints = [
+      mint(1700, 100, 0),
+      mint(1701, 100, 1),
+      mint(1702, 100, 2),
+    ],
+    orderIds = orderMints.map((x) => M.parseTx(x.rawTx).txid),
+    orderHeader = Buffer.alloc(80);
+  M.merkle(orderIds, true).copy(orderHeader, 36);
+  const orderHost = { 100: M.hex(M.dsha(orderHeader)) };
+  const orderEntries = orderMints.map((x, i) => ({
+    id: ["fee-spent", "ordinary-b", "ordinary-c"][i],
+    txid: orderIds[i],
+    height: 100,
+    txIndex: i,
+    ordNumber: [503, 500, 501][i],
+    spentToFees: i === 0,
+    proof: M.evidence(
+      { txid: orderIds[i], height: 100, txIndex: i },
+      3,
+      orderIds,
+      orderHeader,
+    ),
+  }));
+  const orderBase = {
+    entries: orderEntries,
+    hostHashes: orderHost,
+    source: "branch",
+    blocks: {
+      100: M.hex(
+        M.cat(
+          orderHeader,
+          M.compact(3),
+          ...orderMints.map((x) => M.b(x.rawTx)),
+        ),
+      ),
+    },
+  };
+  const oc = [];
+  function orderCase(name, edit) {
+    const x = clone(orderBase);
+    edit?.(x);
+    oc.push(test("ordering", name, [13, 47], x));
+  }
+  orderCase("fee-spent-number-is-not-transaction-order");
+  orderCase("raw-block-proves-transaction-order", (x) => {
+    x.source = "block";
+  });
+  orderCase("inscription-number-alone-is-no-proof", (x) => {
+    x.entries.forEach((e) => {
+      delete e.proof;
+    });
+  });
+  orderCase("false-transaction-position-rejected", (x) => {
+    x.entries[0].txIndex = 2;
+  });
+  orderCase("wrong-block-hash-rejected", (x) => {
+    x.source = "block";
+    x.hostHashes[100] = hash("fork");
+  });
+  suites["transaction-order.json"] = wrap("ordering", oc);
+  const ac = [];
+  const authCase = (name, edit) => {
+    const x = mint(1800, 100, 0);
+    edit?.(x);
+    ac.push(
+      test("commit-auth", name, [7, 46], {
+        rawTx: x.rawTx,
+        commitTx: x.commitTx,
+      }),
+    );
+  };
+  authCase("valid-envelope-commitment");
+  authCase("missing-commit-prevout", (x) => {
+    x.commitTx = null;
+  });
+  authCase("forged-envelope-same-reveal-txid", (x) => {
+    const t = M.parseTx(x.rawTx);
+    t.inputs[0].witness[1] = M.envelope(
+      { p: "koc1", op: "mint", r: M.b(recipe.id), m: M.b(M.publicPoint(7)) },
+      recipe.art.viewer.id,
+    );
+    x.rawTx = M.hex(M.serializeTx(t));
+  });
+  authCase("wrong-control-parity", (x) => {
+    const t = M.parseTx(x.rawTx),
+      c = M.b(t.inputs[0].witness.at(-1));
+    c[0] ^= 1;
+    t.inputs[0].witness[t.inputs[0].witness.length - 1] = M.hex(c);
+    x.rawTx = M.hex(M.serializeTx(t));
+  });
+  authCase("wrong-leaf-version", (x) => {
+    const t = M.parseTx(x.rawTx),
+      c = M.b(t.inputs[0].witness.at(-1));
+    c[0] ^= 2;
+    t.inputs[0].witness[t.inputs[0].witness.length - 1] = M.hex(c);
+    x.rawTx = M.hex(M.serializeTx(t));
+  });
+  authCase("truncated-control-block", (x) => {
+    const t = M.parseTx(x.rawTx);
+    t.inputs[0].witness[t.inputs[0].witness.length - 1] = "c0";
+    x.rawTx = M.hex(M.serializeTx(t));
+  });
+  authCase("changed-commit-output", (x) => {
+    const t = M.parseTx(x.commitTx);
+    t.outputs[0].script = "5120" + M.publicPoint(7);
+    x.commitTx = M.hex(M.serializeTx(t, false));
+  });
+  authCase("wrong-prevout-index", (x) => {
+    const t = M.parseTx(x.rawTx);
+    t.inputs[0].vout = 1;
+    x.rawTx = M.hex(M.serializeTx(t));
+  });
+  authCase("valid-two-leaf-control-path", (x) => {
+    const t = M.parseTx(x.rawTx);
+    x.commitTx = bindCommit(t, 1800, [M.tapleaf("51")]);
+    x.rawTx = M.hex(M.serializeTx(t));
+  });
+  authCase("wrong-control-sibling", (x) => {
+    const t = M.parseTx(x.rawTx);
+    x.commitTx = bindCommit(t, 1800, [M.tapleaf("51")]);
+    const c = M.b(t.inputs[0].witness.at(-1));
+    c[33] ^= 1;
+    t.inputs[0].witness[t.inputs[0].witness.length - 1] = M.hex(c);
+    x.rawTx = M.hex(M.serializeTx(t));
+  });
+  authCase("valid-annex", (x) => {
+    const t = M.parseTx(x.rawTx);
+    t.inputs[0].witness.push("500102");
+    x.rawTx = M.hex(M.serializeTx(t));
+  });
+  suites["commit-auth.json"] = wrap("commit-auth", ac);
+  const pendingBase = {
+    recipe,
+    refs,
+    minterKeys: [M.publicPoint(6)],
+    coverageComplete: true,
+    discovery: "escrow-payment-script",
+    confirmed: 18,
+    settling: 1,
+    tip: 100,
+    controls: [],
+    candidates: [mint(1900, null, 0), mint(1901, null, 0)],
+  };
+  const pcases = [];
+  function pendingCase(name, edit) {
+    const x = clone(pendingBase);
+    edit?.(x);
+    pcases.push(test("pending", name, [11, 52], x));
+  }
+  pendingCase("escrow-scripts-fill-cap");
+  pendingCase("marker-index-cannot-establish-pending", (x) => {
+    x.discovery = "op-return-marker";
+  });
+  pendingCase("incomplete-script-coverage-is-unknown", (x) => {
+    x.coverageComplete = false;
+  });
+  pendingCase("duplicate-txid-counted-once", (x) => {
+    x.candidates.push(clone(x.candidates[0]));
+  });
+  pendingCase("confirmed-and-wrong-markers-not-pending", (x) => {
+    x.candidates[0].height = 100;
+    alter(x.candidates[1], (t) => {
+      t.outputs[2].script = M.marker("00".repeat(36));
+    });
+  });
+  pendingCase("known-other-minter-script", (x) => {
+    x.minterKeys.push(M.publicPoint(7));
+    const c = mint(1902, null, 0);
+    alter(c, (t) => {
+      t.inputs[0].witness[1] = M.envelope(
+        { p: "koc1", op: "mint", r: M.b(recipe.id), m: M.b(M.publicPoint(7)) },
+        recipe.art.viewer.id,
+      );
+      t.outputs[1].script = M.escrow(
+        recipe.payment,
+        M.publicPoint(7),
+      ).scriptPubKey;
+    });
+    x.candidates.push(c);
+  });
+  pendingCase("pause-notice-excludes-next-block", (x) => {
+    x.controls = [
+      {
+        id: "pending-pause",
+        p: "koc1",
+        op: "control",
+        r: recipe.id,
+        parent: recipe.id,
+        height: 98,
+        action: "pause",
+        at: 101,
+      },
+    ];
+  });
+  pendingCase("post-close-refuses-send", (x) => {
+    x.tip = 102;
+  });
+  pendingCase("unindexed-minter-script-is-incomplete", (x) => {
+    x.minterKeys = [];
+  });
+  suites["pending-mints.json"] = wrap("pending", pcases);
   const wa = mint(777),
     wt = M.parseTx(wa.rawTx);
   wt.inputs[0].witness[1] = M.envelope(
@@ -1174,6 +1408,7 @@ export async function build() {
     test("witness-boundary", "same-txid-different-envelope", [46], {
       a: wa.rawTx,
       b: M.hex(M.serializeTx(wt)),
+      commitTx: wa.commitTx,
     }),
   ]);
   return suites;

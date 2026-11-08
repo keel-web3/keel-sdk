@@ -12,10 +12,10 @@
       ],
       "input": {
         "challengeValid": true,
-        "patchedRoot": "3edb7a8439abcadaf110770f3c8ca7ea1de5ef384958542444c3e72025cfe874",
-        "nextRoot": "3edb7a8439abcadaf110770f3c8ca7ea1de5ef384958542444c3e72025cfe874",
-        "computedRoot": "3edb7a8439abcadaf110770f3c8ca7ea1de5ef384958542444c3e72025cfe874",
-        "cacheRoot": "41de97ff537171527fe72a33a9be1bf24882ce0f29943d2a01806becb598984c"
+        "patchedRoot": "c17bdcc838f3f92112f30f667942d2027168d8735e1aae2967653c32001d8e8e",
+        "nextRoot": "c17bdcc838f3f92112f30f667942d2027168d8735e1aae2967653c32001d8e8e",
+        "computedRoot": "c17bdcc838f3f92112f30f667942d2027168d8735e1aae2967653c32001d8e8e",
+        "cacheRoot": "be113bf584ecdf1f4a35a74dbbc026cd34c92d1d027aaf96fe21dcc128d8e4e9"
       },
       "expected": {
         "switchAllowed": true,
@@ -31,10 +31,10 @@
       ],
       "input": {
         "challengeValid": true,
-        "patchedRoot": "3edb7a8439abcadaf110770f3c8ca7ea1de5ef384958542444c3e72025cfe874",
+        "patchedRoot": "c17bdcc838f3f92112f30f667942d2027168d8735e1aae2967653c32001d8e8e",
         "nextRoot": "6b030d65e11a53523d72fb53f6f3509aac4b96287cac50c30c116e9fe76bbaca",
-        "computedRoot": "3edb7a8439abcadaf110770f3c8ca7ea1de5ef384958542444c3e72025cfe874",
-        "cacheRoot": "41de97ff537171527fe72a33a9be1bf24882ce0f29943d2a01806becb598984c"
+        "computedRoot": "c17bdcc838f3f92112f30f667942d2027168d8735e1aae2967653c32001d8e8e",
+        "cacheRoot": "be113bf584ecdf1f4a35a74dbbc026cd34c92d1d027aaf96fe21dcc128d8e4e9"
       },
       "expected": {
         "switchAllowed": false,
@@ -49,10 +49,10 @@
       ],
       "input": {
         "challengeValid": false,
-        "patchedRoot": "3edb7a8439abcadaf110770f3c8ca7ea1de5ef384958542444c3e72025cfe874",
-        "nextRoot": "3edb7a8439abcadaf110770f3c8ca7ea1de5ef384958542444c3e72025cfe874",
-        "computedRoot": "3edb7a8439abcadaf110770f3c8ca7ea1de5ef384958542444c3e72025cfe874",
-        "cacheRoot": "3edb7a8439abcadaf110770f3c8ca7ea1de5ef384958542444c3e72025cfe874"
+        "patchedRoot": "c17bdcc838f3f92112f30f667942d2027168d8735e1aae2967653c32001d8e8e",
+        "nextRoot": "c17bdcc838f3f92112f30f667942d2027168d8735e1aae2967653c32001d8e8e",
+        "computedRoot": "c17bdcc838f3f92112f30f667942d2027168d8735e1aae2967653c32001d8e8e",
+        "cacheRoot": "c17bdcc838f3f92112f30f667942d2027168d8735e1aae2967653c32001d8e8e"
       },
       "expected": {
         "switchAllowed": false,

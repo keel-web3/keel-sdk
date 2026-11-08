@@ -29,8 +29,27 @@
   "baseCommit": "127e2bae42fa085a64940053b36ec804d34ccde6",
   "assumptions": [
     "synthetic transaction signatures are placeholders; Bitcoin admission is assumed",
-    "commitVerified supplies independently authenticated commit/script-path context",
     "public testnet4 block is a separate pinned raw-byte fixture",
-    "K1 independent Python parity and trust review remain required"
-  ]
+    "envelope authenticity is recomputed from concrete commit prevout Taproot evidence",
+    "K1 independent Python parity and K2 script execution remain separate gates"
+  ],
+  "ownerDecisions": {
+    "path": "ESCALATIONS.md",
+    "heading": "Owner decision 2026-11-08: K0-T02 E1\u2013E4 approved",
+    "sha256": "ef86677ac5585408c2205aef49c688d2d1a2a8ea34e291b5793d71d07f434a35",
+    "decisions": [
+      "E1",
+      "E2",
+      "E3",
+      "E4"
+    ]
+  },
+  "parityFindings": {
+    "path": "sprints/KOC1/K0/reports/K0-T03.md",
+    "sha256": "216a3f6c31ffe80dc7762566b69ed4a5ec0beb4a5a9ae1df9a8a6b481b1f554d",
+    "corrections": [
+      "transaction position never inscription number",
+      "pending discovery uses escrow payment output scripts"
+    ]
+  }
 }

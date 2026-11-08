@@ -118,7 +118,7 @@ const spec = await readFile(new URL("../KOC1.md", dir), "utf8"),
   normative = [...spec.matchAll(/^- \*\*(KOC1-R\d+)\*\*/gm)].map((m) => m[1]);
 assert.deepEqual(
   normative,
-  Array.from({ length: 51 }, (_, i) => "KOC1-R" + (i + 1)),
+  Array.from({ length: 52 }, (_, i) => "KOC1-R" + (i + 1)),
   "numbered normative rules",
 );
 assert(
@@ -355,10 +355,82 @@ assert(find("headers.json", "real-testnet4-header").expected.valid);
 assert(find("headers.json", "linked-headers-with-work").expected.valid);
 assert(!find("headers.json", "header-hash-mismatch").expected.valid);
 assert(!find("headers.json", "broken-link-or-work").expected.valid);
+for (const id of [
+  "fee-spent-number-is-not-transaction-order",
+  "raw-block-proves-transaction-order",
+]) {
+  const expected = find("transaction-order.json", id).expected;
+  assert.deepEqual(expected.canonical, [
+    "fee-spent",
+    "ordinary-b",
+    "ordinary-c",
+  ]);
+  assert.deepEqual(expected.diagnosticOrdOrder, [
+    "ordinary-b",
+    "ordinary-c",
+    "fee-spent",
+  ]);
+  assert.equal(expected.inscriptionNumberProvesOrder, false);
+}
 assert.deepEqual(
-  find("same-block-numbers.json", "relative-ord-and-recursion-order").expected,
-  { ord: ["a", "b", "c"], rpc: ["a", "b", "c"], chain: ["a", "b", "c"] },
+  find("transaction-order.json", "inscription-number-alone-is-no-proof")
+    .expected.canonical,
+  [],
 );
+assert.deepEqual(
+  find("transaction-order.json", "wrong-block-hash-rejected").expected
+    .canonical,
+  [],
+);
+assert.deepEqual(
+  find("transaction-order.json", "false-transaction-position-rejected").expected
+    .rejected,
+  ["fee-spent"],
+);
+for (const c of suites["commit-auth.json"].cases) {
+  assert.equal(c.expected.authenticated, c.id.startsWith("valid-"), c.id);
+}
+assert.equal(
+  find("mint-boundaries.json", "missing-commit-prevout").expected.status,
+  "ignored",
+);
+assert.equal(
+  find("shell-policy.json", "large-collection-sampled").expected.entryAssurance,
+  "sampled",
+);
+assert.equal(
+  find("shell-policy.json", "large-collection-sampled").expected
+    .ownEntryAssurance,
+  "full",
+);
+assert.equal(
+  find("shell-policy.json", "sampled-others-still-check-own-entry").expected
+    .verified,
+  false,
+);
+assert.equal(
+  find("shell-policy.json", "sampled-others-still-check-own-entry").expected
+    .ownEntryAssurance,
+  "failed",
+);
+const pending = (id) => find("pending-mints.json", id).expected;
+assert.equal(pending("escrow-scripts-fill-cap").pending, 2);
+assert(pending("escrow-scripts-fill-cap").refuseSend);
+assert.equal(pending("marker-index-cannot-establish-pending").pending, null);
+assert.equal(pending("incomplete-script-coverage-is-unknown").pending, null);
+assert.equal(pending("duplicate-txid-counted-once").pending, 2);
+assert.equal(pending("confirmed-and-wrong-markers-not-pending").pending, 0);
+assert.equal(pending("known-other-minter-script").queryScripts.length, 2);
+const corrected = wc("applied-omission-preserves-announced-history").chains[0];
+assert.equal(corrected.announced.length, 2);
+assert.equal(corrected.applied.length, 1);
+const lower = state("lower-cap-preserves-effective-block");
+assert(
+  lower[1].members
+    .slice(0, 8)
+    .every((member, i) => member.id === lower[0].members[i].id),
+);
+assert(lower.every((step, i) => i === 0 || step.cap <= lower[i - 1].cap));
 assert.deepEqual(
   find("trust-boundaries.json", "same-txid-different-envelope").expected,
   {
@@ -366,16 +438,19 @@ assert.deepEqual(
     sameStripped: true,
     sameWitness: false,
     s2AloneAuthenticatesEnvelope: false,
+    originalCommitAuthenticated: true,
+    forgedCommitAuthenticated: false,
   },
 );
 
-// Golden K0 commitments: changes require an explicit specification/vector review.
+// Golden commitments after owner-approved E1: concrete commit txids replace the
+// old placeholder prevouts. Metadata/permutation/escrow constants stay unchanged.
 assert.deepEqual(
   state("first-of-supply-end").map((s) => s.indexRoot),
   [
-    "7bad4453980e8cbc8a8ddc252f9d5bc5606ae3adf079441e4426f09153196f83",
-    "c7275934d3fc75a372f362246cef88520d8fb43f0bdfdef9901f33ea73170485",
-    "3edb7a8439abcadaf110770f3c8ca7ea1de5ef384958542444c3e72025cfe874",
+    "4f27a680db1e1a06874848c5acbc61519d133320c54df7d0b22c00528d973d0f",
+    "48e98c79721f40f9ab5d464ac858e8073db2b2d19e20c848e7883ee05caf0040",
+    "c17bdcc838f3f92112f30f667942d2027168d8735e1aae2967653c32001d8e8e",
   ],
 );
 assert.deepEqual(
@@ -398,6 +473,22 @@ assert.deepEqual(
       address: "tb1pnnp5p7m8sra5pm4mdpph0wf465afmzva8hse683dlp9gx4eyjpvqmmgyd4",
     },
   ],
+);
+
+// Approved E1 cannot be bypassed by restoring the retired context boolean.
+const noPrevout = {
+  ...find("mint.json", "valid").input,
+  commitTx: null,
+  commitVerified: true,
+};
+assert.equal(M.formCheck(noPrevout).error, "commit-authentication");
+assert.equal(pending("pause-notice-excludes-next-block").pending, 0);
+assert(pending("pause-notice-excludes-next-block").refuseSend);
+assert(pending("post-close-refuses-send").refuseSend);
+assert.equal(pending("unindexed-minter-script-is-incomplete").pending, null);
+assert.deepEqual(
+  state("lowered-cap-never-raised-by-later-control").map((s) => s.cap),
+  [21, 16, 16],
 );
 
 // Mutations are independent of regeneration: corrupt evidence must fail closed.
@@ -542,6 +633,9 @@ assert.equal(provenance.version, "koc1@1");
 assert.equal(provenance.network, "testnet4");
 assert.match(provenance.research.sha256, /^[0-9a-f]{64}$/);
 assert.equal(provenance.baseCommit, "127e2bae42fa085a64940053b36ec804d34ccde6");
+assert.deepEqual(provenance.ownerDecisions.decisions, ["E1", "E2", "E3", "E4"]);
+assert.match(provenance.ownerDecisions.sha256, /^[0-9a-f]{64}$/);
+assert.match(provenance.parityFindings.sha256, /^[0-9a-f]{64}$/);
 console.log(
   "PASS koc1@1: " +
     caseCount +

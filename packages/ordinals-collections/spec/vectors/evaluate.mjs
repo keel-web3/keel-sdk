@@ -153,8 +153,10 @@ export function evaluate(kind, input) {
   if (kind === "escrow-policy") return M.escrowPolicy(input);
   if (kind === "shell") {
     const incomplete = input.challenges > 32 || input.pageEntries > 1000;
+    const ownEntryVerified = !!input.self && !M.formCheck(input.self).error;
     const depth = M.confirmations(input.height, input.tip),
-      member = input.recipeValid && input.inIndex && !input.burned,
+      member =
+        input.recipeValid && input.inIndex && !input.burned && ownEntryVerified,
       verified = member && depth >= input.F && !incomplete,
       final =
         verified &&
@@ -173,6 +175,7 @@ export function evaluate(kind, input) {
         input.leaf && M.verifyProof(input.leaf, input.path, input.root)
       ),
       entryAssurance: input.count <= 1000 ? "exhaustive" : "sampled",
+      ownEntryAssurance: ownEntryVerified ? "full" : "failed",
       challengeBudget: Math.min(32, input.challenges),
       incomplete,
       followNextAsAuthority: false,
@@ -189,18 +192,90 @@ export function evaluate(kind, input) {
   if (kind === "headers")
     return { valid: M.headerCheck(input.headers, input.hostHashes) };
   if (kind === "block") return M.parseBlock(input.raw);
-  if (kind === "numbers")
+  if (kind === "commit-auth")
+    return { authenticated: M.authenticateCommit(input.rawTx, input.commitTx) };
+  if (kind === "ordering") {
+    const accepted = [],
+      rejected = [];
+    for (const e of input.entries) {
+      let valid = false;
+      if (input.source === "branch" && e.proof)
+        valid = M.verifyEvidence(e.proof, e, input.hostHashes);
+      if (input.source === "block")
+        try {
+          const block = M.parseBlock(input.blocks[e.height]);
+          valid =
+            block.valid &&
+            block.internalHash === input.hostHashes[e.height] &&
+            block.txids[e.txIndex] === e.txid;
+        } catch {}
+      (valid ? accepted : rejected).push(e);
+    }
     return {
-      ord: [...input.entries]
+      canonical: accepted
+        .sort((a, b) => a.height - b.height || a.txIndex - b.txIndex)
+        .map((e) => e.id),
+      rejected: rejected.map((e) => e.id),
+      diagnosticOrdOrder: [...input.entries]
         .sort((a, b) => a.ordNumber - b.ordNumber)
-        .map((x) => x.id),
-      rpc: [...input.entries]
-        .sort((a, b) => a.rpcNumber - b.rpcNumber)
-        .map((x) => x.id),
-      chain: [...input.entries]
-        .sort((a, b) => a.txIndex - b.txIndex)
-        .map((x) => x.id),
+        .map((e) => e.id),
+      inscriptionNumberProvesOrder: false,
     };
+  }
+  if (kind === "pending") {
+    const scripts =
+      input.recipe.payment.mode === "escrow"
+        ? input.minterKeys.map(
+            (m) => M.escrow(input.recipe.payment, m).scriptPubKey,
+          )
+        : [input.recipe.payment.treasuryScript];
+    const observed = new Set(),
+      height = input.tip + 1,
+      r = input.recipe;
+    let coverage = input.coverageComplete,
+      close = r.end.close ?? Infinity,
+      paused = false;
+    for (const c of M.acceptControls(r, input.controls || []).accepted) {
+      if (c.action === "close") close = Math.min(close, c.at);
+      if (c.at <= height) {
+        if (c.action === "pause") paused = true;
+        if (c.action === "resume") paused = false;
+      }
+    }
+    const recipeValid = M.recipeCheck(r, input.refs).length === 0,
+      windowOpen =
+        recipeValid && height >= r.end.open && height <= close && !paused;
+    for (const candidate of input.candidates) {
+      const c = { ...candidate, recipe: r, refs: input.refs },
+        entry = M.formCheck(c);
+      if (entry.error || c.height !== null) continue;
+      const tx = M.parseTx(c.rawTx);
+      if (!scripts.includes(tx.outputs[1].script)) {
+        coverage = false;
+        continue;
+      }
+      if (windowOpen) observed.add(entry.txid);
+    }
+    const complete = coverage && input.discovery === "escrow-payment-script",
+      pending = complete ? observed.size : null,
+      cap = r.end.max ?? null;
+    return {
+      queryScripts: [...new Set(scripts)],
+      markerIndexUsed: false,
+      observedPending: observed.size,
+      pending,
+      windowOpen,
+      remaining:
+        complete && cap !== null
+          ? Math.max(0, cap - input.confirmed - input.settling - pending)
+          : null,
+      refuseSend:
+        !windowOpen ||
+        !complete ||
+        (cap !== null &&
+          input.confirmed + input.settling + observed.size >= cap),
+    };
+  }
   if (kind === "witness-boundary") {
     const a = M.parseTx(input.a),
       b = M.parseTx(input.b);
@@ -211,6 +286,11 @@ export function evaluate(kind, input) {
         JSON.stringify(a.inputs.map((v) => v.witness)) ===
         JSON.stringify(b.inputs.map((v) => v.witness)),
       s2AloneAuthenticatesEnvelope: false,
+      originalCommitAuthenticated: M.authenticateCommit(
+        input.a,
+        input.commitTx,
+      ),
+      forgedCommitAuthenticated: M.authenticateCommit(input.b, input.commitTx),
     };
   }
   if (kind === "light-switch")

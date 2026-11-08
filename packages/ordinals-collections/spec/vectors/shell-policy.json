@@ -42,7 +42,107 @@
         "pageEntries": 20,
         "bridged": false,
         "endHeight": 102,
-        "paymentMode": "escrow"
+        "paymentMode": "escrow",
+        "self": {
+          "id": "mint-1600",
+          "recipe": {
+            "p": "koc1",
+            "op": "recipe",
+            "v": 1,
+            "name": "KOC1 vector collection",
+            "network": "testnet4",
+            "id": "e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000",
+            "height": 99,
+            "txIndex": 10,
+            "end": {
+              "mode": "first",
+              "max": 21,
+              "open": 100,
+              "close": 102
+            },
+            "finality": 2,
+            "challengeWindow": 3,
+            "price": 1000,
+            "payment": {
+              "mode": "escrow",
+              "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+              "writerKeys": [
+                "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+                "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+                "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+              ],
+              "collectAfter": 3,
+              "refundAfter": 18,
+              "earlyRefund": true
+            },
+            "controls": {
+              "notice": 2,
+              "pausable": true
+            },
+            "metadata": {
+              "mode": "merkle",
+              "root": "a1c029e95f5760da0829b7307c7cc591e4e981b75287ef2a478edb65d453e26a",
+              "count": 21,
+              "bundles": [
+                {
+                  "id": "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000",
+                  "sha256": "2f5521fda79e7fb3faef6af39f138fcbd1ce80321fd1e1f3c34416892b4fd2bb",
+                  "from": 1,
+                  "to": 21
+                }
+              ],
+              "order": "direct"
+            },
+            "art": {
+              "viewer": {
+                "id": "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000",
+                "sha256": "ca9871f953b29328b4962f723a476b1290aef33653f2161fbfee79401cbf3f92"
+              }
+            },
+            "writers": [
+              {
+                "authority": "4ab9c870bca18a35161456c19359890ece11023f6a23c1916e2fe35f1566702c00000000",
+                "label": "w1"
+              },
+              {
+                "authority": "caef788a4b418b2946f228b003b2f1ec3a3b3b32a4fe2f02f1dd0beea6f09cf600000000",
+                "label": "w2"
+              },
+              {
+                "authority": "11cf95fb8971c73efc959f13bffa6c13039f90488c496fb96053c66ca953f6e700000000",
+                "label": "w3"
+              }
+            ],
+            "quorum": 2,
+            "writerRegistry": null,
+            "indexer": {
+              "id": "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000",
+              "sha256": "08fe4bfede214f960dd2428f24cad0db7cb6f577aa4cce0cc56ada52b099bb61",
+              "reference": "keel-koc1-indexer@1"
+            },
+            "bridges": null,
+            "checkpoint": null
+          },
+          "refs": {
+            "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000": {
+              "height": 90,
+              "bytes": "7b226e616d65223a22424c4148202331222c227472616974223a22726564227d0a7b226e616d65223a22424c4148202332222c227472616974223a22626c7565227d0a7b226e616d65223a22424c4148202333222c227472616974223a22676f6c64227d0a7b226e616d65223a22424c4148202334222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202335222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202336222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202337222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202338222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202339222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233130222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233131222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233132222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233133222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233134222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233135222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233136222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233137222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233138222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233139222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233230222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233231222c227472616974223a2266697874757265227d"
+            },
+            "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e74686574696320766965776572206279746573"
+            },
+            "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e746865746963207265666572656e63652d696e646578657220736f75726365"
+            }
+          },
+          "rawTx": "02000000000101913c71ad6a037cdfbcaab100e04b782de630b122aeb728171f0b04ec2d66da160000000000fdffffff034a01000000000000225120fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556e803000000000000225120c9c51f3842bde1813ff5324d5ed210f38cb693f0cd794e439ba554973623a1f400000000000000002a6a284b4f4331e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000034000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000b420fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556ac0063036f72640107046b6f6331010b200d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef01054c5ca4616d5820fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a14602975566170646b6f633161725824e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000626f70646d696e74006821c0fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a146029755640060000",
+          "height": 100,
+          "txIndex": 1,
+          "charms": [],
+          "commitTx": "0200000001a8a36caf619cd6fea20cd0f839b3a5c4369db296faf9b9dddc09ca8b2a08c1470000000000fdffffff01b80b0000000000002251208695b76795d1e784bfab48cbad4eea499e7294ed6c51f675a16a94bcd921e28a40060000"
+        }
       },
       "expected": {
         "depth": 6,
@@ -52,6 +152,7 @@
         "artVerified": true,
         "metadataVerified": true,
         "entryAssurance": "exhaustive",
+        "ownEntryAssurance": "full",
         "challengeBudget": 2,
         "incomplete": false,
         "followNextAsAuthority": false,
@@ -97,7 +198,107 @@
         "pageEntries": 20,
         "bridged": false,
         "endHeight": 102,
-        "paymentMode": "escrow"
+        "paymentMode": "escrow",
+        "self": {
+          "id": "mint-1600",
+          "recipe": {
+            "p": "koc1",
+            "op": "recipe",
+            "v": 1,
+            "name": "KOC1 vector collection",
+            "network": "testnet4",
+            "id": "e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000",
+            "height": 99,
+            "txIndex": 10,
+            "end": {
+              "mode": "first",
+              "max": 21,
+              "open": 100,
+              "close": 102
+            },
+            "finality": 2,
+            "challengeWindow": 3,
+            "price": 1000,
+            "payment": {
+              "mode": "escrow",
+              "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+              "writerKeys": [
+                "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+                "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+                "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+              ],
+              "collectAfter": 3,
+              "refundAfter": 18,
+              "earlyRefund": true
+            },
+            "controls": {
+              "notice": 2,
+              "pausable": true
+            },
+            "metadata": {
+              "mode": "merkle",
+              "root": "a1c029e95f5760da0829b7307c7cc591e4e981b75287ef2a478edb65d453e26a",
+              "count": 21,
+              "bundles": [
+                {
+                  "id": "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000",
+                  "sha256": "2f5521fda79e7fb3faef6af39f138fcbd1ce80321fd1e1f3c34416892b4fd2bb",
+                  "from": 1,
+                  "to": 21
+                }
+              ],
+              "order": "direct"
+            },
+            "art": {
+              "viewer": {
+                "id": "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000",
+                "sha256": "ca9871f953b29328b4962f723a476b1290aef33653f2161fbfee79401cbf3f92"
+              }
+            },
+            "writers": [
+              {
+                "authority": "4ab9c870bca18a35161456c19359890ece11023f6a23c1916e2fe35f1566702c00000000",
+                "label": "w1"
+              },
+              {
+                "authority": "caef788a4b418b2946f228b003b2f1ec3a3b3b32a4fe2f02f1dd0beea6f09cf600000000",
+                "label": "w2"
+              },
+              {
+                "authority": "11cf95fb8971c73efc959f13bffa6c13039f90488c496fb96053c66ca953f6e700000000",
+                "label": "w3"
+              }
+            ],
+            "quorum": 2,
+            "writerRegistry": null,
+            "indexer": {
+              "id": "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000",
+              "sha256": "08fe4bfede214f960dd2428f24cad0db7cb6f577aa4cce0cc56ada52b099bb61",
+              "reference": "keel-koc1-indexer@1"
+            },
+            "bridges": null,
+            "checkpoint": null
+          },
+          "refs": {
+            "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000": {
+              "height": 90,
+              "bytes": "7b226e616d65223a22424c4148202331222c227472616974223a22726564227d0a7b226e616d65223a22424c4148202332222c227472616974223a22626c7565227d0a7b226e616d65223a22424c4148202333222c227472616974223a22676f6c64227d0a7b226e616d65223a22424c4148202334222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202335222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202336222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202337222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202338222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202339222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233130222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233131222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233132222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233133222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233134222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233135222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233136222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233137222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233138222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233139222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233230222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233231222c227472616974223a2266697874757265227d"
+            },
+            "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e74686574696320766965776572206279746573"
+            },
+            "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e746865746963207265666572656e63652d696e646578657220736f75726365"
+            }
+          },
+          "rawTx": "02000000000101913c71ad6a037cdfbcaab100e04b782de630b122aeb728171f0b04ec2d66da160000000000fdffffff034a01000000000000225120fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556e803000000000000225120c9c51f3842bde1813ff5324d5ed210f38cb693f0cd794e439ba554973623a1f400000000000000002a6a284b4f4331e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000034000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000b420fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556ac0063036f72640107046b6f6331010b200d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef01054c5ca4616d5820fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a14602975566170646b6f633161725824e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000626f70646d696e74006821c0fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a146029755640060000",
+          "height": 100,
+          "txIndex": 1,
+          "charms": [],
+          "commitTx": "0200000001a8a36caf619cd6fea20cd0f839b3a5c4369db296faf9b9dddc09ca8b2a08c1470000000000fdffffff01b80b0000000000002251208695b76795d1e784bfab48cbad4eea499e7294ed6c51f675a16a94bcd921e28a40060000"
+        }
       },
       "expected": {
         "depth": 6,
@@ -107,6 +308,7 @@
         "artVerified": true,
         "metadataVerified": true,
         "entryAssurance": "exhaustive",
+        "ownEntryAssurance": "full",
         "challengeBudget": 2,
         "incomplete": false,
         "followNextAsAuthority": false,
@@ -150,7 +352,107 @@
         "pageEntries": 20,
         "bridged": false,
         "endHeight": 102,
-        "paymentMode": "escrow"
+        "paymentMode": "escrow",
+        "self": {
+          "id": "mint-1600",
+          "recipe": {
+            "p": "koc1",
+            "op": "recipe",
+            "v": 1,
+            "name": "KOC1 vector collection",
+            "network": "testnet4",
+            "id": "e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000",
+            "height": 99,
+            "txIndex": 10,
+            "end": {
+              "mode": "first",
+              "max": 21,
+              "open": 100,
+              "close": 102
+            },
+            "finality": 2,
+            "challengeWindow": 3,
+            "price": 1000,
+            "payment": {
+              "mode": "escrow",
+              "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+              "writerKeys": [
+                "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+                "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+                "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+              ],
+              "collectAfter": 3,
+              "refundAfter": 18,
+              "earlyRefund": true
+            },
+            "controls": {
+              "notice": 2,
+              "pausable": true
+            },
+            "metadata": {
+              "mode": "merkle",
+              "root": "a1c029e95f5760da0829b7307c7cc591e4e981b75287ef2a478edb65d453e26a",
+              "count": 21,
+              "bundles": [
+                {
+                  "id": "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000",
+                  "sha256": "2f5521fda79e7fb3faef6af39f138fcbd1ce80321fd1e1f3c34416892b4fd2bb",
+                  "from": 1,
+                  "to": 21
+                }
+              ],
+              "order": "direct"
+            },
+            "art": {
+              "viewer": {
+                "id": "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000",
+                "sha256": "ca9871f953b29328b4962f723a476b1290aef33653f2161fbfee79401cbf3f92"
+              }
+            },
+            "writers": [
+              {
+                "authority": "4ab9c870bca18a35161456c19359890ece11023f6a23c1916e2fe35f1566702c00000000",
+                "label": "w1"
+              },
+              {
+                "authority": "caef788a4b418b2946f228b003b2f1ec3a3b3b32a4fe2f02f1dd0beea6f09cf600000000",
+                "label": "w2"
+              },
+              {
+                "authority": "11cf95fb8971c73efc959f13bffa6c13039f90488c496fb96053c66ca953f6e700000000",
+                "label": "w3"
+              }
+            ],
+            "quorum": 2,
+            "writerRegistry": null,
+            "indexer": {
+              "id": "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000",
+              "sha256": "08fe4bfede214f960dd2428f24cad0db7cb6f577aa4cce0cc56ada52b099bb61",
+              "reference": "keel-koc1-indexer@1"
+            },
+            "bridges": null,
+            "checkpoint": null
+          },
+          "refs": {
+            "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000": {
+              "height": 90,
+              "bytes": "7b226e616d65223a22424c4148202331222c227472616974223a22726564227d0a7b226e616d65223a22424c4148202332222c227472616974223a22626c7565227d0a7b226e616d65223a22424c4148202333222c227472616974223a22676f6c64227d0a7b226e616d65223a22424c4148202334222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202335222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202336222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202337222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202338222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202339222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233130222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233131222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233132222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233133222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233134222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233135222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233136222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233137222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233138222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233139222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233230222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233231222c227472616974223a2266697874757265227d"
+            },
+            "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e74686574696320766965776572206279746573"
+            },
+            "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e746865746963207265666572656e63652d696e646578657220736f75726365"
+            }
+          },
+          "rawTx": "02000000000101913c71ad6a037cdfbcaab100e04b782de630b122aeb728171f0b04ec2d66da160000000000fdffffff034a01000000000000225120fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556e803000000000000225120c9c51f3842bde1813ff5324d5ed210f38cb693f0cd794e439ba554973623a1f400000000000000002a6a284b4f4331e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000034000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000b420fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556ac0063036f72640107046b6f6331010b200d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef01054c5ca4616d5820fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a14602975566170646b6f633161725824e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000626f70646d696e74006821c0fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a146029755640060000",
+          "height": 100,
+          "txIndex": 1,
+          "charms": [],
+          "commitTx": "0200000001a8a36caf619cd6fea20cd0f839b3a5c4369db296faf9b9dddc09ca8b2a08c1470000000000fdffffff01b80b0000000000002251208695b76795d1e784bfab48cbad4eea499e7294ed6c51f675a16a94bcd921e28a40060000"
+        }
       },
       "expected": {
         "depth": 6,
@@ -160,6 +462,7 @@
         "artVerified": true,
         "metadataVerified": true,
         "entryAssurance": "exhaustive",
+        "ownEntryAssurance": "full",
         "challengeBudget": 2,
         "incomplete": false,
         "followNextAsAuthority": false,
@@ -204,7 +507,107 @@
         "pageEntries": 20,
         "bridged": false,
         "endHeight": 102,
-        "paymentMode": "escrow"
+        "paymentMode": "escrow",
+        "self": {
+          "id": "mint-1600",
+          "recipe": {
+            "p": "koc1",
+            "op": "recipe",
+            "v": 1,
+            "name": "KOC1 vector collection",
+            "network": "testnet4",
+            "id": "e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000",
+            "height": 99,
+            "txIndex": 10,
+            "end": {
+              "mode": "first",
+              "max": 21,
+              "open": 100,
+              "close": 102
+            },
+            "finality": 2,
+            "challengeWindow": 3,
+            "price": 1000,
+            "payment": {
+              "mode": "escrow",
+              "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+              "writerKeys": [
+                "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+                "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+                "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+              ],
+              "collectAfter": 3,
+              "refundAfter": 18,
+              "earlyRefund": true
+            },
+            "controls": {
+              "notice": 2,
+              "pausable": true
+            },
+            "metadata": {
+              "mode": "merkle",
+              "root": "a1c029e95f5760da0829b7307c7cc591e4e981b75287ef2a478edb65d453e26a",
+              "count": 21,
+              "bundles": [
+                {
+                  "id": "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000",
+                  "sha256": "2f5521fda79e7fb3faef6af39f138fcbd1ce80321fd1e1f3c34416892b4fd2bb",
+                  "from": 1,
+                  "to": 21
+                }
+              ],
+              "order": "direct"
+            },
+            "art": {
+              "viewer": {
+                "id": "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000",
+                "sha256": "ca9871f953b29328b4962f723a476b1290aef33653f2161fbfee79401cbf3f92"
+              }
+            },
+            "writers": [
+              {
+                "authority": "4ab9c870bca18a35161456c19359890ece11023f6a23c1916e2fe35f1566702c00000000",
+                "label": "w1"
+              },
+              {
+                "authority": "caef788a4b418b2946f228b003b2f1ec3a3b3b32a4fe2f02f1dd0beea6f09cf600000000",
+                "label": "w2"
+              },
+              {
+                "authority": "11cf95fb8971c73efc959f13bffa6c13039f90488c496fb96053c66ca953f6e700000000",
+                "label": "w3"
+              }
+            ],
+            "quorum": 2,
+            "writerRegistry": null,
+            "indexer": {
+              "id": "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000",
+              "sha256": "08fe4bfede214f960dd2428f24cad0db7cb6f577aa4cce0cc56ada52b099bb61",
+              "reference": "keel-koc1-indexer@1"
+            },
+            "bridges": null,
+            "checkpoint": null
+          },
+          "refs": {
+            "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000": {
+              "height": 90,
+              "bytes": "7b226e616d65223a22424c4148202331222c227472616974223a22726564227d0a7b226e616d65223a22424c4148202332222c227472616974223a22626c7565227d0a7b226e616d65223a22424c4148202333222c227472616974223a22676f6c64227d0a7b226e616d65223a22424c4148202334222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202335222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202336222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202337222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202338222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202339222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233130222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233131222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233132222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233133222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233134222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233135222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233136222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233137222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233138222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233139222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233230222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233231222c227472616974223a2266697874757265227d"
+            },
+            "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e74686574696320766965776572206279746573"
+            },
+            "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e746865746963207265666572656e63652d696e646578657220736f75726365"
+            }
+          },
+          "rawTx": "02000000000101913c71ad6a037cdfbcaab100e04b782de630b122aeb728171f0b04ec2d66da160000000000fdffffff034a01000000000000225120fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556e803000000000000225120c9c51f3842bde1813ff5324d5ed210f38cb693f0cd794e439ba554973623a1f400000000000000002a6a284b4f4331e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000034000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000b420fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556ac0063036f72640107046b6f6331010b200d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef01054c5ca4616d5820fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a14602975566170646b6f633161725824e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000626f70646d696e74006821c0fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a146029755640060000",
+          "height": 100,
+          "txIndex": 1,
+          "charms": [],
+          "commitTx": "0200000001a8a36caf619cd6fea20cd0f839b3a5c4369db296faf9b9dddc09ca8b2a08c1470000000000fdffffff01b80b0000000000002251208695b76795d1e784bfab48cbad4eea499e7294ed6c51f675a16a94bcd921e28a40060000"
+        }
       },
       "expected": {
         "depth": 6,
@@ -214,6 +617,7 @@
         "artVerified": true,
         "metadataVerified": true,
         "entryAssurance": "exhaustive",
+        "ownEntryAssurance": "full",
         "challengeBudget": 2,
         "incomplete": false,
         "followNextAsAuthority": false,
@@ -259,7 +663,107 @@
         "pageEntries": 20,
         "bridged": false,
         "endHeight": 102,
-        "paymentMode": "escrow"
+        "paymentMode": "escrow",
+        "self": {
+          "id": "mint-1600",
+          "recipe": {
+            "p": "koc1",
+            "op": "recipe",
+            "v": 1,
+            "name": "KOC1 vector collection",
+            "network": "testnet4",
+            "id": "e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000",
+            "height": 99,
+            "txIndex": 10,
+            "end": {
+              "mode": "first",
+              "max": 21,
+              "open": 100,
+              "close": 102
+            },
+            "finality": 2,
+            "challengeWindow": 3,
+            "price": 1000,
+            "payment": {
+              "mode": "escrow",
+              "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+              "writerKeys": [
+                "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+                "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+                "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+              ],
+              "collectAfter": 3,
+              "refundAfter": 18,
+              "earlyRefund": true
+            },
+            "controls": {
+              "notice": 2,
+              "pausable": true
+            },
+            "metadata": {
+              "mode": "merkle",
+              "root": "a1c029e95f5760da0829b7307c7cc591e4e981b75287ef2a478edb65d453e26a",
+              "count": 21,
+              "bundles": [
+                {
+                  "id": "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000",
+                  "sha256": "2f5521fda79e7fb3faef6af39f138fcbd1ce80321fd1e1f3c34416892b4fd2bb",
+                  "from": 1,
+                  "to": 21
+                }
+              ],
+              "order": "direct"
+            },
+            "art": {
+              "viewer": {
+                "id": "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000",
+                "sha256": "ca9871f953b29328b4962f723a476b1290aef33653f2161fbfee79401cbf3f92"
+              }
+            },
+            "writers": [
+              {
+                "authority": "4ab9c870bca18a35161456c19359890ece11023f6a23c1916e2fe35f1566702c00000000",
+                "label": "w1"
+              },
+              {
+                "authority": "caef788a4b418b2946f228b003b2f1ec3a3b3b32a4fe2f02f1dd0beea6f09cf600000000",
+                "label": "w2"
+              },
+              {
+                "authority": "11cf95fb8971c73efc959f13bffa6c13039f90488c496fb96053c66ca953f6e700000000",
+                "label": "w3"
+              }
+            ],
+            "quorum": 2,
+            "writerRegistry": null,
+            "indexer": {
+              "id": "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000",
+              "sha256": "08fe4bfede214f960dd2428f24cad0db7cb6f577aa4cce0cc56ada52b099bb61",
+              "reference": "keel-koc1-indexer@1"
+            },
+            "bridges": null,
+            "checkpoint": null
+          },
+          "refs": {
+            "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000": {
+              "height": 90,
+              "bytes": "7b226e616d65223a22424c4148202331222c227472616974223a22726564227d0a7b226e616d65223a22424c4148202332222c227472616974223a22626c7565227d0a7b226e616d65223a22424c4148202333222c227472616974223a22676f6c64227d0a7b226e616d65223a22424c4148202334222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202335222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202336222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202337222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202338222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202339222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233130222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233131222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233132222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233133222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233134222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233135222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233136222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233137222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233138222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233139222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233230222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233231222c227472616974223a2266697874757265227d"
+            },
+            "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e74686574696320766965776572206279746573"
+            },
+            "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e746865746963207265666572656e63652d696e646578657220736f75726365"
+            }
+          },
+          "rawTx": "02000000000101913c71ad6a037cdfbcaab100e04b782de630b122aeb728171f0b04ec2d66da160000000000fdffffff034a01000000000000225120fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556e803000000000000225120c9c51f3842bde1813ff5324d5ed210f38cb693f0cd794e439ba554973623a1f400000000000000002a6a284b4f4331e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000034000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000b420fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556ac0063036f72640107046b6f6331010b200d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef01054c5ca4616d5820fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a14602975566170646b6f633161725824e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000626f70646d696e74006821c0fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a146029755640060000",
+          "height": 100,
+          "txIndex": 1,
+          "charms": [],
+          "commitTx": "0200000001a8a36caf619cd6fea20cd0f839b3a5c4369db296faf9b9dddc09ca8b2a08c1470000000000fdffffff01b80b0000000000002251208695b76795d1e784bfab48cbad4eea499e7294ed6c51f675a16a94bcd921e28a40060000"
+        }
       },
       "expected": {
         "depth": 1,
@@ -269,6 +773,7 @@
         "artVerified": true,
         "metadataVerified": true,
         "entryAssurance": "exhaustive",
+        "ownEntryAssurance": "full",
         "challengeBudget": 2,
         "incomplete": false,
         "followNextAsAuthority": false,
@@ -313,7 +818,107 @@
         "pageEntries": 20,
         "bridged": false,
         "endHeight": 102,
-        "paymentMode": "escrow"
+        "paymentMode": "escrow",
+        "self": {
+          "id": "mint-1600",
+          "recipe": {
+            "p": "koc1",
+            "op": "recipe",
+            "v": 1,
+            "name": "KOC1 vector collection",
+            "network": "testnet4",
+            "id": "e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000",
+            "height": 99,
+            "txIndex": 10,
+            "end": {
+              "mode": "first",
+              "max": 21,
+              "open": 100,
+              "close": 102
+            },
+            "finality": 2,
+            "challengeWindow": 3,
+            "price": 1000,
+            "payment": {
+              "mode": "escrow",
+              "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+              "writerKeys": [
+                "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+                "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+                "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+              ],
+              "collectAfter": 3,
+              "refundAfter": 18,
+              "earlyRefund": true
+            },
+            "controls": {
+              "notice": 2,
+              "pausable": true
+            },
+            "metadata": {
+              "mode": "merkle",
+              "root": "a1c029e95f5760da0829b7307c7cc591e4e981b75287ef2a478edb65d453e26a",
+              "count": 21,
+              "bundles": [
+                {
+                  "id": "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000",
+                  "sha256": "2f5521fda79e7fb3faef6af39f138fcbd1ce80321fd1e1f3c34416892b4fd2bb",
+                  "from": 1,
+                  "to": 21
+                }
+              ],
+              "order": "direct"
+            },
+            "art": {
+              "viewer": {
+                "id": "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000",
+                "sha256": "ca9871f953b29328b4962f723a476b1290aef33653f2161fbfee79401cbf3f92"
+              }
+            },
+            "writers": [
+              {
+                "authority": "4ab9c870bca18a35161456c19359890ece11023f6a23c1916e2fe35f1566702c00000000",
+                "label": "w1"
+              },
+              {
+                "authority": "caef788a4b418b2946f228b003b2f1ec3a3b3b32a4fe2f02f1dd0beea6f09cf600000000",
+                "label": "w2"
+              },
+              {
+                "authority": "11cf95fb8971c73efc959f13bffa6c13039f90488c496fb96053c66ca953f6e700000000",
+                "label": "w3"
+              }
+            ],
+            "quorum": 2,
+            "writerRegistry": null,
+            "indexer": {
+              "id": "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000",
+              "sha256": "08fe4bfede214f960dd2428f24cad0db7cb6f577aa4cce0cc56ada52b099bb61",
+              "reference": "keel-koc1-indexer@1"
+            },
+            "bridges": null,
+            "checkpoint": null
+          },
+          "refs": {
+            "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000": {
+              "height": 90,
+              "bytes": "7b226e616d65223a22424c4148202331222c227472616974223a22726564227d0a7b226e616d65223a22424c4148202332222c227472616974223a22626c7565227d0a7b226e616d65223a22424c4148202333222c227472616974223a22676f6c64227d0a7b226e616d65223a22424c4148202334222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202335222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202336222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202337222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202338222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202339222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233130222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233131222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233132222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233133222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233134222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233135222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233136222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233137222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233138222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233139222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233230222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233231222c227472616974223a2266697874757265227d"
+            },
+            "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e74686574696320766965776572206279746573"
+            },
+            "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e746865746963207265666572656e63652d696e646578657220736f75726365"
+            }
+          },
+          "rawTx": "02000000000101913c71ad6a037cdfbcaab100e04b782de630b122aeb728171f0b04ec2d66da160000000000fdffffff034a01000000000000225120fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556e803000000000000225120c9c51f3842bde1813ff5324d5ed210f38cb693f0cd794e439ba554973623a1f400000000000000002a6a284b4f4331e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000034000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000b420fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556ac0063036f72640107046b6f6331010b200d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef01054c5ca4616d5820fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a14602975566170646b6f633161725824e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000626f70646d696e74006821c0fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a146029755640060000",
+          "height": 100,
+          "txIndex": 1,
+          "charms": [],
+          "commitTx": "0200000001a8a36caf619cd6fea20cd0f839b3a5c4369db296faf9b9dddc09ca8b2a08c1470000000000fdffffff01b80b0000000000002251208695b76795d1e784bfab48cbad4eea499e7294ed6c51f675a16a94bcd921e28a40060000"
+        }
       },
       "expected": {
         "depth": 6,
@@ -323,6 +928,7 @@
         "artVerified": true,
         "metadataVerified": true,
         "entryAssurance": "exhaustive",
+        "ownEntryAssurance": "full",
         "challengeBudget": 2,
         "incomplete": false,
         "followNextAsAuthority": false,
@@ -368,6 +974,106 @@
         "bridged": false,
         "endHeight": 102,
         "paymentMode": "escrow",
+        "self": {
+          "id": "mint-1600",
+          "recipe": {
+            "p": "koc1",
+            "op": "recipe",
+            "v": 1,
+            "name": "KOC1 vector collection",
+            "network": "testnet4",
+            "id": "e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000",
+            "height": 99,
+            "txIndex": 10,
+            "end": {
+              "mode": "first",
+              "max": 21,
+              "open": 100,
+              "close": 102
+            },
+            "finality": 2,
+            "challengeWindow": 3,
+            "price": 1000,
+            "payment": {
+              "mode": "escrow",
+              "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+              "writerKeys": [
+                "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+                "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+                "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+              ],
+              "collectAfter": 3,
+              "refundAfter": 18,
+              "earlyRefund": true
+            },
+            "controls": {
+              "notice": 2,
+              "pausable": true
+            },
+            "metadata": {
+              "mode": "merkle",
+              "root": "a1c029e95f5760da0829b7307c7cc591e4e981b75287ef2a478edb65d453e26a",
+              "count": 21,
+              "bundles": [
+                {
+                  "id": "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000",
+                  "sha256": "2f5521fda79e7fb3faef6af39f138fcbd1ce80321fd1e1f3c34416892b4fd2bb",
+                  "from": 1,
+                  "to": 21
+                }
+              ],
+              "order": "direct"
+            },
+            "art": {
+              "viewer": {
+                "id": "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000",
+                "sha256": "ca9871f953b29328b4962f723a476b1290aef33653f2161fbfee79401cbf3f92"
+              }
+            },
+            "writers": [
+              {
+                "authority": "4ab9c870bca18a35161456c19359890ece11023f6a23c1916e2fe35f1566702c00000000",
+                "label": "w1"
+              },
+              {
+                "authority": "caef788a4b418b2946f228b003b2f1ec3a3b3b32a4fe2f02f1dd0beea6f09cf600000000",
+                "label": "w2"
+              },
+              {
+                "authority": "11cf95fb8971c73efc959f13bffa6c13039f90488c496fb96053c66ca953f6e700000000",
+                "label": "w3"
+              }
+            ],
+            "quorum": 2,
+            "writerRegistry": null,
+            "indexer": {
+              "id": "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000",
+              "sha256": "08fe4bfede214f960dd2428f24cad0db7cb6f577aa4cce0cc56ada52b099bb61",
+              "reference": "keel-koc1-indexer@1"
+            },
+            "bridges": null,
+            "checkpoint": null
+          },
+          "refs": {
+            "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000": {
+              "height": 90,
+              "bytes": "7b226e616d65223a22424c4148202331222c227472616974223a22726564227d0a7b226e616d65223a22424c4148202332222c227472616974223a22626c7565227d0a7b226e616d65223a22424c4148202333222c227472616974223a22676f6c64227d0a7b226e616d65223a22424c4148202334222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202335222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202336222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202337222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202338222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202339222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233130222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233131222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233132222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233133222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233134222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233135222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233136222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233137222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233138222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233139222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233230222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233231222c227472616974223a2266697874757265227d"
+            },
+            "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e74686574696320766965776572206279746573"
+            },
+            "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e746865746963207265666572656e63652d696e646578657220736f75726365"
+            }
+          },
+          "rawTx": "02000000000101913c71ad6a037cdfbcaab100e04b782de630b122aeb728171f0b04ec2d66da160000000000fdffffff034a01000000000000225120fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556e803000000000000225120c9c51f3842bde1813ff5324d5ed210f38cb693f0cd794e439ba554973623a1f400000000000000002a6a284b4f4331e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000034000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000b420fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556ac0063036f72640107046b6f6331010b200d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef01054c5ca4616d5820fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a14602975566170646b6f633161725824e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000626f70646d696e74006821c0fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a146029755640060000",
+          "height": 100,
+          "txIndex": 1,
+          "charms": [],
+          "commitTx": "0200000001a8a36caf619cd6fea20cd0f839b3a5c4369db296faf9b9dddc09ca8b2a08c1470000000000fdffffff01b80b0000000000002251208695b76795d1e784bfab48cbad4eea499e7294ed6c51f675a16a94bcd921e28a40060000"
+        },
         "unresolved": true
       },
       "expected": {
@@ -378,6 +1084,7 @@
         "artVerified": true,
         "metadataVerified": true,
         "entryAssurance": "exhaustive",
+        "ownEntryAssurance": "full",
         "challengeBudget": 2,
         "incomplete": false,
         "followNextAsAuthority": false,
@@ -421,7 +1128,107 @@
         "pageEntries": 20,
         "bridged": false,
         "endHeight": 102,
-        "paymentMode": "escrow"
+        "paymentMode": "escrow",
+        "self": {
+          "id": "mint-1600",
+          "recipe": {
+            "p": "koc1",
+            "op": "recipe",
+            "v": 1,
+            "name": "KOC1 vector collection",
+            "network": "testnet4",
+            "id": "e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000",
+            "height": 99,
+            "txIndex": 10,
+            "end": {
+              "mode": "first",
+              "max": 21,
+              "open": 100,
+              "close": 102
+            },
+            "finality": 2,
+            "challengeWindow": 3,
+            "price": 1000,
+            "payment": {
+              "mode": "escrow",
+              "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+              "writerKeys": [
+                "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+                "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+                "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+              ],
+              "collectAfter": 3,
+              "refundAfter": 18,
+              "earlyRefund": true
+            },
+            "controls": {
+              "notice": 2,
+              "pausable": true
+            },
+            "metadata": {
+              "mode": "merkle",
+              "root": "a1c029e95f5760da0829b7307c7cc591e4e981b75287ef2a478edb65d453e26a",
+              "count": 21,
+              "bundles": [
+                {
+                  "id": "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000",
+                  "sha256": "2f5521fda79e7fb3faef6af39f138fcbd1ce80321fd1e1f3c34416892b4fd2bb",
+                  "from": 1,
+                  "to": 21
+                }
+              ],
+              "order": "direct"
+            },
+            "art": {
+              "viewer": {
+                "id": "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000",
+                "sha256": "ca9871f953b29328b4962f723a476b1290aef33653f2161fbfee79401cbf3f92"
+              }
+            },
+            "writers": [
+              {
+                "authority": "4ab9c870bca18a35161456c19359890ece11023f6a23c1916e2fe35f1566702c00000000",
+                "label": "w1"
+              },
+              {
+                "authority": "caef788a4b418b2946f228b003b2f1ec3a3b3b32a4fe2f02f1dd0beea6f09cf600000000",
+                "label": "w2"
+              },
+              {
+                "authority": "11cf95fb8971c73efc959f13bffa6c13039f90488c496fb96053c66ca953f6e700000000",
+                "label": "w3"
+              }
+            ],
+            "quorum": 2,
+            "writerRegistry": null,
+            "indexer": {
+              "id": "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000",
+              "sha256": "08fe4bfede214f960dd2428f24cad0db7cb6f577aa4cce0cc56ada52b099bb61",
+              "reference": "keel-koc1-indexer@1"
+            },
+            "bridges": null,
+            "checkpoint": null
+          },
+          "refs": {
+            "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000": {
+              "height": 90,
+              "bytes": "7b226e616d65223a22424c4148202331222c227472616974223a22726564227d0a7b226e616d65223a22424c4148202332222c227472616974223a22626c7565227d0a7b226e616d65223a22424c4148202333222c227472616974223a22676f6c64227d0a7b226e616d65223a22424c4148202334222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202335222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202336222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202337222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202338222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202339222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233130222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233131222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233132222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233133222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233134222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233135222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233136222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233137222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233138222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233139222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233230222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233231222c227472616974223a2266697874757265227d"
+            },
+            "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e74686574696320766965776572206279746573"
+            },
+            "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e746865746963207265666572656e63652d696e646578657220736f75726365"
+            }
+          },
+          "rawTx": "02000000000101913c71ad6a037cdfbcaab100e04b782de630b122aeb728171f0b04ec2d66da160000000000fdffffff034a01000000000000225120fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556e803000000000000225120c9c51f3842bde1813ff5324d5ed210f38cb693f0cd794e439ba554973623a1f400000000000000002a6a284b4f4331e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000034000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000b420fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556ac0063036f72640107046b6f6331010b200d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef01054c5ca4616d5820fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a14602975566170646b6f633161725824e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000626f70646d696e74006821c0fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a146029755640060000",
+          "height": 100,
+          "txIndex": 1,
+          "charms": [],
+          "commitTx": "0200000001a8a36caf619cd6fea20cd0f839b3a5c4369db296faf9b9dddc09ca8b2a08c1470000000000fdffffff01b80b0000000000002251208695b76795d1e784bfab48cbad4eea499e7294ed6c51f675a16a94bcd921e28a40060000"
+        }
       },
       "expected": {
         "depth": 6,
@@ -431,6 +1238,7 @@
         "artVerified": true,
         "metadataVerified": true,
         "entryAssurance": "exhaustive",
+        "ownEntryAssurance": "full",
         "challengeBudget": 32,
         "incomplete": true,
         "followNextAsAuthority": false,
@@ -474,7 +1282,107 @@
         "pageEntries": 1001,
         "bridged": false,
         "endHeight": 102,
-        "paymentMode": "escrow"
+        "paymentMode": "escrow",
+        "self": {
+          "id": "mint-1600",
+          "recipe": {
+            "p": "koc1",
+            "op": "recipe",
+            "v": 1,
+            "name": "KOC1 vector collection",
+            "network": "testnet4",
+            "id": "e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000",
+            "height": 99,
+            "txIndex": 10,
+            "end": {
+              "mode": "first",
+              "max": 21,
+              "open": 100,
+              "close": 102
+            },
+            "finality": 2,
+            "challengeWindow": 3,
+            "price": 1000,
+            "payment": {
+              "mode": "escrow",
+              "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+              "writerKeys": [
+                "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+                "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+                "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+              ],
+              "collectAfter": 3,
+              "refundAfter": 18,
+              "earlyRefund": true
+            },
+            "controls": {
+              "notice": 2,
+              "pausable": true
+            },
+            "metadata": {
+              "mode": "merkle",
+              "root": "a1c029e95f5760da0829b7307c7cc591e4e981b75287ef2a478edb65d453e26a",
+              "count": 21,
+              "bundles": [
+                {
+                  "id": "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000",
+                  "sha256": "2f5521fda79e7fb3faef6af39f138fcbd1ce80321fd1e1f3c34416892b4fd2bb",
+                  "from": 1,
+                  "to": 21
+                }
+              ],
+              "order": "direct"
+            },
+            "art": {
+              "viewer": {
+                "id": "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000",
+                "sha256": "ca9871f953b29328b4962f723a476b1290aef33653f2161fbfee79401cbf3f92"
+              }
+            },
+            "writers": [
+              {
+                "authority": "4ab9c870bca18a35161456c19359890ece11023f6a23c1916e2fe35f1566702c00000000",
+                "label": "w1"
+              },
+              {
+                "authority": "caef788a4b418b2946f228b003b2f1ec3a3b3b32a4fe2f02f1dd0beea6f09cf600000000",
+                "label": "w2"
+              },
+              {
+                "authority": "11cf95fb8971c73efc959f13bffa6c13039f90488c496fb96053c66ca953f6e700000000",
+                "label": "w3"
+              }
+            ],
+            "quorum": 2,
+            "writerRegistry": null,
+            "indexer": {
+              "id": "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000",
+              "sha256": "08fe4bfede214f960dd2428f24cad0db7cb6f577aa4cce0cc56ada52b099bb61",
+              "reference": "keel-koc1-indexer@1"
+            },
+            "bridges": null,
+            "checkpoint": null
+          },
+          "refs": {
+            "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000": {
+              "height": 90,
+              "bytes": "7b226e616d65223a22424c4148202331222c227472616974223a22726564227d0a7b226e616d65223a22424c4148202332222c227472616974223a22626c7565227d0a7b226e616d65223a22424c4148202333222c227472616974223a22676f6c64227d0a7b226e616d65223a22424c4148202334222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202335222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202336222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202337222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202338222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202339222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233130222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233131222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233132222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233133222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233134222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233135222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233136222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233137222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233138222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233139222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233230222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233231222c227472616974223a2266697874757265227d"
+            },
+            "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e74686574696320766965776572206279746573"
+            },
+            "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e746865746963207265666572656e63652d696e646578657220736f75726365"
+            }
+          },
+          "rawTx": "02000000000101913c71ad6a037cdfbcaab100e04b782de630b122aeb728171f0b04ec2d66da160000000000fdffffff034a01000000000000225120fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556e803000000000000225120c9c51f3842bde1813ff5324d5ed210f38cb693f0cd794e439ba554973623a1f400000000000000002a6a284b4f4331e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000034000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000b420fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556ac0063036f72640107046b6f6331010b200d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef01054c5ca4616d5820fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a14602975566170646b6f633161725824e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000626f70646d696e74006821c0fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a146029755640060000",
+          "height": 100,
+          "txIndex": 1,
+          "charms": [],
+          "commitTx": "0200000001a8a36caf619cd6fea20cd0f839b3a5c4369db296faf9b9dddc09ca8b2a08c1470000000000fdffffff01b80b0000000000002251208695b76795d1e784bfab48cbad4eea499e7294ed6c51f675a16a94bcd921e28a40060000"
+        }
       },
       "expected": {
         "depth": 6,
@@ -484,6 +1392,7 @@
         "artVerified": true,
         "metadataVerified": true,
         "entryAssurance": "exhaustive",
+        "ownEntryAssurance": "full",
         "challengeBudget": 2,
         "incomplete": true,
         "followNextAsAuthority": false,
@@ -527,7 +1436,107 @@
         "pageEntries": 20,
         "bridged": false,
         "endHeight": 102,
-        "paymentMode": "escrow"
+        "paymentMode": "escrow",
+        "self": {
+          "id": "mint-1600",
+          "recipe": {
+            "p": "koc1",
+            "op": "recipe",
+            "v": 1,
+            "name": "KOC1 vector collection",
+            "network": "testnet4",
+            "id": "e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000",
+            "height": 99,
+            "txIndex": 10,
+            "end": {
+              "mode": "first",
+              "max": 21,
+              "open": 100,
+              "close": 102
+            },
+            "finality": 2,
+            "challengeWindow": 3,
+            "price": 1000,
+            "payment": {
+              "mode": "escrow",
+              "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+              "writerKeys": [
+                "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+                "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+                "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+              ],
+              "collectAfter": 3,
+              "refundAfter": 18,
+              "earlyRefund": true
+            },
+            "controls": {
+              "notice": 2,
+              "pausable": true
+            },
+            "metadata": {
+              "mode": "merkle",
+              "root": "a1c029e95f5760da0829b7307c7cc591e4e981b75287ef2a478edb65d453e26a",
+              "count": 21,
+              "bundles": [
+                {
+                  "id": "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000",
+                  "sha256": "2f5521fda79e7fb3faef6af39f138fcbd1ce80321fd1e1f3c34416892b4fd2bb",
+                  "from": 1,
+                  "to": 21
+                }
+              ],
+              "order": "direct"
+            },
+            "art": {
+              "viewer": {
+                "id": "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000",
+                "sha256": "ca9871f953b29328b4962f723a476b1290aef33653f2161fbfee79401cbf3f92"
+              }
+            },
+            "writers": [
+              {
+                "authority": "4ab9c870bca18a35161456c19359890ece11023f6a23c1916e2fe35f1566702c00000000",
+                "label": "w1"
+              },
+              {
+                "authority": "caef788a4b418b2946f228b003b2f1ec3a3b3b32a4fe2f02f1dd0beea6f09cf600000000",
+                "label": "w2"
+              },
+              {
+                "authority": "11cf95fb8971c73efc959f13bffa6c13039f90488c496fb96053c66ca953f6e700000000",
+                "label": "w3"
+              }
+            ],
+            "quorum": 2,
+            "writerRegistry": null,
+            "indexer": {
+              "id": "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000",
+              "sha256": "08fe4bfede214f960dd2428f24cad0db7cb6f577aa4cce0cc56ada52b099bb61",
+              "reference": "keel-koc1-indexer@1"
+            },
+            "bridges": null,
+            "checkpoint": null
+          },
+          "refs": {
+            "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000": {
+              "height": 90,
+              "bytes": "7b226e616d65223a22424c4148202331222c227472616974223a22726564227d0a7b226e616d65223a22424c4148202332222c227472616974223a22626c7565227d0a7b226e616d65223a22424c4148202333222c227472616974223a22676f6c64227d0a7b226e616d65223a22424c4148202334222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202335222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202336222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202337222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202338222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202339222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233130222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233131222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233132222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233133222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233134222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233135222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233136222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233137222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233138222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233139222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233230222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233231222c227472616974223a2266697874757265227d"
+            },
+            "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e74686574696320766965776572206279746573"
+            },
+            "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e746865746963207265666572656e63652d696e646578657220736f75726365"
+            }
+          },
+          "rawTx": "02000000000101913c71ad6a037cdfbcaab100e04b782de630b122aeb728171f0b04ec2d66da160000000000fdffffff034a01000000000000225120fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556e803000000000000225120c9c51f3842bde1813ff5324d5ed210f38cb693f0cd794e439ba554973623a1f400000000000000002a6a284b4f4331e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000034000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000b420fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556ac0063036f72640107046b6f6331010b200d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef01054c5ca4616d5820fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a14602975566170646b6f633161725824e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000626f70646d696e74006821c0fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a146029755640060000",
+          "height": 100,
+          "txIndex": 1,
+          "charms": [],
+          "commitTx": "0200000001a8a36caf619cd6fea20cd0f839b3a5c4369db296faf9b9dddc09ca8b2a08c1470000000000fdffffff01b80b0000000000002251208695b76795d1e784bfab48cbad4eea499e7294ed6c51f675a16a94bcd921e28a40060000"
+        }
       },
       "expected": {
         "depth": 6,
@@ -537,6 +1546,162 @@
         "artVerified": true,
         "metadataVerified": true,
         "entryAssurance": "sampled",
+        "ownEntryAssurance": "full",
+        "challengeBudget": 2,
+        "incomplete": false,
+        "followNextAsAuthority": false,
+        "bridgeAccepted": true,
+        "spentKnown": false,
+        "scanStopped": true,
+        "cancelReservesSupply": false,
+        "directOptInRequired": false
+      }
+    },
+    {
+      "id": "sampled-others-still-check-own-entry",
+      "rules": [
+        "KOC1-R46",
+        "KOC1-R48"
+      ],
+      "input": {
+        "height": 100,
+        "tip": 105,
+        "F": 2,
+        "W": 3,
+        "C": 105,
+        "recipeValid": true,
+        "inIndex": true,
+        "burned": false,
+        "artBytes": "617274",
+        "artHash": "d3cec99112255db9bf4963f7798562b6a36f1bd0b2016918629e007d474deb70",
+        "leaf": "ecae9b184e86ef39abbd2f780bee3a9849b75b829cc0ff571c238b20e7017f70",
+        "path": [
+          {
+            "side": "left",
+            "hash": "4df264c81bb73e78bae3b05c1c163e27d25a269a6fdfb2a24e874f5f19f8bf2d"
+          },
+          {
+            "side": "right",
+            "hash": "0d73381b9339d6da99e2eae08c68f9dcd20a3e0179a830c8131d2ff5de1565fd"
+          }
+        ],
+        "root": "58e3264fe062e6ea843b36122519ab32f477ce27ea93764102e2d469f28df3fe",
+        "count": 1001,
+        "challenges": 2,
+        "pageEntries": 20,
+        "bridged": false,
+        "endHeight": 102,
+        "paymentMode": "escrow",
+        "self": {
+          "id": "mint-1600",
+          "recipe": {
+            "p": "koc1",
+            "op": "recipe",
+            "v": 1,
+            "name": "KOC1 vector collection",
+            "network": "testnet4",
+            "id": "e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000",
+            "height": 99,
+            "txIndex": 10,
+            "end": {
+              "mode": "first",
+              "max": 21,
+              "open": 100,
+              "close": 102
+            },
+            "finality": 2,
+            "challengeWindow": 3,
+            "price": 1000,
+            "payment": {
+              "mode": "escrow",
+              "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+              "writerKeys": [
+                "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+                "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+                "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+              ],
+              "collectAfter": 3,
+              "refundAfter": 18,
+              "earlyRefund": true
+            },
+            "controls": {
+              "notice": 2,
+              "pausable": true
+            },
+            "metadata": {
+              "mode": "merkle",
+              "root": "a1c029e95f5760da0829b7307c7cc591e4e981b75287ef2a478edb65d453e26a",
+              "count": 21,
+              "bundles": [
+                {
+                  "id": "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000",
+                  "sha256": "2f5521fda79e7fb3faef6af39f138fcbd1ce80321fd1e1f3c34416892b4fd2bb",
+                  "from": 1,
+                  "to": 21
+                }
+              ],
+              "order": "direct"
+            },
+            "art": {
+              "viewer": {
+                "id": "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000",
+                "sha256": "ca9871f953b29328b4962f723a476b1290aef33653f2161fbfee79401cbf3f92"
+              }
+            },
+            "writers": [
+              {
+                "authority": "4ab9c870bca18a35161456c19359890ece11023f6a23c1916e2fe35f1566702c00000000",
+                "label": "w1"
+              },
+              {
+                "authority": "caef788a4b418b2946f228b003b2f1ec3a3b3b32a4fe2f02f1dd0beea6f09cf600000000",
+                "label": "w2"
+              },
+              {
+                "authority": "11cf95fb8971c73efc959f13bffa6c13039f90488c496fb96053c66ca953f6e700000000",
+                "label": "w3"
+              }
+            ],
+            "quorum": 2,
+            "writerRegistry": null,
+            "indexer": {
+              "id": "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000",
+              "sha256": "08fe4bfede214f960dd2428f24cad0db7cb6f577aa4cce0cc56ada52b099bb61",
+              "reference": "keel-koc1-indexer@1"
+            },
+            "bridges": null,
+            "checkpoint": null
+          },
+          "refs": {
+            "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000": {
+              "height": 90,
+              "bytes": "7b226e616d65223a22424c4148202331222c227472616974223a22726564227d0a7b226e616d65223a22424c4148202332222c227472616974223a22626c7565227d0a7b226e616d65223a22424c4148202333222c227472616974223a22676f6c64227d0a7b226e616d65223a22424c4148202334222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202335222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202336222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202337222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202338222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202339222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233130222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233131222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233132222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233133222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233134222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233135222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233136222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233137222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233138222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233139222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233230222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233231222c227472616974223a2266697874757265227d"
+            },
+            "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e74686574696320766965776572206279746573"
+            },
+            "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e746865746963207265666572656e63652d696e646578657220736f75726365"
+            }
+          },
+          "rawTx": "02000000000101913c71ad6a037cdfbcaab100e04b782de630b122aeb728171f0b04ec2d66da160000000000fdffffff034a01000000000000225120fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556e803000000000000225120c9c51f3842bde1813ff5324d5ed210f38cb693f0cd794e439ba554973623a1f400000000000000002a6a284b4f4331e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000034000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000b520fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556ac0063036f72640107046b6f6331010b200d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef01054c5ca4616d5820fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a14602975566170646b6f633161725824e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000626f70646d696e7400680021c0fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a146029755640060000",
+          "height": 100,
+          "txIndex": 1,
+          "charms": [],
+          "commitTx": "0200000001a8a36caf619cd6fea20cd0f839b3a5c4369db296faf9b9dddc09ca8b2a08c1470000000000fdffffff01b80b0000000000002251208695b76795d1e784bfab48cbad4eea499e7294ed6c51f675a16a94bcd921e28a40060000"
+        }
+      },
+      "expected": {
+        "depth": 6,
+        "verified": false,
+        "final": false,
+        "current": false,
+        "artVerified": true,
+        "metadataVerified": true,
+        "entryAssurance": "sampled",
+        "ownEntryAssurance": "failed",
         "challengeBudget": 2,
         "incomplete": false,
         "followNextAsAuthority": false,
@@ -581,7 +1746,107 @@
         "pageEntries": 20,
         "bridged": false,
         "endHeight": 102,
-        "paymentMode": "escrow"
+        "paymentMode": "escrow",
+        "self": {
+          "id": "mint-1600",
+          "recipe": {
+            "p": "koc1",
+            "op": "recipe",
+            "v": 1,
+            "name": "KOC1 vector collection",
+            "network": "testnet4",
+            "id": "e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000",
+            "height": 99,
+            "txIndex": 10,
+            "end": {
+              "mode": "first",
+              "max": 21,
+              "open": 100,
+              "close": 102
+            },
+            "finality": 2,
+            "challengeWindow": 3,
+            "price": 1000,
+            "payment": {
+              "mode": "escrow",
+              "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+              "writerKeys": [
+                "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+                "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+                "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+              ],
+              "collectAfter": 3,
+              "refundAfter": 18,
+              "earlyRefund": true
+            },
+            "controls": {
+              "notice": 2,
+              "pausable": true
+            },
+            "metadata": {
+              "mode": "merkle",
+              "root": "a1c029e95f5760da0829b7307c7cc591e4e981b75287ef2a478edb65d453e26a",
+              "count": 21,
+              "bundles": [
+                {
+                  "id": "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000",
+                  "sha256": "2f5521fda79e7fb3faef6af39f138fcbd1ce80321fd1e1f3c34416892b4fd2bb",
+                  "from": 1,
+                  "to": 21
+                }
+              ],
+              "order": "direct"
+            },
+            "art": {
+              "viewer": {
+                "id": "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000",
+                "sha256": "ca9871f953b29328b4962f723a476b1290aef33653f2161fbfee79401cbf3f92"
+              }
+            },
+            "writers": [
+              {
+                "authority": "4ab9c870bca18a35161456c19359890ece11023f6a23c1916e2fe35f1566702c00000000",
+                "label": "w1"
+              },
+              {
+                "authority": "caef788a4b418b2946f228b003b2f1ec3a3b3b32a4fe2f02f1dd0beea6f09cf600000000",
+                "label": "w2"
+              },
+              {
+                "authority": "11cf95fb8971c73efc959f13bffa6c13039f90488c496fb96053c66ca953f6e700000000",
+                "label": "w3"
+              }
+            ],
+            "quorum": 2,
+            "writerRegistry": null,
+            "indexer": {
+              "id": "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000",
+              "sha256": "08fe4bfede214f960dd2428f24cad0db7cb6f577aa4cce0cc56ada52b099bb61",
+              "reference": "keel-koc1-indexer@1"
+            },
+            "bridges": null,
+            "checkpoint": null
+          },
+          "refs": {
+            "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000": {
+              "height": 90,
+              "bytes": "7b226e616d65223a22424c4148202331222c227472616974223a22726564227d0a7b226e616d65223a22424c4148202332222c227472616974223a22626c7565227d0a7b226e616d65223a22424c4148202333222c227472616974223a22676f6c64227d0a7b226e616d65223a22424c4148202334222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202335222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202336222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202337222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202338222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202339222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233130222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233131222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233132222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233133222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233134222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233135222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233136222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233137222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233138222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233139222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233230222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233231222c227472616974223a2266697874757265227d"
+            },
+            "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e74686574696320766965776572206279746573"
+            },
+            "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e746865746963207265666572656e63652d696e646578657220736f75726365"
+            }
+          },
+          "rawTx": "02000000000101913c71ad6a037cdfbcaab100e04b782de630b122aeb728171f0b04ec2d66da160000000000fdffffff034a01000000000000225120fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556e803000000000000225120c9c51f3842bde1813ff5324d5ed210f38cb693f0cd794e439ba554973623a1f400000000000000002a6a284b4f4331e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000034000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000b420fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556ac0063036f72640107046b6f6331010b200d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef01054c5ca4616d5820fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a14602975566170646b6f633161725824e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000626f70646d696e74006821c0fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a146029755640060000",
+          "height": 100,
+          "txIndex": 1,
+          "charms": [],
+          "commitTx": "0200000001a8a36caf619cd6fea20cd0f839b3a5c4369db296faf9b9dddc09ca8b2a08c1470000000000fdffffff01b80b0000000000002251208695b76795d1e784bfab48cbad4eea499e7294ed6c51f675a16a94bcd921e28a40060000"
+        }
       },
       "expected": {
         "depth": 6,
@@ -591,6 +1856,7 @@
         "artVerified": true,
         "metadataVerified": false,
         "entryAssurance": "exhaustive",
+        "ownEntryAssurance": "full",
         "challengeBudget": 2,
         "incomplete": false,
         "followNextAsAuthority": false,
@@ -634,7 +1900,107 @@
         "pageEntries": 20,
         "bridged": false,
         "endHeight": 102,
-        "paymentMode": "escrow"
+        "paymentMode": "escrow",
+        "self": {
+          "id": "mint-1600",
+          "recipe": {
+            "p": "koc1",
+            "op": "recipe",
+            "v": 1,
+            "name": "KOC1 vector collection",
+            "network": "testnet4",
+            "id": "e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000",
+            "height": 99,
+            "txIndex": 10,
+            "end": {
+              "mode": "first",
+              "max": 21,
+              "open": 100,
+              "close": 102
+            },
+            "finality": 2,
+            "challengeWindow": 3,
+            "price": 1000,
+            "payment": {
+              "mode": "escrow",
+              "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+              "writerKeys": [
+                "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+                "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+                "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+              ],
+              "collectAfter": 3,
+              "refundAfter": 18,
+              "earlyRefund": true
+            },
+            "controls": {
+              "notice": 2,
+              "pausable": true
+            },
+            "metadata": {
+              "mode": "merkle",
+              "root": "a1c029e95f5760da0829b7307c7cc591e4e981b75287ef2a478edb65d453e26a",
+              "count": 21,
+              "bundles": [
+                {
+                  "id": "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000",
+                  "sha256": "2f5521fda79e7fb3faef6af39f138fcbd1ce80321fd1e1f3c34416892b4fd2bb",
+                  "from": 1,
+                  "to": 21
+                }
+              ],
+              "order": "direct"
+            },
+            "art": {
+              "viewer": {
+                "id": "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000",
+                "sha256": "ca9871f953b29328b4962f723a476b1290aef33653f2161fbfee79401cbf3f92"
+              }
+            },
+            "writers": [
+              {
+                "authority": "4ab9c870bca18a35161456c19359890ece11023f6a23c1916e2fe35f1566702c00000000",
+                "label": "w1"
+              },
+              {
+                "authority": "caef788a4b418b2946f228b003b2f1ec3a3b3b32a4fe2f02f1dd0beea6f09cf600000000",
+                "label": "w2"
+              },
+              {
+                "authority": "11cf95fb8971c73efc959f13bffa6c13039f90488c496fb96053c66ca953f6e700000000",
+                "label": "w3"
+              }
+            ],
+            "quorum": 2,
+            "writerRegistry": null,
+            "indexer": {
+              "id": "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000",
+              "sha256": "08fe4bfede214f960dd2428f24cad0db7cb6f577aa4cce0cc56ada52b099bb61",
+              "reference": "keel-koc1-indexer@1"
+            },
+            "bridges": null,
+            "checkpoint": null
+          },
+          "refs": {
+            "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000": {
+              "height": 90,
+              "bytes": "7b226e616d65223a22424c4148202331222c227472616974223a22726564227d0a7b226e616d65223a22424c4148202332222c227472616974223a22626c7565227d0a7b226e616d65223a22424c4148202333222c227472616974223a22676f6c64227d0a7b226e616d65223a22424c4148202334222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202335222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202336222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202337222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202338222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202339222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233130222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233131222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233132222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233133222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233134222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233135222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233136222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233137222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233138222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233139222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233230222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233231222c227472616974223a2266697874757265227d"
+            },
+            "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e74686574696320766965776572206279746573"
+            },
+            "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e746865746963207265666572656e63652d696e646578657220736f75726365"
+            }
+          },
+          "rawTx": "02000000000101913c71ad6a037cdfbcaab100e04b782de630b122aeb728171f0b04ec2d66da160000000000fdffffff034a01000000000000225120fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556e803000000000000225120c9c51f3842bde1813ff5324d5ed210f38cb693f0cd794e439ba554973623a1f400000000000000002a6a284b4f4331e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000034000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000b420fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556ac0063036f72640107046b6f6331010b200d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef01054c5ca4616d5820fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a14602975566170646b6f633161725824e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000626f70646d696e74006821c0fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a146029755640060000",
+          "height": 100,
+          "txIndex": 1,
+          "charms": [],
+          "commitTx": "0200000001a8a36caf619cd6fea20cd0f839b3a5c4369db296faf9b9dddc09ca8b2a08c1470000000000fdffffff01b80b0000000000002251208695b76795d1e784bfab48cbad4eea499e7294ed6c51f675a16a94bcd921e28a40060000"
+        }
       },
       "expected": {
         "depth": 6,
@@ -644,6 +2010,7 @@
         "artVerified": false,
         "metadataVerified": true,
         "entryAssurance": "exhaustive",
+        "ownEntryAssurance": "full",
         "challengeBudget": 2,
         "incomplete": false,
         "followNextAsAuthority": false,
@@ -688,6 +2055,106 @@
         "bridged": true,
         "endHeight": 102,
         "paymentMode": "escrow",
+        "self": {
+          "id": "mint-1600",
+          "recipe": {
+            "p": "koc1",
+            "op": "recipe",
+            "v": 1,
+            "name": "KOC1 vector collection",
+            "network": "testnet4",
+            "id": "e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000",
+            "height": 99,
+            "txIndex": 10,
+            "end": {
+              "mode": "first",
+              "max": 21,
+              "open": 100,
+              "close": 102
+            },
+            "finality": 2,
+            "challengeWindow": 3,
+            "price": 1000,
+            "payment": {
+              "mode": "escrow",
+              "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+              "writerKeys": [
+                "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+                "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+                "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+              ],
+              "collectAfter": 3,
+              "refundAfter": 18,
+              "earlyRefund": true
+            },
+            "controls": {
+              "notice": 2,
+              "pausable": true
+            },
+            "metadata": {
+              "mode": "merkle",
+              "root": "a1c029e95f5760da0829b7307c7cc591e4e981b75287ef2a478edb65d453e26a",
+              "count": 21,
+              "bundles": [
+                {
+                  "id": "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000",
+                  "sha256": "2f5521fda79e7fb3faef6af39f138fcbd1ce80321fd1e1f3c34416892b4fd2bb",
+                  "from": 1,
+                  "to": 21
+                }
+              ],
+              "order": "direct"
+            },
+            "art": {
+              "viewer": {
+                "id": "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000",
+                "sha256": "ca9871f953b29328b4962f723a476b1290aef33653f2161fbfee79401cbf3f92"
+              }
+            },
+            "writers": [
+              {
+                "authority": "4ab9c870bca18a35161456c19359890ece11023f6a23c1916e2fe35f1566702c00000000",
+                "label": "w1"
+              },
+              {
+                "authority": "caef788a4b418b2946f228b003b2f1ec3a3b3b32a4fe2f02f1dd0beea6f09cf600000000",
+                "label": "w2"
+              },
+              {
+                "authority": "11cf95fb8971c73efc959f13bffa6c13039f90488c496fb96053c66ca953f6e700000000",
+                "label": "w3"
+              }
+            ],
+            "quorum": 2,
+            "writerRegistry": null,
+            "indexer": {
+              "id": "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000",
+              "sha256": "08fe4bfede214f960dd2428f24cad0db7cb6f577aa4cce0cc56ada52b099bb61",
+              "reference": "keel-koc1-indexer@1"
+            },
+            "bridges": null,
+            "checkpoint": null
+          },
+          "refs": {
+            "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000": {
+              "height": 90,
+              "bytes": "7b226e616d65223a22424c4148202331222c227472616974223a22726564227d0a7b226e616d65223a22424c4148202332222c227472616974223a22626c7565227d0a7b226e616d65223a22424c4148202333222c227472616974223a22676f6c64227d0a7b226e616d65223a22424c4148202334222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202335222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202336222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202337222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202338222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202339222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233130222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233131222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233132222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233133222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233134222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233135222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233136222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233137222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233138222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233139222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233230222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233231222c227472616974223a2266697874757265227d"
+            },
+            "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e74686574696320766965776572206279746573"
+            },
+            "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e746865746963207265666572656e63652d696e646578657220736f75726365"
+            }
+          },
+          "rawTx": "02000000000101913c71ad6a037cdfbcaab100e04b782de630b122aeb728171f0b04ec2d66da160000000000fdffffff034a01000000000000225120fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556e803000000000000225120c9c51f3842bde1813ff5324d5ed210f38cb693f0cd794e439ba554973623a1f400000000000000002a6a284b4f4331e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000034000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000b420fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556ac0063036f72640107046b6f6331010b200d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef01054c5ca4616d5820fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a14602975566170646b6f633161725824e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000626f70646d696e74006821c0fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a146029755640060000",
+          "height": 100,
+          "txIndex": 1,
+          "charms": [],
+          "commitTx": "0200000001a8a36caf619cd6fea20cd0f839b3a5c4369db296faf9b9dddc09ca8b2a08c1470000000000fdffffff01b80b0000000000002251208695b76795d1e784bfab48cbad4eea499e7294ed6c51f675a16a94bcd921e28a40060000"
+        },
         "existingGroth16Verified": false
       },
       "expected": {
@@ -698,6 +2165,7 @@
         "artVerified": true,
         "metadataVerified": true,
         "entryAssurance": "exhaustive",
+        "ownEntryAssurance": "full",
         "challengeBudget": 2,
         "incomplete": false,
         "followNextAsAuthority": false,
@@ -742,6 +2210,106 @@
         "bridged": true,
         "endHeight": 102,
         "paymentMode": "escrow",
+        "self": {
+          "id": "mint-1600",
+          "recipe": {
+            "p": "koc1",
+            "op": "recipe",
+            "v": 1,
+            "name": "KOC1 vector collection",
+            "network": "testnet4",
+            "id": "e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000",
+            "height": 99,
+            "txIndex": 10,
+            "end": {
+              "mode": "first",
+              "max": 21,
+              "open": 100,
+              "close": 102
+            },
+            "finality": 2,
+            "challengeWindow": 3,
+            "price": 1000,
+            "payment": {
+              "mode": "escrow",
+              "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+              "writerKeys": [
+                "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+                "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+                "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+              ],
+              "collectAfter": 3,
+              "refundAfter": 18,
+              "earlyRefund": true
+            },
+            "controls": {
+              "notice": 2,
+              "pausable": true
+            },
+            "metadata": {
+              "mode": "merkle",
+              "root": "a1c029e95f5760da0829b7307c7cc591e4e981b75287ef2a478edb65d453e26a",
+              "count": 21,
+              "bundles": [
+                {
+                  "id": "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000",
+                  "sha256": "2f5521fda79e7fb3faef6af39f138fcbd1ce80321fd1e1f3c34416892b4fd2bb",
+                  "from": 1,
+                  "to": 21
+                }
+              ],
+              "order": "direct"
+            },
+            "art": {
+              "viewer": {
+                "id": "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000",
+                "sha256": "ca9871f953b29328b4962f723a476b1290aef33653f2161fbfee79401cbf3f92"
+              }
+            },
+            "writers": [
+              {
+                "authority": "4ab9c870bca18a35161456c19359890ece11023f6a23c1916e2fe35f1566702c00000000",
+                "label": "w1"
+              },
+              {
+                "authority": "caef788a4b418b2946f228b003b2f1ec3a3b3b32a4fe2f02f1dd0beea6f09cf600000000",
+                "label": "w2"
+              },
+              {
+                "authority": "11cf95fb8971c73efc959f13bffa6c13039f90488c496fb96053c66ca953f6e700000000",
+                "label": "w3"
+              }
+            ],
+            "quorum": 2,
+            "writerRegistry": null,
+            "indexer": {
+              "id": "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000",
+              "sha256": "08fe4bfede214f960dd2428f24cad0db7cb6f577aa4cce0cc56ada52b099bb61",
+              "reference": "keel-koc1-indexer@1"
+            },
+            "bridges": null,
+            "checkpoint": null
+          },
+          "refs": {
+            "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000": {
+              "height": 90,
+              "bytes": "7b226e616d65223a22424c4148202331222c227472616974223a22726564227d0a7b226e616d65223a22424c4148202332222c227472616974223a22626c7565227d0a7b226e616d65223a22424c4148202333222c227472616974223a22676f6c64227d0a7b226e616d65223a22424c4148202334222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202335222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202336222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202337222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202338222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202339222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233130222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233131222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233132222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233133222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233134222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233135222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233136222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233137222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233138222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233139222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233230222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233231222c227472616974223a2266697874757265227d"
+            },
+            "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e74686574696320766965776572206279746573"
+            },
+            "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e746865746963207265666572656e63652d696e646578657220736f75726365"
+            }
+          },
+          "rawTx": "02000000000101913c71ad6a037cdfbcaab100e04b782de630b122aeb728171f0b04ec2d66da160000000000fdffffff034a01000000000000225120fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556e803000000000000225120c9c51f3842bde1813ff5324d5ed210f38cb693f0cd794e439ba554973623a1f400000000000000002a6a284b4f4331e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000034000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000b420fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556ac0063036f72640107046b6f6331010b200d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef01054c5ca4616d5820fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a14602975566170646b6f633161725824e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000626f70646d696e74006821c0fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a146029755640060000",
+          "height": 100,
+          "txIndex": 1,
+          "charms": [],
+          "commitTx": "0200000001a8a36caf619cd6fea20cd0f839b3a5c4369db296faf9b9dddc09ca8b2a08c1470000000000fdffffff01b80b0000000000002251208695b76795d1e784bfab48cbad4eea499e7294ed6c51f675a16a94bcd921e28a40060000"
+        },
         "existingGroth16Verified": true
       },
       "expected": {
@@ -752,6 +2320,7 @@
         "artVerified": true,
         "metadataVerified": true,
         "entryAssurance": "exhaustive",
+        "ownEntryAssurance": "full",
         "challengeBudget": 2,
         "incomplete": false,
         "followNextAsAuthority": false,
@@ -796,7 +2365,107 @@
         "pageEntries": 20,
         "bridged": false,
         "endHeight": 102,
-        "paymentMode": "escrow"
+        "paymentMode": "escrow",
+        "self": {
+          "id": "mint-1600",
+          "recipe": {
+            "p": "koc1",
+            "op": "recipe",
+            "v": 1,
+            "name": "KOC1 vector collection",
+            "network": "testnet4",
+            "id": "e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000",
+            "height": 99,
+            "txIndex": 10,
+            "end": {
+              "mode": "first",
+              "max": 21,
+              "open": 100,
+              "close": 102
+            },
+            "finality": 2,
+            "challengeWindow": 3,
+            "price": 1000,
+            "payment": {
+              "mode": "escrow",
+              "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+              "writerKeys": [
+                "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+                "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+                "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+              ],
+              "collectAfter": 3,
+              "refundAfter": 18,
+              "earlyRefund": true
+            },
+            "controls": {
+              "notice": 2,
+              "pausable": true
+            },
+            "metadata": {
+              "mode": "merkle",
+              "root": "a1c029e95f5760da0829b7307c7cc591e4e981b75287ef2a478edb65d453e26a",
+              "count": 21,
+              "bundles": [
+                {
+                  "id": "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000",
+                  "sha256": "2f5521fda79e7fb3faef6af39f138fcbd1ce80321fd1e1f3c34416892b4fd2bb",
+                  "from": 1,
+                  "to": 21
+                }
+              ],
+              "order": "direct"
+            },
+            "art": {
+              "viewer": {
+                "id": "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000",
+                "sha256": "ca9871f953b29328b4962f723a476b1290aef33653f2161fbfee79401cbf3f92"
+              }
+            },
+            "writers": [
+              {
+                "authority": "4ab9c870bca18a35161456c19359890ece11023f6a23c1916e2fe35f1566702c00000000",
+                "label": "w1"
+              },
+              {
+                "authority": "caef788a4b418b2946f228b003b2f1ec3a3b3b32a4fe2f02f1dd0beea6f09cf600000000",
+                "label": "w2"
+              },
+              {
+                "authority": "11cf95fb8971c73efc959f13bffa6c13039f90488c496fb96053c66ca953f6e700000000",
+                "label": "w3"
+              }
+            ],
+            "quorum": 2,
+            "writerRegistry": null,
+            "indexer": {
+              "id": "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000",
+              "sha256": "08fe4bfede214f960dd2428f24cad0db7cb6f577aa4cce0cc56ada52b099bb61",
+              "reference": "keel-koc1-indexer@1"
+            },
+            "bridges": null,
+            "checkpoint": null
+          },
+          "refs": {
+            "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000": {
+              "height": 90,
+              "bytes": "7b226e616d65223a22424c4148202331222c227472616974223a22726564227d0a7b226e616d65223a22424c4148202332222c227472616974223a22626c7565227d0a7b226e616d65223a22424c4148202333222c227472616974223a22676f6c64227d0a7b226e616d65223a22424c4148202334222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202335222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202336222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202337222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202338222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202339222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233130222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233131222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233132222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233133222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233134222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233135222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233136222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233137222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233138222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233139222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233230222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233231222c227472616974223a2266697874757265227d"
+            },
+            "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e74686574696320766965776572206279746573"
+            },
+            "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e746865746963207265666572656e63652d696e646578657220736f75726365"
+            }
+          },
+          "rawTx": "02000000000101913c71ad6a037cdfbcaab100e04b782de630b122aeb728171f0b04ec2d66da160000000000fdffffff034a01000000000000225120fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556e803000000000000225120c9c51f3842bde1813ff5324d5ed210f38cb693f0cd794e439ba554973623a1f400000000000000002a6a284b4f4331e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000034000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000b420fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556ac0063036f72640107046b6f6331010b200d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef01054c5ca4616d5820fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a14602975566170646b6f633161725824e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000626f70646d696e74006821c0fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a146029755640060000",
+          "height": 100,
+          "txIndex": 1,
+          "charms": [],
+          "commitTx": "0200000001a8a36caf619cd6fea20cd0f839b3a5c4369db296faf9b9dddc09ca8b2a08c1470000000000fdffffff01b80b0000000000002251208695b76795d1e784bfab48cbad4eea499e7294ed6c51f675a16a94bcd921e28a40060000"
+        }
       },
       "expected": {
         "depth": 6,
@@ -806,6 +2475,7 @@
         "artVerified": true,
         "metadataVerified": true,
         "entryAssurance": "exhaustive",
+        "ownEntryAssurance": "full",
         "challengeBudget": 2,
         "incomplete": false,
         "followNextAsAuthority": false,
@@ -849,7 +2519,107 @@
         "pageEntries": 20,
         "bridged": false,
         "endHeight": null,
-        "paymentMode": "escrow"
+        "paymentMode": "escrow",
+        "self": {
+          "id": "mint-1600",
+          "recipe": {
+            "p": "koc1",
+            "op": "recipe",
+            "v": 1,
+            "name": "KOC1 vector collection",
+            "network": "testnet4",
+            "id": "e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000",
+            "height": 99,
+            "txIndex": 10,
+            "end": {
+              "mode": "first",
+              "max": 21,
+              "open": 100,
+              "close": 102
+            },
+            "finality": 2,
+            "challengeWindow": 3,
+            "price": 1000,
+            "payment": {
+              "mode": "escrow",
+              "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+              "writerKeys": [
+                "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+                "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+                "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+              ],
+              "collectAfter": 3,
+              "refundAfter": 18,
+              "earlyRefund": true
+            },
+            "controls": {
+              "notice": 2,
+              "pausable": true
+            },
+            "metadata": {
+              "mode": "merkle",
+              "root": "a1c029e95f5760da0829b7307c7cc591e4e981b75287ef2a478edb65d453e26a",
+              "count": 21,
+              "bundles": [
+                {
+                  "id": "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000",
+                  "sha256": "2f5521fda79e7fb3faef6af39f138fcbd1ce80321fd1e1f3c34416892b4fd2bb",
+                  "from": 1,
+                  "to": 21
+                }
+              ],
+              "order": "direct"
+            },
+            "art": {
+              "viewer": {
+                "id": "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000",
+                "sha256": "ca9871f953b29328b4962f723a476b1290aef33653f2161fbfee79401cbf3f92"
+              }
+            },
+            "writers": [
+              {
+                "authority": "4ab9c870bca18a35161456c19359890ece11023f6a23c1916e2fe35f1566702c00000000",
+                "label": "w1"
+              },
+              {
+                "authority": "caef788a4b418b2946f228b003b2f1ec3a3b3b32a4fe2f02f1dd0beea6f09cf600000000",
+                "label": "w2"
+              },
+              {
+                "authority": "11cf95fb8971c73efc959f13bffa6c13039f90488c496fb96053c66ca953f6e700000000",
+                "label": "w3"
+              }
+            ],
+            "quorum": 2,
+            "writerRegistry": null,
+            "indexer": {
+              "id": "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000",
+              "sha256": "08fe4bfede214f960dd2428f24cad0db7cb6f577aa4cce0cc56ada52b099bb61",
+              "reference": "keel-koc1-indexer@1"
+            },
+            "bridges": null,
+            "checkpoint": null
+          },
+          "refs": {
+            "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000": {
+              "height": 90,
+              "bytes": "7b226e616d65223a22424c4148202331222c227472616974223a22726564227d0a7b226e616d65223a22424c4148202332222c227472616974223a22626c7565227d0a7b226e616d65223a22424c4148202333222c227472616974223a22676f6c64227d0a7b226e616d65223a22424c4148202334222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202335222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202336222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202337222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202338222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202339222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233130222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233131222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233132222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233133222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233134222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233135222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233136222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233137222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233138222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233139222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233230222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233231222c227472616974223a2266697874757265227d"
+            },
+            "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e74686574696320766965776572206279746573"
+            },
+            "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e746865746963207265666572656e63652d696e646578657220736f75726365"
+            }
+          },
+          "rawTx": "02000000000101913c71ad6a037cdfbcaab100e04b782de630b122aeb728171f0b04ec2d66da160000000000fdffffff034a01000000000000225120fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556e803000000000000225120c9c51f3842bde1813ff5324d5ed210f38cb693f0cd794e439ba554973623a1f400000000000000002a6a284b4f4331e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000034000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000b420fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556ac0063036f72640107046b6f6331010b200d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef01054c5ca4616d5820fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a14602975566170646b6f633161725824e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000626f70646d696e74006821c0fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a146029755640060000",
+          "height": 100,
+          "txIndex": 1,
+          "charms": [],
+          "commitTx": "0200000001a8a36caf619cd6fea20cd0f839b3a5c4369db296faf9b9dddc09ca8b2a08c1470000000000fdffffff01b80b0000000000002251208695b76795d1e784bfab48cbad4eea499e7294ed6c51f675a16a94bcd921e28a40060000"
+        }
       },
       "expected": {
         "depth": 6,
@@ -859,6 +2629,7 @@
         "artVerified": true,
         "metadataVerified": true,
         "entryAssurance": "exhaustive",
+        "ownEntryAssurance": "full",
         "challengeBudget": 2,
         "incomplete": false,
         "followNextAsAuthority": false,
@@ -902,7 +2673,107 @@
         "pageEntries": 20,
         "bridged": false,
         "endHeight": 102,
-        "paymentMode": "direct"
+        "paymentMode": "direct",
+        "self": {
+          "id": "mint-1600",
+          "recipe": {
+            "p": "koc1",
+            "op": "recipe",
+            "v": 1,
+            "name": "KOC1 vector collection",
+            "network": "testnet4",
+            "id": "e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000",
+            "height": 99,
+            "txIndex": 10,
+            "end": {
+              "mode": "first",
+              "max": 21,
+              "open": 100,
+              "close": 102
+            },
+            "finality": 2,
+            "challengeWindow": 3,
+            "price": 1000,
+            "payment": {
+              "mode": "escrow",
+              "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+              "writerKeys": [
+                "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+                "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+                "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+              ],
+              "collectAfter": 3,
+              "refundAfter": 18,
+              "earlyRefund": true
+            },
+            "controls": {
+              "notice": 2,
+              "pausable": true
+            },
+            "metadata": {
+              "mode": "merkle",
+              "root": "a1c029e95f5760da0829b7307c7cc591e4e981b75287ef2a478edb65d453e26a",
+              "count": 21,
+              "bundles": [
+                {
+                  "id": "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000",
+                  "sha256": "2f5521fda79e7fb3faef6af39f138fcbd1ce80321fd1e1f3c34416892b4fd2bb",
+                  "from": 1,
+                  "to": 21
+                }
+              ],
+              "order": "direct"
+            },
+            "art": {
+              "viewer": {
+                "id": "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000",
+                "sha256": "ca9871f953b29328b4962f723a476b1290aef33653f2161fbfee79401cbf3f92"
+              }
+            },
+            "writers": [
+              {
+                "authority": "4ab9c870bca18a35161456c19359890ece11023f6a23c1916e2fe35f1566702c00000000",
+                "label": "w1"
+              },
+              {
+                "authority": "caef788a4b418b2946f228b003b2f1ec3a3b3b32a4fe2f02f1dd0beea6f09cf600000000",
+                "label": "w2"
+              },
+              {
+                "authority": "11cf95fb8971c73efc959f13bffa6c13039f90488c496fb96053c66ca953f6e700000000",
+                "label": "w3"
+              }
+            ],
+            "quorum": 2,
+            "writerRegistry": null,
+            "indexer": {
+              "id": "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000",
+              "sha256": "08fe4bfede214f960dd2428f24cad0db7cb6f577aa4cce0cc56ada52b099bb61",
+              "reference": "keel-koc1-indexer@1"
+            },
+            "bridges": null,
+            "checkpoint": null
+          },
+          "refs": {
+            "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000": {
+              "height": 90,
+              "bytes": "7b226e616d65223a22424c4148202331222c227472616974223a22726564227d0a7b226e616d65223a22424c4148202332222c227472616974223a22626c7565227d0a7b226e616d65223a22424c4148202333222c227472616974223a22676f6c64227d0a7b226e616d65223a22424c4148202334222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202335222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202336222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202337222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202338222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202339222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233130222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233131222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233132222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233133222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233134222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233135222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233136222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233137222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233138222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233139222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233230222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233231222c227472616974223a2266697874757265227d"
+            },
+            "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e74686574696320766965776572206279746573"
+            },
+            "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e746865746963207265666572656e63652d696e646578657220736f75726365"
+            }
+          },
+          "rawTx": "02000000000101913c71ad6a037cdfbcaab100e04b782de630b122aeb728171f0b04ec2d66da160000000000fdffffff034a01000000000000225120fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556e803000000000000225120c9c51f3842bde1813ff5324d5ed210f38cb693f0cd794e439ba554973623a1f400000000000000002a6a284b4f4331e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000034000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000b420fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556ac0063036f72640107046b6f6331010b200d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef01054c5ca4616d5820fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a14602975566170646b6f633161725824e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000626f70646d696e74006821c0fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a146029755640060000",
+          "height": 100,
+          "txIndex": 1,
+          "charms": [],
+          "commitTx": "0200000001a8a36caf619cd6fea20cd0f839b3a5c4369db296faf9b9dddc09ca8b2a08c1470000000000fdffffff01b80b0000000000002251208695b76795d1e784bfab48cbad4eea499e7294ed6c51f675a16a94bcd921e28a40060000"
+        }
       },
       "expected": {
         "depth": 6,
@@ -912,6 +2783,7 @@
         "artVerified": true,
         "metadataVerified": true,
         "entryAssurance": "exhaustive",
+        "ownEntryAssurance": "full",
         "challengeBudget": 2,
         "incomplete": false,
         "followNextAsAuthority": false,
@@ -956,6 +2828,106 @@
         "bridged": false,
         "endHeight": 102,
         "paymentMode": "escrow",
+        "self": {
+          "id": "mint-1600",
+          "recipe": {
+            "p": "koc1",
+            "op": "recipe",
+            "v": 1,
+            "name": "KOC1 vector collection",
+            "network": "testnet4",
+            "id": "e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000",
+            "height": 99,
+            "txIndex": 10,
+            "end": {
+              "mode": "first",
+              "max": 21,
+              "open": 100,
+              "close": 102
+            },
+            "finality": 2,
+            "challengeWindow": 3,
+            "price": 1000,
+            "payment": {
+              "mode": "escrow",
+              "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+              "writerKeys": [
+                "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+                "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+                "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+              ],
+              "collectAfter": 3,
+              "refundAfter": 18,
+              "earlyRefund": true
+            },
+            "controls": {
+              "notice": 2,
+              "pausable": true
+            },
+            "metadata": {
+              "mode": "merkle",
+              "root": "a1c029e95f5760da0829b7307c7cc591e4e981b75287ef2a478edb65d453e26a",
+              "count": 21,
+              "bundles": [
+                {
+                  "id": "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000",
+                  "sha256": "2f5521fda79e7fb3faef6af39f138fcbd1ce80321fd1e1f3c34416892b4fd2bb",
+                  "from": 1,
+                  "to": 21
+                }
+              ],
+              "order": "direct"
+            },
+            "art": {
+              "viewer": {
+                "id": "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000",
+                "sha256": "ca9871f953b29328b4962f723a476b1290aef33653f2161fbfee79401cbf3f92"
+              }
+            },
+            "writers": [
+              {
+                "authority": "4ab9c870bca18a35161456c19359890ece11023f6a23c1916e2fe35f1566702c00000000",
+                "label": "w1"
+              },
+              {
+                "authority": "caef788a4b418b2946f228b003b2f1ec3a3b3b32a4fe2f02f1dd0beea6f09cf600000000",
+                "label": "w2"
+              },
+              {
+                "authority": "11cf95fb8971c73efc959f13bffa6c13039f90488c496fb96053c66ca953f6e700000000",
+                "label": "w3"
+              }
+            ],
+            "quorum": 2,
+            "writerRegistry": null,
+            "indexer": {
+              "id": "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000",
+              "sha256": "08fe4bfede214f960dd2428f24cad0db7cb6f577aa4cce0cc56ada52b099bb61",
+              "reference": "keel-koc1-indexer@1"
+            },
+            "bridges": null,
+            "checkpoint": null
+          },
+          "refs": {
+            "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000": {
+              "height": 90,
+              "bytes": "7b226e616d65223a22424c4148202331222c227472616974223a22726564227d0a7b226e616d65223a22424c4148202332222c227472616974223a22626c7565227d0a7b226e616d65223a22424c4148202333222c227472616974223a22676f6c64227d0a7b226e616d65223a22424c4148202334222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202335222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202336222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202337222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202338222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c4148202339222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233130222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233131222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233132222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233133222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233134222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233135222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233136222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233137222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233138222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233139222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233230222c227472616974223a2266697874757265227d0a7b226e616d65223a22424c414820233231222c227472616974223a2266697874757265227d"
+            },
+            "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e74686574696320766965776572206279746573"
+            },
+            "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000": {
+              "height": 90,
+              "bytes": "7075626c69632073796e746865746963207265666572656e63652d696e646578657220736f75726365"
+            }
+          },
+          "rawTx": "02000000000101913c71ad6a037cdfbcaab100e04b782de630b122aeb728171f0b04ec2d66da160000000000fdffffff034a01000000000000225120fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556e803000000000000225120c9c51f3842bde1813ff5324d5ed210f38cb693f0cd794e439ba554973623a1f400000000000000002a6a284b4f4331e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000034000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000b420fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556ac0063036f72640107046b6f6331010b200d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef01054c5ca4616d5820fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a14602975566170646b6f633161725824e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000626f70646d696e74006821c0fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a146029755640060000",
+          "height": 100,
+          "txIndex": 1,
+          "charms": [],
+          "commitTx": "0200000001a8a36caf619cd6fea20cd0f839b3a5c4369db296faf9b9dddc09ca8b2a08c1470000000000fdffffff01b80b0000000000002251208695b76795d1e784bfab48cbad4eea499e7294ed6c51f675a16a94bcd921e28a40060000"
+        },
         "spenderResponse": {
           "txid": "661e1e9edb2609c0298f3d208088bb29a394b5a9a874de80f6e0a2177013ef87",
           "height": 104
@@ -969,6 +2941,7 @@
         "artVerified": true,
         "metadataVerified": true,
         "entryAssurance": "exhaustive",
+        "ownEntryAssurance": "full",
         "challengeBudget": 2,
         "incomplete": false,
         "followNextAsAuthority": false,

@@ -163,11 +163,13 @@ export const tapleaf = (script) =>
   tagged("TapLeaf", b("c0"), compact(b(script).length), b(script));
 export const tapbranch = (a, c) =>
   tagged("TapBranch", ...[b(a), b(c)].sort(Buffer.compare));
-function tapOutput(internal, root) {
+export function tapOutput(internal, root) {
   const t = BigInt("0x" + hex(tagged("TapTweak", b(internal), b(root))));
   if (t >= secp256k1.CURVE.n) throw Error("invalid tweak");
   const q = secp256k1.ProjectivePoint.fromHex("02" + internal).add(
-    secp256k1.ProjectivePoint.BASE.multiply(t),
+    t === 0n
+      ? secp256k1.ProjectivePoint.ZERO
+      : secp256k1.ProjectivePoint.BASE.multiply(t),
   );
   if (q.equals(secp256k1.ProjectivePoint.ZERO)) throw Error("infinite key");
   const bytes = q.toRawBytes(true);
@@ -681,6 +683,44 @@ export function recipeCheck(r, refs) {
   }
   return [...new Set(errors)];
 }
+// E1: reveal prevout authenticates the stripped commit bytes; its output commits
+// to the exact tapscript. This does not authenticate signatures or the annex.
+export function authenticateCommit(rawReveal, rawCommit) {
+  try {
+    if (typeof rawCommit !== "string") return false;
+    const reveal = parseTx(rawReveal),
+      commit = parseTx(rawCommit),
+      input = reveal.inputs[0];
+    if (
+      reveal.end !== b(rawReveal).length ||
+      commit.end !== b(rawCommit).length ||
+      !input ||
+      input.txid !== commit.txid
+    )
+      return false;
+    const output = commit.outputs[input.vout];
+    if (!output || !/^5120[0-9a-f]{64}$/.test(output.script)) return false;
+    const witness = [...input.witness];
+    if (witness.length >= 2 && witness.at(-1).startsWith("50")) witness.pop();
+    if (witness.length < 2) return false;
+    const script = b(witness.at(-2)),
+      control = b(witness.at(-1));
+    if (
+      control.length < 33 ||
+      control.length > 33 + 128 * 32 ||
+      (control.length - 33) % 32 !== 0 ||
+      (control[0] & 0xfe) !== 0xc0
+    )
+      return false;
+    let root = tapleaf(script);
+    for (let i = 33; i < control.length; i += 32)
+      root = tapbranch(root, control.subarray(i, i + 32));
+    const q = tapOutput(hex(control.subarray(1, 33)), root);
+    return output.script === "5120" + q.key && (control[0] & 1) === q.parity;
+  } catch {
+    return false;
+  }
+}
 export function formCheck(input) {
   const { recipe: r } = input;
   let tx;
@@ -761,7 +801,8 @@ export function formCheck(input) {
     )
   )
     return { error: "charms" };
-  if (!input.commitVerified) return { error: "commit-unverified" };
+  if (!authenticateCommit(input.rawTx, input.commitTx))
+    return { error: "commit-authentication" };
   if (!tx.outputs[0] || tx.outputs[0].value < 330)
     return { error: "recipient" };
   const marks = tx.outputs.filter((o) => o.script.startsWith("6a284b4f4331"));
@@ -1237,6 +1278,8 @@ export function writerChain(
     equivocations,
     usable,
     h: usable && accepted.length ? h : null,
+    announced: announced.map((x) => x.txid),
+    applied: [...applied],
     entries: usable ? entries : [],
   };
 }
