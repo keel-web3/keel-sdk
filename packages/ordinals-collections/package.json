@@ -7,7 +7,7 @@
   "scripts": {
     "vectors:generate": "node spec/vectors/generate.mjs",
     "vectors:check": "node spec/vectors/check.mjs",
-    "test": "node spec/vectors/check.mjs"
+    "test": "node --test test/*.test.mjs && node spec/vectors/check.mjs"
   },
   "engines": {
     "node": ">=22"
