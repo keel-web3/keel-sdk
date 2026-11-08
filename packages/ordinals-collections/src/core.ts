@@ -907,9 +907,9 @@ export function indexState(r, refs, candidates, h, hash, controls = []) {
   let sold = null,
     cap = r.end.max ?? null,
     endHeight = r.end.close ?? null;
-  for (const x of candidates) if (x.height === null || !uint(x.txIndex)) pending.push(x.id);
+  for (const x of candidates) if (!uint(x.height) || !uint(x.txIndex)) pending.push(x.id);
   const rows = candidates
-    .filter((x) => x.height !== null && uint(x.txIndex))
+    .filter((x) => uint(x.height) && uint(x.txIndex))
     .map((x) => ({ input: x, entry: formCheck({ ...x, recipe: r, refs }) }))
     .sort(
       (a, c) =>

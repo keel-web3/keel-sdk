@@ -43,7 +43,8 @@ position and the non-mutated Merkle tree; branch-only proofs are insufficient.
 
 Writer-chain validation requires the matching recipe policy and authenticated
 control history; it rejects updates when that policy is unavailable. Merge uses
-that policy to classify members and refunds, counts distinct original writer
-authorities, and leaves entries without a position pending. `challenge verify`
+that policy to classify members and refunds, counts distinct authorities listed
+in the recipe, and leaves entries without a position pending. `challenge verify`
 requires supplied mint history to assess eligibility, as well as full-block
-position evidence. These caller-supplied histories still require authentication.
+position evidence; omitted paused, late and over-cap entries are accepted as
+refund candidates, while before-open reveals remain excluded. These caller-supplied histories still require authentication.

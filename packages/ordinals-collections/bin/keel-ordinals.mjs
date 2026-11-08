@@ -57,7 +57,7 @@ try {
    if(checked.error || !Array.isArray(input.history))return {entry:location,validity:'unknown'};
    const candidate={...item,id:id};
    const state=indexState(input.recipe,input.refs,[...input.history.filter(x=>x.id!==id),candidate],input.cache.h,input.cache.hash??'00'.repeat(32),input.controls??[]);
-   return state.members.some(x=>x.txid===id) ? {entry:checked,validity:'valid'} : {entry:location,validity:'unknown'};
+   return [...state.members,...state.refund].some(x=>x.txid===id) ? {entry:checked,validity:'valid'} : {entry:location,validity:'unknown'};
   };
   const valid=validateChallenge(input.challenge,input.cache,resolver,input.hostHashes);
   const patched=valid ? applyChallenge(input.cache.entries,input.challenge,resolver).map(x=>x.txid) : undefined;

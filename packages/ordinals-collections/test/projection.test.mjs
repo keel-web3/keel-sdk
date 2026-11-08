@@ -29,10 +29,10 @@ test('writer requires recipe policy and accepts late-refund canonical root',()=>
 test('quorum needs distinct writers and rejects q=1',()=>{
  assert.throws(()=>merge({originals:[],q:1,W:1,verifyEntry:()=>true}));
  const w={authority:'writer',usable:true,h:10,entries:[]};
- assert.equal(merge({originals:[w,w],q:2,W:1,verifyEntry:()=>true}).C,null);
+ assert.equal(merge({originals:[w,w],q:2,W:1,verifyEntry:()=>true,policy:{writers:[{authority:'writer'}]}}).C,null);
 });
 test('merge retains only eligible member numbers under pause, close and cap',()=>{
- const recipe='11'.repeat(36),policy={id:recipe,end:{mode:'first',open:100,close:103,max:2},controls:{notice:1,pausable:true}};
+ const recipe='11'.repeat(36),policy={id:recipe,end:{mode:'first',open:100,close:103,max:2},controls:{notice:1,pausable:true},writers:[{authority:'a'},{authority:'b'}]};
  const row=(n,height)=>({id:`m${n}`,txid:n.toString(16).padStart(64,'0'),height,txIndex:n});
  const rows=[row(1,100),row(2,101),row(3,102),row(4,103),row(5,104)];
  const controls=[{id:'p',p:'koc1',op:'control',r:recipe,parent:recipe,height:99,action:'pause',at:101},{id:'r',p:'koc1',op:'control',r:recipe,parent:recipe,height:99,action:'resume',at:102}];

@@ -28,15 +28,17 @@ export function writerChain(updates, {authority,recipe,hostHashes,pins=[],policy
   return {authority,accepted:accepted.map(u=>u.id),ignored,equivocations,usable,h:usable && accepted.length ? height : null,announced:announced.map(x=>x.txid),applied:[...applied],entries:usable ? entries : []};
 }
 // verifyEntry is mandatory: unknown evidence must never become a member.
-export function merge({originals,registry=[],self=[],challenges=[],ch=[],q,W,unresolved=false,verifyEntry,policy,controls=[],cap}) {
+export function merge({originals,registry=[],self=[],challenges=[],ch=[],q,W,unresolved=false,verifyEntry,policy,controls=[]}) {
   if (typeof verifyEntry !== 'function' || !Number.isInteger(q) || q<2 || !Number.isInteger(W) || W<1) throw Error('invalid merge parameters');
+  if(!Array.isArray(policy?.writers) || policy.writers.length===0 || policy.writers.some(w=>typeof w?.authority!=='string'||!w.authority))throw Error('recipe writers required');
+  const authorities=new Set(policy.writers.map(w=>w.authority));
   const voters=new Map();
-  for(const w of originals) if(typeof w.authority==='string' && w.authority && w.usable && w.h!==null && Number.isInteger(w.h) && !voters.has(w.authority))voters.set(w.authority,w.h);
+  for(const w of originals) if(authorities.has(w.authority) && w.usable && w.h!==null && Number.isInteger(w.h) && !voters.has(w.authority))voters.set(w.authority,w.h);
   const votes=[...voters.values()].sort((a,b)=>b-a), C=votes.length>=q ? votes[q-1] : null;
   const all=[...originals,...registry].flatMap(w=>w.usable ? w.entries : []).concat(self,challenges,ch), seen=new Map();
   for(const x of all)if(verifyEntry(x)===true && !seen.has(x.txid))seen.set(x.txid,x);
   if(seen.size===0)return {C,entries:[],refund:[],pending:[]};
-  const p=policy??(cap!==undefined?{end:{open:0,max:cap}}:null);
+  const p=policy;
   const classified=classifyEntries([...seen.values()],p,controls);
   return {C,entries:classified.members.map((x,i)=>({id:x.id,txid:x.txid,n:i+1,settled:C!==null&&x.height<=C,final:C!==null&&x.height+W<=C&&!unresolved})),refund:classified.refund.map(x=>({id:x.id,txid:x.txid,reason:x.reason})),pending:classified.pending.map(x=>({id:x.id,txid:x.txid}))};
 }

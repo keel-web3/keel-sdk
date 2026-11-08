@@ -511,6 +511,7 @@ export async function build() {
   });
   stateCase("time-end", [12, 13, 18, 33], (x) => {
     x.recipe.end = { mode: "time", open: 100, close: 101 };
+    x.recipe.metadata.cycle = true;
   });
   stateCase("first-of-time-end", [18, 33], (x) => {
     x.recipe.end.close = 101;
@@ -644,7 +645,7 @@ export async function build() {
   const chall = [];
   function challengeCase(name, kind, edit) {
     const x = {
-      recipe,
+      recipe: clone(recipe),
       cache: clone(cache),
       entries: clone(entries),
       hostHashes: clone(hostHashes),
@@ -674,6 +675,11 @@ export async function build() {
   }
   challengeCase("omitted-valid-shifts-4-through-21", "omitted", (x) => {
     x.cache.entries = x.cache.entries.filter((e) => e.txid !== ordered[3].txid);
+  });
+  challengeCase("omitted-valid-over-cap-refund", "omitted", (x) => {
+    x.recipe.end.max = 3;
+    x.cache.entries = x.cache.entries.filter((e) => e.txid !== ordered[3].txid);
+    x.canonicalRoot = M.rootFromEntries(recipe.id, x.cache.h, x.cache.hash, ordered, 3).indexRoot;
   });
   challengeCase("omitted-invalid-already-present", "omitted", () => {});
   challengeCase("omitted-invalid-branch", "omitted", (x) => {

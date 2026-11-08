@@ -23,8 +23,8 @@ const mintCase=id=>structuredClone(load('mint').cases.find(x=>x.id===id).input);
 // never a member), so it can never be labelled with a member number or final.
 test('R14/R39: merge never numbers or finalizes an over-cap mint', () => {
   const rows=[1,2,3].map(i=>({id:'m'+i,txid:h('m'+i).toString('hex'),height:100,txIndex:i}));
-  const w=id=>({usable:true,h:200,entries:rows});
-  const out=merge({originals:[w(),w()],q:2,W:1,cap:2,verifyEntry:()=>true});
+  const w=authority=>({authority,usable:true,h:200,entries:rows});
+  const out=merge({originals:[w('a'),w('b')],q:2,W:1,policy:{end:{open:0,max:2},writers:[{authority:'a'},{authority:'b'}]},verifyEntry:()=>true});
   const third=out.entries.find(e=>e.id==='m3');
   assert.ok(!third || !(third.n>2) , 'mint #3 of a cap-2 recipe must not receive member number 3');
   assert.ok(!third || !third.final, 'an over-cap mint must not be final');
@@ -33,7 +33,7 @@ test('R14/R39: merge never numbers or finalizes an over-cap mint', () => {
 // R40: C is the q-th highest h of distinct usable original writers. One writer's chain passed twice is one vote.
 test('R40: one original writer counted twice cannot settle a q=2 collection', () => {
   const chain={authority:'aa'.repeat(36),usable:true,h:150,entries:[]};
-  const out=merge({originals:[chain,chain],q:2,W:1,verifyEntry:()=>true});
+  const out=merge({originals:[chain,chain],q:2,W:1,verifyEntry:()=>true,policy:{writers:[{authority:chain.authority}]}});
   assert.equal(out.C,null,'a single writer must not reach quorum 2');
 });
 

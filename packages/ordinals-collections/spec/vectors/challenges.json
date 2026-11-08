@@ -703,6 +703,705 @@
       }
     },
     {
+      "id": "omitted-valid-over-cap-refund",
+      "rules": [
+        "KOC1-R35",
+        "KOC1-R38"
+      ],
+      "input": {
+        "recipe": {
+          "p": "koc1",
+          "op": "recipe",
+          "v": 1,
+          "name": "KOC1 vector collection",
+          "network": "testnet4",
+          "id": "e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000",
+          "height": 99,
+          "txIndex": 10,
+          "end": {
+            "mode": "first",
+            "max": 3,
+            "open": 100,
+            "close": 102
+          },
+          "finality": 2,
+          "challengeWindow": 3,
+          "price": 1000,
+          "payment": {
+            "mode": "escrow",
+            "treasuryKey": "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+            "writerKeys": [
+              "f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+              "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+              "2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4"
+            ],
+            "collectAfter": 3,
+            "refundAfter": 18,
+            "earlyRefund": true
+          },
+          "controls": {
+            "notice": 2,
+            "pausable": true
+          },
+          "metadata": {
+            "mode": "merkle",
+            "root": "a1c029e95f5760da0829b7307c7cc591e4e981b75287ef2a478edb65d453e26a",
+            "count": 21,
+            "bundles": [
+              {
+                "id": "651aadce68662bb9397b9a28097e2a3f027de9d73a4c7151b6d14ad4af29f6d000000000",
+                "sha256": "2f5521fda79e7fb3faef6af39f138fcbd1ce80321fd1e1f3c34416892b4fd2bb",
+                "from": 1,
+                "to": 21
+              }
+            ],
+            "order": "direct"
+          },
+          "art": {
+            "viewer": {
+              "id": "0d2867fd7d3d22f7d3d8c8e06b6414bcd904488b1afc4ba39d05d87159bc7eef00000000",
+              "sha256": "ca9871f953b29328b4962f723a476b1290aef33653f2161fbfee79401cbf3f92"
+            }
+          },
+          "writers": [
+            {
+              "authority": "4ab9c870bca18a35161456c19359890ece11023f6a23c1916e2fe35f1566702c00000000",
+              "label": "w1"
+            },
+            {
+              "authority": "caef788a4b418b2946f228b003b2f1ec3a3b3b32a4fe2f02f1dd0beea6f09cf600000000",
+              "label": "w2"
+            },
+            {
+              "authority": "11cf95fb8971c73efc959f13bffa6c13039f90488c496fb96053c66ca953f6e700000000",
+              "label": "w3"
+            }
+          ],
+          "quorum": 2,
+          "writerRegistry": null,
+          "indexer": {
+            "id": "06184b580f964069cb5c3f587189934b6b982fb6bbcec3bc3bfa753f2fed3e2700000000",
+            "sha256": "08fe4bfede214f960dd2428f24cad0db7cb6f577aa4cce0cc56ada52b099bb61",
+            "reference": "keel-koc1-indexer@1"
+          },
+          "bridges": null,
+          "checkpoint": null
+        },
+        "cache": {
+          "id": "eb617942a5f72462a06be85ac04c904b95e05c754242c045bd68541ff255320000000000",
+          "r": "e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000",
+          "h": 102,
+          "hash": "ca06215cecf8dc2c3c65b37030f1b58d98312247781bab70e15aa64bd7efd3c9",
+          "entries": [
+            {
+              "txid": "7641dba2f0685625ecdd4f024bfb46cd982814f8739ac5a776bb04f995844192",
+              "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+              "height": 100,
+              "txIndex": 1,
+              "paymentOutpoint": "7641dba2f0685625ecdd4f024bfb46cd982814f8739ac5a776bb04f99584419200000001",
+              "id": "mint-100",
+              "valid": true
+            },
+            {
+              "txid": "1b6fac54264829230964ec7b3c05b84e07254ea61d14b4318076b280a4591f48",
+              "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+              "height": 100,
+              "txIndex": 3,
+              "paymentOutpoint": "1b6fac54264829230964ec7b3c05b84e07254ea61d14b4318076b280a4591f4800000001",
+              "id": "mint-101",
+              "valid": true
+            },
+            {
+              "txid": "1508a79982e2148fce0345c127f64e487384dabbc33d314650263692c831e105",
+              "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+              "height": 100,
+              "txIndex": 5,
+              "paymentOutpoint": "1508a79982e2148fce0345c127f64e487384dabbc33d314650263692c831e10500000001",
+              "id": "mint-102",
+              "valid": true
+            },
+            {
+              "txid": "68138a553095fd7b1cb92142adb3271a9fbbe343c1a00d2bf73b2f89fdf1a6cb",
+              "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+              "height": 100,
+              "txIndex": 9,
+              "paymentOutpoint": "68138a553095fd7b1cb92142adb3271a9fbbe343c1a00d2bf73b2f89fdf1a6cb00000001",
+              "id": "mint-104",
+              "valid": true
+            },
+            {
+              "txid": "8f81e6e4bfbfd5a26e8d72744338c4645c47db30e82b8c7b15566fb664199f46",
+              "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+              "height": 100,
+              "txIndex": 11,
+              "paymentOutpoint": "8f81e6e4bfbfd5a26e8d72744338c4645c47db30e82b8c7b15566fb664199f4600000001",
+              "id": "mint-105",
+              "valid": true
+            },
+            {
+              "txid": "1b924e6a6f8bd372db78061c8250a0e7a521a45ba6e8cd9b5b5f65bbf93247a9",
+              "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+              "height": 100,
+              "txIndex": 13,
+              "paymentOutpoint": "1b924e6a6f8bd372db78061c8250a0e7a521a45ba6e8cd9b5b5f65bbf93247a900000001",
+              "id": "mint-106",
+              "valid": true
+            },
+            {
+              "txid": "015d5e02581339a2bfb9148ae36df8edb2863346f026234910edd70109f94798",
+              "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+              "height": 100,
+              "txIndex": 15,
+              "paymentOutpoint": "015d5e02581339a2bfb9148ae36df8edb2863346f026234910edd70109f9479800000001",
+              "id": "mint-107",
+              "valid": true
+            },
+            {
+              "txid": "1088bbd1c27e42ef44228dc171d5c54016f32d3bc487278bbc94fab5a353703c",
+              "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+              "height": 101,
+              "txIndex": 1,
+              "paymentOutpoint": "1088bbd1c27e42ef44228dc171d5c54016f32d3bc487278bbc94fab5a353703c00000001",
+              "id": "mint-108",
+              "valid": true
+            },
+            {
+              "txid": "58b04a87953d72c94947d6107cdf74fbf5035bd8cc36427497ef9c434e3ad41a",
+              "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+              "height": 101,
+              "txIndex": 3,
+              "paymentOutpoint": "58b04a87953d72c94947d6107cdf74fbf5035bd8cc36427497ef9c434e3ad41a00000001",
+              "id": "mint-109",
+              "valid": true
+            },
+            {
+              "txid": "df8ac1aa8dbdf323e3c4ed539bfd1fcd60c0c155dfd0e492be2d969c17549121",
+              "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+              "height": 101,
+              "txIndex": 5,
+              "paymentOutpoint": "df8ac1aa8dbdf323e3c4ed539bfd1fcd60c0c155dfd0e492be2d969c1754912100000001",
+              "id": "mint-110",
+              "valid": true
+            },
+            {
+              "txid": "bfd2b4e4e7f528abcd70c03eba0b0e6edccbe085c12ed42fefdb537f4ed4cc4c",
+              "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+              "height": 101,
+              "txIndex": 7,
+              "paymentOutpoint": "bfd2b4e4e7f528abcd70c03eba0b0e6edccbe085c12ed42fefdb537f4ed4cc4c00000001",
+              "id": "mint-111",
+              "valid": true
+            },
+            {
+              "txid": "7219b4b11a252f45919cee1a6b6d9a932702c2a84a86c3dead63df1e19f69a38",
+              "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+              "height": 101,
+              "txIndex": 9,
+              "paymentOutpoint": "7219b4b11a252f45919cee1a6b6d9a932702c2a84a86c3dead63df1e19f69a3800000001",
+              "id": "mint-112",
+              "valid": true
+            },
+            {
+              "txid": "cb667c6251584b69699e02176f4396a6fa27f5ec429b5889dab883cb12e119cc",
+              "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+              "height": 101,
+              "txIndex": 11,
+              "paymentOutpoint": "cb667c6251584b69699e02176f4396a6fa27f5ec429b5889dab883cb12e119cc00000001",
+              "id": "mint-113",
+              "valid": true
+            },
+            {
+              "txid": "e35e26eab992293bbeae2dbabebc67ad84a80b2b19a09840f8ededcdfeeebcc4",
+              "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+              "height": 101,
+              "txIndex": 13,
+              "paymentOutpoint": "e35e26eab992293bbeae2dbabebc67ad84a80b2b19a09840f8ededcdfeeebcc400000001",
+              "id": "mint-114",
+              "valid": true
+            },
+            {
+              "txid": "baa79b5bfcf22b210a97c06dee2a649613c0be1d1b1ed97610a1228999bb5d72",
+              "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+              "height": 101,
+              "txIndex": 15,
+              "paymentOutpoint": "baa79b5bfcf22b210a97c06dee2a649613c0be1d1b1ed97610a1228999bb5d7200000001",
+              "id": "mint-115",
+              "valid": true
+            },
+            {
+              "txid": "e12336cd5f9b160be958684761e52040e6fb6c3d563745142807d9fe739176be",
+              "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+              "height": 102,
+              "txIndex": 1,
+              "paymentOutpoint": "e12336cd5f9b160be958684761e52040e6fb6c3d563745142807d9fe739176be00000001",
+              "id": "mint-116",
+              "valid": true
+            },
+            {
+              "txid": "a6b1bb50f0e1ffb258d136e0d67d74836bddfb2b19435da4791eb0e111a85a8b",
+              "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+              "height": 102,
+              "txIndex": 3,
+              "paymentOutpoint": "a6b1bb50f0e1ffb258d136e0d67d74836bddfb2b19435da4791eb0e111a85a8b00000001",
+              "id": "mint-117",
+              "valid": true
+            },
+            {
+              "txid": "1d669b4446ce3fa5ea2b81d8cd00253d7a1ee9f18889a9440d620deea70feb40",
+              "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+              "height": 102,
+              "txIndex": 5,
+              "paymentOutpoint": "1d669b4446ce3fa5ea2b81d8cd00253d7a1ee9f18889a9440d620deea70feb4000000001",
+              "id": "mint-118",
+              "valid": true
+            },
+            {
+              "txid": "032e3ed9796119a3f28f76207ed0e101b8c2bb49df36d411c49a919f585ae04e",
+              "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+              "height": 102,
+              "txIndex": 7,
+              "paymentOutpoint": "032e3ed9796119a3f28f76207ed0e101b8c2bb49df36d411c49a919f585ae04e00000001",
+              "id": "mint-119",
+              "valid": true
+            },
+            {
+              "txid": "ccc6af5784679ced3d0ce5777e9e3201d69b5080b1c9ef809c5033726ebd1209",
+              "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+              "height": 102,
+              "txIndex": 9,
+              "paymentOutpoint": "ccc6af5784679ced3d0ce5777e9e3201d69b5080b1c9ef809c5033726ebd120900000001",
+              "id": "mint-120",
+              "valid": true
+            },
+            {
+              "txid": "d351f0da739439448367c2b0cfb8cea44441e8204eb971608e0702365eb1851e",
+              "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+              "height": 102,
+              "txIndex": 11,
+              "paymentOutpoint": "d351f0da739439448367c2b0cfb8cea44441e8204eb971608e0702365eb1851e00000001",
+              "id": "mint-121",
+              "valid": true
+            },
+            {
+              "txid": "2d2ba5385532459ac9996f0ac9240af3e4cd9b79d715c21923bebffa4eb46060",
+              "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+              "height": 102,
+              "txIndex": 13,
+              "paymentOutpoint": "2d2ba5385532459ac9996f0ac9240af3e4cd9b79d715c21923bebffa4eb4606000000001",
+              "id": "mint-122",
+              "valid": true
+            },
+            {
+              "txid": "7aa453f98b95d5fa4344d2d348d673b89b90553294d489925c255b32ee63d659",
+              "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+              "height": 102,
+              "txIndex": 15,
+              "paymentOutpoint": "7aa453f98b95d5fa4344d2d348d673b89b90553294d489925c255b32ee63d65900000001",
+              "id": "mint-123",
+              "valid": true
+            }
+          ]
+        },
+        "entries": {
+          "7641dba2f0685625ecdd4f024bfb46cd982814f8739ac5a776bb04f995844192": {
+            "txid": "7641dba2f0685625ecdd4f024bfb46cd982814f8739ac5a776bb04f995844192",
+            "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+            "height": 100,
+            "txIndex": 1,
+            "paymentOutpoint": "7641dba2f0685625ecdd4f024bfb46cd982814f8739ac5a776bb04f99584419200000001",
+            "id": "mint-100",
+            "valid": true
+          },
+          "1b6fac54264829230964ec7b3c05b84e07254ea61d14b4318076b280a4591f48": {
+            "txid": "1b6fac54264829230964ec7b3c05b84e07254ea61d14b4318076b280a4591f48",
+            "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+            "height": 100,
+            "txIndex": 3,
+            "paymentOutpoint": "1b6fac54264829230964ec7b3c05b84e07254ea61d14b4318076b280a4591f4800000001",
+            "id": "mint-101",
+            "valid": true
+          },
+          "1508a79982e2148fce0345c127f64e487384dabbc33d314650263692c831e105": {
+            "txid": "1508a79982e2148fce0345c127f64e487384dabbc33d314650263692c831e105",
+            "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+            "height": 100,
+            "txIndex": 5,
+            "paymentOutpoint": "1508a79982e2148fce0345c127f64e487384dabbc33d314650263692c831e10500000001",
+            "id": "mint-102",
+            "valid": true
+          },
+          "532542e8fd8cdb7608dbb6599e3f6676c6253b78bc323e4ac807d597749c7909": {
+            "txid": "532542e8fd8cdb7608dbb6599e3f6676c6253b78bc323e4ac807d597749c7909",
+            "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+            "height": 100,
+            "txIndex": 7,
+            "paymentOutpoint": "532542e8fd8cdb7608dbb6599e3f6676c6253b78bc323e4ac807d597749c790900000001",
+            "id": "mint-103",
+            "valid": true
+          },
+          "68138a553095fd7b1cb92142adb3271a9fbbe343c1a00d2bf73b2f89fdf1a6cb": {
+            "txid": "68138a553095fd7b1cb92142adb3271a9fbbe343c1a00d2bf73b2f89fdf1a6cb",
+            "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+            "height": 100,
+            "txIndex": 9,
+            "paymentOutpoint": "68138a553095fd7b1cb92142adb3271a9fbbe343c1a00d2bf73b2f89fdf1a6cb00000001",
+            "id": "mint-104",
+            "valid": true
+          },
+          "8f81e6e4bfbfd5a26e8d72744338c4645c47db30e82b8c7b15566fb664199f46": {
+            "txid": "8f81e6e4bfbfd5a26e8d72744338c4645c47db30e82b8c7b15566fb664199f46",
+            "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+            "height": 100,
+            "txIndex": 11,
+            "paymentOutpoint": "8f81e6e4bfbfd5a26e8d72744338c4645c47db30e82b8c7b15566fb664199f4600000001",
+            "id": "mint-105",
+            "valid": true
+          },
+          "1b924e6a6f8bd372db78061c8250a0e7a521a45ba6e8cd9b5b5f65bbf93247a9": {
+            "txid": "1b924e6a6f8bd372db78061c8250a0e7a521a45ba6e8cd9b5b5f65bbf93247a9",
+            "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+            "height": 100,
+            "txIndex": 13,
+            "paymentOutpoint": "1b924e6a6f8bd372db78061c8250a0e7a521a45ba6e8cd9b5b5f65bbf93247a900000001",
+            "id": "mint-106",
+            "valid": true
+          },
+          "015d5e02581339a2bfb9148ae36df8edb2863346f026234910edd70109f94798": {
+            "txid": "015d5e02581339a2bfb9148ae36df8edb2863346f026234910edd70109f94798",
+            "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+            "height": 100,
+            "txIndex": 15,
+            "paymentOutpoint": "015d5e02581339a2bfb9148ae36df8edb2863346f026234910edd70109f9479800000001",
+            "id": "mint-107",
+            "valid": true
+          },
+          "1088bbd1c27e42ef44228dc171d5c54016f32d3bc487278bbc94fab5a353703c": {
+            "txid": "1088bbd1c27e42ef44228dc171d5c54016f32d3bc487278bbc94fab5a353703c",
+            "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+            "height": 101,
+            "txIndex": 1,
+            "paymentOutpoint": "1088bbd1c27e42ef44228dc171d5c54016f32d3bc487278bbc94fab5a353703c00000001",
+            "id": "mint-108",
+            "valid": true
+          },
+          "58b04a87953d72c94947d6107cdf74fbf5035bd8cc36427497ef9c434e3ad41a": {
+            "txid": "58b04a87953d72c94947d6107cdf74fbf5035bd8cc36427497ef9c434e3ad41a",
+            "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+            "height": 101,
+            "txIndex": 3,
+            "paymentOutpoint": "58b04a87953d72c94947d6107cdf74fbf5035bd8cc36427497ef9c434e3ad41a00000001",
+            "id": "mint-109",
+            "valid": true
+          },
+          "df8ac1aa8dbdf323e3c4ed539bfd1fcd60c0c155dfd0e492be2d969c17549121": {
+            "txid": "df8ac1aa8dbdf323e3c4ed539bfd1fcd60c0c155dfd0e492be2d969c17549121",
+            "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+            "height": 101,
+            "txIndex": 5,
+            "paymentOutpoint": "df8ac1aa8dbdf323e3c4ed539bfd1fcd60c0c155dfd0e492be2d969c1754912100000001",
+            "id": "mint-110",
+            "valid": true
+          },
+          "bfd2b4e4e7f528abcd70c03eba0b0e6edccbe085c12ed42fefdb537f4ed4cc4c": {
+            "txid": "bfd2b4e4e7f528abcd70c03eba0b0e6edccbe085c12ed42fefdb537f4ed4cc4c",
+            "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+            "height": 101,
+            "txIndex": 7,
+            "paymentOutpoint": "bfd2b4e4e7f528abcd70c03eba0b0e6edccbe085c12ed42fefdb537f4ed4cc4c00000001",
+            "id": "mint-111",
+            "valid": true
+          },
+          "7219b4b11a252f45919cee1a6b6d9a932702c2a84a86c3dead63df1e19f69a38": {
+            "txid": "7219b4b11a252f45919cee1a6b6d9a932702c2a84a86c3dead63df1e19f69a38",
+            "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+            "height": 101,
+            "txIndex": 9,
+            "paymentOutpoint": "7219b4b11a252f45919cee1a6b6d9a932702c2a84a86c3dead63df1e19f69a3800000001",
+            "id": "mint-112",
+            "valid": true
+          },
+          "cb667c6251584b69699e02176f4396a6fa27f5ec429b5889dab883cb12e119cc": {
+            "txid": "cb667c6251584b69699e02176f4396a6fa27f5ec429b5889dab883cb12e119cc",
+            "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+            "height": 101,
+            "txIndex": 11,
+            "paymentOutpoint": "cb667c6251584b69699e02176f4396a6fa27f5ec429b5889dab883cb12e119cc00000001",
+            "id": "mint-113",
+            "valid": true
+          },
+          "e35e26eab992293bbeae2dbabebc67ad84a80b2b19a09840f8ededcdfeeebcc4": {
+            "txid": "e35e26eab992293bbeae2dbabebc67ad84a80b2b19a09840f8ededcdfeeebcc4",
+            "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+            "height": 101,
+            "txIndex": 13,
+            "paymentOutpoint": "e35e26eab992293bbeae2dbabebc67ad84a80b2b19a09840f8ededcdfeeebcc400000001",
+            "id": "mint-114",
+            "valid": true
+          },
+          "baa79b5bfcf22b210a97c06dee2a649613c0be1d1b1ed97610a1228999bb5d72": {
+            "txid": "baa79b5bfcf22b210a97c06dee2a649613c0be1d1b1ed97610a1228999bb5d72",
+            "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+            "height": 101,
+            "txIndex": 15,
+            "paymentOutpoint": "baa79b5bfcf22b210a97c06dee2a649613c0be1d1b1ed97610a1228999bb5d7200000001",
+            "id": "mint-115",
+            "valid": true
+          },
+          "e12336cd5f9b160be958684761e52040e6fb6c3d563745142807d9fe739176be": {
+            "txid": "e12336cd5f9b160be958684761e52040e6fb6c3d563745142807d9fe739176be",
+            "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+            "height": 102,
+            "txIndex": 1,
+            "paymentOutpoint": "e12336cd5f9b160be958684761e52040e6fb6c3d563745142807d9fe739176be00000001",
+            "id": "mint-116",
+            "valid": true
+          },
+          "a6b1bb50f0e1ffb258d136e0d67d74836bddfb2b19435da4791eb0e111a85a8b": {
+            "txid": "a6b1bb50f0e1ffb258d136e0d67d74836bddfb2b19435da4791eb0e111a85a8b",
+            "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+            "height": 102,
+            "txIndex": 3,
+            "paymentOutpoint": "a6b1bb50f0e1ffb258d136e0d67d74836bddfb2b19435da4791eb0e111a85a8b00000001",
+            "id": "mint-117",
+            "valid": true
+          },
+          "1d669b4446ce3fa5ea2b81d8cd00253d7a1ee9f18889a9440d620deea70feb40": {
+            "txid": "1d669b4446ce3fa5ea2b81d8cd00253d7a1ee9f18889a9440d620deea70feb40",
+            "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+            "height": 102,
+            "txIndex": 5,
+            "paymentOutpoint": "1d669b4446ce3fa5ea2b81d8cd00253d7a1ee9f18889a9440d620deea70feb4000000001",
+            "id": "mint-118",
+            "valid": true
+          },
+          "032e3ed9796119a3f28f76207ed0e101b8c2bb49df36d411c49a919f585ae04e": {
+            "txid": "032e3ed9796119a3f28f76207ed0e101b8c2bb49df36d411c49a919f585ae04e",
+            "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+            "height": 102,
+            "txIndex": 7,
+            "paymentOutpoint": "032e3ed9796119a3f28f76207ed0e101b8c2bb49df36d411c49a919f585ae04e00000001",
+            "id": "mint-119",
+            "valid": true
+          },
+          "ccc6af5784679ced3d0ce5777e9e3201d69b5080b1c9ef809c5033726ebd1209": {
+            "txid": "ccc6af5784679ced3d0ce5777e9e3201d69b5080b1c9ef809c5033726ebd1209",
+            "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+            "height": 102,
+            "txIndex": 9,
+            "paymentOutpoint": "ccc6af5784679ced3d0ce5777e9e3201d69b5080b1c9ef809c5033726ebd120900000001",
+            "id": "mint-120",
+            "valid": true
+          },
+          "d351f0da739439448367c2b0cfb8cea44441e8204eb971608e0702365eb1851e": {
+            "txid": "d351f0da739439448367c2b0cfb8cea44441e8204eb971608e0702365eb1851e",
+            "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+            "height": 102,
+            "txIndex": 11,
+            "paymentOutpoint": "d351f0da739439448367c2b0cfb8cea44441e8204eb971608e0702365eb1851e00000001",
+            "id": "mint-121",
+            "valid": true
+          },
+          "2d2ba5385532459ac9996f0ac9240af3e4cd9b79d715c21923bebffa4eb46060": {
+            "txid": "2d2ba5385532459ac9996f0ac9240af3e4cd9b79d715c21923bebffa4eb46060",
+            "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+            "height": 102,
+            "txIndex": 13,
+            "paymentOutpoint": "2d2ba5385532459ac9996f0ac9240af3e4cd9b79d715c21923bebffa4eb4606000000001",
+            "id": "mint-122",
+            "valid": true
+          },
+          "7aa453f98b95d5fa4344d2d348d673b89b90553294d489925c255b32ee63d659": {
+            "txid": "7aa453f98b95d5fa4344d2d348d673b89b90553294d489925c255b32ee63d659",
+            "m": "fff97bd5755eeea420453a14355235d382f6472f8568a18b2f057a1460297556",
+            "height": 102,
+            "txIndex": 15,
+            "paymentOutpoint": "7aa453f98b95d5fa4344d2d348d673b89b90553294d489925c255b32ee63d65900000001",
+            "id": "mint-123",
+            "valid": true
+          }
+        },
+        "hostHashes": {
+          "100": "5e31235d5b185f7369cd03cd959fd4dbc696d5be37a2769e3aed7180df15eff6",
+          "101": "25b331927837bb316e113fc261688e7a83220270c9d52e96c7131f5d8357f6b6",
+          "102": "013b968ee5c162678453e469ff3a08c2765376a0a1d9cc00e9308dec7bc75539"
+        },
+        "canonicalRoot": "b805d9ba293fa5fe2c096a493960ad08d32a89965fc70f62085dcfd014b7b106",
+        "challenge": {
+          "p": "koc1",
+          "op": "challenge",
+          "r": "e552a62928a0819b67a8504ba99e21172f0b7d99a08f3fac4ace45be8f6f758600000000",
+          "index": "eb617942a5f72462a06be85ac04c904b95e05c754242c045bd68541ff255320000000000",
+          "kind": "omitted",
+          "mint": "532542e8fd8cdb7608dbb6599e3f6676c6253b78bc323e4ac807d597749c7909",
+          "height": 100,
+          "txIndex": 7,
+          "total": 16,
+          "branch": [
+            "e0fd439da4c5f8184a6c21aa24b6dd5ca35168550a56e460e3778f3bf63e7c89",
+            "a7ee1975e218448b9632fb81fe6653bd1c1a89f40c1a4582b0684c972c007b3a",
+            "14ceef40e921296254392e646c81f0f83fd4dc95227543496aba305d336630de",
+            "c6887857f9f932ef0bce8548058532a7d79a8dcaae2968f629d30148884f08c5"
+          ],
+          "header": "040000000000000000000000000000000000000000000000000000000000000000000000072381d72127903981361053f1f4e23835dcd19e79730122f561993e4dd12e9864f15365ffff7f2000000000"
+        }
+      },
+      "expected": {
+        "valid": true,
+        "orderedIds": [
+          "mint-100",
+          "mint-101",
+          "mint-102",
+          "mint-103",
+          "mint-104",
+          "mint-105",
+          "mint-106",
+          "mint-107",
+          "mint-108",
+          "mint-109",
+          "mint-110",
+          "mint-111",
+          "mint-112",
+          "mint-113",
+          "mint-114",
+          "mint-115",
+          "mint-116",
+          "mint-117",
+          "mint-118",
+          "mint-119",
+          "mint-120",
+          "mint-121",
+          "mint-122",
+          "mint-123"
+        ],
+        "positions": [
+          {
+            "id": "mint-100",
+            "n": 1,
+            "shift": 0
+          },
+          {
+            "id": "mint-101",
+            "n": 2,
+            "shift": 0
+          },
+          {
+            "id": "mint-102",
+            "n": 3,
+            "shift": 0
+          },
+          {
+            "id": "mint-103",
+            "n": 4,
+            "shift": null
+          },
+          {
+            "id": "mint-104",
+            "n": 5,
+            "shift": 1
+          },
+          {
+            "id": "mint-105",
+            "n": 6,
+            "shift": 1
+          },
+          {
+            "id": "mint-106",
+            "n": 7,
+            "shift": 1
+          },
+          {
+            "id": "mint-107",
+            "n": 8,
+            "shift": 1
+          },
+          {
+            "id": "mint-108",
+            "n": 9,
+            "shift": 1
+          },
+          {
+            "id": "mint-109",
+            "n": 10,
+            "shift": 1
+          },
+          {
+            "id": "mint-110",
+            "n": 11,
+            "shift": 1
+          },
+          {
+            "id": "mint-111",
+            "n": 12,
+            "shift": 1
+          },
+          {
+            "id": "mint-112",
+            "n": 13,
+            "shift": 1
+          },
+          {
+            "id": "mint-113",
+            "n": 14,
+            "shift": 1
+          },
+          {
+            "id": "mint-114",
+            "n": 15,
+            "shift": 1
+          },
+          {
+            "id": "mint-115",
+            "n": 16,
+            "shift": 1
+          },
+          {
+            "id": "mint-116",
+            "n": 17,
+            "shift": 1
+          },
+          {
+            "id": "mint-117",
+            "n": 18,
+            "shift": 1
+          },
+          {
+            "id": "mint-118",
+            "n": 19,
+            "shift": 1
+          },
+          {
+            "id": "mint-119",
+            "n": 20,
+            "shift": 1
+          },
+          {
+            "id": "mint-120",
+            "n": 21,
+            "shift": 1
+          },
+          {
+            "id": "mint-121",
+            "n": 22,
+            "shift": 1
+          },
+          {
+            "id": "mint-122",
+            "n": 23,
+            "shift": 1
+          },
+          {
+            "id": "mint-123",
+            "n": 24,
+            "shift": 1
+          }
+        ],
+        "patchedRoot": "b805d9ba293fa5fe2c096a493960ad08d32a89965fc70f62085dcfd014b7b106",
+        "count": 3,
+        "over": 21,
+        "canonicalMatch": true
+      }
+    },
+    {
       "id": "omitted-invalid-already-present",
       "rules": [
         "KOC1-R35",

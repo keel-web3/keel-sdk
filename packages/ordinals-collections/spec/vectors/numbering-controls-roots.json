@@ -1289,7 +1289,8 @@
                 "to": 21
               }
             ],
-            "order": "direct"
+            "order": "direct",
+            "cycle": true
           },
           "art": {
             "viewer": {

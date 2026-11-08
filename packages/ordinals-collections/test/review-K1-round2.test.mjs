@@ -50,3 +50,12 @@ test('R35/R47: a 64-byte transaction elsewhere in the block does not block an ho
   const proof={mint:mintTx.txid,height:7,txIndex:0,total:2,branch:[smallId],header:hdr.toString('hex'),rawBlock:Buffer.concat([hdr,Buffer.from([2]),mint,small]).toString('hex')};
   assert.equal(verifyPosition(proof,{txid:mintTx.txid,height:7,txIndex:0},{7:dsha(hdr).toString('hex')}),true);
 });
+
+test('R6/R40: merge fails without recipe writers and deduplicates authorized voters',()=>{
+  assert.throws(()=>merge({originals:[],q:2,W:1,verifyEntry:()=>true}),/writers/);
+  assert.throws(()=>merge({originals:[],q:2,W:1,verifyEntry:()=>true,policy:{writers:[]}}),/writers/);
+  const policy={writers:[{authority:'a'},{authority:'b'}]};
+  const chain=authority=>({authority,usable:true,h:150,entries:[]});
+  assert.equal(merge({originals:[chain('a'),chain('a'),chain('outside')],q:2,W:1,verifyEntry:()=>true,policy}).C,null);
+  assert.equal(merge({originals:[chain('a'),chain('b'),chain('outside')],q:2,W:1,verifyEntry:()=>true,policy}).C,150);
+});

@@ -3,19 +3,11 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { evaluate } from './evaluate-core.mjs';
 import { parseOrdEnvelopes } from '../src/envelope.ts';
-import { recipeCheck } from '../src/mint.ts';
 
 for (const file of ['wire', 'escrow', 'escrow-policy', 'mint', 'mint-boundaries', 'recipes', 'numbering-controls-roots', 'commit-auth']) {
   const suite = JSON.parse(readFileSync(new URL(`../spec/vectors/${file}.json`, import.meta.url)));
   test(`${file}: frozen core vectors`, () => {
-    for (const c of suite.cases) {
-      if (file === 'numbering-controls-roots' && c.id === 'time-end') {
-        // The frozen fixture predates R4's unbounded-time cycle correction.
-        assert.ok(recipeCheck(c.input.recipe,c.input.refs).includes('metadata'));
-        const corrected=structuredClone(c.input);corrected.recipe.metadata.cycle=true;
-        assert.deepEqual(evaluate(suite.kind,corrected),c.expected,`${c.id} with required cycle`);
-      } else assert.deepEqual(evaluate(suite.kind, c.input), c.expected, c.id);
-    }
+    for (const c of suite.cases) assert.deepEqual(evaluate(suite.kind, c.input), c.expected, c.id);
   });
 }
 test('ord envelope parser ignores incomplete and non-push envelopes without shifting offsets', () => {
