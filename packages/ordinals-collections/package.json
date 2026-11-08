@@ -24,6 +24,15 @@
     "./end": "./src/end.ts",
     "./controls": "./src/controls.ts",
     "./merkle": "./src/merkle.ts",
-    "./perm": "./src/perm.ts"
+    "./perm": "./src/perm.ts",
+    "./index-root": "./src/index/root.mjs",
+    "./merge": "./src/merge/index.mjs",
+    "./challenge": "./src/challenge/index.mjs",
+    "./sources": "./indexer/sources.mjs",
+    "./block-loop": "./indexer/loop.mjs",
+    "./discovery": "./indexer/discovery.mjs"
+  },
+  "bin": {
+    "keel-ordinals": "./bin/keel-ordinals.mjs"
   }
 }
