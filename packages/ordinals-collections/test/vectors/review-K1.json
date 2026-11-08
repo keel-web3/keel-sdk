@@ -1,0 +1,68 @@
+{
+  "version": "koc1@1",
+  "source": "transaction-order.json:fee-spent-number-is-not-transaction-order and mint.json:valid",
+  "position": [
+    {
+      "id": "authenticated-full-block",
+      "mutation": "none",
+      "valid": true
+    },
+    {
+      "id": "missing-full-block",
+      "mutation": "missing-block",
+      "valid": false
+    },
+    {
+      "id": "forged-last-count",
+      "mutation": "forged-last",
+      "valid": false
+    },
+    {
+      "id": "same-node-at-real-sibling",
+      "mutation": "duplicate-real-sibling",
+      "valid": false
+    },
+    {
+      "id": "altered-block",
+      "mutation": "altered-block",
+      "valid": false
+    },
+    {
+      "id": "64-byte-stripped-transaction",
+      "mutation": "64-byte-transaction",
+      "valid": false
+    },
+    {
+      "id": "mutated-full-block-duplicate-last",
+      "mutation": "duplicated-last-block",
+      "valid": false
+    }
+  ],
+  "escrow": [
+    {
+      "id": "distinct",
+      "mutation": "none",
+      "valid": true
+    },
+    {
+      "id": "treasury-is-writer-1",
+      "mutation": "treasury-writer-0",
+      "valid": false
+    },
+    {
+      "id": "treasury-is-writer-2",
+      "mutation": "treasury-writer-1",
+      "valid": false
+    },
+    {
+      "id": "treasury-is-writer-3",
+      "mutation": "treasury-writer-2",
+      "valid": false
+    },
+    {
+      "id": "duplicate-writers",
+      "mutation": "duplicate-writers",
+      "valid": false
+    }
+  ]
+}

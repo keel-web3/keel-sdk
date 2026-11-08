@@ -37,3 +37,6 @@ marker from a raw transaction and bound Merkle branch, and can check omissions,
 coordinates and ordering; insufficient invalidity evidence remains pending.
 Do not use these paths for publication or a verified collector verdict. The merged
 K1-T01 core and this trust-sensitive layer both require independent review.
+
+Position proofs require the complete raw block to authenticate transaction count,
+position and the non-mutated Merkle tree; branch-only proofs are insufficient.

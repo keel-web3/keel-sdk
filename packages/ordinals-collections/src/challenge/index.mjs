@@ -1,16 +1,41 @@
 import { createHash } from 'node:crypto';
+import { parseTx, merkle } from '../core.ts';
 const hash = b => createHash('sha256').update(b).digest();
 const hash2 = b => hash(hash(b));
 const raw = (v, n) => typeof v === 'string' && new RegExp(`^[0-9a-fA-F]{${n*2}}$`).test(v) ? Buffer.from(v, 'hex') : null;
 const uint = n => Number.isSafeInteger(n) && n >= 0 && n <= 0xffffffff;
+// A Bitcoin header does not commit to the transaction count separately. Require
+// the complete block so that count and every leaf are bound to its Merkle root.
+// Consensus admission and the selected best-chain header are caller boundaries.
 export function verifyPosition(proof, entry, hostHashes) {
   try {
     const header = raw(proof.header,80), txid = raw(proof.mint,32);
     if (!header || !txid || proof.mint !== entry.txid || proof.height !== entry.height || proof.txIndex !== entry.txIndex || !uint(proof.total) || !uint(proof.txIndex) || proof.total < 1 || proof.txIndex >= proof.total || hash2(header).toString('hex') !== hostHashes[proof.height] || !Array.isArray(proof.branch)) return false;
-    let h = txid, n = proof.total, i = proof.txIndex, depth = 0;
+    if (typeof proof.rawBlock !== 'string' || !/^(?:[0-9a-fA-F]{2})+$/.test(proof.rawBlock) || proof.rawBlock.length > 8_000_000) return false;
+    const block = Buffer.from(proof.rawBlock, 'hex');
+    if (block.length < 81 || !block.subarray(0,80).equals(header)) return false;
+    let pos = 80, total = block[pos++];
+    if (total === 253) {
+      if (pos + 2 > block.length) return false;
+      total = block.readUInt16LE(pos); pos += 2;
+      if (total < 253) return false;
+    } else if (total === 254) {
+      if (pos + 4 > block.length) return false;
+      total = block.readUInt32LE(pos); pos += 4;
+      if (total <= 65535) return false;
+    } else if (total === 255) return false;
+    if (total !== proof.total || total > 100000 || total > block.length - pos) return false;
+    const ids = [];
+    for (let j = 0; j < total; j++) {
+      const tx = parseTx(block, pos);
+      if (tx.strippedHex.length === 128) return false;
+      ids.push(tx.txid); pos = tx.end;
+    }
+    if (pos !== block.length || ids[proof.txIndex] !== proof.mint || !merkle(ids, true).equals(header.subarray(36,68))) return false;
+    let h = txid, n = total, i = proof.txIndex, depth = 0;
     while (n > 1) {
-      const sibling = raw(proof.branch[depth++],32);
-      if (!sibling || ((i ^ 1) >= n && !sibling.equals(h))) return false;
+      const sibling = raw(proof.branch[depth++],32), missing = (i ^ 1) >= n;
+      if (!sibling || (missing ? !sibling.equals(h) : sibling.equals(h))) return false;
       h = hash2(i % 2 ? Buffer.concat([sibling,h]) : Buffer.concat([h,sibling]));
       i = Math.floor(i/2); n = Math.ceil(n/2);
     }
