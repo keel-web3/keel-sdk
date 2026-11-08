@@ -298,6 +298,12 @@ importers:
 
   packages/mint-queue: {}
 
+  packages/ordinals-collections:
+    dependencies:
+      '@noble/curves':
+        specifier: 1.9.7
+        version: 1.9.7
+
   packages/pixel-engine: {}
 
   packages/protocol:

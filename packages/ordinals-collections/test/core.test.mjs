@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { metadataLeaf, merkleRoot } from '../src/merkle.ts';
+import { metadataLeaf, merkleRoot, merkleProof, verifyMerkleProof } from '../src/merkle.ts';
 import { permutation } from '../src/perm.ts';
 
 const vectors = name => JSON.parse(readFileSync(new URL(`../spec/vectors/${name}.json`, import.meta.url)));
@@ -10,6 +10,13 @@ test('metadata leaves and roots match frozen vectors', () => {
     const leaves = input.messages.map((m, i) => metadataLeaf(i + 1, m));
     assert.deepEqual(leaves.map(x => x.toString('hex')), expected.leaves);
     assert.equal(merkleRoot(leaves).toString('hex'), expected.root);
+    for (let i = 0; i < leaves.length; i++) {
+      const proof = merkleProof(leaves, i);
+      assert.equal(verifyMerkleProof(leaves[i], proof, merkleRoot(leaves)), true);
+      assert.equal(verifyMerkleProof(Buffer.alloc(32), proof, merkleRoot(leaves)), false);
+    }
+    assert.deepEqual(merkleProof(leaves, 1).map(x => ({ side: x.side, hash: x.hash.toString('hex') })), expected.proof2);
+    assert.deepEqual(merkleProof(leaves, 2).map(x => ({ side: x.side, hash: x.hash.toString('hex') })), expected.proof3);
   }
   assert.deepEqual(merkleRoot([]), Buffer.alloc(32));
   assert.throws(() => metadataLeaf(0, ''));

@@ -10,9 +10,20 @@
     "test": "node --test test/*.test.mjs && node spec/vectors/check.mjs"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=22.18"
   },
   "dependencies": {
     "@noble/curves": "1.9.7"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./tx": "./src/tx.ts",
+    "./envelope": "./src/envelope.ts",
+    "./mint": "./src/mint.ts",
+    "./escrow": "./src/escrow.ts",
+    "./end": "./src/end.ts",
+    "./controls": "./src/controls.ts",
+    "./merkle": "./src/merkle.ts",
+    "./perm": "./src/perm.ts"
   }
 }
