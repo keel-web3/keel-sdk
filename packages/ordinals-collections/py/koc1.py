@@ -176,7 +176,7 @@ def recipe_errors(r, refs):
         except (ValueError, KeyError, TypeError): add('escrow')
     metadata = r.get('metadata', {}); bundles = metadata.get('bundles', [])
     if metadata.get('mode') == 'merkle':
-        if (mode == 'open' and not metadata.get('cycle')) or (metadata.get('order') == 'blind' and mode == 'open'): add('metadata')
+        if ((mode == 'open' or (mode == 'time' and close is not None)) and maximum is None and not metadata.get('cycle')) or (metadata.get('order') == 'blind' and mode == 'open'): add('metadata')
         count = metadata.get('count', 0)
         if not uint(count) or not count or (maximum is not None and count < maximum and not metadata.get('cycle')): add('metadata')
         cursor = 1
@@ -223,7 +223,7 @@ def apply_challenge(recipe, cache, entries, hosts, challenge):
     valid = False
     if c.get('kind') == 'omitted':
         valid = (position is None and fact is not None and fact.get('valid') is True and proof
-                 and c['height'] <= cache['h'] and (fact['height'],fact['txIndex']) == (c['height'],c['txIndex']))
+                 and recipe['end']['open'] <= c['height'] <= cache['h'] and (fact['height'],fact['txIndex']) == (c['height'],c['txIndex']))
         if valid: result.append(fact)
     elif c.get('kind') == 'invalid' and position is not None and fact is not None:
         actual = result[position]
@@ -724,3 +724,30 @@ def metadata_proof(leaves, index):
         level = [digest(b'\x01'+level[i]+level[i+1]) if i+1<len(level) else level[i] for i in range(0,len(level),2)]
         index //= 2
     return path
+
+
+def partition_challenged_entries(recipe, entries, controls=()):
+    """Classify verified entries with authenticated controls into committed roots."""
+    members, refunds = [], []
+    end = recipe['end']; cap = end.get('max'); close = end.get('close'); sold = None
+    groups = {}
+    for entry in entries:
+        groups.setdefault(entry['height'],[]).append(entry)
+    for h in sorted(set(groups) | {c['at'] for c in controls}):
+        paused = False; effective_close = close
+        for c in controls:
+            if c['at'] > h: continue
+            if c['action'] == 'pause': paused = True
+            elif c['action'] == 'resume': paused = False
+            elif c['action'] == 'close': effective_close = min(effective_close,c['at']) if effective_close is not None else c['at']
+        block = [e for e in groups.get(h,[]) if h >= end['open']]
+        eligible = [] if paused or (effective_close is not None and h > effective_close) or (sold is not None and h > sold) else block
+        if not eligible: refunds.extend(block)
+        for c in controls:
+            if c['action'] == 'lowerCap' and c['at'] == h and cap is not None and c['cap'] < cap:
+                cap = min(cap,max(c['cap'],len(members)+len(eligible)))
+        for entry in eligible:
+            if cap is not None and len(members) >= cap: refunds.append(entry)
+            else: members.append(entry)
+        if sold is None and cap is not None and len(members) >= cap: sold = h
+    return members, refunds

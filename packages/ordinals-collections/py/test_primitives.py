@@ -62,15 +62,15 @@ class ChallengeVectors(unittest.TestCase):
                 valid, entries = apply_challenge(i['recipe'], i['cache'], i['entries'], i['hostHashes'], i['challenge'])
                 self.assertEqual(valid, e['valid'])
                 self.assertEqual([x['id'] for x in entries], e['orderedIds'])
-                from koc1 import commitment_for_entries
-                cap = i['recipe']['end']['max']
-                root = commitment_for_entries(i['cache']['r'], i['cache']['h'], i['cache']['hash'], entries[:cap], entries[cap:])
+                from koc1 import commitment_for_entries, partition_challenged_entries
+                members, refunds = partition_challenged_entries(i['recipe'], entries)
+                root = commitment_for_entries(i['cache']['r'], i['cache']['h'], i['cache']['hash'], members, refunds)
                 self.assertEqual(root.hex(), e['patchedRoot'])
                 old = {entry['txid']:n for n,entry in enumerate(i['cache']['entries'],1)}
                 positions = [{'id':entry['id'],'n':n,'shift':None if entry['txid'] not in old else n-old[entry['txid']]} for n,entry in enumerate(entries,1)]
                 self.assertEqual(positions,e['positions'])
-                self.assertEqual(len(entries[:cap]),e['count'])
-                self.assertEqual(len(entries[cap:]),e['over'])
+                self.assertEqual(len(members),e['count'])
+                self.assertEqual(len(refunds),e['over'])
                 self.assertEqual(root.hex()==i['canonicalRoot'],e['canonicalMatch'])
 
 class RegistryVectors(unittest.TestCase):
@@ -196,3 +196,31 @@ class CoverageInventory(unittest.TestCase):
                     'escrow-policy','writers','wire'}
         actual = {p.stem for p in VECTORS.glob('*.json') if 'cases' in json.loads(p.read_text())}
         self.assertEqual(actual,expected, 'new vector families need independent tests')
+
+class RoundTwoBoundaries(unittest.TestCase):
+    def test_time_metadata_requires_cycle(self):
+        import copy
+        from koc1 import recipe_errors
+        case = next(c for c in json.loads((VECTORS / 'numbering-controls-roots.json').read_text())['cases'] if c['id']=='time-end')
+        recipe = copy.deepcopy(case['input']['recipe'])
+        self.assertNotIn('metadata',recipe_errors(recipe,case['input']['refs']))
+        recipe['metadata'].pop('cycle')
+        self.assertIn('metadata',recipe_errors(recipe,case['input']['refs']))
+    def test_challenge_refunds_and_before_open(self):
+        import copy
+        from koc1 import apply_challenge, partition_challenged_entries
+        case = next(c for c in json.loads((VECTORS / 'challenges.json').read_text())['cases'] if c['id']=='omitted-valid-over-cap-refund')
+        i = case['input']; recipe = copy.deepcopy(i['recipe']); recipe['end']['max'] = 30
+        valid, entries = apply_challenge(recipe,i['cache'],i['entries'],i['hostHashes'],i['challenge'])
+        self.assertTrue(valid)
+        target = i['challenge']['mint']
+        controls = [{'action':'pause','at':100},{'action':'resume','at':101}]
+        members, refunds = partition_challenged_entries(recipe,entries,controls)
+        self.assertIn(target,[e['txid'] for e in refunds]); self.assertNotIn(target,[e['txid'] for e in members])
+        recipe['end']['close'] = 100
+        late = dict(next(e for e in entries if e['txid'] == target), height=101)
+        members, refunds = partition_challenged_entries(recipe,[late])
+        self.assertIn(target,[e['txid'] for e in refunds]); self.assertNotIn(target,[e['txid'] for e in members])
+        recipe['end']['open'] = 101
+        valid, _ = apply_challenge(recipe,i['cache'],i['entries'],i['hostHashes'],i['challenge'])
+        self.assertFalse(valid)
