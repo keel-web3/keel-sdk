@@ -85,3 +85,13 @@ class MintVectors(unittest.TestCase):
             for case in json.loads((VECTORS / filename).read_text())['cases']:
                 with self.subTest(case=case['id']):
                     self.assertEqual(check_mint(case['input']),case['expected'])
+
+class ControlVectors(unittest.TestCase):
+    def test_control_admission(self):
+        from koc1 import controls_at
+        for case in json.loads((VECTORS / 'numbering-controls-roots.json').read_text())['cases']:
+            for h, expected in zip(case['input']['heights'],case['expected']):
+                with self.subTest(case=case['id'],height=h['height']):
+                    accepted, ignored = controls_at(case['input']['recipe'],case['input']['controls'],h['height'])
+                    self.assertEqual([x['id'] for x in accepted], expected['acceptedControls'])
+                    self.assertEqual([x['id'] for x in ignored], expected['ignoredControls'])

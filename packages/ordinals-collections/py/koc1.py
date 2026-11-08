@@ -445,3 +445,26 @@ def check_mint(data):
         position = 1+data.get('earlierValid',0); cap = end.get('max')
         return {'status':'over-cap' if cap is not None and position > cap else 'member','position':position,'txid':tx['txid'].hex()}
     except (ValueError,KeyError,TypeError,IndexError,OverflowError): return ignored('malformed')
+
+
+def controls_at(recipe, controls, tip):
+    """Return authenticated controls in child order, before applying their heights."""
+    accepted, ignored = [], []
+    policy = recipe.get('controls'); sealed = False
+    maximum = recipe['end'].get('max')
+    for c in controls:
+        if c.get('height', tip+1) > tip: continue
+        action = c.get('action'); at = c.get('at'); allowed = {'id','p','op','r','parent','height','action','at'}
+        if action == 'lowerCap': allowed.add('cap')
+        good = (isinstance(policy,dict) and not sealed and c.get('p') == 'koc1' and c.get('op') == 'control'
+                and c.get('r') == recipe['id'] and c.get('parent') == recipe['id'] and not set(c)-allowed
+                and type(at) is int and type(c.get('height')) is int and at >= c['height']+policy.get('notice',0))
+        if action in ('pause','resume'): good = good and policy.get('pausable') is True
+        elif action == 'close': good = good and (recipe['end'].get('close') is None or at <= recipe['end']['close'])
+        elif action == 'lowerCap': good = good and maximum is not None and type(c.get('cap')) is int and 0 < c['cap'] < maximum
+        else: good = False
+        if good:
+            accepted.append(c)
+            if action == 'close': sealed = True
+        else: ignored.append(c)
+    return accepted, ignored
