@@ -92,6 +92,7 @@ export const TEST_FILES_ON_DISK = Object.freeze(readdirSync(TEST_ROOT)
  */
 export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/mcp-koc1.test.mjs",
+  "tests/mcp-koc1-draft.test.mjs",
   "tests/actual-media-container.test.mjs",
   "tests/actual-media-pair.test.mjs",
   "tests/audio-clock-binding-mcp.test.mjs",

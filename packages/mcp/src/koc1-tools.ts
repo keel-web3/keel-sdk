@@ -1,3 +1,4 @@
+import { KOC1_DRAFT_PROPERTIES, prepareKoc1Draft } from './koc1-draft.js';
 import type { JsonSchema, ToolDefinition } from './types.js';
 
 // This reference package ships native .ts modules (Node >=22.18). Load only on
@@ -100,8 +101,9 @@ export const KOC1_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   {
     descriptor: {
       name: 'keel-ordinals-collection-prepare',
-      description: 'Validate a KOC1 testnet4 recipe and supplied references; return canonical CBOR recipe bytes, escrow leaves/key checks and unsigned mint commit/reveal PSBTs. Never signs, broadcasts or treats a supplied recipe location as published proof.',
-      inputSchema: { type:'object', additionalProperties:false, required:['recipe','refs','minter','funding','commitValue','commitFee','revealFee','recipientScript','changeScript'], properties: {
+      description: 'Use mode=draft with the raw Studio form to validate fields and estimate exact unbound CBOR size, escrow and fees without funding or chain reads. For a located recipe, validate a KOC1 testnet4 recipe and supplied references; return canonical CBOR recipe bytes, escrow leaves/key checks and unsigned mint commit/reveal PSBTs. Never signs, broadcasts or treats a supplied recipe location as published proof.',
+      inputSchema: { type:'object', additionalProperties:false, properties: {
+        ...KOC1_DRAFT_PROPERTIES,mode:{type:'string',enum:['draft','mint']},
         recipe:objectSchema, refs:objectSchema, minter:hexSchema, internalKey:hexSchema,
         funding:{type:'array',minItems:1,maxItems:100,items:objectSchema}, commitValue:{type:'integer',minimum:330},
         commitFee:{type:'integer',minimum:0}, revealFee:{type:'integer',minimum:0}, postage:{type:'integer',minimum:330},
@@ -109,7 +111,9 @@ export const KOC1_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
       } },
     },
     async run(_context,input) {
-      const a = request(input,['recipe','refs','minter','internalKey','funding','commitValue','commitFee','revealFee','postage','recipientScript','changeScript']);
+      if (input && typeof input==='object' && (input as Row).mode==='draft') return prepareKoc1Draft(input,await core());
+      const a = request(input,['mode','recipe','refs','minter','internalKey','funding','commitValue','commitFee','revealFee','postage','recipientScript','changeScript']);
+      if (a.mode!==undefined && a.mode!=='mint') throw new TypeError('Choose mode draft or mint');
       const lib = await core(), r = await resolveRecipe(a,lib);
       if (!r || r.errors.length) throw new TypeError(`Invalid recipe: ${r?.errors.join(', ')}`);
       if (r.recipe.payment.mode !== 'escrow') throw new TypeError('This escrow mint planner requires escrow payment mode');

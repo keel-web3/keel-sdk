@@ -676,3 +676,54 @@ These are local reference results, not a collector badge or a mint authorization
 Next-block pending eligibility does not guarantee confirmation, and supplied
 controls/locations still need authentication. No tool enables sending; an
 integration must authenticate those boundaries first.
+
+### KOC1 Studio draft preparation
+
+Call `keel-ordinals-collection-prepare` with `{mode: "draft", draft, feeRate?}`.
+`draft` is the raw K2-T03 form state: `mode` (edition mode), string-valued
+`open`, `close`, `cap`, `price`, `challengeWindow`, `collectAfter`, `refundAfter`,
+`notice`, `treasuryKey`, `metadataRoot`, `metadataCount`; booleans `earlyRefund`,
+`pausable`, `blind`, `cycle`; three-element `writers` (display inscription IDs)
+and `writerKeys` arrays; optional `artName`. `cap` maps to `end.max`.
+The optional numeric fee rate defaults to **2 sat/vB**, not a live network quote.
+No recipe location, funding, chain reads or signing is needed.
+
+Import `Koc1StudioDraft`, `Koc1DraftPrepareRequest`, `Koc1DraftPrepareResponse`,
+`Koc1DraftErrors`, and the supporting size/cost interfaces as types from
+`@keel/mcp`. `KOC1_DRAFT_DEFAULT_FEE_RATE` is also exported. For example:
+
+```ts
+import type { Koc1StudioDraft, Koc1DraftPrepareRequest, Koc1DraftPrepareResponse } from '@keel/mcp';
+function request(draft: Koc1StudioDraft): Koc1DraftPrepareRequest {
+  return { mode: 'draft', draft, feeRate: 2 };
+}
+```
+
+Invalid fields return `valid: false` and plain-word `errors` keyed exactly like
+the form, including `writer0`–`writer2`, `key0`–`key2`, and `feeRate`; byte/tree/
+cost fields are null. Valid drafts return exact canonical CBOR `recipeBytes`
+(hex), `recipeByteLength`, escrow scripts/control blocks and size measurements,
+and `inscriptionCost`/`mintCost` with `estimated: true`.
+
+The form does not collect finality or publication references. Consequently these
+bytes are an **unbound draft**, not a publication artifact: finality is null,
+metadata bundles are empty, viewer/indexer are unresolved, and no chain location
+is embedded. `specValid` and `publicationReady` remain false. `deferredChecks`
+and `assumptions` name the missing evidence and omitted future bytes; adding those
+fields changes both byte size and cost. Nothing fabricates onchain IDs or hashes.
+
+Vsize is calculated from serialized transaction weight, using one P2TR input,
+64-byte signatures, a single-leaf control block and change. Escrow leaves use a
+stated public NUMS buyer key for illustration; actual buyer keys change tree bytes
+but preserve sizes. Leaf `scriptVbytes` is script bytes / 4; leaf `vsize` measures
+a complete one-input, one-P2TR-output spend. No signatures are generated to size
+these transactions. Mint estimates include recipient, escrow, marker and change;
+the escrow output's 43 vB are already included in reveal vsize. Price is held in
+escrow, so it is counted once, with a dust top-up when below 330 sats.
+`revealSpendSats` excludes commit fees; `totalSats` includes commit/reveal fees,
+postage and escrow payment. Recoverable change is excluded.
+
+Omitted `mode` retains the existing located-recipe mint planner. Explicit
+`mode: "mint"` selects that same path. Draft fields cannot be mixed with mint
+funding or bump controls; validation of the selected mode is enforced at runtime
+because MCP tool schemas must not use a top-level union.
