@@ -26,3 +26,46 @@ class PrimitiveVectors(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+class EscrowVectors(unittest.TestCase):
+    def test_escrow(self):
+        from koc1 import escrow
+        for case in json.loads((VECTORS / 'escrow.json').read_text())['cases']:
+            with self.subTest(case=case['id']):
+                self.assertEqual(escrow(case['input']['payment'], case['input']['minter']), case['expected'])
+
+class RecipeVectors(unittest.TestCase):
+    def test_recipes(self):
+        from koc1 import recipe_errors
+        for case in json.loads((VECTORS / 'recipes.json').read_text())['cases']:
+            with self.subTest(case=case['id']):
+                self.assertEqual(recipe_errors(case['input']['recipe'], case['input']['refs']), case['expected']['errors'])
+
+class ChallengeVectors(unittest.TestCase):
+    def test_challenges(self):
+        from koc1 import apply_challenge
+        for case in json.loads((VECTORS / 'challenges.json').read_text())['cases']:
+            with self.subTest(case=case['id']):
+                i, e = case['input'], case['expected']
+                valid, entries = apply_challenge(i['recipe'], i['cache'], i['entries'], i['hostHashes'], i['challenge'])
+                self.assertEqual(valid, e['valid'])
+                self.assertEqual([x['id'] for x in entries], e['orderedIds'])
+                from koc1 import commitment_for_entries
+                cap = i['recipe']['end']['max']
+                root = commitment_for_entries(i['cache']['r'], i['cache']['h'], i['cache']['hash'], entries[:cap], entries[cap:])
+                self.assertEqual(root.hex(), e['patchedRoot'])
+
+class RegistryVectors(unittest.TestCase):
+    def test_registry(self):
+        from koc1 import registry_additions
+        for case in json.loads((VECTORS / 'registry.json').read_text())['cases']:
+            with self.subTest(case=case['id']):
+                i = case['input']
+                self.assertEqual(registry_additions(i['children'], i['originals'], i['burnHeight']), case['expected']['accepted'])
+
+class PolicyVectors(unittest.TestCase):
+    def test_policy(self):
+        from koc1 import escrow_policy
+        for case in json.loads((VECTORS / 'escrow-policy.json').read_text())['cases']:
+            with self.subTest(case=case['id']):
+                self.assertEqual(escrow_policy(case['input']), (case['expected']['consensus'], case['expected']['writerPolicy']))
