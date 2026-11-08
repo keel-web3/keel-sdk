@@ -635,3 +635,44 @@ required. See [the account connection guide](../../docs/KEEL_STUDIO_WALLET_REVIE
 `--connection-status` prints metadata only; `--import-key` uses a hidden prompt.
 
 Sepolia publication preflight checks the simulator version and transaction capacity with public empty calls on the same retained socket before sending project calldata. Every actual simulation returns its transaction gas envelope; silent RPC gas clamping is a provider limit, not a contract compatibility failure. Never retry a failed program on another backend to manufacture success. Use Hosted Studio receipt recovery and a fresh complete review; Desktop remains optional.
+
+### KOC1 reference tools
+
+The following tools require Node 22.18+ and the workspace
+`@keel/ordinals-collections` reference package. They do not sign, broadcast,
+launch ord, or contact public nodes. Chain evidence is supplied by the caller.
+All three report `verified: false` until an integration authenticates references,
+controls, charms, current best chain and scan completeness.
+
+- `keel-ordinals-collection-prepare`: takes `recipe` (the reference recipe object
+  including supplied `id`, `height`, optional `txIndex`), `refs`, `minter`,
+  `funding`, `commitValue`, `commitFee`, `revealFee`, `recipientScript`, and
+  `changeScript`. Optional `internalKey` and `postage` follow the mint builder.
+  Escrow parameters live in `recipe.payment`. Returns canonical CBOR
+  `recipeBytes` (hex, excluding the recipe's own chain location), the escrow
+  tree and key checks, and unsigned `commit.psbt` / `reveal.psbt` (base64 BIP174
+  v0/BIP371). This prepares a mint against the supplied recipe ID, not a recipe
+  publication with a fabricated future ID. Key validity does not prove writer
+  operator ownership. Funding UTXO txids use internal byte order.
+- `keel-ordinals-collection-verify`: supply exactly one of `recipe`,
+  `recipeBytes`, or `recipeId`, and `refs`. For CBOR bytes also supply
+  `inscriptionId`, `height`, optional `txIndex`. For an ID, supply an
+  `inscriptions` map keyed by the ID with `{bytes, height, txIndex?}` evidence;
+  missing evidence returns pending. IDs accept display `txidiN` or 36-byte
+  internal-order route hex. Optional `indexSnapshots` are recomputed with the
+  reference indexer; an expected `indexRoot` must match.
+- `keel-ordinals-collection-supply`: same recipe inputs plus `snapshot`:
+  `{height, hash, candidates, controls?, indexRoot?}`. Each candidate includes
+  raw reveal and commit hex, explicit `charms`, `id`, and confirmed
+  `height`/`txIndex`, or null height/index for a pending reveal. Snapshot hashes
+  use internal order. Returns minted, confirmed, settling, refund, pending and
+  remaining counts. Pending validation checks full mint form, E1 authentication,
+  deduplication and next-block window/controls. `pendingCoverage` defaults to
+  `unknown`, giving null pending/remaining; explicit `complete` means the caller
+  asserts complete mempool coverage. Missing confirmed positions also preserve
+  unknown counts. Known pending candidates are reported separately.
+
+These are local reference results, not a collector badge or a mint authorization.
+Next-block pending eligibility does not guarantee confirmation, and supplied
+controls/locations still need authentication. No tool enables sending; an
+integration must authenticate those boundaries first.

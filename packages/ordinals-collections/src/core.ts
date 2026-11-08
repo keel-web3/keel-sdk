@@ -269,12 +269,15 @@ export function cbor(x) {
     if (n <= 255) return Buffer.from([(major << 5) | 24, n]);
     if (n <= 65535)
       return cat(Buffer.from([(major << 5) | 25, n >>> 8, n & 255]));
-    return cat(Buffer.from([(major << 5) | 26]), u32(n));
+    if (n <= 0xffffffff) return cat(Buffer.from([(major << 5) | 26]), u32(n));
+    const wide = Buffer.alloc(8);
+    wide.writeBigUInt64BE(BigInt(n));
+    return cat(Buffer.from([(major << 5) | 27]), wide);
   };
   if (x === null) return b("f6");
   if (typeof x === "boolean") return b(x ? "f5" : "f4");
   if (typeof x === "number") {
-    if (!Number.isSafeInteger(x) || x < 0 || x > 0xffffffff)
+    if (!Number.isSafeInteger(x) || x < 0)
       throw Error("CBOR integer");
     return head(0, x);
   }
@@ -305,7 +308,7 @@ export function decodeCbor(bytes) {
       if (t === 0xf6) return null;
       throw Error("CBOR simple");
     }
-    if (ai >= 27) throw Error("CBOR indefinite/large");
+    if (ai > 27) throw Error("CBOR indefinite/large");
     const n =
       ai < 24
         ? ai
@@ -313,7 +316,10 @@ export function decodeCbor(bytes) {
           ? take(1)[0]
           : ai === 25
             ? take(2).readUInt16BE()
-            : take(4).readUInt32BE();
+            : ai === 26
+              ? take(4).readUInt32BE()
+              : Number(take(8).readBigUInt64BE());
+    if (!Number.isSafeInteger(n)) throw Error("CBOR integer precision");
     if (major === 0) return n;
     if (major === 2) return Buffer.from(take(n));
     if (major === 3)

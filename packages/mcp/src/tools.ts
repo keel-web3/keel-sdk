@@ -1,3 +1,4 @@
+import { KOC1_TOOL_DEFINITIONS } from './koc1-tools.js';
 import { TRAILER_TOOL_DEFINITIONS } from './trailer-tools.js';
 import { AUTHORED_PROJECT_TOOL_DEFINITIONS, loadAuthoredProject } from "./authored-project-tools.js";
 import { executeKeelStudioAgentDraftOperation } from "@keel/sdk/studio-agent-drafts";
@@ -1876,6 +1877,7 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = withKeelLinkGate([
   ...CURATION_TOOL_DEFINITIONS,
   ...MATRIX_TOOL_DEFINITIONS,
   ...METADATA_TOOL_DEFINITIONS,
+  ...KOC1_TOOL_DEFINITIONS,
   ...PREREVEAL_TOOL_DEFINITIONS,
   ...ARENA_TOOL_DEFINITIONS,
   ...MATERIAL_TOOL_DEFINITIONS,

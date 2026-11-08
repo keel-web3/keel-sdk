@@ -20,7 +20,7 @@
     "build": "tsc -p tsconfig.json && node scripts/package-skills.mjs"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=22.18"
   },
   "license": "MIT",
   "dependencies": {
@@ -28,7 +28,8 @@
     "@keel/ethereum-adapter": "workspace:*",
     "@keel/protocol": "workspace:*",
     "@keel/sdk": "workspace:*",
-    "@keel/trailer": "workspace:*"
+    "@keel/trailer": "workspace:*",
+    "@keel/ordinals-collections": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.9.0"

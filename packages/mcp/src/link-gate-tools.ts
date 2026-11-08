@@ -31,6 +31,7 @@ import type { ToolContext, ToolDefinition } from "./types.js";
 const MAX_GATE_FILE_BYTES = 64 * 1024 * 1024;
 
 export const KEEL_LINK_GATED_TOOLS: ReadonlySet<string> = new Set([
+  "keel-ordinals-collection-prepare",
   // Upload plans and storage writes.
   "upload-plan", "chain-plan", "ethereum-encode", "publish-plan", "keel-graph-weld-prepare", "keel-tezos-hold-resources-prepare",
   // Inline / creator preparation and Studio publication.
@@ -56,6 +57,7 @@ const AUDITS = "audits bytes already published or prepared; refuses links itself
 
 export const KEEL_LINK_GATE_EXEMPT_TOOLS: Readonly<Record<string, string>> = Object.freeze({
   "keel-link-gate": "the gate itself",
+  "keel-ordinals-collection-verify": AUDITS, "keel-ordinals-collection-supply": READS,
   "keel-send-window-plan": "schedules nonces and gas for calls whose bytes the preparing tool already gated; it adds no bytes",
   "keel-media-capabilities": READS, "keel-media-candidate": LOCAL, "keel-media-compare": LOCAL, "keel-studio-media": LOCAL,
   "keel-signature-privacy-readiness": READS,
@@ -76,7 +78,7 @@ export const KEEL_LINK_GATE_EXEMPT_TOOLS: Readonly<Record<string, string>> = Obj
   "keel-studio-access": "access-list administration; sends no transaction", "keel-shell-search": READS, "keel-plugins-list": READS,
 });
 
-const HEX_KEYS = new Set(["data", "calldata", "sourceHex", "hex", "bytecode", "initCode", "bytes"]);
+const HEX_KEYS = new Set(["data", "calldata", "sourceHex", "hex", "bytecode", "initCode", "bytes", "recipeBytes"]);
 const TEXT_KEYS = new Set(["tokenURI", "tokenUri", "parameters", "michelson", "artifactUri", "displayUri", "thumbnailUri"]);
 const HEX = /^(?:0x)?(?:[0-9a-fA-F]{2})+$/u;
 

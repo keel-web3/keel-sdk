@@ -282,6 +282,9 @@ importers:
       '@keel/ethereum-adapter':
         specifier: workspace:*
         version: link:../ethereum-adapter
+      '@keel/ordinals-collections':
+        specifier: workspace:*
+        version: link:../ordinals-collections
       '@keel/protocol':
         specifier: workspace:*
         version: link:../protocol
