@@ -95,3 +95,19 @@ class ControlVectors(unittest.TestCase):
                     accepted, ignored = controls_at(case['input']['recipe'],case['input']['controls'],h['height'])
                     self.assertEqual([x['id'] for x in accepted], expected['acceptedControls'])
                     self.assertEqual([x['id'] for x in ignored], expected['ignoredControls'])
+
+class IndexVectors(unittest.TestCase):
+    def test_index(self):
+        from koc1 import compute_index
+        for case in json.loads((VECTORS / 'numbering-controls-roots.json').read_text())['cases']:
+            i = case['input']
+            for h, expected in zip(i['heights'],case['expected']):
+                with self.subTest(case=case['id'],height=h['height']):
+                    self.assertEqual(compute_index(i['recipe'],i['refs'],i['candidates'],i['controls'],h['height'],h['hash']), expected)
+
+class WriterVectors(unittest.TestCase):
+    def test_writers(self):
+        from koc1 import writer_merge
+        for case in json.loads((VECTORS / 'writers.json').read_text())['cases']:
+            with self.subTest(case=case['id']):
+                self.assertEqual(writer_merge(case['input']),case['expected'])

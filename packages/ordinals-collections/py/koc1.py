@@ -468,3 +468,101 @@ def controls_at(recipe, controls, tip):
             if action == 'close': sealed = True
         else: ignored.append(c)
     return accepted, ignored
+
+
+def compute_index(recipe, refs, candidates, controls, height, blockhash):
+    """Compute a complete index snapshot from independently checked reveals."""
+    accepted, ignored = controls_at(recipe, controls, height)
+    cap = recipe['end'].get('max'); close = recipe['end'].get('close'); sold = None
+    for control in accepted:
+        if control['action'] == 'close': close = min(close,control['at']) if close is not None else control['at']
+    members, refunds, rejected = [], [], []
+    pending = [c['id'] for c in candidates if c.get('height') is None]
+    confirmed = sorted((c for c in candidates if c.get('height') is not None and c['height'] <= height), key=lambda c:(c['height'],c['txIndex']))
+    byheight = {}
+    for candidate in confirmed: byheight.setdefault(candidate['height'],[]).append(candidate)
+    for h in sorted(set(byheight) | {c['at'] for c in accepted if c['at'] <= height}):
+        active = [c for c in accepted if c['at'] <= h]
+        paused = False
+        for c in active:
+            if c['action'] == 'pause': paused = True
+            elif c['action'] == 'resume': paused = False
+            elif c['action'] == 'close': close = min(close,c['at']) if close is not None else c['at']
+        eligible = []
+        for c in byheight.get(h,[]):
+            data = dict(c,recipe=recipe,refs=refs); verdict = check_mint(data)
+            if verdict['status'] == 'ignored': rejected.append({'id':c['id'],'reason':verdict['reason']}); continue
+            if h < recipe['end']['open']:
+                rejected.append({'id':c['id'],'reason':'before-open'}); continue
+            tx = parse_tx(c['rawTx']); fields = _mint_fields(_envelopes(tx)[0][1]); meta = _cbor(b''.join(fields[5]))
+            entry = dict(c, txid=tx['txid'].hex(), m=meta['m'].hex(), paymentOutpoint=(tx['txid']+u32(1)).hex())
+            if (close is not None and h > close) or (sold is not None and h > sold): refunds.append((entry,'late'))
+            elif paused: refunds.append((entry,'paused'))
+            else: eligible.append(entry)
+        for control in accepted:
+            if control['action'] == 'lowerCap' and control['at'] == h and cap is not None and control['cap'] < cap:
+                cap = min(cap,max(control['cap'],len(members)+len(eligible)))
+        for entry in eligible:
+            if cap is None or len(members) < cap: members.append(entry)
+            else: refunds.append((entry,'over-cap'))
+        if sold is None and cap is not None and len(members) >= cap: sold = h
+    end = min(close,sold) if close is not None and sold is not None else close if sold is None else sold
+    def root(es):
+        return merkle_root([member_leaf(n,bytes.fromhex(e['txid']),e['height'],e['txIndex'],bytes.fromhex(e['m']),bytes.fromhex(e['paymentOutpoint'])) for n,e in enumerate(es,1)])
+    mr,orr = root(members),root([e for e,_ in refunds])
+    return {'count':len(members),'over':len(refunds),'cap':cap,'endHeight':end,'sold':sold,
+            'members':[{'id':e['id'],'n':n} for n,e in enumerate(members,1)],
+            'refund':[{'id':e['id'],'reason':reason} for e,reason in refunds], 'rejected':rejected,'pending':pending,
+            'acceptedControls':[c['id'] for c in accepted], 'ignoredControls':[c['id'] for c in ignored],
+            'membersRoot':mr.hex(),'overRoot':orr.hex(),
+            'indexRoot':index_root(bytes.fromhex(recipe['id']),height,bytes.fromhex(blockhash),len(members),mr,orr).hex()}
+
+
+def writer_merge(data):
+    """Merge writer caches after entry and correction evidence has been verified by caller."""
+    chains, states = [], []
+    for wi, writer in enumerate(data['writers']):
+        accepted, ignored, equivocations, history, applied = [], [], [], [], []
+        working = []; prev = None; roots = {}; siblings = {}
+        for update in writer['updates']:
+            try:
+                uid = update['id']; parent = update['prev']
+                basic = (update['p']=='koc1' and update['op']=='index' and update['parent']==writer['authority']
+                         and update['r']==data['recipe'] and data['hostHashes'].get(str(update['h']))==update['hash'])
+                if not basic: raise ValueError()
+                if parent in siblings:
+                    equivocations.append([siblings[parent],uid]); raise ValueError()
+                if parent != (prev['id'] if prev else None) or update['prevRoot'] != (prev['root'] if prev else None) or (prev and update['h'] < prev['h']): raise ValueError()
+                new = update['new']; ids = [x['txid'] for x in history+new]
+                if len(ids) != len(set(ids)) or any(x['height'] > update['h'] for x in new): raise ValueError()
+                next_history = history+new; projection = list(next_history)
+                next_applied = update['applied']
+                if any(x not in next_applied for x in applied): raise ValueError()
+                for cid in dict.fromkeys(next_applied):
+                    correction = data['corrections'].get(cid)
+                    if not correction or correction.get('valid') is not True: raise ValueError()
+                    c = correction['challenge']; mint = c['mint']
+                    if c['kind'] == 'omitted' and all(e['txid'] != mint for e in projection): projection.append(correction['entries'][mint])
+                    elif c['kind'] == 'invalid': projection = [e for e in projection if e['txid'] != mint]
+                    elif c['kind'] != 'order' and c['kind'] != 'omitted': raise ValueError()
+                projection.sort(key=lambda e:(e['height'],e['txIndex']))
+                cap = data['cap']; members = projection[:cap] if cap is not None else projection; over = projection[len(members):]
+                if (update['count'] != len(members) or update['over'] != len(over) or commitment_for_entries(data['recipe'],update['h'],update['hash'],members,over).hex() != update['root']): raise ValueError()
+                siblings[parent] = uid; accepted.append(uid); roots[uid] = update['root']; history = next_history; working = projection; applied = list(dict.fromkeys(next_applied)); prev = update
+            except (ValueError,KeyError,TypeError,IndexError): ignored.append(update.get('id'))
+        usable = all(pin['updateId'] in roots and roots[pin['updateId']] == pin['root'] for pin in data['pins'] if pin['writerIndex'] == wi)
+        chains.append({'accepted':accepted,'ignored':ignored,'equivocations':equivocations,'usable':usable,'h':prev['h'] if usable and prev else None,'announced':[x['txid'] for x in history],'applied':applied})
+        states.append(working if usable else [])
+    heights = sorted((c['h'] for c in chains if c['h'] is not None),reverse=True)
+    covered = heights[data['q']-1] if len(heights) >= data['q'] else None
+    candidates = [e for state in states for e in state]
+    for registry in data['registry']:
+        if registry.get('usable'): candidates.extend(registry['entries'])
+    for key in ('self','challenges','ch'): candidates.extend(data[key])
+    unique = {}
+    for e in candidates:
+        if e.get('valid') is True: unique.setdefault(e['txid'],e)
+    entries = sorted(unique.values(),key=lambda e:(e['height'],e['txIndex']))
+    merged = [{'id':e['id'],'txid':e['txid'],'n':n,'settled':covered is not None and e['height'] <= covered,
+               'final':covered is not None and e['height']+data['W'] <= covered and not data['unresolved']} for n,e in enumerate(entries,1)]
+    return {'chains':chains,'merged':{'C':covered,'entries':merged}}
