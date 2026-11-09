@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {fixture,addUpdate} from './mock-recursion.mjs';
 import {verifyShell,inscriptionId,positionSample} from '../src/shell/index.mjs';
-import {b,hex,sha,utf,publicPoint,envelope,escrow,marker,parseTx} from '../src/core.ts';
+import {b,hex,sha,utf,reverse,publicPoint,envelope,escrow,marker,parseTx} from '../src/core.ts';
 
 const key=publicPoint(6);
 const run=async(f,t)=>{
@@ -53,16 +53,18 @@ test('S9 a first-writer minority variant cannot hide exactly q corroborated unkn
 
 test('S9 exactly q matching writers permit sampling; a sampled invalid row forces exhaustive checking',async t=>{
   const f=fixture({count:1002,writers:0});
-  const sampledBad=f.mints[0],unsampledBad=f.mints[1];
-  assert.ok(positionSample(f.rows.slice(0,-1),1002).some(row=>row.txid===sampledBad.txid));
-  assert.ok(!positionSample(f.rows.slice(0,-1),1002).some(row=>row.txid===unsampledBad.txid));
+  const sample=positionSample(f.rows.slice(0,-1),1002,64,hex(reverse(f.mock.routes.get('/r/blockhash/106'))));
+  const sampledBad=f.mints.find(m=>sample.some(row=>row.txid===m.txid));
+  const unsampledBad=f.mints.slice(0,-1).find(m=>!sample.some(row=>row.txid===m.txid));
   // Both quorum writers commit these rows, but two authenticated mint reveals
   // fail form checks. Only one of those rows is in the normal sample.
+  const badRows=[];
   for(const old of [sampledBad,unsampledBad]) {
     const tx=parseTx(old.rawTx);tx.outputs[1].value=999;
     const bad=f.mock.add({metadata:old.metadata,script:tx.inputs[0].witness[1],outputs:tx.outputs,height:100});
     const i=f.mints.indexOf(old);f.mints[i]=bad;
     f.rows[i]={...f.rows[i],id:bad.id,txid:bad.txid,paymentOutpoint:bad.txid+'00000001'};
+    badRows.push(f.rows[i]);
   }
   f.mock.block(100,f.mints);
   // The fallback must check rows placed after self as well: their claimed
@@ -79,7 +81,7 @@ test('S9 exactly q matching writers permit sampling; a sampled invalid row force
   assert.equal(v.entryAssurance,'exhaustive');assert.equal(v.checkedPrior,1001);assert.equal(v.rank,1000);
   assert.equal(v.originals[0].accepted.length,2);assert.equal(v.originals[1].accepted.length,2);
   assert.equal(v.originals[2].h,null);
-  for(const bad of f.rows.slice(0,2)) assert.ok(!v.merged.entries.some(row=>row.txid===bad.txid));
+  for(const bad of badRows) assert.ok(!v.merged.entries.some(row=>row.txid===bad.txid));
   assert.ok(!v.merged.entries.some(row=>row.txid===note.txid));
   assert.equal(v.merged.entries.length,1000);
 });

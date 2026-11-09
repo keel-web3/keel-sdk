@@ -1,4 +1,4 @@
-import { b, hex, cat, u32, le32, dsha, reverse, parseBlock, formCheck, recipeCheck, marker, acceptControls, proof } from '../core.ts';
+import { b, hex, cat, utf, u32, le32, sha, dsha, reverse, parseBlock, formCheck, recipeCheck, marker, acceptControls, proof } from '../core.ts';
 import { writerChain, merge } from '../merge/index.mjs';
 import { validateChallenge } from '../challenge/index.mjs';
 import { classifyEntries } from '../index/classify.mjs';
@@ -17,12 +17,24 @@ export function shellPolicy({height,tip,F,W,C,recipeValid,inIndex,count,ownValid
   return {depth,eligible,final:eligible && C !== null && height+W <= C && !unresolved,
     entryAssurance:count > 1000 ? 'sampled' : 'exhaustive',ownEntryAssurance:ownValid ? 'full' : 'failed'};
 }
-// Stable, evenly spaced sample including both ends. The self entry is always
-// checked separately. The explicit assurance survives into every verdict.
-export function positionSample(prior, memberCount, sampleSize=64) {
+// Partial Fisher–Yates, driven by a domain-separated block-hash stream. Rejection
+// avoids modulo bias; the sparse swaps draw unique positions without copying
+// the entire input. Return them in position order. Self is checked separately.
+export function positionSample(prior, memberCount, sampleSize=64, blockHash='00'.repeat(32)) {
   if (!uint(sampleSize) || sampleSize < 2) throw Error('sample size must be at least two');
   if (memberCount <= 1000 || prior.length <= sampleSize) return prior;
-  return Array.from({length:sampleSize},(_,i)=>prior[Math.floor(i*(prior.length-1)/(sampleSize-1))]);
+  if (!/^[a-f0-9]{64}$/.test(blockHash)) throw Error('sample block hash required');
+  const seed=cat(utf('KOC1/shell-sample'),b(blockHash)), swaps=new Map(), selected=[];
+  let counter=0;
+  for (let i=0;i<sampleSize;i++) {
+    const remaining=prior.length-i, limit=Math.floor(0x100000000/remaining)*remaining;
+    let draw;
+    do { draw=sha(cat(seed,u32(counter++))).readUInt32BE(0); } while (draw>=limit);
+    const j=i+draw%remaining;
+    selected.push(swaps.get(j)??j);
+    swaps.set(j,swaps.get(i)??i);
+  }
+  return selected.sort((a,b)=>a-b).map(i=>prior[i]);
 }
 function headerFromInfo(info) {
   if (![info.version,info.nonce,info.timestamp].every(uint) || !/^[a-f0-9]{64}$/.test(info.previous_block) || !/^[a-f0-9]{64}$/.test(info.merkle_root)) throw new IncompleteEvidence('S7: header fields unavailable');
@@ -194,11 +206,17 @@ export async function verifyShell({location=globalThis.location,fetcher=globalTh
     }
     for (const found of evidence.values()) if (found.validity==='valid') union.set(found.entry.txid,found.entry);
     const corroborated=row=>(claims.get(rowKey(row))?.size??0)>=recipe.quorum;
-    // Only matching claims from q accepted writer chains may enable sampling.
-    const provisional=classifyEntries([...union.values()].filter(row=>corroborated(row) && !['invalid','unknown'].includes(evidence.get(row.txid)?.validity)),recipe,controls), memberCount=provisional.members.length;
+    // Only corroborated rows that can affect self's position, plus the fully
+    // checked self, may enable sampling. Unchecked rows after self cannot do so.
+    const provisional=classifyEntries([...union.values()].filter(row=>row.txid===ownEntry.txid || (order(row,ownEntry)<0 && corroborated(row) && !['invalid','unknown'].includes(evidence.get(row.txid)?.validity))),recipe,controls), memberCount=provisional.members.length;
     assurance=memberCount>1000?'sampled':'exhaustive';
     const prior=[...union.values()].filter(row=>order(row,ownEntry)<0).sort(order);
-    const sampled=positionSample(prior.filter(corroborated),memberCount,sampleSize), rejected=new Set(invalidTxids), checked=new Set();
+    // Reuse merge's exact quorum calculation. The accepted chains already bind
+    // this covered tip's hash; neither writer-supplied randomness nor local
+    // randomness can pick different positions for viewers at the same C.
+    const {C}=merge({originals,q:recipe.quorum,W:recipe.challengeWindow,policy:recipe,controls,verifyEntry:()=>false});
+    if (assurance==='sampled' && (C===null || !hashes[C])) throw new IncompleteEvidence('S9: covered tip hash unavailable');
+    const sampled=assurance==='sampled'?positionSample(prior.filter(corroborated),memberCount,sampleSize,hashes[C]):[], rejected=new Set(invalidTxids), checked=new Set();
     const check=async row=>{
       const found=await inspect(row);
       checked.add(row.txid);
@@ -208,7 +226,7 @@ export async function verifyShell({location=globalThis.location,fetcher=globalTh
     };
     // Minority claims never inherit sampled trust, even when their claimed
     // coordinates place them after self. Authentic coordinates may differ.
-    for (const row of union.values()) if (!corroborated(row)) await check(row);
+    for (const row of union.values()) if (assurance==='exhaustive' || !corroborated(row)) await check(row);
     let badSample=false;
     for (const row of sampled) {
       const found=await check(row);

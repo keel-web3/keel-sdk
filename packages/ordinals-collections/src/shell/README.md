@@ -44,11 +44,16 @@ R31 keeps the first valid child for a prev and ignores later siblings. D16 leave
 bad entries out without adding a permanent reputation rule. Missing or
 ratchet-rejected originals cast no vote; the recipe's q stays fixed.
 
-S9 enables sampling only above 1,000 members with matching row claims from at
-least the recipe's q accepted writer chains. Through that threshold it checks
-every preceding entry; above it, an evenly spaced 64-entry sample (configurable
-`sampleSize`, minimum 2) plus independently validated invalid challenges reached
-from original authorities or self. Minority rows are always checked exhaustively,
+S9 enables sampling only above 1,000 candidate members through self: the fully
+checked own entry plus preceding rows with matching claims from at least the
+recipe's q accepted writer chains, excluding known invalid/unknown rows. Rows
+after self cannot enable sampling. Through that threshold it checks the entire
+union; above it, a 64-entry sample (configurable `sampleSize`, minimum 2) plus
+independently validated invalid challenges reached from original authorities or
+self. Sample positions are drawn without replacement using domain-separated
+SHA-256 of the block hash at quorum-covered height C, with rejection to avoid
+modulo bias. The same C/hash yields the same sample for every viewer; a changed
+covered block hash changes the draw. Minority rows are always checked exhaustively,
 including claimed positions after self. An invalid sampled row or a sampled row
 that contradicts authentic coordinates/m/P triggers exhaustive checking of the
 entire union for that load. The own entry always receives the full checks.

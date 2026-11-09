@@ -109,13 +109,13 @@ test('S9 above 1000 combines sampling with an invalid challenge outside the samp
     const last=addUpdate(f.mock,f.r,f.authorities[i].id,f.rows,{prev:first.id,prevRoot:first.metadata.root,new:f.rows.slice(1000)});
     if(i===0)f.mock.add({metadata:{p:'koc1',op:'challenge',r:f.r.id,index:last.id,kind:'invalid',mint:bad.txid},parent:f.authorities[i].id});
   }
-  assert.ok(!positionSample(f.rows.slice(0,-1),1002).some(row=>row.txid===bad.txid));
+  assert.ok(!positionSample(f.rows.slice(0,-1),1002,64,hex(reverse(f.mock.routes.get('/r/blockhash/106')))).some(row=>row.txid===bad.txid));
   const v=await run(f,t);assert.equal(v.entryAssurance,'sampled');assert.equal(v.ownEntryAssurance,'full');assert.equal(v.checkedPrior,64);assert.equal(v.rank,1001);assert.equal(v.status,'settling');assert.equal(v.deferred.challenges.length,1);
 });
 test('S9 threshold: exhaustive through 1000, sampled above; own is never part of the sample',()=>{
   const rows=Array.from({length:1200},(_,i)=>({id:i}));
   assert.equal(positionSample(rows.slice(0,999),1000).length,999);
-  const sample=positionSample(rows,1201);assert.equal(sample.length,64);assert.equal(sample[0].id,0);assert.equal(sample.at(-1).id,1199);
+  const sample=positionSample(rows,1201);assert.equal(sample.length,64);assert.equal(new Set(sample).size,64);assert.ok(sample.every(row=>rows.includes(row)));
 });
 test('bounded child paging is incomplete, and non-/r/ fetches are refused',async t=>{
   const f=fixture();for(let i=0;i<101;i++)f.mock.add({metadata:{p:'koc1',op:'noise'},parent:f.r.id});
