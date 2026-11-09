@@ -44,13 +44,25 @@ R31 keeps the first valid child for a prev and ignores later siblings. D16 leave
 bad entries out without adding a permanent reputation rule. Missing or
 ratchet-rejected originals cast no vote; the recipe's q stays fixed.
 
-S9 checks every preceding entry through 1,000 claimed members. Above that threshold
-it checks an evenly spaced 64-entry sample (configurable `sampleSize`, minimum 2)
-plus independently validated invalid challenges reached from original authorities
-or self. The own entry always receives the full checks. Results explicitly say
-`exhaustive` or `sampled`; sampled results do not establish completeness. Compact
-`new` triples are enriched from mint bytes for the existing root primitive; full
-entry objects are also accepted. Each update is limited to 1,000 new entries.
+S9 enables sampling only above 1,000 members with matching row claims from at
+least the recipe's q accepted writer chains. Through that threshold it checks
+every preceding entry; above it, an evenly spaced 64-entry sample (configurable
+`sampleSize`, minimum 2) plus independently validated invalid challenges reached
+from original authorities or self. Minority rows are always checked exhaustively,
+including claimed positions after self. An invalid sampled row or a sampled row
+that contradicts authentic coordinates/m/P triggers exhaustive checking of the
+entire union for that load. The own entry always receives the full checks.
+Results explicitly say `exhaustive` or `sampled`; sampled results do not establish
+completeness.
+
+Unprovable rows are unknown and excluded, never treated as invalid-challenge
+evidence. They set `incomplete: true` and prevent finality only when corroborated
+by q distinct writers. Compact `new` triples are enriched from mint bytes for the
+existing root primitive; full entry objects are also accepted. An unavailable
+compact lookup leaves m/P absent, so its update cannot gain a verified root or
+vote; matching unknown triples from q authenticated writers also keep the result
+incomplete. An accepted earlier chain prefix remains usable. Each update is
+limited to 1,000 new entries.
 
 K4 seams: `deferred.stages` lists S10–S14 and `deferred.challenges` gives discovered
 challenge IDs. This core does not follow arbitrary `next`/`fork` pointers. Registry

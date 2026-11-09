@@ -6,6 +6,8 @@ import { Recursion, IncompleteEvidence, selfFromLocation, walk, normalize } from
 export { Recursion, IncompleteEvidence, selfFromLocation, walk, routeId, inscriptionId } from './recursion.mjs';
 const uint = n => Number.isSafeInteger(n) && n >= 0 && n <= 0xffffffff;
 const order = (a,b) => a.height-b.height || a.txIndex-b.txIndex;
+const rowKey = row => JSON.stringify([row.txid,row.height,row.txIndex,row.m,row.paymentOutpoint]);
+const tripleKey = row => JSON.stringify([row.txid,row.height,row.txIndex]);
 
 // S10–S14 consume this result in K4; this is not an owner/burn, art, bridge,
 // challenge-discovery or full-window-audit badge.
@@ -124,7 +126,8 @@ export async function verifyShell({location=globalThis.location,fetcher=globalTh
       catch (error) {if (!(error instanceof IncompleteEvidence)) throw error;}
     }
     const rows=new Map([[ownEntry.txid,ownEntry]]), evidence=new Map([[ownEntry.txid,{validity:'valid',entry:ownEntry}]]);
-    for (const u of updates.flat()) {
+    const compactUnknown=new Map();
+    for (let w=0;w<updates.length;w++) for (const u of updates[w]) {
       if (Array.isArray(u.new) && u.new.length>1000) throw new IncompleteEvidence('update entry budget exhausted');
       if (!Array.isArray(u.new)) continue;
       u.new=u.new.map(x=>Array.isArray(x)?{txid:x[0],height:x[1],txIndex:x[2],m:x[3],paymentOutpoint:x[4]}:x);
@@ -133,8 +136,20 @@ export async function verifyShell({location=globalThis.location,fetcher=globalTh
       for (let i=0;i<u.new.length;i++) {
         const x=u.new[i];
         if (!x.m || !x.paymentOutpoint) {
-          const r=await client.record(x.txid+'00000000'), m=normalize(r.metadata);
-          u.new[i]={...x,m:m?.m,paymentOutpoint:x.txid+'00000001'};
+          try {
+            const r=await client.record(x.txid+'00000000'), m=normalize(r.metadata);
+            u.new[i]={...x,m:m?.m,paymentOutpoint:x.txid+'00000001'};
+          } catch (error) {
+            const validity=error instanceof IncompleteEvidence?'unknown':'invalid';
+            evidence.set(x.txid,{validity,entry:x});
+            if (validity==='unknown') {
+              const key=tripleKey(x);
+              if (!compactUnknown.has(key)) compactUnknown.set(key,new Set());
+              compactUnknown.get(key).add(w);
+            }
+            // Leave the commitment fields absent. K1 must reject an update
+            // whose root cannot be checked; never fabricate m/P or a vote.
+          }
         }
         if (!rows.has(x.txid)) rows.set(x.txid,u.new[i]);
       }
@@ -147,8 +162,7 @@ export async function verifyShell({location=globalThis.location,fetcher=globalTh
         const position=await locate(r), entry=formCheck({...r,recipe,height:r.height,txIndex:position.txIndex,charms:r.info.charms});
         value={validity:entry.error?'invalid':'valid',entry:entry.error?row:{...entry,id:r.id},position:position.position};
       } catch (error) {
-        if (error instanceof IncompleteEvidence) throw error;
-        value={validity:'invalid',entry:row};
+        value={validity:error instanceof IncompleteEvidence?'unknown':'invalid',entry:row};
       }
       evidence.set(row.txid,value); return value;
     };
@@ -170,27 +184,62 @@ export async function verifyShell({location=globalThis.location,fetcher=globalTh
     }
     originals=updates.map((us,i)=>writerChain(us,{authority:recipe.writers[i].authority,recipe:recipe.id,hostHashes:hashes,pins:pins.filter(p=>p.writerIndex===i),policy:recipe,controls,resolveCorrection:id=>corrections.get(id)}));
     const union=new Map([[ownEntry.txid,ownEntry]]);
-    for (const w of originals) for (const row of w.entries) if (!union.has(row.txid)) union.set(row.txid,row);
+    const claims=new Map(), tripleClaims=new Map();
+    for (let w=0;w<originals.length;w++) for (const row of originals[w].entries) {
+      if (!union.has(row.txid)) union.set(row.txid,row);
+      for (const [map,key] of [[claims,rowKey(row)],[tripleClaims,tripleKey(row)]]) {
+        if (!map.has(key)) map.set(key,new Set());
+        map.get(key).add(w);
+      }
+    }
     for (const found of evidence.values()) if (found.validity==='valid') union.set(found.entry.txid,found.entry);
-    const provisional=classifyEntries([...union.values()],recipe,controls), memberCount=provisional.members.length;
+    const corroborated=row=>(claims.get(rowKey(row))?.size??0)>=recipe.quorum;
+    // Only matching claims from q accepted writer chains may enable sampling.
+    const provisional=classifyEntries([...union.values()].filter(row=>corroborated(row) && !['invalid','unknown'].includes(evidence.get(row.txid)?.validity)),recipe,controls), memberCount=provisional.members.length;
     assurance=memberCount>1000?'sampled':'exhaustive';
     const prior=[...union.values()].filter(row=>order(row,ownEntry)<0).sort(order);
-    const sampled=positionSample(prior,memberCount,sampleSize), rejected=new Set(invalidTxids);
-    for (const row of sampled) {
+    const sampled=positionSample(prior.filter(corroborated),memberCount,sampleSize), rejected=new Set(invalidTxids), checked=new Set();
+    const check=async row=>{
       const found=await inspect(row);
+      checked.add(row.txid);
       if (found.validity!=='valid') rejected.add(row.txid);
       else union.set(row.txid,found.entry); // independently proven coordinates win
+      return found;
+    };
+    // Minority claims never inherit sampled trust, even when their claimed
+    // coordinates place them after self. Authentic coordinates may differ.
+    for (const row of union.values()) if (!corroborated(row)) await check(row);
+    let badSample=false;
+    for (const row of sampled) {
+      const found=await check(row);
+      if (found.validity==='invalid' || (found.validity==='valid' && rowKey(row)!==rowKey(found.entry))) badSample=true;
     }
+    if (badSample) {
+      // A writer caught in the sample cannot keep unchecked claims on this
+      // load. Check the entire union, including potentially false positions
+      // after self, without imposing a lasting ban on that writer.
+      for (const row of union.values()) if (!checked.has(row.txid)) await check(row);
+      assurance='exhaustive';
+    }
+    let incomplete=false;
+    // A minority variant selected first for the union must not hide matching
+    // unknown claims from q later writers.
+    for (const w of originals) for (const row of w.entries) if (evidence.get(row.txid)?.validity==='unknown' && corroborated(row)) incomplete=true;
+    for (const [key,writers] of compactUnknown) {
+      const support=new Set([...writers,...(tripleClaims.get(key)??[])]);
+      if (support.size>=recipe.quorum) incomplete=true;
+    }
+    if (incomplete) reasons.push('S9: quorum-corroborated row evidence unavailable');
     // All rows selected for verification have been checked. Beyond the sample,
     // preserve the cache claim explicitly as sampled, never exhaustive.
     for (const w of originals) w.entries=w.entries.map(x=>union.get(x.txid)??x);
-    merged=merge({originals,self:[ownEntry],ch:[...evidence.values()].filter(x=>x.validity==='valid').map(x=>x.entry),q:recipe.quorum,W:recipe.challengeWindow,policy:recipe,controls,unresolved:challengeRecords.length>0,verifyEntry:x=>!rejected.has(x.txid)});
+    merged=merge({originals,self:[ownEntry],ch:[...evidence.values()].filter(x=>x.validity==='valid').map(x=>x.entry),q:recipe.quorum,W:recipe.challengeWindow,policy:recipe,controls,unresolved:challengeRecords.length>0||incomplete,verifyEntry:x=>!rejected.has(x.txid)&&evidence.get(x.txid)?.validity!=='unknown'});
     checks.S9=true;
     const member=merged.entries.find(x=>x.txid===ownEntry.txid), refund=merged.refund.find(x=>x.txid===ownEntry.txid);
-    const policy=shellPolicy({height:own.height,tip,F:recipe.finality,W:recipe.challengeWindow,C:merged.C,recipeValid:true,inIndex:!!member,count:memberCount,ownValid:true,unresolved:challengeRecords.length>0});
-    const extra={self,recipe:recipe.id,rank:member?.n??null,C:merged.C,depth:policy.depth,final:policy.final,originals,merged,controls:acceptControls(recipe,controls),checkedPrior:sampled.length};
+    const policy=shellPolicy({height:own.height,tip,F:recipe.finality,W:recipe.challengeWindow,C:merged.C,recipeValid:true,inIndex:!!member,count:memberCount,ownValid:true,unresolved:challengeRecords.length>0,incomplete});
+    const extra={self,recipe:recipe.id,rank:member?.n??null,C:merged.C,depth:policy.depth,final:policy.final,incomplete,originals,merged,controls:acceptControls(recipe,controls),checkedPrior:prior.filter(row=>checked.has(row.txid)).length};
     if (!member) {reasons.push(refund?.reason??'before-open');return result('not member',extra);}
-    if (!policy.final) {reasons.push(!checks.S6?'insufficient confirmations':merged.C===null?'no writer quorum':challengeRecords.length?'challenges await S10 resolution':'challenge window not covered');return result('settling',extra);}
+    if (!policy.final) {if (!incomplete) reasons.push(!checks.S6?'insufficient confirmations':merged.C===null?'no writer quorum':challengeRecords.length?'challenges await S10 resolution':'challenge window not covered');return result('settling',extra);}
     reasons.push(assurance==='sampled'?'quorum member; preceding entries sampled':'quorum member; preceding entries checked');
     return result('member',extra);
   } catch (error) {
