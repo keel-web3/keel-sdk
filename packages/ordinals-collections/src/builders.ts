@@ -38,7 +38,7 @@ export function unsignedPsbt(tx, prevouts, paths = []) {
       p.root ? field(b('18'),b(p.root)) : Buffer.alloc(0), b('00'));
   });
   const psbt = cat(b('70736274ff'),field(b('00'),serializeTx(tx,false)),b('00'),...maps,...tx.outputs.map(()=>b('00')));
-  return { psbt, tx, prevouts, paths, fee };
+  return { psbt: Buffer.from(psbt), tx, prevouts, paths, fee };
 }
 // BIP341 SIGHASH_DEFAULT, no annex, all inputs and outputs committed.
 export function taprootSighash(plan, index) {
@@ -107,7 +107,7 @@ function mintLayout(tx, paths = []) {
       if (chunks.length) {
         const metadata = decodeCbor(Buffer.concat(chunks));
         if (metadata.p==='koc1' && metadata.op==='mint') {
-          if (!Buffer.isBuffer(metadata.r) || metadata.r.length!==36) throw Error('invalid mint recipe');
+          if (!(metadata.r instanceof Uint8Array) || metadata.r.length!==36) throw Error('invalid mint recipe');
           recipes.push(hex(metadata.r));
         }
       }

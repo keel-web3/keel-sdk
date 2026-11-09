@@ -1,8 +1,8 @@
-import { createHash } from 'node:crypto';
+import { sha as hash } from '../core.ts';
+import { Bytes } from '../bytes.mjs';
 import { parseTx, merkle } from '../core.ts';
-const hash = b => createHash('sha256').update(b).digest();
 const hash2 = b => hash(hash(b));
-const raw = (v, n) => typeof v === 'string' && new RegExp(`^[0-9a-fA-F]{${n*2}}$`).test(v) ? Buffer.from(v, 'hex') : null;
+const raw = (v, n) => typeof v === 'string' && new RegExp(`^[0-9a-fA-F]{${n*2}}$`).test(v) ? Bytes.from(v, 'hex') : null;
 const uint = n => Number.isSafeInteger(n) && n >= 0 && n <= 0xffffffff;
 // A Bitcoin header does not commit to the transaction count separately. Require
 // the complete block so that count and every leaf are bound to its Merkle root.
@@ -12,7 +12,7 @@ export function verifyPosition(proof, entry, hostHashes) {
     const header = raw(proof.header,80), txid = raw(proof.mint,32);
     if (!header || !txid || proof.mint !== entry.txid || proof.height !== entry.height || proof.txIndex !== entry.txIndex || !uint(proof.total) || !uint(proof.txIndex) || proof.total < 1 || proof.txIndex >= proof.total || hash2(header).toString('hex') !== hostHashes[proof.height] || !Array.isArray(proof.branch)) return false;
     if (typeof proof.rawBlock !== 'string' || !/^(?:[0-9a-fA-F]{2})+$/.test(proof.rawBlock) || proof.rawBlock.length > 8_000_000) return false;
-    const block = Buffer.from(proof.rawBlock, 'hex');
+    const block = Bytes.from(proof.rawBlock, 'hex');
     if (block.length < 81 || !block.subarray(0,80).equals(header)) return false;
     let pos = 80, total = block[pos++];
     if (total === 253) {
@@ -36,7 +36,7 @@ export function verifyPosition(proof, entry, hostHashes) {
     while (n > 1) {
       const sibling = raw(proof.branch[depth++],32), missing = (i ^ 1) >= n;
       if (!sibling || (missing ? !sibling.equals(h) : sibling.equals(h))) return false;
-      h = hash2(i % 2 ? Buffer.concat([sibling,h]) : Buffer.concat([h,sibling]));
+      h = hash2(i % 2 ? Bytes.concat([sibling,h]) : Bytes.concat([h,sibling]));
       i = Math.floor(i/2); n = Math.ceil(n/2);
     }
     return depth === proof.branch.length && h.equals(header.subarray(36,68));

@@ -119,3 +119,7 @@ of private-key argument order. The third slot stays empty even when all keys are
 available. Missing keys still produce empty slots for negative consensus tests.
 The regtest matrix also has Core's descriptor wallet sign and finalize an
 unsigned builder PSBT via `walletprocesspsbt`/`finalizepsbt`, then broadcasts it.
+
+The browser-only `shell` subpath adds the recursion-backed S1–S9 core, with
+`member` / `not member` / `settling` / `invalid` verdicts. It shares the K1
+algorithms and has no Node runtime dependencies. See [the shell API and scope](src/shell/README.md).

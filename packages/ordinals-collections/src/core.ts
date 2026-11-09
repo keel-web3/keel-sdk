@@ -1,34 +1,33 @@
 // KOC1 core adapted from the frozen K0 executable specification.
 // @ts-nocheck
-import { createHash } from "node:crypto";
+import { sha256 } from "@noble/hashes/sha256";
+import { Bytes } from "./bytes.mjs";
 import { secp256k1 } from "@noble/curves/secp256k1";
 
-export const b = (x) => (Buffer.isBuffer(x) ? x : Buffer.from(x, "hex"));
+export const b = (x) => (x instanceof Bytes ? x : Bytes.from(x, "hex"));
 export const hex = (x) => b(x).toString("hex");
-export const cat = (...xs) => Buffer.concat(xs.map(b));
+export const cat = (...xs) => Bytes.concat(xs.map(b));
 export const sha = (...xs) =>
-  createHash("sha256")
-    .update(cat(...xs))
-    .digest();
+  Bytes.from(sha256(cat(...xs)));
 export const dsha = (...xs) => sha(sha(...xs));
-export const utf = (s) => Buffer.from(s, "utf8");
-export const zero = (n) => Buffer.alloc(n);
+export const utf = (s) => Bytes.from(s, "utf8");
+export const zero = (n) => Bytes.alloc(n);
 export const u32 = (n) => {
-  const r = Buffer.alloc(4);
+  const r = Bytes.alloc(4);
   r.writeUInt32BE(n);
   return r;
 };
 export const le32 = (n) => {
-  const r = Buffer.alloc(4);
+  const r = Bytes.alloc(4);
   r.writeUInt32LE(n);
   return r;
 };
 const le64 = (n) => {
-  const r = Buffer.alloc(8);
+  const r = Bytes.alloc(8);
   r.writeBigUInt64LE(BigInt(n));
   return r;
 };
-export const reverse = (x) => Buffer.from(b(x)).reverse();
+export const reverse = (x) => Bytes.from(b(x)).reverse();
 export const outpoint = (displayTxid, n) => cat(reverse(displayTxid), u32(n));
 // Ord fields are not KOC1 route outpoints: their index is little-endian and trimmed.
 export function ordIdValue(routeId) {
@@ -46,7 +45,7 @@ export function ordIdFromValue(value) {
     (v.length > 32 && v.length < 36 && v.at(-1) === 0)
   )
     throw Error("ord ID encoding");
-  const index = Buffer.alloc(4);
+  const index = Bytes.alloc(4);
   v.subarray(32).copy(index);
   return cat(v.subarray(0, 32), u32(index.readUInt32LE()));
 }
@@ -65,9 +64,9 @@ export const NUMS =
   "50929b74c1a04954b78b4b6035e97a5e078a5a0f28ec96d547bfee9ace803ac0";
 export const compact = (n) =>
   n < 253
-    ? Buffer.from([n])
+    ? Bytes.from([n])
     : n <= 65535
-      ? cat(b("fd"), Buffer.from([n & 255, n >>> 8]))
+      ? cat(b("fd"), Bytes.from([n & 255, n >>> 8]))
       : cat(b("fe"), le32(n));
 export function merkle(leaves, bitcoin = false) {
   if (!leaves.length) return zero(32);
@@ -140,30 +139,30 @@ export function permutation(recipe, hash, max) {
 
 export function push(data, nonminimal = false) {
   const x = b(data);
-  if (nonminimal) return cat(b("4c"), Buffer.from([x.length]), x);
+  if (nonminimal) return cat(b("4c"), Bytes.from([x.length]), x);
   return x.length === 0
     ? b("00")
     : x.length <= 75
-      ? cat(Buffer.from([x.length]), x)
+      ? cat(Bytes.from([x.length]), x)
       : x.length <= 255
-        ? cat(b("4c"), Buffer.from([x.length]), x)
-        : cat(b("4d"), Buffer.from([x.length & 255, x.length >>> 8]), x);
+        ? cat(b("4c"), Bytes.from([x.length]), x)
+        : cat(b("4d"), Bytes.from([x.length & 255, x.length >>> 8]), x);
 }
 const scriptnum = (n) => {
   if (n === 0) return b("00");
-  if (n <= 16) return Buffer.from([0x50 + n]);
+  if (n <= 16) return Bytes.from([0x50 + n]);
   const a = [];
   while (n) {
     a.push(n & 255);
     n >>>= 8;
   }
   if (a.at(-1) & 128) a.push(0);
-  return push(Buffer.from(a));
+  return push(Bytes.from(a));
 };
 export const tapleaf = (script) =>
   tagged("TapLeaf", b("c0"), compact(b(script).length), b(script));
 export const tapbranch = (a, c) =>
-  tagged("TapBranch", ...[b(a), b(c)].sort(Buffer.compare));
+  tagged("TapBranch", ...[b(a), b(c)].sort(Bytes.compare));
 export function tapOutput(internal, root) {
   const t = BigInt("0x" + hex(tagged("TapTweak", b(internal), b(root))));
   if (t >= secp256k1.CURVE.n) throw Error("invalid tweak");
@@ -256,7 +255,7 @@ export function escrow(p, m) {
     controlBlocks: Object.fromEntries(
       Object.entries(paths).map(([k, v]) => [
         k,
-        hex(cat(Buffer.from([0xc0 | q.parity]), b(NUMS), ...v.map(b))),
+        hex(cat(Bytes.from([0xc0 | q.parity]), b(NUMS), ...v.map(b))),
       ]),
     ),
   };
@@ -265,14 +264,14 @@ export function escrow(p, m) {
 // Deterministic CBOR for fixture authoring; decoder also accepts non-map-order inputs.
 export function cbor(x) {
   const head = (major, n) => {
-    if (n < 24) return Buffer.from([(major << 5) | n]);
-    if (n <= 255) return Buffer.from([(major << 5) | 24, n]);
+    if (n < 24) return Bytes.from([(major << 5) | n]);
+    if (n <= 255) return Bytes.from([(major << 5) | 24, n]);
     if (n <= 65535)
-      return cat(Buffer.from([(major << 5) | 25, n >>> 8, n & 255]));
-    if (n <= 0xffffffff) return cat(Buffer.from([(major << 5) | 26]), u32(n));
-    const wide = Buffer.alloc(8);
+      return cat(Bytes.from([(major << 5) | 25, n >>> 8, n & 255]));
+    if (n <= 0xffffffff) return cat(Bytes.from([(major << 5) | 26]), u32(n));
+    const wide = Bytes.alloc(8);
     wide.writeBigUInt64BE(BigInt(n));
-    return cat(Buffer.from([(major << 5) | 27]), wide);
+    return cat(Bytes.from([(major << 5) | 27]), wide);
   };
   if (x === null) return b("f6");
   if (typeof x === "boolean") return b(x ? "f5" : "f4");
@@ -281,12 +280,12 @@ export function cbor(x) {
       throw Error("CBOR integer");
     return head(0, x);
   }
-  if (Buffer.isBuffer(x)) return cat(head(2, x.length), x);
-  if (typeof x === "string") return cat(head(3, Buffer.byteLength(x)), utf(x));
+  if (Bytes.isBytes(x)) return cat(head(2, x.length), x);
+  if (typeof x === "string") return cat(head(3, Bytes.byteLength(x)), utf(x));
   if (Array.isArray(x)) return cat(head(4, x.length), ...x.map(cbor));
   const pairs = Object.entries(x)
     .map(([k, v]) => [cbor(k), cbor(v)])
-    .sort((a, c) => a[0].length - c[0].length || Buffer.compare(a[0], c[0]));
+    .sort((a, c) => a[0].length - c[0].length || Bytes.compare(a[0], c[0]));
   return cat(head(5, pairs.length), ...pairs.flat());
 }
 export function decodeCbor(bytes) {
@@ -321,7 +320,7 @@ export function decodeCbor(bytes) {
               : Number(take(8).readBigUInt64BE());
     if (!Number.isSafeInteger(n)) throw Error("CBOR integer precision");
     if (major === 0) return n;
-    if (major === 2) return Buffer.from(take(n));
+    if (major === 2) return Bytes.from(take(n));
     if (major === 3)
       return new TextDecoder("utf-8", { fatal: true }).decode(take(n));
     if (major === 4) return Array.from({ length: n }, read);
@@ -368,7 +367,7 @@ export function envelope(
       b("ac0063"),
       push(utf("ord")),
       ...fields.flatMap(([tag, value]) => [
-        push(Buffer.from([tag]), nonminimal),
+        push(Bytes.from([tag]), nonminimal),
         push(value),
       ]),
       b("00"),
@@ -433,7 +432,7 @@ export function parseOrdEnvelopes(script) {
       if (t.op === 0x68) { complete = true; break; }
       if (t.data) payload.push(t.data);
       else if (t.op === 0x4f || (t.op >= 0x51 && t.op <= 0x60)) {
-        pushnum = true; payload.push(Buffer.from([t.op === 0x4f ? 0x81 : t.op - 0x50]));
+        pushnum = true; payload.push(Bytes.from([t.op === 0x4f ? 0x81 : t.op - 0x50]));
       } else break;
     }
     if (complete) result.push({ offset: result.length, payload, pushnum, stutter });
@@ -726,12 +725,12 @@ export function recipeCheck(r, refs) {
 }
 // E1: reveal prevout authenticates the stripped commit bytes; its output commits
 // to the exact tapscript. This does not authenticate signatures or the annex.
-export function authenticateCommit(rawReveal, rawCommit) {
+export function authenticateCommit(rawReveal, rawCommit, inputIndex = 0) {
   try {
     if (typeof rawCommit !== "string") return false;
     const reveal = parseTx(rawReveal),
       commit = parseTx(rawCommit),
-      input = reveal.inputs[0];
+      input = reveal.inputs[inputIndex];
     if (
       reveal.end !== b(rawReveal).length ||
       commit.end !== b(rawCommit).length ||
@@ -796,9 +795,9 @@ export function formCheck(input) {
     e.viewer !== r.art.viewer.id ||
     e.m.p !== "koc1" ||
     e.m.op !== "mint" ||
-    !Buffer.isBuffer(e.m.r) ||
+    !Bytes.isBytes(e.m.r) ||
     hex(e.m.r) !== r.id ||
-    !Buffer.isBuffer(e.m.m) ||
+    !Bytes.isBytes(e.m.m) ||
     !key(hex(e.m.m)) ||
     Object.hasOwn(e.m, "n")
   )
@@ -806,7 +805,7 @@ export function formCheck(input) {
   if (
     e.m.ch !== undefined &&
     (!Array.isArray(e.m.ch) ||
-      !e.m.ch.every((x) => Buffer.isBuffer(x) && x.length === 36))
+      !e.m.ch.every((x) => Bytes.isBytes(x) && x.length === 36))
   )
     return { error: "ch" };
   if (
@@ -818,9 +817,9 @@ export function formCheck(input) {
           x.length === 3 &&
           uint(x[0]) &&
           x[0] < r.writers.length &&
-          Buffer.isBuffer(x[1]) &&
+          Bytes.isBytes(x[1]) &&
           x[1].length === 36 &&
-          Buffer.isBuffer(x[2]) &&
+          Bytes.isBytes(x[2]) &&
           x[2].length === 32,
       ))
   )

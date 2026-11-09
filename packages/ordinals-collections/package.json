@@ -13,7 +13,8 @@
     "node": ">=22.18"
   },
   "dependencies": {
-    "@noble/curves": "1.9.7"
+    "@noble/curves": "1.9.7",
+    "@noble/hashes": "1.8.0"
   },
   "exports": {
     ".": "./src/index.ts",
@@ -32,7 +33,8 @@
     "./block-loop": "./indexer/loop.mjs",
     "./discovery": "./indexer/discovery.mjs",
     "./cache": "./indexer/cache.mjs",
-    "./verify-token": "./src/verify/token.mjs"
+    "./verify-token": "./src/verify/token.mjs",
+    "./shell": "./src/shell/index.mjs"
   },
   "bin": {
     "keel-ordinals": "./bin/keel-ordinals.mjs"
