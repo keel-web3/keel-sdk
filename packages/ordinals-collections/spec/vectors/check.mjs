@@ -118,7 +118,11 @@ const spec = await readFile(new URL("../KOC1.md", dir), "utf8"),
   normative = [...spec.matchAll(/^- \*\*(KOC1-R\d+)\*\*/gm)].map((m) => m[1]);
 assert.deepEqual(
   normative,
-  Array.from({ length: 52 }, (_, i) => "KOC1-R" + (i + 1)),
+  [
+    ...Array.from({ length: 48 }, (_, i) => "KOC1-R" + (i + 1)),
+    "KOC1-R53",
+    ...Array.from({ length: 4 }, (_, i) => "KOC1-R" + (i + 49)),
+  ],
   "numbered normative rules",
 );
 assert(

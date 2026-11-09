@@ -151,6 +151,14 @@ export function evaluate(kind, input) {
   if (kind === "registry")
     return M.registryRead(input.children, input.originals, input.burnHeight);
   if (kind === "escrow-policy") return M.escrowPolicy(input);
+  if (kind === "sample-seed") {
+    const ok = h => Number.isInteger(h) && h >= 0 && h < 0xffffffff;
+    const commits = input.commitHeights.map(hs =>
+      hs.length >= input.q && hs.every(ok) ? [...hs].sort((a, b) => a - b)[input.q - 1] : null);
+    const height = commits.length && commits.every(h => h !== null) ? Math.max(...commits) + 1 : null;
+    const hash = height !== null && height <= input.tip ? input.hashes[height] ?? null : null;
+    return {height, hash, ready: hash !== null};
+  }
   if (kind === "shell") {
     const incomplete = input.challenges > 32 || input.pageEntries > 1000;
     const ownEntryVerified = !!input.self && !M.formCheck(input.self).error;

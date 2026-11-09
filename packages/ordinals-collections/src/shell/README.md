@@ -51,9 +51,18 @@ after self cannot enable sampling. Through that threshold it checks the entire
 union; above it, a 64-entry sample (configurable `sampleSize`, minimum 2) plus
 independently validated invalid challenges reached from original authorities or
 self. Sample positions are drawn without replacement using domain-separated
-SHA-256 of the block hash at quorum-covered height C, with rejection to avoid
-modulo bias. The same C/hash yields the same sample for every viewer; a changed
-covered block hash changes the draw. Minority rows are always checked exhaustively,
+SHA-256 of block H* (R53): the first block after every sample candidate was
+committed. A candidate (a q-corroborated row before self) is committed at the
+q-th earliest confirmation height of the accepted update in which each claiming
+writer first listed it. Heights come from `/r/inscription/` records; writer
+metadata and covered height C cannot choose the seed, and the candidate list is
+fixed before the hash exists. Fetch that hash through `/r/blockhash/<height>`
+only. Until the block exists the verdict stays settling. Updates that add no
+candidate do not move H*, so per-block publication stays live. `sampleSeed`
+reports `{height,hash}` (null hash while pending), or null for an exhaustive
+load. The same accepted chains/hash and ordered candidates yield the same
+sample for every viewer; a later tip cannot change it. Reorgs recompute the
+evidence; miners can still influence the seed block. Minority rows are always checked exhaustively,
 including claimed positions after self. An invalid sampled row or a sampled row
 that contradicts authentic coordinates/m/P triggers exhaustive checking of the
 entire union for that load. The own entry always receives the full checks.

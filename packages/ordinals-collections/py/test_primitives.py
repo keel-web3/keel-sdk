@@ -164,6 +164,12 @@ class ShellVectors(unittest.TestCase):
         for case in json.loads((VECTORS / 'shell-policy.json').read_text())['cases']:
             with self.subTest(case=case['id']): self.assertEqual(shell_policy(case['input']),case['expected'])
 
+class SampleSeedVectors(unittest.TestCase):
+    def test_sample_seed(self):
+        from koc1 import sample_seed
+        for case in json.loads((VECTORS / 'sample-seed.json').read_text())['cases']:
+            with self.subTest(case=case['id']): self.assertEqual(sample_seed(case['input']),case['expected'])
+
 class PendingVectors(unittest.TestCase):
     def test_pending(self):
         from koc1 import pending_mints
@@ -193,7 +199,7 @@ class CoverageInventory(unittest.TestCase):
         expected = {'pending-mints','recipes','testnet4-block','registry','mint-boundaries','challenges',
                     'metadata','commit-auth','trust-boundaries','shell-policy','numbering-controls-roots',
                     'headers','mint','escrow','light-switch','permutation','transaction-order','tags',
-                    'escrow-policy','writers','wire'}
+                    'escrow-policy','writers','wire','sample-seed'}
         actual = {p.stem for p in VECTORS.glob('*.json') if 'cases' in json.loads(p.read_text())}
         self.assertEqual(actual,expected, 'new vector families need independent tests')
 

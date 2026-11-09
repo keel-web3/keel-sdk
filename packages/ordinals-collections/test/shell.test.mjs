@@ -109,7 +109,7 @@ test('S9 above 1000 combines sampling with an invalid challenge outside the samp
     const last=addUpdate(f.mock,f.r,f.authorities[i].id,f.rows,{prev:first.id,prevRoot:first.metadata.root,new:f.rows.slice(1000)});
     if(i===0)f.mock.add({metadata:{p:'koc1',op:'challenge',r:f.r.id,index:last.id,kind:'invalid',mint:bad.txid},parent:f.authorities[i].id});
   }
-  assert.ok(!positionSample(f.rows.slice(0,-1),1002,64,hex(reverse(f.mock.routes.get('/r/blockhash/106')))).some(row=>row.txid===bad.txid));
+  assert.ok(!positionSample(f.rows.slice(0,-1),1002,64,hex(reverse(f.mock.routes.get('/r/blockhash/107')))).some(row=>row.txid===bad.txid));
   const v=await run(f,t);assert.equal(v.entryAssurance,'sampled');assert.equal(v.ownEntryAssurance,'full');assert.equal(v.checkedPrior,64);assert.equal(v.rank,1001);assert.equal(v.status,'settling');assert.equal(v.deferred.challenges.length,1);
 });
 test('S9 threshold: exhaustive through 1000, sampled above; own is never part of the sample',()=>{

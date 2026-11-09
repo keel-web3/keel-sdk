@@ -80,8 +80,9 @@ export function fixture({writers=2,seen=[],count=1}={}) {
   }
   const hash=mock.block(100,mints);
   const rows=mints.map((m,i)=>({id:m.id,txid:m.txid,height:100,txIndex:i,m:key,paymentOutpoint:m.txid+'00000001'}));
-  for(let h=101;h<=106;h++)mock.routes.set(`/r/blockhash/${h}`,hex(reverse(sha(utf(`block-${h}`)))));
-  mock.routes.set('/r/blockheight',106);
+  for(let h=101;h<=107;h++)mock.routes.set(`/r/blockhash/${h}`,hex(reverse(sha(utf(`block-${h}`)))));
+  // Updates confirm at 106 by default, so 107 is the first R53 seed block.
+  mock.routes.set('/r/blockheight',107);
   const updates=[];
   for(let i=0;i<writers;i++){
     if(rows.length<=1000)updates.push(addUpdate(mock,r,authorities[i].id,rows));
@@ -89,8 +90,8 @@ export function fixture({writers=2,seen=[],count=1}={}) {
   }
   return {mock,r,authorities,mints,rows,updates,hash,self:mints.at(-1).id};
 }
-export function addUpdate(mock,recipe,authority,rows,{h=106,prev=null,prevRoot=null,...overrides}={}){
+export function addUpdate(mock,recipe,authority,rows,{h=106,at=106,prev=null,prevRoot=null,...overrides}={}){
   const hash=hex(reverse(mock.routes.get(`/r/blockhash/${h}`))),root=indexRoot({recipe:recipe.id,height:h,blockhash:hash,members:rows,refunds:[]});
   const metadata={p:'koc1',op:'index',r:recipe.id,h,hash,root:root.indexRoot,count:rows.length,over:0,prev,prevRoot,new:prev?[]:rows,applied:[],...overrides};
-  return mock.add({metadata,height:106,parent:authority});
+  return mock.add({metadata,height:at,parent:authority});
 }

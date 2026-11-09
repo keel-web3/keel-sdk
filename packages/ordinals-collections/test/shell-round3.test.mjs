@@ -29,13 +29,13 @@ test('S9 sampled positions are unique, repeatable per block hash, and change wit
   assert.throws(()=>positionSample(rows,1201,64,'bad hash'),/block hash/);
 });
 
-test('S9 uses merge C block hash for the actual fetch sample, independent of a later host tip',async t=>{
+test('S9 uses the post-update block hash for the actual fetch sample, independent of C and a later host tip',async t=>{
   const samples=[];
   for (const hash of ['11'.repeat(32),'22'.repeat(32)]) {
     const f=fixture({count:1002,writers:0});
-    f.mock.routes.set('/r/blockhash/106',hex(reverse(hash)));
-    f.mock.routes.set('/r/blockheight',107);
-    f.mock.routes.set('/r/blockhash/107','33'.repeat(32));
+    f.mock.routes.set('/r/blockhash/107',hex(reverse(hash)));
+    f.mock.routes.set('/r/blockheight',108);
+    f.mock.routes.set('/r/blockhash/108','33'.repeat(32));
     for(let w=0;w<2;w++) {
       const first=addUpdate(f.mock,f.r,f.authorities[w].id,f.rows.slice(0,1000),{h:100});
       addUpdate(f.mock,f.r,f.authorities[w].id,f.rows,{prev:first.id,prevRoot:first.metadata.root,new:f.rows.slice(1000)});

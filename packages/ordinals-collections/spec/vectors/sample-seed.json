@@ -1,0 +1,312 @@
+{
+  "version": "koc1@1",
+  "network": "testnet4",
+  "kind": "sample-seed",
+  "cases": [
+    {
+      "id": "after-latest-candidate-commitment",
+      "rules": [
+        "KOC1-R48",
+        "KOC1-R53"
+      ],
+      "input": {
+        "commitHeights": [
+          [
+            106,
+            108
+          ],
+          [
+            108,
+            110,
+            112
+          ]
+        ],
+        "q": 2,
+        "tip": 115,
+        "hashes": {
+          "109": "01e9aaac5f777d58669c9d6e9b5ac9885377dda84298c4e5630d1630688c03b4",
+          "111": "e9591c69a5c9aba8a22c01e3dbd1d0932774c4a76cd566622289bff87b58fa11",
+          "113": "973c79c7f5d52f465e250fb520ef5584aaf0f5f1754cf233b787c3fe945f89ab",
+          "115": "378441a76c707fcc4e32bfcf841abd785a6e9aff0eff5690423982e877c919cc"
+        }
+      },
+      "expected": {
+        "height": 111,
+        "hash": "e9591c69a5c9aba8a22c01e3dbd1d0932774c4a76cd566622289bff87b58fa11",
+        "ready": true
+      }
+    },
+    {
+      "id": "settling-at-commitment-height",
+      "rules": [
+        "KOC1-R48",
+        "KOC1-R53"
+      ],
+      "input": {
+        "commitHeights": [
+          [
+            106,
+            108
+          ],
+          [
+            108,
+            110,
+            112
+          ]
+        ],
+        "q": 2,
+        "tip": 110,
+        "hashes": {
+          "109": "01e9aaac5f777d58669c9d6e9b5ac9885377dda84298c4e5630d1630688c03b4",
+          "111": "e9591c69a5c9aba8a22c01e3dbd1d0932774c4a76cd566622289bff87b58fa11",
+          "113": "973c79c7f5d52f465e250fb520ef5584aaf0f5f1754cf233b787c3fe945f89ab",
+          "115": "378441a76c707fcc4e32bfcf841abd785a6e9aff0eff5690423982e877c919cc"
+        }
+      },
+      "expected": {
+        "height": 111,
+        "hash": null,
+        "ready": false
+      }
+    },
+    {
+      "id": "ready-at-first-successor",
+      "rules": [
+        "KOC1-R48",
+        "KOC1-R53"
+      ],
+      "input": {
+        "commitHeights": [
+          [
+            106,
+            108
+          ],
+          [
+            108,
+            110,
+            112
+          ]
+        ],
+        "q": 2,
+        "tip": 111,
+        "hashes": {
+          "109": "01e9aaac5f777d58669c9d6e9b5ac9885377dda84298c4e5630d1630688c03b4",
+          "111": "e9591c69a5c9aba8a22c01e3dbd1d0932774c4a76cd566622289bff87b58fa11",
+          "113": "973c79c7f5d52f465e250fb520ef5584aaf0f5f1754cf233b787c3fe945f89ab",
+          "115": "378441a76c707fcc4e32bfcf841abd785a6e9aff0eff5690423982e877c919cc"
+        }
+      },
+      "expected": {
+        "height": 111,
+        "hash": "e9591c69a5c9aba8a22c01e3dbd1d0932774c4a76cd566622289bff87b58fa11",
+        "ready": true
+      }
+    },
+    {
+      "id": "missing-successor-hash",
+      "rules": [
+        "KOC1-R48",
+        "KOC1-R53"
+      ],
+      "input": {
+        "commitHeights": [
+          [
+            106,
+            108
+          ],
+          [
+            108,
+            110,
+            112
+          ]
+        ],
+        "q": 2,
+        "tip": 115,
+        "hashes": {
+          "109": "01e9aaac5f777d58669c9d6e9b5ac9885377dda84298c4e5630d1630688c03b4",
+          "113": "973c79c7f5d52f465e250fb520ef5584aaf0f5f1754cf233b787c3fe945f89ab",
+          "115": "378441a76c707fcc4e32bfcf841abd785a6e9aff0eff5690423982e877c919cc"
+        }
+      },
+      "expected": {
+        "height": 111,
+        "hash": null,
+        "ready": false
+      }
+    },
+    {
+      "id": "later-tip-keeps-same-seed",
+      "rules": [
+        "KOC1-R48",
+        "KOC1-R53"
+      ],
+      "input": {
+        "commitHeights": [
+          [
+            106,
+            108
+          ],
+          [
+            108,
+            110,
+            112
+          ]
+        ],
+        "q": 2,
+        "tip": 120,
+        "hashes": {
+          "109": "01e9aaac5f777d58669c9d6e9b5ac9885377dda84298c4e5630d1630688c03b4",
+          "111": "e9591c69a5c9aba8a22c01e3dbd1d0932774c4a76cd566622289bff87b58fa11",
+          "113": "973c79c7f5d52f465e250fb520ef5584aaf0f5f1754cf233b787c3fe945f89ab",
+          "115": "378441a76c707fcc4e32bfcf841abd785a6e9aff0eff5690423982e877c919cc",
+          "120": "3fa9b54ac3382a540a511bd8d8c4ed47268ae5112036e0da677aea659552d5bc"
+        }
+      },
+      "expected": {
+        "height": 111,
+        "hash": "e9591c69a5c9aba8a22c01e3dbd1d0932774c4a76cd566622289bff87b58fa11",
+        "ready": true
+      }
+    },
+    {
+      "id": "late-third-writer-does-not-delay",
+      "rules": [
+        "KOC1-R48",
+        "KOC1-R53"
+      ],
+      "input": {
+        "commitHeights": [
+          [
+            106,
+            108,
+            115
+          ],
+          [
+            108,
+            110,
+            112
+          ]
+        ],
+        "q": 2,
+        "tip": 115,
+        "hashes": {
+          "109": "01e9aaac5f777d58669c9d6e9b5ac9885377dda84298c4e5630d1630688c03b4",
+          "111": "e9591c69a5c9aba8a22c01e3dbd1d0932774c4a76cd566622289bff87b58fa11",
+          "113": "973c79c7f5d52f465e250fb520ef5584aaf0f5f1754cf233b787c3fe945f89ab",
+          "115": "378441a76c707fcc4e32bfcf841abd785a6e9aff0eff5690423982e877c919cc"
+        }
+      },
+      "expected": {
+        "height": 111,
+        "hash": "e9591c69a5c9aba8a22c01e3dbd1d0932774c4a76cd566622289bff87b58fa11",
+        "ready": true
+      }
+    },
+    {
+      "id": "new-candidate-moves-seed",
+      "rules": [
+        "KOC1-R48",
+        "KOC1-R53"
+      ],
+      "input": {
+        "commitHeights": [
+          [
+            106,
+            108
+          ],
+          [
+            108,
+            110,
+            112
+          ],
+          [
+            112,
+            112
+          ]
+        ],
+        "q": 2,
+        "tip": 115,
+        "hashes": {
+          "109": "01e9aaac5f777d58669c9d6e9b5ac9885377dda84298c4e5630d1630688c03b4",
+          "111": "e9591c69a5c9aba8a22c01e3dbd1d0932774c4a76cd566622289bff87b58fa11",
+          "113": "973c79c7f5d52f465e250fb520ef5584aaf0f5f1754cf233b787c3fe945f89ab",
+          "115": "378441a76c707fcc4e32bfcf841abd785a6e9aff0eff5690423982e877c919cc"
+        }
+      },
+      "expected": {
+        "height": 113,
+        "hash": "973c79c7f5d52f465e250fb520ef5584aaf0f5f1754cf233b787c3fe945f89ab",
+        "ready": true
+      }
+    },
+    {
+      "id": "uncorroborated-candidate-no-seed",
+      "rules": [
+        "KOC1-R48",
+        "KOC1-R53"
+      ],
+      "input": {
+        "commitHeights": [
+          [
+            106,
+            108
+          ],
+          [
+            108,
+            110,
+            112
+          ],
+          [
+            108
+          ]
+        ],
+        "q": 2,
+        "tip": 115,
+        "hashes": {
+          "109": "01e9aaac5f777d58669c9d6e9b5ac9885377dda84298c4e5630d1630688c03b4",
+          "111": "e9591c69a5c9aba8a22c01e3dbd1d0932774c4a76cd566622289bff87b58fa11",
+          "113": "973c79c7f5d52f465e250fb520ef5584aaf0f5f1754cf233b787c3fe945f89ab",
+          "115": "378441a76c707fcc4e32bfcf841abd785a6e9aff0eff5690423982e877c919cc"
+        }
+      },
+      "expected": {
+        "height": null,
+        "hash": null,
+        "ready": false
+      }
+    },
+    {
+      "id": "missing-height-no-seed",
+      "rules": [
+        "KOC1-R48",
+        "KOC1-R53"
+      ],
+      "input": {
+        "commitHeights": [
+          [
+            106,
+            108
+          ],
+          [
+            null,
+            110,
+            112
+          ]
+        ],
+        "q": 2,
+        "tip": 115,
+        "hashes": {
+          "109": "01e9aaac5f777d58669c9d6e9b5ac9885377dda84298c4e5630d1630688c03b4",
+          "111": "e9591c69a5c9aba8a22c01e3dbd1d0932774c4a76cd566622289bff87b58fa11",
+          "113": "973c79c7f5d52f465e250fb520ef5584aaf0f5f1754cf233b787c3fe945f89ab",
+          "115": "378441a76c707fcc4e32bfcf841abd785a6e9aff0eff5690423982e877c919cc"
+        }
+      },
+      "expected": {
+        "height": null,
+        "hash": null,
+        "ready": false
+      }
+    }
+  ]
+}

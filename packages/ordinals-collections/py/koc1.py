@@ -651,6 +651,14 @@ def shell_policy(data):
             'cancelReservesSupply':False,'directOptInRequired':data['paymentMode']=='direct'}
 
 
+def sample_seed(data):
+    """KOC1-R53: seed block H* = 1 + max over candidates of the q-th smallest first-listing height."""
+    q = data['q']; ok = lambda h: isinstance(h,int) and not isinstance(h,bool) and 0 <= h < 0xffffffff
+    commits = [sorted(hs)[q-1] if len(hs) >= q and all(ok(h) for h in hs) else None for hs in data['commitHeights']]
+    height = max(commits)+1 if commits and None not in commits else None
+    hash_ = data['hashes'].get(str(height)) if height is not None and height <= data['tip'] else None
+    return {'height':height,'hash':hash_,'ready':hash_ is not None}
+
 def pending_mints(data):
     recipe = data['recipe']; payment = recipe['payment']; end = recipe['end']; next_height = data['tip']+1
     scripts = [escrow(payment,key)['scriptPubKey'] for key in data['minterKeys']] if payment['mode']=='escrow' else [payment['treasuryScript']]

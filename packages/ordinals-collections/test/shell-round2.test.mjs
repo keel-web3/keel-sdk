@@ -53,7 +53,7 @@ test('S9 a first-writer minority variant cannot hide exactly q corroborated unkn
 
 test('S9 exactly q matching writers permit sampling; a sampled invalid row forces exhaustive checking',async t=>{
   const f=fixture({count:1002,writers:0});
-  const sample=positionSample(f.rows.slice(0,-1),1002,64,hex(reverse(f.mock.routes.get('/r/blockhash/106'))));
+  const sample=positionSample(f.rows.slice(0,-1),1002,64,hex(reverse(f.mock.routes.get('/r/blockhash/107'))));
   const sampledBad=f.mints.find(m=>sample.some(row=>row.txid===m.txid));
   const unsampledBad=f.mints.slice(0,-1).find(m=>!sample.some(row=>row.txid===m.txid));
   // Both quorum writers commit these rows, but two authenticated mint reveals

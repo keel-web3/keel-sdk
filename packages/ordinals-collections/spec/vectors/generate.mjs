@@ -1150,6 +1150,26 @@ export async function build() {
     x.spenderResponse = { txid: hash("spender"), height: 104 };
   });
   suites["shell-policy.json"] = wrap("shell", sc);
+  // R53: commitHeights[i] lists, per usable original writer claiming
+  // candidate i, the confirmation height of its first listing.
+  const seedBase = {
+    commitHeights: [[106, 108], [108, 110, 112]],
+    q: 2, tip: 115, hashes: {109: hash(109), 111: hash(111), 113: hash(113), 115: hash(115)},
+  }, seedCases = [];
+  const sampleSeed = (name, edit) => {
+    const x = clone(seedBase); edit?.(x);
+    seedCases.push(test("sample-seed", name, [48, 53], x));
+  };
+  sampleSeed("after-latest-candidate-commitment");
+  sampleSeed("settling-at-commitment-height", x => { x.tip = 110; });
+  sampleSeed("ready-at-first-successor", x => { x.tip = 111; });
+  sampleSeed("missing-successor-hash", x => { delete x.hashes[111]; });
+  sampleSeed("later-tip-keeps-same-seed", x => { x.tip = 120; x.hashes[120] = hash(120); });
+  sampleSeed("late-third-writer-does-not-delay", x => { x.commitHeights[0].push(115); });
+  sampleSeed("new-candidate-moves-seed", x => { x.commitHeights.push([112, 112]); });
+  sampleSeed("uncorroborated-candidate-no-seed", x => { x.commitHeights.push([108]); });
+  sampleSeed("missing-height-no-seed", x => { x.commitHeights[1][0] = null; });
+  suites["sample-seed.json"] = wrap("sample-seed", seedCases);
   const block = JSON.parse(
       await readFile(new URL("testnet4-block.json", dir), "utf8"),
     ),

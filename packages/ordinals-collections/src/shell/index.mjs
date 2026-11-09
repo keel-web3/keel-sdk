@@ -36,6 +36,22 @@ export function positionSample(prior, memberCount, sampleSize=64, blockHash='00'
   }
   return selected.sort((a,b)=>a-b).map(i=>prior[i]);
 }
+// R53: a sampled row is committed once q writers have published it; its
+// commitment height is the q-th earliest confirmation height of the accepted
+// update in which each claiming writer first listed it. The seed block is the
+// first block after the latest commitment among the sample candidates, so the
+// whole candidate list, its order and its size are fixed before the seed hash
+// exists. Later updates that add nothing before self do not move it, so honest
+// per-block updates keep it live. Heights come from recursion records only.
+export function positionSeedHeight(commitHeights, q) {
+  if (!uint(q) || q < 1 || !commitHeights.length) return null;
+  let latest=-1;
+  for (const heights of commitHeights) {
+    if (!Array.isArray(heights) || heights.length<q || !heights.every(uint)) return null;
+    latest=Math.max(latest,[...heights].sort((a,b)=>a-b)[q-1]);
+  }
+  return uint(latest+1)?latest+1:null;
+}
 function headerFromInfo(info) {
   if (![info.version,info.nonce,info.timestamp].every(uint) || !/^[a-f0-9]{64}$/.test(info.previous_block) || !/^[a-f0-9]{64}$/.test(info.merkle_root)) throw new IncompleteEvidence('S7: header fields unavailable');
   const bits = typeof info.bits === 'string' && /^[a-f0-9]{8}$/.test(info.bits) ? parseInt(info.bits,16) : info.bits;
@@ -52,8 +68,8 @@ export function headerHasWork(header) {
 
 export async function verifyShell({location=globalThis.location,fetcher=globalThis.fetch,checkWork=true,sampleSize=64,limits={}} = {}) {
   const client = new Recursion({fetcher,...limits}), reasons = [], checks = {}, deferred = {stages:['S10','S11','S12','S13','S14'],challenges:[]};
-  let self, recipe, merged, originals, assurance='exhaustive';
-  const result = (status, extra={}) => ({status,reasons,checks,scope:'S1-S9',entryAssurance:assurance,ownEntryAssurance:checks.S2 && checks.S3 && checks.S4 ? 'full' : 'failed',...extra,stats:{...client.stats},deferred});
+  let self, recipe, merged, originals, sampleSeed=null, assurance='exhaustive';
+  const result = (status, extra={}) => ({status,reasons,checks,scope:'S1-S9',entryAssurance:assurance,ownEntryAssurance:checks.S2 && checks.S3 && checks.S4 ? 'full' : 'failed',sampleSeed,...extra,stats:{...client.stats},deferred});
   try {
     self = selfFromLocation(location); checks.S1=true;
     const own = await client.record(self), ownMeta=normalize(own.metadata);
@@ -133,6 +149,7 @@ export async function verifyShell({location=globalThis.location,fetcher=globalTh
     const challengeRecords=[...walks.flatMap(w=>w.records),...ownChildren.records].filter(r=>r.tag7==='koc1' && r.metadata?.op==='challenge');
     deferred.challenges=challengeRecords.map(r=>r.id);
     const updates=walks.map((w,i)=>w.records.filter(r=>r.tag7==='koc1' && r.metadata?.op==='index').map(r=>({...normalize(r.metadata),id:r.id,parent:recipe.writers[i].authority})));
+    const confirmationHeights=new Map(walks.flatMap(w=>w.records.map(r=>[r.id,r.height])));
     for (const u of updates.flat()) if (uint(u.h) && u.h<=tip) {
       try {hashes[u.h]=await client.hash(u.h);}
       catch (error) {if (!(error instanceof IncompleteEvidence)) throw error;}
@@ -211,12 +228,32 @@ export async function verifyShell({location=globalThis.location,fetcher=globalTh
     const provisional=classifyEntries([...union.values()].filter(row=>row.txid===ownEntry.txid || (order(row,ownEntry)<0 && corroborated(row) && !['invalid','unknown'].includes(evidence.get(row.txid)?.validity))),recipe,controls), memberCount=provisional.members.length;
     assurance=memberCount>1000?'sampled':'exhaustive';
     const prior=[...union.values()].filter(row=>order(row,ownEntry)<0).sort(order);
-    // Reuse merge's exact quorum calculation. The accepted chains already bind
-    // this covered tip's hash; neither writer-supplied randomness nor local
-    // randomness can pick different positions for viewers at the same C.
-    const {C}=merge({originals,q:recipe.quorum,W:recipe.challengeWindow,policy:recipe,controls,verifyEntry:()=>false});
-    if (assurance==='sampled' && (C===null || !hashes[C])) throw new IncompleteEvidence('S9: covered tip hash unavailable');
-    const sampled=assurance==='sampled'?positionSample(prior.filter(corroborated),memberCount,sampleSize,hashes[C]):[], rejected=new Set(invalidTxids), checked=new Set();
+    merged=merge({originals,q:recipe.quorum,W:recipe.challengeWindow,policy:recipe,controls,verifyEntry:()=>false});
+    const candidates=prior.filter(corroborated);
+    if (assurance==='sampled') {
+      // First listing height per writer per row, over that writer's accepted
+      // updates in chain order. A claimed row with no listing (for example a
+      // challenge-projected row) is committed no earlier than the writer's
+      // latest accepted update.
+      const firstListed=originals.map((w,i)=>{
+        const at=new Map(), ids=new Set(w.accepted);
+        let latest=null;
+        for (const u of updates[i]) {
+          if (!ids.has(u.id)) continue;
+          const height=confirmationHeights.get(u.id);
+          if (!uint(height)) {latest=null; at.clear(); break;}
+          latest=Math.max(latest??0,height);
+          for (const row of u.new??[]) if (!at.has(rowKey(row))) at.set(rowKey(row),height);
+        }
+        return {at,latest};
+      });
+      const commitHeights=candidates.map(row=>[...(claims.get(rowKey(row))??[])].map(w=>firstListed[w].at.get(rowKey(row))??firstListed[w].latest));
+      const height=positionSeedHeight(commitHeights,recipe.quorum);
+      sampleSeed={height,hash:null};
+      if (merged.C===null || height===null || height>tip) throw new IncompleteEvidence('S9: sample seed block after the candidates were committed is not yet available');
+      sampleSeed.hash=await client.hash(height);
+    }
+    const sampled=assurance==='sampled'?positionSample(candidates,memberCount,sampleSize,sampleSeed.hash):[], rejected=new Set(invalidTxids), checked=new Set();
     const check=async row=>{
       const found=await inspect(row);
       checked.add(row.txid);

@@ -26,6 +26,7 @@
         "registry",
         "escrow-policy",
         "shell",
+        "sample-seed",
         "headers",
         "block",
         "witness-boundary",
