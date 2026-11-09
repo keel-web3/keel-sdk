@@ -52,7 +52,9 @@ union; above it, a 64-entry sample (configurable `sampleSize`, minimum 2) plus
 independently validated invalid challenges reached from original authorities or
 self. Sample positions are drawn without replacement using domain-separated
 SHA-256 of block H* (R53): the first block after every sample candidate was
-committed. A candidate (a q-corroborated row before self) is committed at the
+committed. A candidate is an exact row (txid, coordinates, m, P) claimed before
+self by at least q writers, read from their claims, not the first-writer union,
+so a new variant from one writer cannot drop it. It is committed at the
 q-th earliest confirmation height of the accepted update in which each claiming
 writer first listed it. Heights come from `/r/inscription/` records; writer
 metadata and covered height C cannot choose the seed, and the candidate list is

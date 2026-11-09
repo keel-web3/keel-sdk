@@ -213,9 +213,10 @@ export async function verifyShell({location=globalThis.location,fetcher=globalTh
     }
     originals=updates.map((us,i)=>writerChain(us,{authority:recipe.writers[i].authority,recipe:recipe.id,hostHashes:hashes,pins:pins.filter(p=>p.writerIndex===i),policy:recipe,controls,resolveCorrection:id=>corrections.get(id)}));
     const union=new Map([[ownEntry.txid,ownEntry]]);
-    const claims=new Map(), tripleClaims=new Map();
+    const claims=new Map(), tripleClaims=new Map(), claimRows=new Map();
     for (let w=0;w<originals.length;w++) for (const row of originals[w].entries) {
       if (!union.has(row.txid)) union.set(row.txid,row);
+      if (!claimRows.has(rowKey(row))) claimRows.set(rowKey(row),row);
       for (const [map,key] of [[claims,rowKey(row)],[tripleClaims,tripleKey(row)]]) {
         if (!map.has(key)) map.set(key,new Set());
         map.get(key).add(w);
@@ -223,13 +224,22 @@ export async function verifyShell({location=globalThis.location,fetcher=globalTh
     }
     for (const found of evidence.values()) if (found.validity==='valid') union.set(found.entry.txid,found.entry);
     const corroborated=row=>(claims.get(rowKey(row))?.size??0)>=recipe.quorum;
-    // Only corroborated rows that can affect self's position, plus the fully
-    // checked self, may enable sampling. Unchecked rows after self cannot do so.
-    const provisional=classifyEntries([...union.values()].filter(row=>row.txid===ownEntry.txid || (order(row,ownEntry)<0 && corroborated(row) && !['invalid','unknown'].includes(evidence.get(row.txid)?.validity))),recipe,controls), memberCount=provisional.members.length;
+    // R53 candidates: exactly the rows before self that q writers agree on,
+    // read from the claims themselves, never through the union. The union keeps
+    // the first writer's variant of a txid, so a writer listing a new variant
+    // after the seed is public could otherwise drop agreed rows from the list
+    // without adding a candidate, and redraw the sample from the same seed.
+    // Append-only chains cannot retract a claim, so this list is fixed once
+    // committed. Ties order by txid so every viewer gets the same list.
+    const candidates=[], candidateTxids=new Set();
+    for (const [key,row] of [...claimRows].sort(([,a],[,c])=>order(a,c)||(a.txid<c.txid?-1:a.txid>c.txid?1:0)))
+      if (claims.get(key).size>=recipe.quorum && row.txid!==ownEntry.txid && order(row,ownEntry)<0 && !candidateTxids.has(row.txid)) {candidates.push(row);candidateTxids.add(row.txid);}
+    // Only those candidates, plus the fully checked self, may enable sampling.
+    // Unchecked rows after self cannot do so.
+    const provisional=classifyEntries([ownEntry,...candidates.filter(row=>!['invalid','unknown'].includes(evidence.get(row.txid)?.validity))],recipe,controls), memberCount=provisional.members.length;
     assurance=memberCount>1000?'sampled':'exhaustive';
     const prior=[...union.values()].filter(row=>order(row,ownEntry)<0).sort(order);
     merged=merge({originals,q:recipe.quorum,W:recipe.challengeWindow,policy:recipe,controls,verifyEntry:()=>false});
-    const candidates=prior.filter(corroborated);
     if (assurance==='sampled') {
       // First listing height per writer per row, over that writer's accepted
       // updates in chain order. A claimed row with no listing (for example a
